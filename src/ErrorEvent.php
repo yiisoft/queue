@@ -16,4 +16,8 @@ namespace yii\queue;
  */
 class ErrorEvent extends ExecEvent
 {
+    /**
+     * @event ExecEvent
+     */
+    const AFTER = 'after.error';
 }

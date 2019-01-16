@@ -33,4 +33,12 @@ abstract class JobEvent extends Event
      * @var int time to reserve in seconds of the job
      */
     public $ttr;
+
+    public function __construct(string $name, $id, $job, $ttr)
+    {
+        parent::__construct($name);
+        $this->id = $id;
+        $this->job = $job;
+        $this->ttr = $ttr;
+    }
 }

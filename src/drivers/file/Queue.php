@@ -7,12 +7,13 @@
 
 namespace yii\queue\file;
 
-use Yii;
+use yii\helpers\Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\helpers\FileHelper;
 use yii\queue\cli\Queue as CliQueue;
+use yii\queue\serializers\SerializerInterface;
 
 /**
  * File Queue.
@@ -24,11 +25,11 @@ class Queue extends CliQueue
     /**
      * @var string
      */
-    public $path = '@runtime/queue';
+    private $path;
     /**
      * @var int
      */
-    public $dirMode = 0755;
+    private $dirMode;
     /**
      * @var int|null
      */
@@ -50,10 +51,11 @@ class Queue extends CliQueue
     /**
      * @inheritdoc
      */
-    public function init()
+    public function __construct(SerializerInterface $serializer, string $path = '@runtime/queue', string $dirMode = '0755')
     {
-        parent::init();
-        $this->path = Yii::getAlias($this->path);
+        parent::__construct($serializer);
+        $this->path = Yii::getAlias($path);
+        $this->dirMode = $dirMode;
         if (!is_dir($this->path)) {
             FileHelper::createDirectory($this->path, $this->dirMode, true);
         }

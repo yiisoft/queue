@@ -7,7 +7,7 @@
 
 namespace yii\queue;
 
-use Yii;
+use yii\helpers\Yii;
 use yii\base\Component;
 use yii\base\InvalidArgumentException;
 use yii\di\Instance;
@@ -25,26 +25,6 @@ use yii\queue\serializers\SerializerInterface;
  */
 abstract class Queue extends Component
 {
-    /**
-     * @event PushEvent
-     */
-    const EVENT_BEFORE_PUSH = 'beforePush';
-    /**
-     * @event PushEvent
-     */
-    const EVENT_AFTER_PUSH = 'afterPush';
-    /**
-     * @event ExecEvent
-     */
-    const EVENT_BEFORE_EXEC = 'beforeExec';
-    /**
-     * @event ExecEvent
-     */
-    const EVENT_AFTER_EXEC = 'afterExec';
-    /**
-     * @event ExecEvent
-     */
-    const EVENT_AFTER_ERROR = 'afterError';
     /**
      * @see Queue::isWaiting()
      */
@@ -67,7 +47,7 @@ abstract class Queue extends Component
     /**
      * @var SerializerInterface|array
      */
-    public $serializer = PhpSerializer::class;
+    private $serializer;
     /**
      * @var int default time to reserve a job
      */
@@ -85,10 +65,9 @@ abstract class Queue extends Component
     /**
      * @inheritdoc
      */
-    public function init()
+    public function __construct(SerializerInterface $serializer)
     {
-        parent::init();
-        $this->serializer = Instance::ensure($this->serializer, SerializerInterface::class);
+        $this->serializer = $serializer;
     }
 
     /**
@@ -135,22 +114,18 @@ abstract class Queue extends Component
      */
     public function push($job)
     {
-        $event = new PushEvent([
-            'job' => $job,
-            'ttr' => $this->pushTtr ?: (
-                $job instanceof RetryableJobInterface
-                    ? $job->getTtr()
-                    : $this->ttr
-            ),
-            'delay' => $this->pushDelay ?: 0,
-            'priority' => $this->pushPriority,
-        ]);
+        $event = PushEvent::before($job, $this->pushTtr ?: (
+        $job instanceof RetryableJobInterface
+            ? $job->getTtr()
+            : $this->ttr
+        ), $this->pushDelay ?: 0, $this->pushPriority);
+
         $this->pushTtr = null;
         $this->pushDelay = null;
         $this->pushPriority = null;
 
-        $this->trigger(self::EVENT_BEFORE_PUSH, $event);
-        if ($event->handled) {
+        $this->trigger($event);
+        if ($event->isPropagationStopped()) {
             return null;
         }
 
@@ -160,7 +135,8 @@ abstract class Queue extends Component
 
         $message = $this->serializer->serialize($event->job);
         $event->id = $this->pushMessage($message, $event->ttr, $event->delay, $event->priority);
-        $this->trigger(self::EVENT_AFTER_PUSH, $event);
+
+        $this->trigger(PushEvent::after($event));
 
         return $event->id;
     }
@@ -194,15 +170,9 @@ abstract class Queue extends Component
     protected function handleMessage($id, $message, $ttr, $attempt)
     {
         list($job, $error) = $this->unserializeMessage($message);
-        $event = new ExecEvent([
-            'id' => $id,
-            'job' => $job,
-            'ttr' => $ttr,
-            'attempt' => $attempt,
-            'error' => $error,
-        ]);
-        $this->trigger(self::EVENT_BEFORE_EXEC, $event);
-        if ($event->handled) {
+        $event = ExecEvent::before($id, $job, $ttr, $attempt, $error);
+        $this->trigger($event);
+        if ($event->isPropagationStopped()) {
             return true;
         }
         if ($event->error) {
@@ -217,7 +187,7 @@ abstract class Queue extends Component
             $event->error = $error;
             return $this->handleError($event);
         }
-        $this->trigger(self::EVENT_AFTER_EXEC, $event);
+        $this->trigger(ExecEvent::after($event));
         return true;
     }
 
@@ -259,7 +229,7 @@ abstract class Queue extends Component
         } elseif ($event->job instanceof RetryableJobInterface) {
             $event->retry = $event->job->canRetry($event->attempt, $event->error);
         }
-        $this->trigger(self::EVENT_AFTER_ERROR, $event);
+        $this->trigger(ErrorEvent::after($event));
         return !$event->retry;
     }
 

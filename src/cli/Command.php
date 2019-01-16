@@ -12,6 +12,7 @@ use Symfony\Component\Process\Exception\RuntimeException as ProcessRuntimeExcept
 use Symfony\Component\Process\Process;
 use yii\console\Controller;
 use yii\queue\ExecEvent;
+use yii\base\Action;
 
 /**
  * Base Command.
@@ -43,7 +44,7 @@ abstract class Command extends Controller
      * @since 2.0.2
      */
     public $verboseConfig = [
-        'class' => VerboseBehavior::class,
+        '__class' => VerboseBehavior::class,
     ];
     /**
      * @var bool isolate mode. It executes a job in a child process.
@@ -112,7 +113,7 @@ abstract class Command extends Controller
     /**
      * @inheritdoc
      */
-    public function beforeAction($action)
+    public function beforeAction(Action $action): bool
     {
         if ($this->canVerbose($action->id) && $this->verbose) {
             $this->queue->attachBehavior('verbose', ['command' => $this] + $this->verboseConfig);
@@ -197,13 +198,7 @@ abstract class Command extends Controller
             return $result === self::EXEC_DONE;
         } catch (ProcessRuntimeException $error) {
             list($job) = $this->queue->unserializeMessage($message);
-            return $this->queue->handleError(new ExecEvent([
-                'id' => $id,
-                'job' => $job,
-                'ttr' => $ttr,
-                'attempt' => $attempt,
-                'error' => $error,
-            ]));
+            return $this->queue->handleError(ExecEvent::before($id, $job, $ttr, $attempt, $error));
         }
     }
 }

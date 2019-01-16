@@ -10,6 +10,7 @@ namespace yii\queue\cli;
 use yii\base\Behavior;
 use yii\console\Controller;
 use yii\helpers\Console;
+use yii\queue\ErrorEvent;
 use yii\queue\ExecEvent;
 use yii\queue\JobInterface;
 
@@ -45,11 +46,11 @@ class VerboseBehavior extends Behavior
     public function events()
     {
         return [
-            Queue::EVENT_BEFORE_EXEC => 'beforeExec',
-            Queue::EVENT_AFTER_EXEC => 'afterExec',
-            Queue::EVENT_AFTER_ERROR => 'afterError',
-            Queue::EVENT_WORKER_START => 'workerStart',
-            Queue::EVENT_WORKER_STOP => 'workerStop',
+            ExecEvent::BEFORE => 'beforeExec',
+            ExecEvent::AFTER => 'afterExec',
+            ErrorEvent::AFTER => 'afterError',
+            WorkerEvent::START => 'workerStart',
+            WorkerEvent::STOP => 'workerStop',
         ];
     }
 
@@ -109,7 +110,7 @@ class VerboseBehavior extends Behavior
     {
         $name = $event->job instanceof JobInterface ? get_class($event->job) : 'unknown job';
         $extra = "attempt: $event->attempt";
-        if ($pid = $event->sender->getWorkerPid()) {
+        if ($pid = $event->getTarget()->getWorkerPid()) {
             $extra .= ", pid: $pid";
         }
         return " [$event->id] $name ($extra)";
@@ -123,7 +124,7 @@ class VerboseBehavior extends Behavior
     {
         $this->workerStartedAt = time();
         $this->command->stdout(date('Y-m-d H:i:s'), Console::FG_YELLOW);
-        $pid = $event->sender->getWorkerPid();
+        $pid = $event->getTarget()->getWorkerPid();
         $this->command->stdout(" [pid: $pid]", Console::FG_GREY);
         $this->command->stdout(" - Worker is started\n", Console::FG_GREEN);
     }
@@ -135,7 +136,7 @@ class VerboseBehavior extends Behavior
     public function workerStop(WorkerEvent $event)
     {
         $this->command->stdout(date('Y-m-d H:i:s'), Console::FG_YELLOW);
-        $pid = $event->sender->getWorkerPid();
+        $pid = $event->getTarget()->getWorkerPid();
         $this->command->stdout(" [pid: $pid]", Console::FG_GREY);
         $this->command->stdout(' - Worker is stopped ', Console::FG_GREEN);
         $duration = $this->formatDuration(time() - $this->workerStartedAt);
