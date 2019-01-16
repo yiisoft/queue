@@ -8,9 +8,9 @@
 namespace yii\queue\file;
 
 use yii\helpers\Yii;
-use yii\base\InvalidArgumentException;
-use yii\base\InvalidConfigException;
-use yii\base\NotSupportedException;
+use yii\exceptions\InvalidArgumentException;
+use yii\exceptions\InvalidConfigException;
+use yii\exceptions\NotSupportedException;
 use yii\helpers\FileHelper;
 use yii\queue\cli\Queue as CliQueue;
 use yii\queue\serializers\SerializerInterface;

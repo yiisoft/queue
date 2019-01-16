@@ -5,9 +5,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests\drivers\db;
+namespace yii\queue\tests\drivers\db;
 
-use Yii;
+use yii\helpers\Yii;
 use yii\queue\db\Queue;
 
 /**

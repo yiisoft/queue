@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests\drivers\sync;
+namespace yii\queue\tests\drivers\sync;
 
-use Yii;
-use tests\drivers\TestCase;
+use yii\helpers\Yii;
+use yii\queue\tests\drivers\TestCase;
 use yii\queue\sync\Queue;
 
 /**

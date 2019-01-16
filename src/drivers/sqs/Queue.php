@@ -9,7 +9,7 @@ namespace yii\queue\sqs;
 
 use Aws\Credentials\CredentialProvider;
 use Aws\Sqs\SqsClient;
-use yii\base\NotSupportedException;
+use yii\exceptions\NotSupportedException;
 use yii\queue\cli\Queue as CliQueue;
 use yii\queue\serializers\JsonSerializer;
 

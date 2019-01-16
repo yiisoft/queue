@@ -5,11 +5,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests\drivers\redis;
+namespace yii\queue\tests\drivers\redis;
 
-use tests\app\RetryJob;
-use tests\drivers\CliTestCase;
-use Yii;
+use yii\helpers\Yii;
+use yii\queue\tests\app\RetryJob;
+use yii\queue\tests\drivers\CliTestCase;
 use yii\queue\redis\Queue;
 
 /**

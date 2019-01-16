@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests\serializers;
+namespace yii\queue\tests\serializers;
 
 use yii\queue\serializers\JsonSerializer;
 
@@ -25,7 +25,7 @@ class JsonSerializerTest extends TestCase
     }
 
     /**
-     * @expectedException \yii\base\InvalidConfigException
+     * @expectedException \yii\exceptions\InvalidConfigException
      */
     public function testInvalidArrayKey()
     {

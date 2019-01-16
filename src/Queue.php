@@ -9,7 +9,7 @@ namespace yii\queue;
 
 use yii\helpers\Yii;
 use yii\base\Component;
-use yii\base\InvalidArgumentException;
+use yii\exceptions\InvalidArgumentException;
 use yii\di\Instance;
 use yii\helpers\VarDumper;
 use yii\queue\serializers\PhpSerializer;

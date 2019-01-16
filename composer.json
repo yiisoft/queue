@@ -20,16 +20,23 @@
         "yiisoft/di": "^3.0@dev",
         "symfony/process": "^4.0"
     },
+    "minimum-stability": "dev",
     "require-dev": {
-        "yiisoft/db-redis": "^3.0",
+        "yiisoft/db-redis": "dev-master",
+        "yiisoft/db": "dev-master",
         "php-amqplib/php-amqplib": "*",
         "enqueue/amqp-lib": "^0.8",
         "pda/pheanstalk": "*",
         "jeremeamia/superclosure": "*",
-        "yiisoft/yii-debug": "*",
-        "yiisoft/yii-gii": "*",
-        "phpunit/phpunit": "~4.4",
-        "aws/aws-sdk-php": ">=2.4"
+        "yiisoft/yii-debug": "dev-master",
+        "yiisoft/yii-gii": "dev-master",
+        "yiisoft/yii-bootstrap4": "dev-master",
+        "yiisoft/di": "^3.0@dev",
+        "yiisoft/log": "^3.0@dev",
+        "yiisoft/cache": "^3.0@dev",
+        "phpunit/phpunit": "^7.3",
+        "aws/aws-sdk-php": ">=2.4",
+        "hiqdev/composer-config-plugin": "^1.0@dev"
     },
     "suggest": {
         "ext-pcntl": "Need for process signals.",
@@ -56,7 +63,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "tests\\": "tests"
+            "yii\\queue\\tests\\": "tests"
         }
     },
     "extra": {
@@ -64,6 +71,7 @@
             "dev-master": "3.x-dev"
         },
         "config-plugin": {
+            "tests": "config/tests.php",
             "params": "config/params.php",
             "common": "config/common.php",
             "console": "config/console.php"

@@ -5,11 +5,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests\drivers\file;
+namespace yii\queue\tests\drivers\file;
 
-use tests\app\RetryJob;
-use tests\drivers\CliTestCase;
-use Yii;
+use yii\helpers\Yii;
+use yii\queue\tests\app\RetryJob;
+use yii\queue\tests\drivers\CliTestCase;
 use yii\queue\file\Queue;
 
 /**

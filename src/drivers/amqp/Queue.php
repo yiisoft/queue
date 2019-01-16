@@ -12,7 +12,7 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use yii\base\Application as BaseApp;
 use yii\base\Event;
-use yii\base\NotSupportedException;
+use yii\exceptions\NotSupportedException;
 use yii\queue\cli\Queue as CliQueue;
 
 /**

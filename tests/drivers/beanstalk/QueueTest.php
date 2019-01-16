@@ -5,14 +5,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests\drivers\beanstalk;
+namespace yii\queue\tests\drivers\beanstalk;
 
 use Pheanstalk\Exception\ServerException;
 use Pheanstalk\Pheanstalk;
-use tests\app\PriorityJob;
-use tests\app\RetryJob;
-use tests\drivers\CliTestCase;
-use Yii;
+use yii\helpers\Yii;
+use yii\queue\tests\app\PriorityJob;
+use yii\queue\tests\app\RetryJob;
+use yii\queue\tests\drivers\CliTestCase;
 use yii\queue\beanstalk\Queue;
 
 /**

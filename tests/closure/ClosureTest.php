@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests\closure;
+namespace yii\queue\tests\closure;
 
-use tests\TestCase;
-use Yii;
+use yii\queue\tests\TestCase;
+use yii\helpers\Yii;
 use yii\queue\closure\Behavior;
 use yii\queue\sync\Queue;
 

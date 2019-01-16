@@ -7,7 +7,7 @@
 
 namespace yii\queue\gearman;
 
-use yii\base\NotSupportedException;
+use yii\exceptions\NotSupportedException;
 use yii\queue\cli\Queue as CliQueue;
 
 /**

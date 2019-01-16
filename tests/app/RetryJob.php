@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests\app;
+namespace yii\queue\tests\app;
 
-use Yii;
 use yii\base\BaseObject;
+use yii\helpers\Yii;
 use yii\queue\RetryableJobInterface;
 
 /**

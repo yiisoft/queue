@@ -10,7 +10,7 @@ namespace yii\queue\sync;
 use yii\base\RequestEvent;
 use yii\helpers\Yii;
 use yii\base\Application;
-use yii\base\InvalidArgumentException;
+use yii\exceptions\InvalidArgumentException;
 use yii\queue\Queue as BaseQueue;
 
 /**

@@ -7,8 +7,8 @@
 
 namespace yii\queue\redis;
 
-use yii\base\InvalidArgumentException;
-use yii\base\NotSupportedException;
+use yii\exceptions\InvalidArgumentException;
+use yii\exceptions\NotSupportedException;
 use yii\di\Instance;
 use yii\queue\cli\Queue as CliQueue;
 use yii\redis\Connection;

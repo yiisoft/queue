@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests\drivers;
+namespace yii\queue\tests\drivers;
 
-use Yii;
-use tests\app\SimpleJob;
+use yii\helpers\Yii;
+use yii\queue\tests\app\SimpleJob;
 use yii\queue\Queue;
 
 /**
@@ -16,7 +16,7 @@ use yii\queue\Queue;
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-abstract class TestCase extends \tests\TestCase
+abstract class TestCase extends \yii\queue\tests\TestCase
 {
     /**
      * @return Queue

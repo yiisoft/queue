@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests\serializers;
+namespace yii\queue\tests\serializers;
 
 use yii\queue\serializers\PhpSerializer;
 

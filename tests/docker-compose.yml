@@ -38,34 +38,34 @@ services:
     - gearmand
     networks:
       net: {}
+  php73:
+    build:
+      context: ..
+      dockerfile: tests/docker/php/7.3/Dockerfile
+    volumes:
+    - ./runtime/.composer73:/root/.composer
+    dns: *php_dns
+    environment: *php_environment
+    depends_on: *php_depends_on
+    networks:
+      net: {}
+  php72:
+    build:
+      context: ..
+      dockerfile: tests/docker/php/7.2/Dockerfile
+    volumes:
+    - ./runtime/.composer72:/root/.composer
+    dns: *php_dns
+    environment: *php_environment
+    depends_on: *php_depends_on
+    networks:
+      net: {}
   php71:
     build:
       context: ..
       dockerfile: tests/docker/php/7.1/Dockerfile
     volumes:
     - ./runtime/.composer71:/root/.composer
-    dns: *php_dns
-    environment: *php_environment
-    depends_on: *php_depends_on
-    networks:
-      net: {}
-  php70:
-    build:
-      context: ..
-      dockerfile: tests/docker/php/7.0/Dockerfile
-    volumes:
-    - ./runtime/.composer70:/root/.composer
-    dns: *php_dns
-    environment: *php_environment
-    depends_on: *php_depends_on
-    networks:
-      net: {}
-  php56:
-    build:
-      context: ..
-      dockerfile: tests/docker/php/5.6/Dockerfile
-    volumes:
-    - ./runtime/.composer56:/root/.composer
     dns: *php_dns
     environment: *php_environment
     depends_on: *php_depends_on
@@ -132,4 +132,3 @@ services:
 networks:
   net:
     name: yii2_queue_net
-

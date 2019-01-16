@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests;
+namespace yii\queue\tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 

@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests;
+namespace yii\queue\tests;
 
 use yii\queue\closure\Behavior as ClosureBehavior;
 use yii\queue\ExecEvent;

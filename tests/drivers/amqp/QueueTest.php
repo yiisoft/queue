@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests\drivers\amqp;
+namespace yii\queue\tests\drivers\amqp;
 
-use tests\drivers\CliTestCase;
-use Yii;
+use yii\helpers\Yii;
+use yii\queue\tests\drivers\CliTestCase;
 use yii\queue\amqp\Queue;
 
 /**

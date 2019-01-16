@@ -7,10 +7,10 @@
 
 namespace yii\queue\serializers;
 
-use Yii;
 use yii\base\BaseObject;
-use yii\base\InvalidConfigException;
+use yii\exceptions\InvalidConfigException;
 use yii\helpers\Json;
+use yii\helpers\Yii;
 
 /**
  * Json Serializer.
@@ -98,7 +98,7 @@ class JsonSerializer extends BaseObject implements SerializerInterface
             return $result;
         }
 
-        $config = ['class' => $data[$this->classKey]];
+        $config = ['__class' => $data[$this->classKey]];
         unset($data[$this->classKey]);
         foreach ($data as $property => $value) {
             $config[$property] = $this->fromArray($value);
