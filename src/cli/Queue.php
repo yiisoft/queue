@@ -7,7 +7,7 @@
 
 namespace yii\queue\cli;
 
-use Yii;
+use yii\helpers\Yii;
 use yii\base\BootstrapInterface;
 use yii\base\InvalidConfigException;
 use yii\console\Application as ConsoleApp;
@@ -21,21 +21,6 @@ use yii\queue\Queue as BaseQueue;
  */
 abstract class Queue extends BaseQueue implements BootstrapInterface
 {
-    /**
-     * @event WorkerEvent that is triggered when the worker is started.
-     * @since 2.0.2
-     */
-    const EVENT_WORKER_START = 'workerStart';
-    /**
-     * @event WorkerEvent that is triggered each iteration between requests to queue.
-     * @since 2.0.3
-     */
-    const EVENT_WORKER_LOOP = 'workerLoop';
-    /**
-     * @event WorkerEvent that is triggered when the worker is stopped.
-     * @since 2.0.2
-     */
-    const EVENT_WORKER_STOP = 'workerStop';
 
     /**
      * @var array|string
@@ -69,11 +54,12 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
      */
     protected function getCommandId()
     {
-        foreach (Yii::$app->getComponents(false) as $id => $component) {
+        foreach (Yii::getContainer()->getInstances() as $id => $component) {
             if ($component === $this) {
                 return Inflector::camel2id($id);
             }
         }
+        return 'queue';
         throw new InvalidConfigException('Queue must be an application component.');
     }
 
@@ -84,7 +70,7 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
     {
         if ($app instanceof ConsoleApp) {
             $app->controllerMap[$this->getCommandId()] = [
-                'class' => $this->commandClass,
+                '__class' => $this->commandClass,
                 'queue' => $this,
             ] + $this->commandOptions;
         }
@@ -103,8 +89,8 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
         /** @var LoopInterface $loop */
         $loop = Yii::createObject($this->loopConfig, [$this]);
 
-        $event = new WorkerEvent(['loop' => $loop]);
-        $this->trigger(self::EVENT_WORKER_START, $event);
+        $event = WorkerEvent::start($loop);
+        $this->trigger($event);
         if ($event->exitCode !== null) {
             return $event->exitCode;
         }
@@ -112,11 +98,11 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
         $exitCode = null;
         try {
             call_user_func($handler, function () use ($loop, $event) {
-                $this->trigger(self::EVENT_WORKER_LOOP, $event);
+                $this->trigger(WorkerEvent::loop($event));
                 return $event->exitCode === null && $loop->canContinue();
             });
         } finally {
-            $this->trigger(self::EVENT_WORKER_STOP, $event);
+            $this->trigger(WorkerEvent::stop($event));
             $this->_workerPid = null;
         }
 

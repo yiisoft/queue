@@ -15,6 +15,15 @@ namespace yii\queue;
 class ExecEvent extends JobEvent
 {
     /**
+     * @event ExecEvent
+     */
+    const BEFORE = 'before.exec';
+    /**
+     * @event ExecEvent
+     */
+    const AFTER = 'after.exec';
+
+    /**
      * @var int attempt number.
      * @see Queue::EVENT_BEFORE_EXEC
      * @see Queue::EVENT_AFTER_EXEC
@@ -39,4 +48,30 @@ class ExecEvent extends JobEvent
      * @since 2.1.1
      */
     public $retry;
+
+    /**
+     * Creates BEFORE event.
+     * @return self created event
+     */
+    public static function before($id, $job, $ttr, $attempt, $error): self
+    {
+        $event = new static(static::BEFORE, $id, $job, $ttr);
+        $event->attempt = $attempt;
+        $event->error = $error;
+        return $event;
+    }
+
+    /**
+     * Creates AFTER event.
+     * @return self created event
+     */
+    public static function after(self $before): self
+    {
+        $event = new static(static::AFTER, $before->id, $before->job, $before->ttr);
+        $event->attempt = $before->attempt;
+        $event->result = $before->result;
+        $event->error = $before->error;
+        $event->retry = $before->retry;
+        return $event;
+    }
 }

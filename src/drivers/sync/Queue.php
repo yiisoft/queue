@@ -7,7 +7,8 @@
 
 namespace yii\queue\sync;
 
-use Yii;
+use yii\base\RequestEvent;
+use yii\helpers\Yii;
 use yii\base\Application;
 use yii\base\InvalidArgumentException;
 use yii\queue\Queue as BaseQueue;
@@ -41,15 +42,22 @@ class Queue extends BaseQueue
      */
     private $finishedId = 0;
 
-
     /**
      * @inheritdoc
      */
-    public function init()
+    public function push($job)
     {
-        parent::init();
+        $this->handle();
+        return parent::push($job);
+    }
+
+    /**
+     * Handle job,Confirm whether to bind the event.
+     */
+    public function handle()
+    {
         if ($this->handle) {
-            Yii::$app->on(Application::EVENT_AFTER_REQUEST, function () {
+            Yii::get('app')->on(RequestEvent::AFTER, function () {
                 ob_start();
                 $this->run();
                 ob_end_clean();

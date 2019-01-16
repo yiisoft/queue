@@ -55,20 +55,9 @@ class SignalLoop extends BaseObject implements LoopInterface
      * @param Queue $queue
      * @inheritdoc
      */
-    public function __construct($queue, array $config = [])
+    public function __construct($queue)
     {
         $this->queue = $queue;
-        parent::__construct($config);
-    }
-
-    /**
-     * Sets signal handlers.
-     *
-     * @inheritdoc
-     */
-    public function init()
-    {
-        parent::init();
         if (extension_loaded('pcntl')) {
             foreach ($this->exitSignals as $signal) {
                 pcntl_signal($signal, function () {
