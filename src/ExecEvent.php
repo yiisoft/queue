@@ -25,26 +25,26 @@ class ExecEvent extends JobEvent
 
     /**
      * @var int attempt number.
-     * @see Queue::EVENT_BEFORE_EXEC
-     * @see Queue::EVENT_AFTER_EXEC
-     * @see Queue::EVENT_AFTER_ERROR
+     * @see ExecEvent::BEFORE
+     * @see ExecEvent::AFTER
+     * @see ErrorEvent::AFTER
      */
     public $attempt;
     /**
      * @var mixed result of a job execution in case job is done.
-     * @see Queue::EVENT_AFTER_EXEC
+     * @see ExecEvent::AFTER
      * @since 2.1.1
      */
     public $result;
     /**
      * @var null|\Exception|\Throwable
-     * @see Queue::EVENT_AFTER_ERROR
+     * @see ErrorEvent::AFTER
      * @since 2.1.1
      */
     public $error;
     /**
      * @var null|bool
-     * @see Queue::EVENT_AFTER_ERROR
+     * @see ErrorEvent::AFTER
      * @since 2.1.1
      */
     public $retry;

@@ -12,7 +12,7 @@ return [
     'queue.serializer' => [
         '__class' => \yii\queue\serializers\PhpSerializer::class,
     ],
-    \PDO::class => \yii\di\Reference::to('pdo'),
+    \PDO::class => Reference::to('pdo'),
     'pdo' => [
         '__class'   => \PDO::class,
         '__construct()' => [
@@ -22,7 +22,7 @@ return [
             'options' => [],
         ]
     ],
-    \yii\mutex\Mutex::class => \yii\di\Reference::to('mutex'),
+    \yii\mutex\Mutex::class => Reference::to('mutex'),
     'mutex' => [
         '__class' => \yii\mutex\MysqlMutex::class
     ],
