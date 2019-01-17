@@ -9,8 +9,8 @@ namespace yii\queue\redis;
 
 use yii\exceptions\InvalidArgumentException;
 use yii\exceptions\NotSupportedException;
-use yii\di\Instance;
 use yii\queue\cli\Queue as CliQueue;
+use yii\queue\serializers\SerializerInterface;
 use yii\redis\Connection;
 
 /**
@@ -23,7 +23,7 @@ class Queue extends CliQueue
     /**
      * @var Connection|array|string
      */
-    public $redis = 'redis';
+    private $redis;
     /**
      * @var string
      */
@@ -37,10 +37,10 @@ class Queue extends CliQueue
     /**
      * @inheritdoc
      */
-    public function init()
+    public function __construct(SerializerInterface $serializer, Connection $redis)
     {
-        parent::init();
-        $this->redis = Instance::ensure($this->redis, Connection::class);
+        parent::__construct($serializer);
+        $this->redis = $redis;
     }
 
     /**
