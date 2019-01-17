@@ -7,7 +7,7 @@
 
 namespace yii\queue;
 
-use Yii;
+use yii\helpers\Yii;
 use yii\base\Behavior;
 
 /**
@@ -34,12 +34,12 @@ class LogBehavior extends Behavior
     public function events()
     {
         return [
-            Queue::EVENT_AFTER_PUSH => 'afterPush',
-            Queue::EVENT_BEFORE_EXEC => 'beforeExec',
-            Queue::EVENT_AFTER_EXEC => 'afterExec',
-            Queue::EVENT_AFTER_ERROR => 'afterError',
-            cli\Queue::EVENT_WORKER_START => 'workerStart',
-            cli\Queue::EVENT_WORKER_STOP => 'workerStop',
+            PushEvent::AFTER => 'afterPush',
+            ExecEvent::BEFORE => 'beforeExec',
+            ExecEvent::AFTER => 'afterExec',
+            ErrorEvent::AFTER => 'afterError',
+            cli\WorkerEvent::START => 'workerStart',
+            cli\WorkerEvent::STOP => 'workerStop',
         ];
     }
 
@@ -71,7 +71,7 @@ class LogBehavior extends Behavior
         Yii::endProfile($title, Queue::class);
         Yii::info("$title is finished.", Queue::class);
         if ($this->autoFlush) {
-            Yii::getLogger()->flush(true);
+            Yii::get('logger')->flush(true);
         }
     }
 
@@ -84,7 +84,7 @@ class LogBehavior extends Behavior
         Yii::endProfile($title, Queue::class);
         Yii::error("$title is finished with error: $event->error.", Queue::class);
         if ($this->autoFlush) {
-            Yii::getLogger()->flush(true);
+            Yii::get('logger')->flush(true);
         }
     }
 
@@ -94,11 +94,11 @@ class LogBehavior extends Behavior
      */
     public function workerStart(cli\WorkerEvent $event)
     {
-        $title = 'Worker ' . $event->sender->getWorkerPid();
+        $title = 'Worker ' . $event->getTarget()->getWorkerPid();
         Yii::info("$title is started.", Queue::class);
         Yii::beginProfile($title, Queue::class);
         if ($this->autoFlush) {
-            Yii::getLogger()->flush(true);
+            Yii::get('logger')->flush(true);
         }
     }
 
@@ -108,11 +108,11 @@ class LogBehavior extends Behavior
      */
     public function workerStop(cli\WorkerEvent $event)
     {
-        $title = 'Worker ' . $event->sender->getWorkerPid();
+        $title = 'Worker ' . $event->getTarget()->getWorkerPid();
         Yii::endProfile($title, Queue::class);
         Yii::info("$title is stopped.", Queue::class);
         if ($this->autoFlush) {
-            Yii::getLogger()->flush(true);
+            Yii::get('logger')->flush(true);
         }
     }
 
@@ -136,7 +136,7 @@ class LogBehavior extends Behavior
     {
         $title = $this->getJobTitle($event);
         $extra = "attempt: $event->attempt";
-        if ($pid = $event->sender->getWorkerPid()) {
+        if ($pid = $event->getTarget()->getWorkerPid()) {
             $extra .= ", PID: $pid";
         }
         return "$title ($extra)";
