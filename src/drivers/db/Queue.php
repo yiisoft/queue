@@ -8,12 +8,14 @@
 namespace yii\queue\db;
 
 use yii\base\Exception;
-use yii\exceptions\InvalidArgumentException;
+use yii\base\InvalidArgumentException;
 use yii\db\Connection;
+use yii\db\ConnectionInterface;
 use yii\db\Query;
 use yii\di\Instance;
 use yii\mutex\Mutex;
 use yii\queue\cli\Queue as CliQueue;
+use yii\queue\serializers\SerializerInterface;
 
 /**
  * Db Queue.
@@ -25,11 +27,11 @@ class Queue extends CliQueue
     /**
      * @var Connection|array|string
      */
-    public $db = 'db';
+    private $db;
     /**
      * @var Mutex|array|string
      */
-    public $mutex = 'mutex';
+    private $mutex;
     /**
      * @var int timeout
      */
@@ -55,11 +57,11 @@ class Queue extends CliQueue
     /**
      * @inheritdoc
      */
-    public function init()
+    public function __construct(SerializerInterface $serializer, ConnectionInterface $db, Mutex $mutex)
     {
-        parent::init();
-        $this->db = Instance::ensure($this->db, Connection::class);
-        $this->mutex = Instance::ensure($this->mutex, Mutex::class);
+        parent::__construct($serializer);
+        $this->db = $db;
+        $this->mutex = $mutex;
     }
 
     /**
