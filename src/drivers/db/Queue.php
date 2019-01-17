@@ -7,8 +7,8 @@
 
 namespace yii\queue\db;
 
-use yii\base\Exception;
-use yii\base\InvalidArgumentException;
+use yii\exceptions\Exception;
+use yii\exceptions\InvalidArgumentException;
 use yii\db\Connection;
 use yii\db\ConnectionInterface;
 use yii\db\Query;
