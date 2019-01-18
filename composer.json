@@ -25,7 +25,7 @@
         "yiisoft/db-redis": "dev-master",
         "yiisoft/db": "dev-master",
         "php-amqplib/php-amqplib": "*",
-        "enqueue/amqp-lib": "^0.8",
+        "enqueue/amqp-lib": "^0.9",
         "pda/pheanstalk": "*",
         "jeremeamia/superclosure": "*",
         "yiisoft/yii-debug": "dev-master",

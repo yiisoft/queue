@@ -21,8 +21,10 @@ use Interop\Amqp\AmqpTopic;
 use Interop\Amqp\Impl\AmqpBind;
 use yii\base\Application as BaseApp;
 use yii\base\Event;
+use yii\base\RequestEvent;
 use yii\exceptions\NotSupportedException;
 use yii\queue\cli\Queue as CliQueue;
+use yii\queue\serializers\SerializerInterface;
 
 /**
  * Amqp Queue.
@@ -217,10 +219,10 @@ class Queue extends CliQueue
     /**
      * @inheritdoc
      */
-    public function init()
+    public function __construct(SerializerInterface $serializer)
     {
-        parent::init();
-        Event::on(BaseApp::class, BaseApp::EVENT_AFTER_REQUEST, function () {
+        parent::__construct($serializer);
+        Event::on(BaseApp::class, RequestEvent::AFTER, function () {
             $this->close();
         });
     }
@@ -235,7 +237,8 @@ class Queue extends CliQueue
 
         $queue = $this->context->createQueue($this->queueName);
         $consumer = $this->context->createConsumer($queue);
-        $this->context->subscribe($consumer, function (AmqpMessage $message, AmqpConsumer $consumer) {
+        $subscriptionConsumer = $this->context->createSubscriptionConsumer();
+        $subscriptionConsumer->subscribe($consumer, function (AmqpMessage $message, AmqpConsumer $consumer) {
             if ($message->isRedelivered()) {
                 $consumer->acknowledge($message);
 
@@ -258,7 +261,7 @@ class Queue extends CliQueue
             return true;
         });
 
-        $this->context->consume();
+        $subscriptionConsumer->consume();
     }
 
     /**
