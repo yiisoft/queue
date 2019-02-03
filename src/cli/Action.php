@@ -31,9 +31,9 @@ abstract class Action extends BaseAction
     /**
      * @inheritdoc
      */
-    public function init()
+    public function __construct($id, $controller)
     {
-        parent::init();
+        parent::__construct($id, $controller);
 
         if (!$this->queue && ($this->controller instanceof Command)) {
             $this->queue = $this->controller->queue;
