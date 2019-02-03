@@ -87,7 +87,15 @@ class Queue extends CliQueue
             }
         });
     }
-
+    
+   /**
+     * {@inheritdoc}
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+    
     /**
      * @inheritdoc
      */
