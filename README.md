@@ -63,12 +63,16 @@ class DownloadJob extends BaseObject implements \yii\queue\JobInterface
 Here's how to send a task into the queue:
 
 ```php
-Yii::$app->queue->push(new DownloadJob('http://example.com/image.jpg', '/tmp/image.jpg'));
+Yii::$app->queue->push(
+    new DownloadJob('http://example.com/image.jpg', '/tmp/image.jpg')
+);
 ```
 To push a job into the queue that should run after 5 minutes:
 
 ```php
-Yii::$app->queue->delay(5 * 60)->push(new DownloadJob('http://example.com/image.jpg', '/tmp/image.jpg'));
+Yii::$app->queue->delay(5 * 60)->push(
+    new DownloadJob('http://example.com/image.jpg', '/tmp/image.jpg')
+);
 ```
 
 The exact way a task is executed depends on the used driver. Most drivers can be run using
