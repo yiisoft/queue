@@ -8,10 +8,6 @@ return [
             'queue' => 'queue',
         ],
     ],
-    \yii\queue\serializers\SerializerInterface::class => Reference::to('queue.serializer'),
-    'queue.serializer' => [
-        '__class' => \yii\queue\serializers\PhpSerializer::class,
-    ],
     \PDO::class => Reference::to('pdo'),
     'pdo' => [
         '__class'   => \PDO::class,
