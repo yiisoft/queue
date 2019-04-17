@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -8,8 +9,8 @@
 namespace yii\queue\tests\drivers;
 
 use yii\helpers\Yii;
-use yii\queue\tests\app\SimpleJob;
 use yii\queue\Queue;
+use yii\queue\tests\app\SimpleJob;
 
 /**
  * Driver Test Case.
@@ -49,7 +50,7 @@ abstract class TestCase extends \yii\queue\tests\TestCase
 
     /**
      * @param SimpleJob $job
-     * @param int $delay
+     * @param int       $delay
      */
     protected function assertSimpleJobLaterDone(SimpleJob $job, $delay)
     {
@@ -66,12 +67,12 @@ abstract class TestCase extends \yii\queue\tests\TestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown()
     {
         // Removes temp job files
-        foreach (glob(Yii::getAlias("@runtime/job-*.lock")) as $fileName) {
+        foreach (glob(Yii::getAlias('@runtime/job-*.lock')) as $fileName) {
             unlink($fileName);
         }
 

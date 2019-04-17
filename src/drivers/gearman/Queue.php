@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -25,13 +26,15 @@ class Queue extends CliQueue
      */
     public $commandClass = Command::class;
 
-
     /**
      * Listens queue and runs each job.
      *
      * @param bool $repeat whether to continue listening when queue is empty.
+     *
      * @return null|int exit code.
+     *
      * @internal for worker command only.
+     *
      * @since 2.0.2
      */
     public function run($repeat)
@@ -54,7 +57,7 @@ class Queue extends CliQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function pushMessage($message, $ttr, $delay, $priority)
     {
@@ -73,7 +76,7 @@ class Queue extends CliQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function status($id)
     {
@@ -98,6 +101,7 @@ class Queue extends CliQueue
             $this->_client = new \GearmanClient();
             $this->_client->addServer($this->host, $this->port);
         }
+
         return $this->_client;
     }
 

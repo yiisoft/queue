@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -8,10 +9,10 @@
 namespace yii\queue\tests\drivers\amqp_interop;
 
 use yii\helpers\Yii;
+use yii\queue\amqp_interop\Queue;
 use yii\queue\tests\app\PriorityJob;
 use yii\queue\tests\app\RetryJob;
 use yii\queue\tests\drivers\CliTestCase;
-use yii\queue\amqp_interop\Queue;
 
 /**
  * AMQP Queue Test.

@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -27,9 +28,8 @@ abstract class Action extends BaseAction
      */
     public $controller;
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct($id, $controller)
     {
@@ -48,6 +48,7 @@ abstract class Action extends BaseAction
 
     /**
      * @param string $string
+     *
      * @return string
      */
     protected function format($string)

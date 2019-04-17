@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -8,8 +9,8 @@
 namespace yii\queue\sync;
 
 use yii\base\RequestEvent;
-use yii\helpers\Yii;
 use yii\exceptions\InvalidArgumentException;
+use yii\helpers\Yii;
 use yii\queue\Queue as BaseQueue;
 
 /**
@@ -42,11 +43,12 @@ class Queue extends BaseQueue
     private $finishedId = 0;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function push($job)
     {
         $this->handle();
+
         return parent::push($job);
     }
 
@@ -79,16 +81,17 @@ class Queue extends BaseQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function pushMessage($message, $ttr, $delay, $priority)
     {
         array_push($this->payloads, [$ttr, $message]);
+
         return ++$this->pushedId;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function status($id)
     {

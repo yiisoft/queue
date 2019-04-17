@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -34,6 +35,7 @@ class PushEvent extends JobEvent
 
     /**
      * Creates BEFORE event.
+     *
      * @return self created event
      */
     public static function before($job, $ttr, $delay, $priority): self
@@ -41,11 +43,13 @@ class PushEvent extends JobEvent
         $event = new static(static::BEFORE, null, $job, $ttr);
         $event->delay = $delay;
         $event->priority = $priority;
+
         return $event;
     }
 
     /**
      * Creates AFTER event.
+     *
      * @return self created event
      */
     public static function after(self $before): self
@@ -53,6 +57,7 @@ class PushEvent extends JobEvent
         $event = new static(static::AFTER, $before->id, $before->job, $before->ttr);
         $event->delay = $before->delay;
         $event->priority = $before->priority;
+
         return $event;
     }
 }

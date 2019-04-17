@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -24,9 +25,8 @@ class Panel extends \yii\debug\Panel implements ViewContextInterface
 {
     private $_jobs = [];
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -34,7 +34,7 @@ class Panel extends \yii\debug\Panel implements ViewContextInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function init()
     {
@@ -46,6 +46,7 @@ class Panel extends \yii\debug\Panel implements ViewContextInterface
 
     /**
      * @param PushEvent $event
+     *
      * @return array
      */
     protected function getPushData(PushEvent $event)
@@ -75,7 +76,7 @@ class Panel extends \yii\debug\Panel implements ViewContextInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function save()
     {
@@ -83,26 +84,26 @@ class Panel extends \yii\debug\Panel implements ViewContextInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getViewPath()
     {
-        return __DIR__ . '/views';
+        return __DIR__.'/views';
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getSummary()
     {
         return Yii::$app->view->render('summary', [
-            'url' => $this->getUrl(),
+            'url'   => $this->getUrl(),
             'count' => isset($this->data['jobs']) ? count($this->data['jobs']) : 0,
         ], $this);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDetail()
     {

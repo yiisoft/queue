@@ -1,15 +1,15 @@
 <?php
 /**
- * @var \yii\web\View $this
- * @var array $jobs
+ * @var \yii\web\View
+ * @var array         $jobs
  */
 use yii\helpers\Html;
 
 $styles = [
-    'unknown' => 'default',
-    'waiting' => 'info',
+    'unknown'  => 'default',
+    'waiting'  => 'info',
     'reserved' => 'warning',
-    'done' => 'success',
+    'done'     => 'success',
 ];
 ?>
 <h1>Pushed <?= count($jobs) ?> jobs</h1>

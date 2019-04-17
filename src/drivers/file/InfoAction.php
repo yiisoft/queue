@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -21,7 +22,6 @@ class InfoAction extends Action
      * @var Queue
      */
     public $queue;
-
 
     /**
      * Info about queue status.
@@ -49,6 +49,7 @@ class InfoAction extends Action
     protected function getWaitingCount()
     {
         $data = $this->getIndexData();
+
         return !empty($data['waiting']) ? count($data['waiting']) : 0;
     }
 
@@ -58,6 +59,7 @@ class InfoAction extends Action
     protected function getDelayedCount()
     {
         $data = $this->getIndexData();
+
         return !empty($data['delayed']) ? count($data['delayed']) : 0;
     }
 
@@ -67,6 +69,7 @@ class InfoAction extends Action
     protected function getReservedCount()
     {
         $data = $this->getIndexData();
+
         return !empty($data['reserved']) ? count($data['reserved']) : 0;
     }
 
@@ -77,6 +80,7 @@ class InfoAction extends Action
     {
         $data = $this->getIndexData();
         $total = isset($data['lastId']) ? $data['lastId'] : 0;
+
         return $total - $this->getDelayedCount() - $this->getWaitingCount();
     }
 
@@ -84,7 +88,7 @@ class InfoAction extends Action
     {
         static $data;
         if ($data === null) {
-            $fileName = $this->queue->path . '/index.data';
+            $fileName = $this->queue->path.'/index.data';
             if (file_exists($fileName)) {
                 $data = call_user_func($this->queue->indexDeserializer, file_get_contents($fileName));
             } else {

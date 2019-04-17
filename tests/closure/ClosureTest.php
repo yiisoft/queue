@@ -1,16 +1,17 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
 namespace yii\queue\tests\closure;
 
-use yii\queue\tests\TestCase;
 use yii\helpers\Yii;
 use yii\queue\closure\Behavior;
 use yii\queue\sync\Queue;
+use yii\queue\tests\TestCase;
 
 /**
  * Closure Test.
@@ -46,21 +47,22 @@ class ClosureTest extends TestCase
     {
         if (!$this->_queue) {
             $this->_queue = new Queue([
-                'handle' => false,
+                'handle'     => false,
                 'as closure' => Behavior::class,
             ]);
         }
+
         return $this->_queue;
     }
 
     private $_queue;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown()
     {
-        foreach (glob(Yii::getAlias("@runtime/job-*.lock")) as $fileName) {
+        foreach (glob(Yii::getAlias('@runtime/job-*.lock')) as $fileName) {
             unlink($fileName);
         }
         parent::tearDown();

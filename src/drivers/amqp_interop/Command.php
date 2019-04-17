@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -13,6 +14,7 @@ use yii\queue\cli\Command as CliCommand;
  * Manages application amqp-queue.
  *
  * @author Maksym Kotliar <kotlyar.maksim@gmail.com>
+ *
  * @since 2.0.2
  */
 class Command extends CliCommand
@@ -22,9 +24,8 @@ class Command extends CliCommand
      */
     public $queue;
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isWorkerAction($actionID)
     {

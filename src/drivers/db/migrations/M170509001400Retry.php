@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -18,7 +19,6 @@ class M170509001400Retry extends Migration
 {
     public $tableName = '{{%queue}}';
 
-
     public function up()
     {
         if ($this->db->driverName !== 'sqlite') {
@@ -33,15 +33,15 @@ class M170509001400Retry extends Migration
         } else {
             $this->dropTable($this->tableName);
             $this->createTable($this->tableName, [
-                'id' => $this->primaryKey(),
-                'channel' => $this->string()->notNull(),
-                'job' => $this->binary()->notNull(),
-                'pushed_at' => $this->integer()->notNull(),
-                'ttr' => $this->integer()->notNull(),
-                'delay' => $this->integer()->notNull(),
+                'id'          => $this->primaryKey(),
+                'channel'     => $this->string()->notNull(),
+                'job'         => $this->binary()->notNull(),
+                'pushed_at'   => $this->integer()->notNull(),
+                'ttr'         => $this->integer()->notNull(),
+                'delay'       => $this->integer()->notNull(),
                 'reserved_at' => $this->integer(),
-                'attempt' => $this->integer(),
-                'done_at' => $this->integer(),
+                'attempt'     => $this->integer(),
+                'done_at'     => $this->integer(),
             ]);
             $this->createIndex('channel', $this->tableName, 'channel');
             $this->createIndex('reserved_at', $this->tableName, 'reserved_at');
@@ -62,12 +62,12 @@ class M170509001400Retry extends Migration
         } else {
             $this->dropTable($this->tableName);
             $this->createTable($this->tableName, [
-                'id' => $this->primaryKey(),
-                'channel' => $this->string()->notNull(),
-                'job' => $this->binary()->notNull(),
-                'created_at' => $this->integer()->notNull(),
-                'timeout' => $this->integer()->notNull(),
-                'started_at' => $this->integer(),
+                'id'          => $this->primaryKey(),
+                'channel'     => $this->string()->notNull(),
+                'job'         => $this->binary()->notNull(),
+                'created_at'  => $this->integer()->notNull(),
+                'timeout'     => $this->integer()->notNull(),
+                'started_at'  => $this->integer(),
                 'finished_at' => $this->integer(),
             ]);
             $this->createIndex('channel', $this->tableName, 'channel');

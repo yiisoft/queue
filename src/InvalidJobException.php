@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -15,6 +16,7 @@ use Throwable;
  * Throws when serialized message cannot be unserialized to a job.
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
+ *
  * @since 2.1.1
  */
 class InvalidJobException extends \Exception
@@ -25,9 +27,9 @@ class InvalidJobException extends \Exception
     private $serialized;
 
     /**
-     * @param string $serialized
-     * @param string $message
-     * @param int $code
+     * @param string         $serialized
+     * @param string         $message
+     * @param int            $code
      * @param Throwable|null $previous
      */
     public function __construct($serialized, $message = '', $code = 0, Throwable $previous = null)

@@ -10,7 +10,6 @@
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-
 $params = $_SERVER['argv'];
 array_shift($params);
 $command = implode(' ', $params);
@@ -26,7 +25,7 @@ $mysql = new PDO(
 $query = $mysql->prepare('SELECT GET_LOCK(?, -1)');
 $query->execute([$lockName]);
 if (!$query->fetch(PDO::FETCH_NUM)[0]) {
-    echo basename(__FILE__) . ': cannot get the lock.' . PHP_EOL;
+    echo basename(__FILE__).': cannot get the lock.'.PHP_EOL;
     exit(1);
 }
 
@@ -37,7 +36,7 @@ passthru($command, $exitCode);
 $query = $mysql->prepare('SELECT RELEASE_LOCK(?)');
 $query->execute([$lockName]);
 if (!$query->fetch(PDO::FETCH_NUM)[0]) {
-    echo basename(__FILE__) . ': cannot release the lock.' . PHP_EOL;
+    echo basename(__FILE__).': cannot release the lock.'.PHP_EOL;
     exit(1);
 }
 
