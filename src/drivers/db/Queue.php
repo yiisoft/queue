@@ -12,7 +12,7 @@ use yii\exceptions\InvalidArgumentException;
 use yii\db\Connection;
 use yii\db\ConnectionInterface;
 use yii\db\Query;
-use yii\mutex\Mutex;
+use Yii\Mutex\Mutex;
 use yii\queue\cli\Queue as CliQueue;
 use yii\queue\serializers\SerializerInterface;
 

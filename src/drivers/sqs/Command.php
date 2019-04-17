@@ -7,7 +7,7 @@
 
 namespace yii\queue\sqs;
 
-use yii\console\Exception;
+use yii\console\exceptions\Exception;
 use yii\queue\cli\Command as CliCommand;
 
 /**

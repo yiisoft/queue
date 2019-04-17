@@ -8,8 +8,8 @@
 namespace yii\queue\debug;
 
 use Yii;
-use yii\base\NotSupportedException;
-use yii\base\ViewContextInterface;
+use yii\exceptions\NotSupportedException;
+use yii\view\ViewContextInterface;
 use yii\helpers\VarDumper;
 use yii\queue\JobInterface;
 use yii\queue\PushEvent;
