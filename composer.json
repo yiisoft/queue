@@ -15,12 +15,15 @@
         "source": "https://github.com/yiisoft/yii-queue",
         "docs": "https://github.com/yiisoft/yii-queue/blob/master/docs/guide"
     },
+    "minimum-stability": "dev",
     "require": {
         "yiisoft/yii-core": "^3.0@dev",
+        "yiisoft/yii-console": "dev-master",
+        "yiisoft/view": "dev-master",
+        "yiisoft/mutex": "dev-master",
         "yiisoft/di": "^3.0@dev",
         "symfony/process": "^4.0"
     },
-    "minimum-stability": "dev",
     "require-dev": {
         "yiisoft/db-redis": "dev-master",
         "yiisoft/db": "dev-master",

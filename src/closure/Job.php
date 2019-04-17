@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -22,15 +23,15 @@ class Job implements JobInterface
      */
     public $serialized;
 
-
     /**
      * Unserializes and executes a closure.
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function execute($queue)
     {
         $serializer = new Serializer();
         $closure = $serializer->unserialize($this->serialized);
+
         return $closure();
     }
 }

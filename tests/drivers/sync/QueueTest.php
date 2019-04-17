@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -8,8 +9,8 @@
 namespace yii\queue\tests\drivers\sync;
 
 use yii\helpers\Yii;
-use yii\queue\tests\drivers\TestCase;
 use yii\queue\sync\Queue;
+use yii\queue\tests\drivers\TestCase;
 
 /**
  * Sync Queue Test.

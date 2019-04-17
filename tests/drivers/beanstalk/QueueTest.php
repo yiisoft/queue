@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -10,10 +11,10 @@ namespace yii\queue\tests\drivers\beanstalk;
 use Pheanstalk\Exception\ServerException;
 use Pheanstalk\Pheanstalk;
 use yii\helpers\Yii;
+use yii\queue\beanstalk\Queue;
 use yii\queue\tests\app\PriorityJob;
 use yii\queue\tests\app\RetryJob;
 use yii\queue\tests\drivers\CliTestCase;
-use yii\queue\beanstalk\Queue;
 
 /**
  * Beanstalk Queue Test.
@@ -103,14 +104,18 @@ class QueueTest extends CliTestCase
 
     /**
      * @param int $id of a job
-     * @return bool
+     *
      * @throws
+     *
+     * @return bool
      */
     protected function jobIsExists($id)
     {
         $connection = new Pheanstalk($this->getQueue()->host, $this->getQueue()->port);
+
         try {
             $connection->peek($id);
+
             return true;
         } catch (ServerException $e) {
             if (strpos($e->getMessage(), 'NOT_FOUND') === 0) {

@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -53,10 +54,11 @@ class Action extends \yii\base\Action
     /**
      * Runs benchmark of job wait time.
      *
-     * @param string $mode one of 'fast' or 'isolate'
-     * @param int $jobCount number of jobs that will be pushed to a queue
-     * @param int $workerCount number of workers that listen a queue
-     * @param int $payloadSize additional job size
+     * @param string $mode        one of 'fast' or 'isolate'
+     * @param int    $jobCount    number of jobs that will be pushed to a queue
+     * @param int    $workerCount number of workers that listen a queue
+     * @param int    $payloadSize additional job size
+     *
      * @throws
      */
     public function run($mode = 'fast', $jobCount = 1000, $workerCount = 10, $payloadSize = 0)
@@ -65,10 +67,10 @@ class Action extends \yii\base\Action
             throw new ConsoleException("Unknown mode: $mode.");
         }
         if ($jobCount <= 0) {
-            throw new ConsoleException("Job count must be greater than zero.");
+            throw new ConsoleException('Job count must be greater than zero.');
         }
         if ($workerCount <= 0) {
-            throw new ConsoleException("Worker count must be greater than zero.");
+            throw new ConsoleException('Worker count must be greater than zero.');
         }
 
         foreach ($this->modes[$mode] as $queueName => $workerCommand) {
@@ -123,7 +125,7 @@ class Action extends \yii\base\Action
                 }
 
                 Console::endProgress(strtr(
-                    'MEDIAN = {median} s; AVG = {avg} s; MIN = {min} s; MAX = {max} s' . PHP_EOL,
+                    'MEDIAN = {median} s; AVG = {avg} s; MIN = {min} s; MAX = {max} s'.PHP_EOL,
                     $this->calcResult($resultFileName, 4)
                 ));
             } finally {
@@ -135,8 +137,8 @@ class Action extends \yii\base\Action
     /**
      * Starts few workers.
      *
-     * @param string $command
-     * @param int $count
+     * @param string   $command
+     * @param int      $count
      * @param callable $callback
      */
     private function startWorkers($command, $count, callable $callback)
@@ -153,7 +155,7 @@ class Action extends \yii\base\Action
     private function stopWorkers()
     {
         foreach ($this->workers as $worker) {
-            /** @var Process $worker */
+            /* @var Process $worker */
             $worker->stop();
         }
         $this->workers = [];
@@ -163,7 +165,8 @@ class Action extends \yii\base\Action
      * Calculates aggregated wait time.
      *
      * @param string $fileName of result storage
-     * @param int $scale
+     * @param int    $scale
+     *
      * @return array of aggregate results in seconds
      */
     private function calcResult($fileName, $scale = 4)
@@ -183,11 +186,11 @@ class Action extends \yii\base\Action
         $max = max($times);
 
         return [
-            '{count}' => $count,
+            '{count}'  => $count,
             '{median}' => number_format($median, $scale, '.', ''),
-            '{avg}' => number_format($avg, $scale, '.', ''),
-            '{min}' => number_format($min, $scale, '.', ''),
-            '{max}' => number_format($max, $scale, '.', ''),
+            '{avg}'    => number_format($avg, $scale, '.', ''),
+            '{min}'    => number_format($min, $scale, '.', ''),
+            '{max}'    => number_format($max, $scale, '.', ''),
         ];
     }
 }

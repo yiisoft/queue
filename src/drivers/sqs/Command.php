@@ -1,13 +1,14 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
 namespace yii\queue\sqs;
 
-use yii\console\Exception;
+use yii\console\exceptions\Exception;
 use yii\queue\cli\Command as CliCommand;
 
 /**
@@ -22,7 +23,6 @@ class Command extends CliCommand
      * @var Queue
      */
     public $queue;
-
 
     /**
      * Runs all jobs from sqs.
@@ -40,7 +40,9 @@ class Command extends CliCommand
      * It can be used as demon process.
      *
      * @param int $timeout number of seconds to sleep before next reading of the queue.
+     *
      * @throws Exception when params are invalid.
+     *
      * @return null|int exit code.
      */
     public function actionListen($timeout = 3)
@@ -67,7 +69,7 @@ class Command extends CliCommand
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isWorkerAction($actionID)
     {

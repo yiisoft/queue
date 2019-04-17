@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -17,7 +18,7 @@ use yii\base\BaseObject;
 class PhpSerializer extends BaseObject implements SerializerInterface
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function serialize($job)
     {
@@ -25,7 +26,7 @@ class PhpSerializer extends BaseObject implements SerializerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function unserialize($serialized)
     {

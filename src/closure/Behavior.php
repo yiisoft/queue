@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -33,9 +34,8 @@ class Behavior extends \yii\base\Behavior
      */
     public $owner;
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function events()
     {
@@ -46,6 +46,7 @@ class Behavior extends \yii\base\Behavior
 
     /**
      * Converts the closure to a job object.
+     *
      * @param PushEvent $event
      */
     public function beforePush(PushEvent $event)

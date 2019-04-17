@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -28,9 +29,8 @@ class JsonSerializer extends BaseObject implements SerializerInterface
      */
     public $options = 0;
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function serialize($job)
     {
@@ -38,7 +38,7 @@ class JsonSerializer extends BaseObject implements SerializerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function unserialize($serialized)
     {
@@ -47,8 +47,10 @@ class JsonSerializer extends BaseObject implements SerializerInterface
 
     /**
      * @param mixed $data
-     * @return array|mixed
+     *
      * @throws InvalidConfigException
+     *
+     * @return array|mixed
      */
     protected function toArray($data)
     {
@@ -81,6 +83,7 @@ class JsonSerializer extends BaseObject implements SerializerInterface
 
     /**
      * @param array $data
+     *
      * @return mixed
      */
     protected function fromArray($data)

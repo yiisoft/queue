@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -41,7 +42,7 @@ abstract class CliTestCase extends TestCase
      */
     protected function startProcess($cmd)
     {
-        $process = new Process('exec ' . $this->prepareCmd($cmd));
+        $process = new Process('exec '.$this->prepareCmd($cmd));
         $process->start();
         sleep(2);
         if ($process->getExitCode() !== null) {
@@ -52,6 +53,7 @@ abstract class CliTestCase extends TestCase
 
     /**
      * @param string $cmd
+     *
      * @return string
      */
     private function prepareCmd($cmd)
@@ -61,14 +63,14 @@ abstract class CliTestCase extends TestCase
         $method->setAccessible(true);
 
         return strtr($cmd, [
-            'php' => PHP_BINARY,
-            'yii' => 'tests/yii',
+            'php'   => PHP_BINARY,
+            'yii'   => 'tests/yii',
             'queue' => $method->invoke($this->getQueue()),
         ]);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown()
     {

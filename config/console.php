@@ -9,17 +9,19 @@ return [
         ],
     ],
     \PDO::class => Reference::to('pdo'),
-    'pdo' => [
-        '__class'   => \PDO::class,
+    'pdo'       => [
+        '__class'       => \PDO::class,
         '__construct()' => [
-            'dsn' => $params['db.dsn'],
-            'username'  => $params['db.username'],
+            'dsn'       => 'pgsql:dbname='.$params['db.name']
+                .(!empty($params['db.host']) ? (';host='.$params['db.host']) : '')
+                .(!empty($params['db.port']) ? (';port='.$params['db.port']) : ''),
+            'username'  => $params['db.user'],
             'password'  => $params['db.password'],
-            'options' => [],
-        ]
+            'options'   => [],
+        ],
     ],
     \yii\mutex\Mutex::class => Reference::to('mutex'),
-    'mutex' => [
-        '__class' => \yii\mutex\MysqlMutex::class
+    'mutex'                 => [
+        '__class' => \yii\mutex\MysqlMutex::class,
     ],
 ];

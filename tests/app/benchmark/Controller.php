@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -24,21 +25,23 @@ class Controller extends \yii\console\Controller
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function beforeAction($action)
     {
         $this->startedAt = time();
+
         return parent::beforeAction($action);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function afterAction($action, $result)
     {
         $duration = time() - $this->startedAt;
         $this->stdout("\nCompleted in {$duration} s.\n");
+
         return parent::afterAction($action, $result);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -8,9 +9,9 @@
 namespace yii\queue\tests\drivers\gearman;
 
 use yii\helpers\Yii;
+use yii\queue\gearman\Queue;
 use yii\queue\tests\app\PriorityJob;
 use yii\queue\tests\drivers\CliTestCase;
-use yii\queue\gearman\Queue;
 
 /**
  * Gearman Queue Test.

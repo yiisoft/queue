@@ -1,15 +1,16 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
 namespace yii\queue\tests\serializers;
 
-use yii\queue\tests\app\SimpleJob;
 use yii\base\BaseObject;
 use yii\queue\serializers\SerializerInterface;
+use yii\queue\tests\app\SimpleJob;
 
 /**
  * Serializer Test Case.
@@ -25,6 +26,7 @@ abstract class TestCase extends \yii\queue\tests\TestCase
 
     /**
      * @dataProvider providerSerialize
+     *
      * @param mixed $expected
      */
     public function testSerialize($expected)
@@ -42,7 +44,7 @@ abstract class TestCase extends \yii\queue\tests\TestCase
         return [
             // Job object
             [
-                new SimpleJob(['uid' => 123])
+                new SimpleJob(['uid' => 123]),
             ],
             // Any object
             [
@@ -50,7 +52,7 @@ abstract class TestCase extends \yii\queue\tests\TestCase
                     'foo' => 1,
                     'bar' => [
                         new TestObject(['foo' => 1]),
-                    ]
+                    ],
                 ]),
             ],
             // Array of mixed data
@@ -68,7 +70,7 @@ abstract class TestCase extends \yii\queue\tests\TestCase
             ],
             // Scalar
             [
-                'string value'
+                'string value',
             ],
         ];
     }

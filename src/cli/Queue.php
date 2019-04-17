@@ -1,17 +1,18 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
 namespace yii\queue\cli;
 
-use yii\helpers\Yii;
 use yii\base\BootstrapInterface;
-use yii\base\InvalidConfigException;
 use yii\console\Application as ConsoleApp;
+use yii\exceptions\InvalidConfigException;
 use yii\helpers\Inflector;
+use yii\helpers\Yii;
 use yii\queue\Queue as BaseQueue;
 
 /**
@@ -21,9 +22,9 @@ use yii\queue\Queue as BaseQueue;
  */
 abstract class Queue extends BaseQueue implements BootstrapInterface
 {
-
     /**
      * @var array|string
+     *
      * @since 2.0.2
      */
     public $loopConfig = SignalLoop::class;
@@ -37,20 +38,22 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
     public $commandOptions = [];
     /**
      * @var callable|null
+     *
      * @internal for worker command only
      */
     public $messageHandler;
 
     /**
      * @var int|null current process ID of a worker.
+     *
      * @since 2.0.2
      */
     private $_workerPid;
 
-
     /**
-     * @return string command id
      * @throws
+     *
+     * @return string command id
      */
     protected function getCommandId()
     {
@@ -59,19 +62,21 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
                 return Inflector::camel2id($id);
             }
         }
+
         return 'queue';
+
         throw new InvalidConfigException('Queue must be an application component.');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function bootstrap($app)
     {
         if ($app instanceof ConsoleApp) {
             $app->controllerMap[$this->getCommandId()] = [
                 '__class' => $this->commandClass,
-                'queue' => $this,
+                'queue'   => $this,
             ] + $this->commandOptions;
         }
     }
@@ -80,7 +85,9 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
      * Runs worker.
      *
      * @param callable $handler
+     *
      * @return null|int exit code
+     *
      * @since 2.0.2
      */
     protected function runWorker(callable $handler)
@@ -96,9 +103,11 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
         }
 
         $exitCode = null;
+
         try {
             call_user_func($handler, function () use ($loop, $event) {
                 $this->trigger(WorkerEvent::loop($event));
+
                 return $event->exitCode === null && $loop->canContinue();
             });
         } finally {
@@ -112,8 +121,10 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
     /**
      * Gets process ID of a worker.
      *
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @return int|null
+     *
      * @since 2.0.2
      */
     public function getWorkerPid()
@@ -122,7 +133,7 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function handleMessage($id, $message, $ttr, $attempt)
     {
@@ -134,17 +145,20 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
     }
 
     /**
-     * @param string $id of a message
-     * @param string $message
-     * @param int $ttr time to reserve
-     * @param int $attempt number
+     * @param string   $id        of a message
+     * @param string   $message
+     * @param int      $ttr       time to reserve
+     * @param int      $attempt   number
      * @param int|null $workerPid of worker process
+     *
      * @return bool
+     *
      * @internal for worker command only
      */
     public function execute($id, $message, $ttr, $attempt, $workerPid)
     {
         $this->_workerPid = $workerPid;
+
         return parent::handleMessage($id, $message, $ttr, $attempt);
     }
 }

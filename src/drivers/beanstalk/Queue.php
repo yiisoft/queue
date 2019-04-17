@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -38,14 +39,16 @@ class Queue extends CliQueue
      */
     public $commandClass = Command::class;
 
-
     /**
      * Listens queue and runs each job.
      *
-     * @param bool $repeat whether to continue listening when queue is empty.
-     * @param int $timeout number of seconds to wait for next message.
+     * @param bool $repeat  whether to continue listening when queue is empty.
+     * @param int  $timeout number of seconds to wait for next message.
+     *
      * @return null|int exit code.
+     *
      * @internal for worker command only.
+     *
      * @since 2.0.2
      */
     public function run($repeat, $timeout = 0)
@@ -70,7 +73,7 @@ class Queue extends CliQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function status($id)
     {
@@ -98,13 +101,16 @@ class Queue extends CliQueue
      * Removes a job by ID.
      *
      * @param int $id of a job
+     *
      * @return bool
+     *
      * @since 2.0.1
      */
     public function remove($id)
     {
         try {
             $this->getPheanstalk()->delete(new Job($id, null));
+
             return true;
         } catch (ServerException $e) {
             if (strpos($e->getMessage(), 'NOT_FOUND') === 0) {
@@ -116,7 +122,7 @@ class Queue extends CliQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function pushMessage($message, $ttr, $delay, $priority)
     {
@@ -145,6 +151,7 @@ class Queue extends CliQueue
         if (!$this->_pheanstalk) {
             $this->_pheanstalk = new Pheanstalk($this->host, $this->port);
         }
+
         return $this->_pheanstalk;
     }
 

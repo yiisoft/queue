@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -8,8 +9,8 @@
 namespace yii\queue\tests\drivers\amqp;
 
 use yii\helpers\Yii;
-use yii\queue\tests\drivers\CliTestCase;
 use yii\queue\amqp\Queue;
+use yii\queue\tests\drivers\CliTestCase;
 
 /**
  * AMQP Queue Test.

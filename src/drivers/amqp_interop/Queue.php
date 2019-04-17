@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -30,6 +31,7 @@ use yii\queue\serializers\SerializerInterface;
  * Amqp Queue.
  *
  * @author Maksym Kotliar <kotlyar.maksim@gmail.com>
+ *
  * @since 2.0.2
  */
 class Queue extends CliQueue
@@ -215,9 +217,8 @@ class Queue extends CliQueue
      */
     protected $setupBrokerDone = false;
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(SerializerInterface $serializer)
     {
@@ -275,7 +276,7 @@ class Queue extends CliQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function pushMessage($payload, $ttr, $delay, $priority)
     {
@@ -309,7 +310,7 @@ class Queue extends CliQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function status($id)
     {
@@ -340,26 +341,26 @@ class Queue extends CliQueue
         }
 
         $config = [
-            'dsn' => $this->dsn,
-            'host' => $this->host,
-            'port' => $this->port,
-            'user' => $this->user,
-            'pass' => $this->password,
-            'vhost' => $this->vhost,
-            'read_timeout' => $this->readTimeout,
-            'write_timeout' => $this->writeTimeout,
+            'dsn'                => $this->dsn,
+            'host'               => $this->host,
+            'port'               => $this->port,
+            'user'               => $this->user,
+            'pass'               => $this->password,
+            'vhost'              => $this->vhost,
+            'read_timeout'       => $this->readTimeout,
+            'write_timeout'      => $this->writeTimeout,
             'connection_timeout' => $this->connectionTimeout,
-            'heartbeat' => $this->heartbeat,
-            'persisted' => $this->persisted,
-            'lazy' => $this->lazy,
-            'qos_global' => $this->qosGlobal,
-            'qos_prefetch_size' => $this->qosPrefetchSize,
+            'heartbeat'          => $this->heartbeat,
+            'persisted'          => $this->persisted,
+            'lazy'               => $this->lazy,
+            'qos_global'         => $this->qosGlobal,
+            'qos_prefetch_size'  => $this->qosPrefetchSize,
             'qos_prefetch_count' => $this->qosPrefetchCount,
-            'ssl_on' => $this->sslOn,
-            'ssl_verify' => $this->sslVerify,
-            'ssl_cacert' => $this->sslCacert,
-            'ssl_cert' => $this->sslCert,
-            'ssl_key' => $this->sslKey,
+            'ssl_on'             => $this->sslOn,
+            'ssl_verify'         => $this->sslVerify,
+            'ssl_cacert'         => $this->sslCacert,
+            'ssl_cert'           => $this->sslCert,
+            'ssl_key'            => $this->sslKey,
         ];
 
         $config = array_filter($config, function ($value) {

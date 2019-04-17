@@ -1,13 +1,14 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
 namespace yii\queue\beanstalk;
 
-use yii\console\Exception;
+use yii\console\exceptions\Exception;
 use yii\queue\cli\Command as CliCommand;
 
 /**
@@ -26,9 +27,8 @@ class Command extends CliCommand
      */
     public $defaultAction = 'info';
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function actions()
     {
@@ -38,7 +38,7 @@ class Command extends CliCommand
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isWorkerAction($actionID)
     {
@@ -61,7 +61,9 @@ class Command extends CliCommand
      * It can be used as daemon process.
      *
      * @param int $timeout number of seconds to wait a job.
+     *
      * @throws Exception when params are invalid.
+     *
      * @return null|int exit code.
      */
     public function actionListen($timeout = 3)
@@ -80,7 +82,9 @@ class Command extends CliCommand
      * Removes a job by id.
      *
      * @param int $id of the job.
+     *
      * @throws Exception when the job is not found.
+     *
      * @since 2.0.1
      */
     public function actionRemove($id)

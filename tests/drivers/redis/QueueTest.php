@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -8,9 +9,9 @@
 namespace yii\queue\tests\drivers\redis;
 
 use yii\helpers\Yii;
+use yii\queue\redis\Queue;
 use yii\queue\tests\app\RetryJob;
 use yii\queue\tests\drivers\CliTestCase;
-use yii\queue\redis\Queue;
 
 /**
  * Redis Queue Test.
@@ -72,19 +73,19 @@ class QueueTest extends CliTestCase
     public function testClear()
     {
         $this->getQueue()->push($this->createSimpleJob());
-        $this->assertNotEmpty($this->getQueue()->redis->keys($this->getQueue()->channel . '.*'));
+        $this->assertNotEmpty($this->getQueue()->redis->keys($this->getQueue()->channel.'.*'));
         $this->runProcess('php yii queue/clear --interactive=0');
 
-        $this->assertEmpty($this->getQueue()->redis->keys($this->getQueue()->channel . '.*'));
+        $this->assertEmpty($this->getQueue()->redis->keys($this->getQueue()->channel.'.*'));
     }
 
     public function testRemove()
     {
         $id = $this->getQueue()->push($this->createSimpleJob());
-        $this->assertTrue((bool) $this->getQueue()->redis->hexists($this->getQueue()->channel . '.messages', $id));
+        $this->assertTrue((bool) $this->getQueue()->redis->hexists($this->getQueue()->channel.'.messages', $id));
         $this->runProcess("php yii queue/remove $id");
 
-        $this->assertFalse((bool) $this->getQueue()->redis->hexists($this->getQueue()->channel . '.messages', $id));
+        $this->assertFalse((bool) $this->getQueue()->redis->hexists($this->getQueue()->channel.'.messages', $id));
     }
 
     /**
