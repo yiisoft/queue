@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -10,9 +11,9 @@ namespace yii\queue\cli;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\RuntimeException as ProcessRuntimeException;
 use Symfony\Component\Process\Process;
+use yii\base\Action;
 use yii\console\Controller;
 use yii\queue\ExecEvent;
-use yii\base\Action;
 
 /**
  * Base Command.
@@ -36,11 +37,12 @@ abstract class Command extends Controller
     public $queue;
     /**
      * @var bool verbose mode of a job execute. If enabled, execute result of each job
-     * will be printed.
+     *           will be printed.
      */
     public $verbose = false;
     /**
      * @var array additional options to the verbose behavior.
+     *
      * @since 2.0.2
      */
     public $verboseConfig = [
@@ -52,14 +54,14 @@ abstract class Command extends Controller
     public $isolate = true;
     /**
      * @var string path to php interpreter that uses to run child processes.
-     * If it is undefined, PHP_BINARY will be used.
+     *             If it is undefined, PHP_BINARY will be used.
+     *
      * @since 2.0.3
      */
     public $phpBinary;
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function options($actionID)
     {
@@ -76,7 +78,7 @@ abstract class Command extends Controller
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function optionAliases()
     {
@@ -87,13 +89,16 @@ abstract class Command extends Controller
 
     /**
      * @param string $actionID
+     *
      * @return bool
+     *
      * @since 2.0.2
      */
     abstract protected function isWorkerAction($actionID);
 
     /**
      * @param string $actionID
+     *
      * @return bool
      */
     protected function canVerbose($actionID)
@@ -103,6 +108,7 @@ abstract class Command extends Controller
 
     /**
      * @param string $actionID
+     *
      * @return bool
      */
     protected function canIsolate($actionID)
@@ -111,7 +117,7 @@ abstract class Command extends Controller
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function beforeAction(Action $action): bool
     {
@@ -135,11 +141,13 @@ abstract class Command extends Controller
      * Executes a job.
      * The command is internal, and used to isolate a job execution. Manual usage is not provided.
      *
-     * @param string|null $id of a message
-     * @param int $ttr time to reserve
-     * @param int $attempt number
-     * @param int $pid of a worker
+     * @param string|null $id      of a message
+     * @param int         $ttr     time to reserve
+     * @param int         $attempt number
+     * @param int         $pid     of a worker
+     *
      * @return int exit code
+     *
      * @internal It is used with isolate mode.
      */
     public function actionExec($id, $ttr, $attempt, $pid)
@@ -147,18 +155,22 @@ abstract class Command extends Controller
         if ($this->queue->execute($id, file_get_contents('php://stdin'), $ttr, $attempt, $pid ?: null)) {
             return self::EXEC_DONE;
         }
+
         return self::EXEC_RETRY;
     }
 
     /**
      * Handles message using child process.
      *
-     * @param string|null $id of a message
-     * @param string $message
-     * @param int $ttr time to reserve
-     * @param int $attempt number
-     * @return bool
+     * @param string|null $id      of a message
+     * @param string      $message
+     * @param int         $ttr     time to reserve
+     * @param int         $attempt number
+     *
      * @throws
+     *
+     * @return bool
+     *
      * @see actionExec()
      */
     protected function handleMessage($id, $message, $ttr, $attempt)
@@ -167,7 +179,7 @@ abstract class Command extends Controller
         $cmd = [
             $this->phpBinary,
             $_SERVER['SCRIPT_FILENAME'],
-            $this->uniqueId . '/exec',
+            $this->uniqueId.'/exec',
             $id,
             $ttr,
             $attempt,
@@ -176,14 +188,15 @@ abstract class Command extends Controller
 
         foreach ($this->getPassedOptions() as $name) {
             if (in_array($name, $this->options('exec'), true)) {
-                $cmd[] = '--' . $name . '=' . $this->$name;
+                $cmd[] = '--'.$name.'='.$this->$name;
             }
         }
         if (!in_array('color', $this->getPassedOptions(), true)) {
-            $cmd[] = '--color=' . $this->isColorEnabled();
+            $cmd[] = '--color='.$this->isColorEnabled();
         }
 
         $process = new Process($cmd, null, null, $message, $ttr);
+
         try {
             $result = $process->run(function ($type, $buffer) {
                 if ($type === Process::ERR) {
@@ -195,9 +208,11 @@ abstract class Command extends Controller
             if (!in_array($result, [self::EXEC_DONE, self::EXEC_RETRY])) {
                 throw new ProcessFailedException($process);
             }
+
             return $result === self::EXEC_DONE;
         } catch (ProcessRuntimeException $error) {
             list($job) = $this->queue->unserializeMessage($message);
+
             return $this->queue->handleError(ExecEvent::before($id, $job, $ttr, $attempt, $error));
         }
     }

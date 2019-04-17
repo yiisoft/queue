@@ -1,17 +1,18 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
 namespace yii\queue\db;
 
-use yii\exceptions\Exception;
-use yii\exceptions\InvalidArgumentException;
 use yii\db\Connection;
 use yii\db\ConnectionInterface;
 use yii\db\Query;
+use yii\exceptions\Exception;
+use yii\exceptions\InvalidArgumentException;
 use yii\mutex\Mutex;
 use yii\queue\cli\Queue as CliQueue;
 use yii\queue\serializers\SerializerInterface;
@@ -52,9 +53,8 @@ class Queue extends CliQueue
      */
     public $commandClass = Command::class;
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(SerializerInterface $serializer, ConnectionInterface $db, Mutex $mutex)
     {
@@ -66,10 +66,13 @@ class Queue extends CliQueue
     /**
      * Listens queue and runs each job.
      *
-     * @param bool $repeat whether to continue listening when queue is empty.
-     * @param int $timeout number of seconds to sleep before next iteration.
+     * @param bool $repeat  whether to continue listening when queue is empty.
+     * @param int  $timeout number of seconds to sleep before next iteration.
+     *
      * @return null|int exit code.
+     *
      * @internal for worker command only
+     *
      * @since 2.0.2
      */
     public function run($repeat, $timeout = 0)
@@ -95,7 +98,7 @@ class Queue extends CliQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function status($id)
     {
@@ -139,7 +142,9 @@ class Queue extends CliQueue
      * Removes a job by ID.
      *
      * @param int $id of a job
+     *
      * @return bool
+     *
      * @since 2.0.1
      */
     public function remove($id)
@@ -150,32 +155,34 @@ class Queue extends CliQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function pushMessage($message, $ttr, $delay, $priority)
     {
         $this->db->createCommand()->insert($this->tableName, [
-            'channel' => $this->channel,
-            'job' => $message,
+            'channel'   => $this->channel,
+            'job'       => $message,
             'pushed_at' => time(),
-            'ttr' => $ttr,
-            'delay' => $delay,
-            'priority' => $priority ?: 1024,
+            'ttr'       => $ttr,
+            'delay'     => $delay,
+            'priority'  => $priority ?: 1024,
         ])->execute();
         $tableSchema = $this->db->getTableSchema($this->tableName);
+
         return $this->db->getLastInsertID($tableSchema->sequenceName);
     }
 
     /**
      * Takes one message from waiting list and reserves it for handling.
      *
-     * @return array|false payload
      * @throws Exception in case it hasn't waited the lock
+     *
+     * @return array|false payload
      */
     protected function reserve()
     {
         return $this->db->useMaster(function () {
-            if (!$this->mutex->acquire(__CLASS__ . $this->channel, $this->mutexTimeout)) {
+            if (!$this->mutex->acquire(__CLASS__.$this->channel, $this->mutexTimeout)) {
                 throw new Exception('Has not waited the lock.');
             }
 
@@ -195,7 +202,7 @@ class Queue extends CliQueue
                     $payload['attempt'] = (int) $payload['attempt'] + 1;
                     $this->db->createCommand()->update($this->tableName, [
                         'reserved_at' => $payload['reserved_at'],
-                        'attempt' => $payload['attempt'],
+                        'attempt'     => $payload['attempt'],
                     ], [
                         'id' => $payload['id'],
                     ])->execute();
@@ -206,14 +213,12 @@ class Queue extends CliQueue
                     }
                 }
             } finally {
-                $this->mutex->release(__CLASS__ . $this->channel);
+                $this->mutex->release(__CLASS__.$this->channel);
             }
 
             return $payload;
         });
     }
-
-
 
     /**
      * @param array $payload
@@ -229,7 +234,7 @@ class Queue extends CliQueue
             $this->db->createCommand()->update(
                 $this->tableName,
                 ['done_at' => time()],
-                ['id' => $payload['id']]
+                ['id'      => $payload['id']]
             )->execute();
         }
     }

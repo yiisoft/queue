@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -18,11 +19,11 @@ class Signal
 {
     private static $exit = false;
 
-
     /**
      * Checks exit signals
      * Used mainly by [[yii\queue\Queue]] to check, whether job execution
      * loop can be continued.
+     *
      * @return bool
      */
     public static function isExit()

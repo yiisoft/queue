@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -39,18 +40,17 @@ class VerboseBehavior extends Behavior
      */
     private $workerStartedAt;
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function events()
     {
         return [
-            ExecEvent::BEFORE => 'beforeExec',
-            ExecEvent::AFTER => 'afterExec',
-            ErrorEvent::AFTER => 'afterError',
+            ExecEvent::BEFORE  => 'beforeExec',
+            ExecEvent::AFTER   => 'afterExec',
+            ErrorEvent::AFTER  => 'afterError',
             WorkerEvent::START => 'workerStart',
-            WorkerEvent::STOP => 'workerStop',
+            WorkerEvent::STOP  => 'workerStop',
         ];
     }
 
@@ -95,7 +95,7 @@ class VerboseBehavior extends Behavior
             $this->command->stdout(" ($duration s)", Console::FG_YELLOW);
         }
         $this->command->stdout(PHP_EOL);
-        $this->command->stdout('> ' . get_class($event->error) . ': ', Console::FG_RED);
+        $this->command->stdout('> '.get_class($event->error).': ', Console::FG_RED);
         $message = explode("\n", ltrim($event->error->getMessage()), 2)[0]; // First line
         $this->command->stdout($message, Console::FG_GREY);
         $this->command->stdout(PHP_EOL);
@@ -103,7 +103,9 @@ class VerboseBehavior extends Behavior
 
     /**
      * @param ExecEvent $event
+     *
      * @return string
+     *
      * @since 2.0.2
      */
     protected function jobTitle(ExecEvent $event)
@@ -113,11 +115,13 @@ class VerboseBehavior extends Behavior
         if ($pid = $event->getTarget()->getWorkerPid()) {
             $extra .= ", pid: $pid";
         }
+
         return " [$event->id] $name ($extra)";
     }
 
     /**
      * @param WorkerEvent $event
+     *
      * @since 2.0.2
      */
     public function workerStart(WorkerEvent $event)
@@ -131,6 +135,7 @@ class VerboseBehavior extends Behavior
 
     /**
      * @param WorkerEvent $event
+     *
      * @since 2.0.2
      */
     public function workerStop(WorkerEvent $event)
@@ -145,7 +150,9 @@ class VerboseBehavior extends Behavior
 
     /**
      * @param int $value
+     *
      * @return string
+     *
      * @since 2.0.2
      */
     protected function formatDuration($value)

@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -13,6 +14,7 @@ use yii\base\BaseObject;
  * Signal Loop.
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
+ *
  * @since 2.0.2
  */
 class SignalLoop extends BaseObject implements LoopInterface
@@ -27,12 +29,12 @@ class SignalLoop extends BaseObject implements LoopInterface
     ];
     /**
      * @var array of signals to suspend listening of the queue.
-     * For example: SIGTSTP
+     *            For example: SIGTSTP
      */
     public $suspendSignals = [];
     /**
      * @var array of signals to resume listening of the queue.
-     * For example: SIGCONT
+     *            For example: SIGCONT
      */
     public $resumeSignals = [];
 
@@ -50,10 +52,9 @@ class SignalLoop extends BaseObject implements LoopInterface
      */
     private static $pause = false;
 
-
     /**
      * @param Queue $queue
-     * @inheritdoc
+     *                     {@inheritdoc}
      */
     public function __construct($queue)
     {
@@ -80,7 +81,7 @@ class SignalLoop extends BaseObject implements LoopInterface
     /**
      * Checks signals state.
      *
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function canContinue()
     {

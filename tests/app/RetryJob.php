@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -23,6 +24,7 @@ class RetryJob extends BaseObject implements RetryableJobInterface
     public function execute($queue)
     {
         file_put_contents($this->getFileName(), 'a', FILE_APPEND);
+
         throw new \Exception('Planned error.');
     }
 

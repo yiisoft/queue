@@ -1,17 +1,18 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
 namespace yii\queue\redis;
 
+use yii\db\redis\Connection;
 use yii\exceptions\InvalidArgumentException;
 use yii\exceptions\NotSupportedException;
 use yii\queue\cli\Queue as CliQueue;
 use yii\queue\serializers\SerializerInterface;
-use yii\db\redis\Connection;
 
 /**
  * Redis Queue.
@@ -33,9 +34,8 @@ class Queue extends CliQueue
      */
     public $commandClass = Command::class;
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(SerializerInterface $serializer, Connection $redis)
     {
@@ -46,10 +46,13 @@ class Queue extends CliQueue
     /**
      * Listens queue and runs each job.
      *
-     * @param bool $repeat whether to continue listening when queue is empty.
-     * @param int $timeout number of seconds to wait for next message.
+     * @param bool $repeat  whether to continue listening when queue is empty.
+     * @param int  $timeout number of seconds to wait for next message.
+     *
      * @return null|int exit code.
+     *
      * @internal for worker command only.
+     *
      * @since 2.0.2
      */
     public function run($repeat, $timeout = 0)
@@ -69,7 +72,7 @@ class Queue extends CliQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function status($id)
     {
@@ -105,7 +108,9 @@ class Queue extends CliQueue
      * Removes a job by ID.
      *
      * @param int $id of a job
+     *
      * @return bool
+     *
      * @since 2.0.1
      */
     public function remove($id)
@@ -127,6 +132,7 @@ class Queue extends CliQueue
 
     /**
      * @param int $timeout timeout
+     *
      * @return array|null payload
      */
     protected function reserve($timeout)
@@ -145,7 +151,7 @@ class Queue extends CliQueue
             $id = $result[1];
         }
         if (!$id) {
-            return null;
+            return;
         }
 
         $payload = $this->redis->hget("$this->channel.messages", $id);
@@ -183,7 +189,7 @@ class Queue extends CliQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function pushMessage($message, $ttr, $delay, $priority)
     {

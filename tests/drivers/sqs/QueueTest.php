@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -8,9 +9,9 @@
 namespace yii\queue\tests\drivers\sqs;
 
 use yii\helpers\Yii;
+use yii\queue\sqs\Queue;
 use yii\queue\tests\app\RetryJob;
 use yii\queue\tests\drivers\CliTestCase;
-use yii\queue\sqs\Queue;
 
 /**
  * SQS Queue Test.
@@ -60,7 +61,7 @@ class QueueTest extends CliTestCase
     public function testClear()
     {
         if (!getenv('AWS_SQS_CLEAR_TEST_ENABLED')) {
-            $this->markTestSkipped(__METHOD__ . ' is disabled');
+            $this->markTestSkipped(__METHOD__.' is disabled');
         }
 
         $this->getQueue()->push($this->createSimpleJob());

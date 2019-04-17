@@ -1,17 +1,18 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
 namespace yii\queue\file;
 
-use yii\helpers\Yii;
 use yii\exceptions\InvalidArgumentException;
 use yii\exceptions\InvalidConfigException;
 use yii\exceptions\NotSupportedException;
 use yii\helpers\FileHelper;
+use yii\helpers\Yii;
 use yii\queue\cli\Queue as CliQueue;
 use yii\queue\serializers\SerializerInterface;
 
@@ -47,9 +48,8 @@ class Queue extends CliQueue
      */
     public $commandClass = Command::class;
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(SerializerInterface $serializer, string $path = '@runtime/queue', string $dirMode = '0755')
     {
@@ -64,10 +64,13 @@ class Queue extends CliQueue
     /**
      * Listens queue and runs each job.
      *
-     * @param bool $repeat whether to continue listening when queue is empty.
-     * @param int $timeout number of seconds to sleep before next iteration.
+     * @param bool $repeat  whether to continue listening when queue is empty.
+     * @param int  $timeout number of seconds to sleep before next iteration.
+     *
      * @return null|int exit code.
+     *
      * @internal for worker command only.
+     *
      * @since 2.0.2
      */
     public function run($repeat, $timeout = 0)
@@ -89,7 +92,7 @@ class Queue extends CliQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function status($id)
     {
@@ -123,7 +126,9 @@ class Queue extends CliQueue
      * Removes a job by ID.
      *
      * @param int $id of a job
+     *
      * @return bool
+     *
      * @since 2.0.1
      */
     public function remove($id)
@@ -182,6 +187,7 @@ class Queue extends CliQueue
                         list($id, $ttr, $attempt, $time) = $payload;
                         $data['reserved'][$key][2] = ++$attempt;
                         $data['reserved'][$key][3] = time();
+
                         return;
                     }
                 }
@@ -201,8 +207,6 @@ class Queue extends CliQueue
         if ($id) {
             return [$id, file_get_contents("$this->path/job$id.data"), $ttr, $attempt];
         }
-
-        return null;
     }
 
     /**
@@ -225,7 +229,7 @@ class Queue extends CliQueue
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function pushMessage($message, $ttr, $delay, $priority)
     {
@@ -260,6 +264,7 @@ class Queue extends CliQueue
                     if ($a[0] > $b[0]) {
                         return 1;
                     }
+
                     return 0;
                 });
             }
@@ -270,6 +275,7 @@ class Queue extends CliQueue
 
     /**
      * @param callable $callback
+     *
      * @throws InvalidConfigException
      */
     private function touchIndex($callback)
@@ -289,6 +295,7 @@ class Queue extends CliQueue
         if ($content !== '') {
             $data = call_user_func($this->indexDeserializer, $content);
         }
+
         try {
             $callback($data);
             $newContent = call_user_func($this->indexSerializer, $data);

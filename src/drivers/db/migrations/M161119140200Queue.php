@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -19,15 +20,14 @@ class M161119140200Queue extends Migration
     public $tableName = '{{%queue}}';
     public $tableOptions;
 
-
     public function up()
     {
         $this->createTable($this->tableName, [
-            'id' => $this->primaryKey(),
-            'channel' => $this->string()->notNull(),
-            'job' => $this->binary()->notNull(),
-            'created_at' => $this->integer()->notNull(),
-            'started_at' => $this->integer(),
+            'id'          => $this->primaryKey(),
+            'channel'     => $this->string()->notNull(),
+            'job'         => $this->binary()->notNull(),
+            'created_at'  => $this->integer()->notNull(),
+            'started_at'  => $this->integer(),
             'finished_at' => $this->integer(),
         ], $this->tableOptions);
 

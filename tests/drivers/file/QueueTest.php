@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -8,9 +9,9 @@
 namespace yii\queue\tests\drivers\file;
 
 use yii\helpers\Yii;
+use yii\queue\file\Queue;
 use yii\queue\tests\app\RetryJob;
 use yii\queue\tests\drivers\CliTestCase;
-use yii\queue\file\Queue;
 
 /**
  * File Queue Test.
@@ -72,19 +73,19 @@ class QueueTest extends CliTestCase
     public function testClear()
     {
         $this->getQueue()->push($this->createSimpleJob());
-        $this->assertNotEmpty(glob($this->getQueue()->path . '/job*.data'));
+        $this->assertNotEmpty(glob($this->getQueue()->path.'/job*.data'));
         $this->runProcess('php yii queue/clear --interactive=0');
 
-        $this->assertEmpty(glob($this->getQueue()->path . '/job*.data'));
+        $this->assertEmpty(glob($this->getQueue()->path.'/job*.data'));
     }
 
     public function testRemove()
     {
         $id = $this->getQueue()->push($this->createSimpleJob());
-        $this->assertFileExists($this->getQueue()->path . "/job$id.data");
+        $this->assertFileExists($this->getQueue()->path."/job$id.data");
         $this->runProcess("php yii queue/remove $id");
 
-        $this->assertFileNotExists($this->getQueue()->path . "/job$id.data");
+        $this->assertFileNotExists($this->getQueue()->path."/job$id.data");
     }
 
     /**
@@ -97,7 +98,7 @@ class QueueTest extends CliTestCase
 
     protected function tearDown()
     {
-        foreach (glob(Yii::getAlias("@runtime/queue/*")) as $fileName) {
+        foreach (glob(Yii::getAlias('@runtime/queue/*')) as $fileName) {
             unlink($fileName);
         }
         parent::tearDown();

@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -17,7 +18,6 @@ use yii\db\Migration;
 class M170601155600Priority extends Migration
 {
     public $tableName = '{{%queue}}';
-
 
     public function up()
     {
