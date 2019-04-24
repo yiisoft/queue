@@ -20,7 +20,7 @@ Yii::setAlias('@yii/queue/sync', dirname(__DIR__) . '/src/drivers/sync');
 Yii::setAlias('@yii/queue/sqs', dirname(__DIR__) . '/src/drivers/sqs');
 Yii::setAlias('@tests', __DIR__);
 
-$config = \yii\helpers\ArrayHelper::merge(
+$config = \Yiisoft\Arrays\ArrayHelper::merge(
     require(__DIR__ . '/app/config/main.php'),
     require(__DIR__ . '/app/config/console.php')
 );
