@@ -20,7 +20,7 @@ return [
             'db' => 'db', // Компонент подключения к БД или его конфиг
             'tableName' => '{{%queue}}', // Имя таблицы
             'channel' => 'default', // Выбранный для очереди канал
-            'mutex' => \yii\mutex\MysqlMutex::class, // Мьютекс для синхронизации запросов
+            'mutex' => \Yiisoft\Mutex\MysqlMutex::class, // Мьютекс для синхронизации запросов
         ],
     ],
 ];

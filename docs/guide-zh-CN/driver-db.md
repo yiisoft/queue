@@ -20,7 +20,7 @@ return [
             'db' => 'db', // DB 连接组件或它的配置
             'tableName' => '{{%queue}}', // 表名
             'channel' => 'default', // Queue channel key
-            'mutex' => \yii\mutex\MysqlMutex::class, // Mutex that used to sync queries
+            'mutex' => \Yiisoft\Mutex\MysqlMutex::class, // Mutex that used to sync queries
         ],
     ],
 ];

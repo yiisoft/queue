@@ -20,7 +20,7 @@ return [
             'db' => 'db', // DB 接続コンポーネントまたはその構成情報
             'tableName' => '{{%queue}}', // テーブル名
             'channel' => 'default', // キュー・チャンネル・キー
-            'mutex' => \yii\mutex\MysqlMutex::class, // クエリ同期のための mutex
+            'mutex' => \Yiisoft\Mutex\MysqlMutex::class, // クエリ同期のための mutex
         ],
     ],
 ];

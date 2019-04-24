@@ -40,7 +40,7 @@ $config = [
             'class' => \yii\queue\db\Queue::class,
             'db'    => 'mysql',
             'mutex' => [
-                'class' => \yii\mutex\MysqlMutex::class,
+                'class' => \Yiisoft\Mutex\MysqlMutex::class,
                 'db'    => 'mysql',
             ],
         ],
@@ -51,7 +51,7 @@ $config = [
         'sqliteQueue' => [
             'class' => \yii\queue\db\Queue::class,
             'db'    => 'sqlite',
-            'mutex' => \yii\mutex\FileMutex::class,
+            'mutex' => \Yiisoft\Mutex\FileMutex::class,
         ],
         'pgsql' => [
             'class' => \yii\db\Connection::class,
@@ -68,7 +68,7 @@ $config = [
             'class' => \yii\queue\db\Queue::class,
             'db'    => 'pgsql',
             'mutex' => [
-                'class' => \yii\mutex\PgsqlMutex::class,
+                'class' => \Yiisoft\Mutex\PgsqlMutex::class,
                 'db'    => 'pgsql',
             ],
             'mutexTimeout' => 0,
