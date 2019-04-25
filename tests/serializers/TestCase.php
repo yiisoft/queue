@@ -44,7 +44,7 @@ abstract class TestCase extends \Yiisoft\Yii\Queue\Tests\TestCase
         return [
             // Job object
             [
-                new SimpleJob(['uid' => 123]),
+                new SimpleJob(123),
             ],
             // Any object
             [
@@ -80,4 +80,11 @@ class TestObject extends BaseObject
 {
     public $foo;
     public $bar;
+
+    public function __construct($foo = null, $bar = null)
+    {
+        $this->foo = $foo;
+        $this->bar = $bar;
+    }
+
 }

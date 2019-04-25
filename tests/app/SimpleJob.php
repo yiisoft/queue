@@ -21,6 +21,11 @@ class SimpleJob extends BaseObject implements JobInterface
 {
     public $uid;
 
+    public function __construct($uid = null)
+    {
+        $this->uid = $uid;
+    }
+
     public function execute($queue)
     {
         file_put_contents($this->getFileName(), '');
