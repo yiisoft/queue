@@ -11,6 +11,7 @@ namespace Yiisoft\Yii\Queue;
 use yii\base\Component;
 use yii\exceptions\InvalidArgumentException;
 use yii\helpers\VarDumper;
+use Yiisoft\Yii\Queue\Events\ErrorEvent;
 use Yiisoft\Yii\Queue\Events\ExecEvent;
 use Yiisoft\Yii\Queue\Events\PushEvent;
 use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
@@ -246,7 +247,7 @@ abstract class Queue extends Component
         } elseif ($event->job instanceof RetryableJobInterface) {
             $event->retry = $event->job->canRetry($event->attempt, $event->error);
         }
-        $this->trigger(ExecEvent::after($event));
+        $this->trigger(ErrorEvent::after($event));
 
         return !$event->retry;
     }
