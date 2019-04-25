@@ -63,7 +63,7 @@ class ClosureTest extends TestCase
     protected function tearDown()
     {
         foreach (glob(Yii::getAlias('@runtime/job-*.lock')) as $fileName) {
-            unlink($fileName);
+           // unlink($fileName);
         }
         parent::tearDown();
     }

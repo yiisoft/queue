@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace tests\app\benchmark\waiting;
+namespace Yiisoft\Yii\Queue\Tests\App\Benchmark\Waiting;
 
 use Symfony\Component\Process\Process;
 use Yii;

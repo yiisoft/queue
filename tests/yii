@@ -1,30 +1,37 @@
 #!/usr/bin/env php
 <?php
-defined('YII_DEBUG') or define('YII_DEBUG', true);
-defined('YII_ENV') or define('YII_ENV', 'test');
-// To exit with error code
-defined('YII_ENV_TEST') or define('YII_ENV_TEST', false);
+/**
+ * @link http://www.yiiframework.com/
+ * @copyright Copyright (c) 2008 Yii Software LLC
+ * @license http://www.yiiframework.com/license/
+ */
 
-require(__DIR__ . '/../vendor/autoload.php');
-require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
+use hiqdev\composer\config\Builder;
+use yii\di\Container;
+use yii\helpers\Yii;
 
-Yii::setAlias('@yii/queue', dirname(__DIR__) . '/src');
-Yii::setAlias('@yii/queue/amqp', dirname(__DIR__) . '/src/drivers/amqp');
-Yii::setAlias('@yii/queue/amqp_interop', dirname(__DIR__) . '/src/drivers/amqp_interop');
-Yii::setAlias('@yii/queue/beanstalk', dirname(__DIR__) . '/src/drivers/beanstalk');
-Yii::setAlias('@yii/queue/db', dirname(__DIR__) . '/src/drivers/db');
-Yii::setAlias('@yii/queue/file', dirname(__DIR__) . '/src/drivers/file');
-Yii::setAlias('@yii/queue/gearman', dirname(__DIR__) . '/src/drivers/gearman');
-Yii::setAlias('@yii/queue/redis', dirname(__DIR__) . '/src/drivers/redis');
-Yii::setAlias('@yii/queue/sync', dirname(__DIR__) . '/src/drivers/sync');
-Yii::setAlias('@yii/queue/sqs', dirname(__DIR__) . '/src/drivers/sqs');
-Yii::setAlias('@tests', __DIR__);
+// ensure we get report on all possible php errors
+error_reporting(-1);
 
-$config = \Yiisoft\Arrays\ArrayHelper::merge(
-    require(__DIR__ . '/app/config/main.php'),
-    require(__DIR__ . '/app/config/console.php')
-);
+define('YII_ENABLE_ERROR_HANDLER', false);
+define('YII_DEBUG', true);
+define('YII_ENV', 'test');
 
-$app = new \yii\console\Application($config);
-$code = $app->run();
-exit($code);
+$_SERVER['SCRIPT_NAME'] = '/' . __DIR__;
+$_SERVER['SCRIPT_FILENAME'] = __FILE__;
+
+(static function () {
+    $composerAutoload = getcwd() . '/vendor/autoload.php';
+    if (!is_file($composerAutoload)) {
+        die('You need to set up the project dependencies using Composer');
+    }
+
+    require_once $composerAutoload;
+
+    $container = new Container(require Builder::path('tests-app'));
+
+    Yii::setContainer($container);
+
+
+    $container->get('app')->run();
+})();

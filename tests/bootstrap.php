@@ -19,7 +19,7 @@ define('YII_ENV', 'test');
 $_SERVER['SCRIPT_NAME'] = '/' . __DIR__;
 $_SERVER['SCRIPT_FILENAME'] = __FILE__;
 
-(function () {
+(static function () {
     $composerAutoload = getcwd() . '/vendor/autoload.php';
     if (!is_file($composerAutoload)) {
         die('You need to set up the project dependencies using Composer');
@@ -27,7 +27,7 @@ $_SERVER['SCRIPT_FILENAME'] = __FILE__;
 
     require_once $composerAutoload;
 
-    $container = new Container(require Builder::path('tests'));
+    $container = new Container(require Builder::path('tests-app'));
 
     Yii::setContainer($container);
 })();

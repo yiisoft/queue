@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue\Tests\app\benchmark;
+namespace Yiisoft\Yii\Queue\Tests\App\Benchmark;
 
 /**
  * Benchmark commands.
@@ -20,14 +20,14 @@ class Controller extends \yii\console\Controller
     public function actions()
     {
         return [
-            'waiting' => waiting\Action::class,
+            'waiting' => Waiting\Action::class,
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $this->startedAt = time();
 

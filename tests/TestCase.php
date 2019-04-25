@@ -24,6 +24,5 @@ abstract class TestCase extends BaseTestCase
     {
         parent::__construct($name, $data, $dataName);
         $this->container = Yii::getContainer();
-
     }
 }
