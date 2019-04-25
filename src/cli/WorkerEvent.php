@@ -24,19 +24,19 @@ class WorkerEvent extends Event
      *
      * @since 2.0.2
      */
-    const START = 'worker.start';
+    public const START = 'worker.start';
     /**
      * @event WorkerEvent that is triggered each iteration between requests to queue.
      *
      * @since 2.0.3
      */
-    const LOOP = 'worker.loop';
+    public const LOOP = 'worker.loop';
     /**
      * @event WorkerEvent that is triggered when the worker is stopped.
      *
      * @since 2.0.2
      */
-    const STOP = 'worker.stop';
+    public const STOP = 'worker.stop';
 
     /**
      * @var Queue

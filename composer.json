@@ -72,7 +72,6 @@
         },
         "config-plugin": {
             "tests": "config/tests.php",
-            "params": "config/params.php",
             "common": "config/common.php",
             "console": "config/console.php",
             "tests-app": ["$common","$console","tests/App/config/main.php", "tests/App/config/console.php"]

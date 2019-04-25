@@ -13,9 +13,9 @@ use yii\db\ConnectionInterface;
 use yii\db\Query;
 use yii\exceptions\Exception;
 use yii\exceptions\InvalidArgumentException;
+use Yiisoft\Mutex\Mutex;
 use Yiisoft\Yii\Queue\Cli\Queue as CliQueue;
 use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
-use Yiisoft\Mutex\Mutex;
 
 /**
  * Db Queue.

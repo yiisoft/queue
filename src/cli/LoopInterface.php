@@ -20,5 +20,5 @@ interface LoopInterface
     /**
      * @return bool whether to continue listening of the queue.
      */
-    public function canContinue();
+    public function canContinue(): bool;
 }

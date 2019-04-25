@@ -11,8 +11,8 @@ namespace Yiisoft\Yii\Queue\Cli;
 use yii\base\BootstrapInterface;
 use yii\console\Application as ConsoleApp;
 use yii\exceptions\InvalidConfigException;
-use Yiisoft\Helpers\InflectorHelper;
 use yii\helpers\Yii;
+use Yiisoft\Helpers\InflectorHelper;
 use Yiisoft\Yii\Queue\Queue as BaseQueue;
 
 /**
@@ -105,7 +105,7 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
         $exitCode = null;
 
         try {
-            call_user_func($handler, function () use ($loop, $event) {
+            $handler(function () use ($loop, $event) {
                 $this->trigger(WorkerEvent::loop($event));
 
                 return $event->exitCode === null && $loop->canContinue();

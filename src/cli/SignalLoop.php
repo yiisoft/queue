@@ -83,7 +83,7 @@ class SignalLoop extends BaseObject implements LoopInterface
      *
      * {@inheritdoc}
      */
-    public function canContinue()
+    public function canContinue(): bool
     {
         if (extension_loaded('pcntl')) {
             pcntl_signal_dispatch();

@@ -42,8 +42,8 @@ class LogBehavior extends Behavior
             ExecEvent::BEFORE      => 'beforeExec',
             ExecEvent::AFTER       => 'afterExec',
             ErrorEvent::AFTER      => 'afterError',
-            cli\WorkerEvent::START => 'workerStart',
-            cli\WorkerEvent::STOP  => 'workerStop',
+            Cli\WorkerEvent::START => 'workerStart',
+            Cli\WorkerEvent::STOP  => 'workerStop',
         ];
     }
 

@@ -10,10 +10,10 @@ namespace Yiisoft\Yii\Queue\Debug;
 
 use yii\exceptions\NotSupportedException;
 use yii\helpers\VarDumper;
+use yii\view\ViewContextInterface;
 use Yiisoft\Yii\Queue\Events\PushEvent;
 use Yiisoft\Yii\Queue\JobInterface;
 use Yiisoft\Yii\Queue\Queue;
-use yii\view\ViewContextInterface;
 
 /**
  * Debug Panel.

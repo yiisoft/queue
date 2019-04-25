@@ -3,6 +3,7 @@
  * @var \yii\web\View
  * @var array         $jobs
  */
+
 use yii\helpers\Html;
 
 $styles = [
