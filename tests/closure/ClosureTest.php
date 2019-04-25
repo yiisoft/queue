@@ -11,6 +11,7 @@ namespace Yiisoft\Yii\Queue\Tests\closure;
 use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Closure\Behavior;
 use Yiisoft\Yii\Queue\Drivers\Sync\Queue;
+use Yiisoft\Yii\Queue\Serializers\JsonSerializer;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 /**
@@ -22,7 +23,7 @@ class ClosureTest extends TestCase
 {
     public function testPush1()
     {
-        $this->getQueue()->push(function () {
+        $this->getQueue()->push(static function () {
             $fileName = Yii::getAlias('@runtime/job-1.lock');
             file_put_contents($fileName, '');
         });
@@ -33,7 +34,7 @@ class ClosureTest extends TestCase
     public function testPush2()
     {
         $fileName = Yii::getAlias('@runtime/job-2.lock');
-        $this->getQueue()->push(function () use ($fileName) {
+        $this->getQueue()->push(static function () use ($fileName) {
             file_put_contents($fileName, '');
         });
         $this->getQueue()->run();
@@ -46,10 +47,9 @@ class ClosureTest extends TestCase
     protected function getQueue()
     {
         if (!$this->_queue) {
-            $this->_queue = new Queue([
-                'handle'     => false,
-                'as closure' => Behavior::class,
-            ]);
+            $this->_queue = new Queue(new JsonSerializer());
+            $this->_queue->handle = false;
+            $this->_queue->attachBehavior('closure', Behavior::class);
         }
 
         return $this->_queue;

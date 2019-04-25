@@ -16,6 +16,7 @@
         "docs": "https://github.com/yiisoft/yii-queue/blob/master/docs/guide"
     },
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "yiisoft/yii-core": "^3.0@dev",
         "yiisoft/yii-console": "^3.0@dev",
@@ -53,12 +54,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Yiisoft\\Queue\\": "src"
+            "Yiisoft\\Yii\\Queue\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Yiisoft\\Queue\\Tests\\": "tests"
+            "Yiisoft\\Yii\\Queue\\Tests\\": "tests"
         }
     },
     "extra": {

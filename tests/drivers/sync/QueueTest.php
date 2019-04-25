@@ -24,7 +24,7 @@ class QueueTest extends TestCase
      */
     protected function getQueue()
     {
-        return Yii::$app->syncQueue;
+        return $this->app->syncQueue;
     }
 
     public function testRun()

@@ -40,7 +40,7 @@ class Behavior extends \yii\base\Behavior
     public function events()
     {
         return [
-            Queue::EVENT_BEFORE_PUSH => 'beforePush',
+            PushEvent::BEFORE => 'beforePush',
         ];
     }
 
