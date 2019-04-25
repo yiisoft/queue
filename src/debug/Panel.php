@@ -10,7 +10,6 @@ namespace Yiisoft\Yii\Queue\Debug;
 
 use yii\exceptions\NotSupportedException;
 use yii\helpers\VarDumper;
-use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Events\PushEvent;
 use Yiisoft\Yii\Queue\JobInterface;
 use Yiisoft\Yii\Queue\Queue;
@@ -51,7 +50,7 @@ class Panel extends \Yiisoft\Debug\Panel implements ViewContextInterface
     protected function getPushData(PushEvent $event)
     {
         $data = [];
-        foreach (Yii::getApp()->getComponents(false) as $id => $component) {
+        foreach ($this->app->getComponents(false) as $id => $component) {
             if ($component === $event->sender) {
                 $data['sender'] = $id;
                 break;
@@ -95,7 +94,7 @@ class Panel extends \Yiisoft\Debug\Panel implements ViewContextInterface
      */
     public function getSummary()
     {
-        return Yii::getApp()->view->render('summary', [
+        return $this->app->view->render('summary', [
             'url'   => $this->getUrl(),
             'count' => isset($this->data['jobs']) ? count($this->data['jobs']) : 0,
         ], $this);
@@ -110,7 +109,7 @@ class Panel extends \Yiisoft\Debug\Panel implements ViewContextInterface
         foreach ($jobs as &$job) {
             $job['status'] = 'unknown';
             /** @var Queue $queue */
-            if ($queue = Yii::getApp()->get($job['sender'], false)) {
+            if ($queue = $this->app->get($job['sender'], false)) {
                 try {
                     if ($queue->isWaiting($job['id'])) {
                         $job['status'] = 'waiting';
@@ -127,6 +126,6 @@ class Panel extends \Yiisoft\Debug\Panel implements ViewContextInterface
         }
         unset($job);
 
-        return Yii::getApp()->view->render('detail', compact('jobs'), $this);
+        return $this->app->view->render('detail', compact('jobs'), $this);
     }
 }
