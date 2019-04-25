@@ -8,8 +8,8 @@ $config = [
         'runtimePath' => dirname(dirname(__DIR__)).'/runtime',
         'bootstrap'   => [
             'mysqlQueue',
-            //'sqliteQueue',
-            //'pgsqlQueue',
+            'sqliteQueue',
+            'pgsqlQueue',
             //'amqpQueue',
             //'amqpInteropQueue',
         ],
@@ -71,8 +71,10 @@ $config = [
     ],
     'sqliteQueue' => [
         '__class' => \Yiisoft\Yii\Queue\Drivers\Db\Queue::class,
-        'db'    => 'sqlite',
-        'mutex' => \Yiisoft\Mutex\FileMutex::class,
+        '__construct()' => [
+            'serializer' => \yii\di\Reference::to(\Yiisoft\Yii\Queue\Serializers\SerializerInterface::class),
+            'db' => \yii\di\Reference::to('sqlite')
+        ]
     ],
     'pgsql' => [
         '__class' => \yii\db\Connection::class,
@@ -87,10 +89,9 @@ $config = [
     ],
     'pgsqlQueue' => [
         '__class' => \Yiisoft\Yii\Queue\Drivers\Db\Queue::class,
-        'db'    => 'pgsql',
-        'mutex' => [
-            '__class' => \Yiisoft\Mutex\PgsqlMutex::class,
-            'db'    => 'pgsql',
+        '__construct()' => [
+            'serializer' => \yii\di\Reference::to(\Yiisoft\Yii\Queue\Serializers\SerializerInterface::class),
+            'db' => \yii\di\Reference::to('pgsql')
         ],
         'mutexTimeout' => 0,
     ],
