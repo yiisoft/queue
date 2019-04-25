@@ -9,7 +9,7 @@
 namespace Yiisoft\Yii\Queue\Closure;
 
 use SuperClosure\Serializer;
-use Yiisoft\Yii\Queue\PushEvent;
+use Yiisoft\Yii\Queue\Events\PushEvent;
 use Yiisoft\Yii\Queue\Queue;
 
 /**

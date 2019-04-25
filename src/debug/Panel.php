@@ -8,11 +8,11 @@
 
 namespace Yiisoft\Yii\Queue\Debug;
 
-use Yii;
 use yii\exceptions\NotSupportedException;
 use yii\helpers\VarDumper;
+use yii\helpers\Yii;
+use Yiisoft\Yii\Queue\Events\PushEvent;
 use Yiisoft\Yii\Queue\JobInterface;
-use Yiisoft\Yii\Queue\PushEvent;
 use Yiisoft\Yii\Queue\Queue;
 use yii\view\ViewContextInterface;
 
@@ -21,7 +21,7 @@ use yii\view\ViewContextInterface;
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-class Panel extends \yii\debug\Panel implements ViewContextInterface
+class Panel extends \Yiisoft\Debug\Panel implements ViewContextInterface
 {
     private $_jobs = [];
 
@@ -38,8 +38,7 @@ class Panel extends \yii\debug\Panel implements ViewContextInterface
      */
     public function init()
     {
-        parent::init();
-        PushEvent::on(Queue::class, Queue::EVENT_AFTER_PUSH, function (PushEvent $event) {
+        PushEvent::on(Queue::class, PushEvent::AFTER, function (PushEvent $event) {
             $this->_jobs[] = $this->getPushData($event);
         });
     }
@@ -52,7 +51,7 @@ class Panel extends \yii\debug\Panel implements ViewContextInterface
     protected function getPushData(PushEvent $event)
     {
         $data = [];
-        foreach (Yii::$app->getComponents(false) as $id => $component) {
+        foreach (Yii::getApp()->getComponents(false) as $id => $component) {
             if ($component === $event->sender) {
                 $data['sender'] = $id;
                 break;
@@ -96,7 +95,7 @@ class Panel extends \yii\debug\Panel implements ViewContextInterface
      */
     public function getSummary()
     {
-        return Yii::$app->view->render('summary', [
+        return Yii::getApp()->view->render('summary', [
             'url'   => $this->getUrl(),
             'count' => isset($this->data['jobs']) ? count($this->data['jobs']) : 0,
         ], $this);
@@ -111,7 +110,7 @@ class Panel extends \yii\debug\Panel implements ViewContextInterface
         foreach ($jobs as &$job) {
             $job['status'] = 'unknown';
             /** @var Queue $queue */
-            if ($queue = Yii::$app->get($job['sender'], false)) {
+            if ($queue = Yii::getApp()->get($job['sender'], false)) {
                 try {
                     if ($queue->isWaiting($job['id'])) {
                         $job['status'] = 'waiting';
@@ -128,6 +127,6 @@ class Panel extends \yii\debug\Panel implements ViewContextInterface
         }
         unset($job);
 
-        return Yii::$app->view->render('detail', compact('jobs'), $this);
+        return Yii::getApp()->view->render('detail', compact('jobs'), $this);
     }
 }

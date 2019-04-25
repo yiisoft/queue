@@ -10,6 +10,10 @@ namespace Yiisoft\Yii\Queue;
 
 use yii\base\Behavior;
 use yii\helpers\Yii;
+use Yiisoft\Yii\Queue\Events\ErrorEvent;
+use Yiisoft\Yii\Queue\Events\ExecEvent;
+use Yiisoft\Yii\Queue\Events\JobEvent;
+use Yiisoft\Yii\Queue\Events\PushEvent;
 
 /**
  * Log Behavior.

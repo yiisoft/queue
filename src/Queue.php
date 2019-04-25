@@ -11,6 +11,9 @@ namespace Yiisoft\Yii\Queue;
 use yii\base\Component;
 use yii\exceptions\InvalidArgumentException;
 use yii\helpers\VarDumper;
+use Yiisoft\Yii\Queue\Events\ErrorEvent;
+use Yiisoft\Yii\Queue\Events\ExecEvent;
+use Yiisoft\Yii\Queue\Events\PushEvent;
 use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
 
 /**

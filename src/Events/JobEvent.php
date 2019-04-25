@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue;
+namespace Yiisoft\Yii\Queue\Events;
 
 use yii\base\Event;
 
@@ -18,7 +18,7 @@ use yii\base\Event;
 abstract class JobEvent extends Event
 {
     /**
-     * @var Queue
+     * @var \Yiisoft\Yii\Queue\Queue
      *            {@inheritdoc}
      */
     public $sender;
@@ -27,7 +27,7 @@ abstract class JobEvent extends Event
      */
     public $id;
     /**
-     * @var JobInterface|null
+     * @var \Yiisoft\Yii\Queue\JobInterface|null
      */
     public $job;
     /**

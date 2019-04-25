@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue\Tests\App\Benchmark;
+namespace Yiisoft\Yii\Queue\Tests\app\benchmark;
 
 /**
  * Benchmark commands.

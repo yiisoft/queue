@@ -8,9 +8,9 @@
 
 namespace Yiisoft\Yii\Queue\Gii;
 
-use Yii;
 use yii\base\BaseObject;
 use yii\gii\CodeFile;
+use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\JobInterface;
 use Yiisoft\Yii\Queue\RetryableJobInterface;
 

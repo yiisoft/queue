@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue\Tests\App\Benchmark\waiting;
+namespace Yiisoft\Yii\Queue\Tests\app\benchmark\waiting;
 
 use yii\base\BaseObject;
 use Yiisoft\Yii\Queue\JobInterface;

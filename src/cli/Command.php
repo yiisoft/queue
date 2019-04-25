@@ -13,7 +13,7 @@ use Symfony\Component\Process\Exception\RuntimeException as ProcessRuntimeExcept
 use Symfony\Component\Process\Process;
 use yii\base\Action;
 use yii\console\Controller;
-use Yiisoft\Yii\Queue\ExecEvent;
+use Yiisoft\Yii\Queue\Events\ExecEvent;
 
 /**
  * Base Command.

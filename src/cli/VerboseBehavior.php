@@ -11,8 +11,8 @@ namespace Yiisoft\Yii\Queue\Cli;
 use yii\base\Behavior;
 use yii\console\Controller;
 use yii\helpers\Console;
-use Yiisoft\Yii\Queue\ErrorEvent;
-use Yiisoft\Yii\Queue\ExecEvent;
+use Yiisoft\Yii\Queue\Events\ErrorEvent;
+use Yiisoft\Yii\Queue\Events\ExecEvent;
 use Yiisoft\Yii\Queue\JobInterface;
 
 /**
