@@ -6,14 +6,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\tests;
+namespace Yiisoft\Yii\Queue\Tests;
 
-use yii\queue\closure\Behavior as ClosureBehavior;
-use yii\queue\ExecEvent;
-use yii\queue\InvalidJobException;
-use yii\queue\JobEvent;
-use yii\queue\Queue;
-use yii\queue\sync\Queue as SyncQueue;
+use Yiisoft\Yii\Queue\Closure\Behavior as ClosureBehavior;
+use Yiisoft\Yii\Queue\ExecEvent;
+use Yiisoft\Yii\Queue\InvalidJobException;
+use Yiisoft\Yii\Queue\JobEvent;
+use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\Drivers\Sync\Queue as SyncQueue;
 
 /**
  * Job Event Test.

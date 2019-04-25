@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\amqp_interop;
+namespace Yiisoft\Yii\Queue\Drivers\Interop;
 
 use Enqueue\AmqpBunny\AmqpConnectionFactory as AmqpBunnyConnectionFactory;
 use Enqueue\AmqpExt\AmqpConnectionFactory as AmqpExtConnectionFactory;
@@ -24,8 +24,8 @@ use yii\base\Application as BaseApp;
 use yii\base\Event;
 use yii\base\RequestEvent;
 use yii\exceptions\NotSupportedException;
-use yii\queue\cli\Queue as CliQueue;
-use yii\queue\serializers\SerializerInterface;
+use Yiisoft\Yii\Queue\Cli\Queue as CliQueue;
+use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
 
 /**
  * Amqp Queue.

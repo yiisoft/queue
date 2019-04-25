@@ -6,10 +6,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\db;
+namespace Yiisoft\Yii\Queue\Drivers\Db;
 
 use yii\console\exceptions\Exception;
-use yii\queue\cli\Command as CliCommand;
+use Yiisoft\Yii\Queue\Cli\Command as CliCommand;
 
 /**
  * Manages application db-queue.

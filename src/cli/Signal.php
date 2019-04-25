@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\cli;
+namespace Yiisoft\Yii\Queue\Cli;
 
 /**
  * Process Signal Helper.
@@ -21,7 +21,7 @@ class Signal
 
     /**
      * Checks exit signals
-     * Used mainly by [[yii\queue\Queue]] to check, whether job execution
+     * Used mainly by [[Yiisoft\Yii\Queue\Queue]] to check, whether job execution
      * loop can be continued.
      *
      * @return bool

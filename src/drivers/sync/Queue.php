@@ -6,12 +6,12 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\sync;
+namespace Yiisoft\Yii\Queue\Drivers\Sync;
 
 use yii\base\RequestEvent;
 use yii\exceptions\InvalidArgumentException;
 use yii\helpers\Yii;
-use yii\queue\Queue as BaseQueue;
+use Yiisoft\Yii\Queue\Queue as BaseQueue;
 
 /**
  * Sync Queue.

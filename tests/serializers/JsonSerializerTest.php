@@ -6,9 +6,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\tests\serializers;
+namespace Yiisoft\Yii\Queue\Tests\serializers;
 
-use yii\queue\serializers\JsonSerializer;
+use Yiisoft\Yii\Queue\Serializers\JsonSerializer;
 
 /**
  * Json Serializer Test.

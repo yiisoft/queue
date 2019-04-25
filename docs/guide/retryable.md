@@ -20,7 +20,7 @@ The first method is to use queue component options:
 ```php
 'components' => [
     'queue' => [
-        'class' => \yii\queue\<driver>\Queue::class,
+        'class' => \Yiisoft\Yii\Queue\<driver>\Queue::class,
         'ttr' => 5 * 60, // Max time for job execution
         'attempts' => 3, // Max number of attempts
     ],

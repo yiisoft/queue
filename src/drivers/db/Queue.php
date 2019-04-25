@@ -6,15 +6,15 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\db;
+namespace Yiisoft\Yii\Queue\Drivers\Db;
 
 use yii\db\Connection;
 use yii\db\ConnectionInterface;
 use yii\db\Query;
 use yii\exceptions\Exception;
 use yii\exceptions\InvalidArgumentException;
-use yii\queue\cli\Queue as CliQueue;
-use yii\queue\serializers\SerializerInterface;
+use Yiisoft\Yii\Queue\Cli\Queue as CliQueue;
+use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
 use Yiisoft\Mutex\Mutex;
 
 /**

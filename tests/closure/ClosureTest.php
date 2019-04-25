@@ -6,12 +6,12 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\tests\closure;
+namespace Yiisoft\Yii\Queue\Tests\closure;
 
 use yii\helpers\Yii;
-use yii\queue\closure\Behavior;
-use yii\queue\sync\Queue;
-use yii\queue\tests\TestCase;
+use Yiisoft\Yii\Queue\Closure\Behavior;
+use Yiisoft\Yii\Queue\Drivers\Sync\Queue;
+use Yiisoft\Yii\Queue\Tests\TestCase;
 
 /**
  * Closure Test.

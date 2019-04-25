@@ -6,18 +6,18 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\tests\serializers;
+namespace Yiisoft\Yii\Queue\Tests\serializers;
 
 use yii\base\BaseObject;
-use yii\queue\serializers\SerializerInterface;
-use yii\queue\tests\app\SimpleJob;
+use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
+use Yiisoft\Yii\Queue\Tests\App\SimpleJob;
 
 /**
  * Serializer Test Case.
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-abstract class TestCase extends \yii\queue\tests\TestCase
+abstract class TestCase extends \Yiisoft\Yii\Queue\Tests\TestCase
 {
     /**
      * @return SerializerInterface

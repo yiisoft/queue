@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\cli;
+namespace Yiisoft\Yii\Queue\Cli;
 
 /**
  * Verbose Behavior.

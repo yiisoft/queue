@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue;
+namespace Yiisoft\Yii\Queue;
 
 use yii\base\Event;
 

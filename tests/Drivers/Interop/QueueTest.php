@@ -6,13 +6,13 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\tests\drivers\amqp_interop;
+namespace Yiisoft\Yii\Queue\Tests\drivers\amqp_interop;
 
 use yii\helpers\Yii;
-use yii\queue\amqp_interop\Queue;
-use yii\queue\tests\app\PriorityJob;
-use yii\queue\tests\app\RetryJob;
-use yii\queue\tests\drivers\CliTestCase;
+use Yiisoft\Yii\Queue\Drivers\Interop\Queue;
+use Yiisoft\Yii\Queue\Tests\App\PriorityJob;
+use Yiisoft\Yii\Queue\Tests\App\RetryJob;
+use Yiisoft\Yii\Queue\Tests\drivers\CliTestCase;
 
 /**
  * AMQP Queue Test.

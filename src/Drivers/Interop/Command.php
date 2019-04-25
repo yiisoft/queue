@@ -6,9 +6,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\amqp_interop;
+namespace Yiisoft\Yii\Queue\Drivers\Interop;
 
-use yii\queue\cli\Command as CliCommand;
+use Yiisoft\Yii\Queue\Cli\Command as CliCommand;
 
 /**
  * Manages application amqp-queue.

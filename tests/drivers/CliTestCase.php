@@ -6,11 +6,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\tests\drivers;
+namespace Yiisoft\Yii\Queue\Tests\drivers;
 
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
-use yii\queue\tests\app\PriorityJob;
+use Yiisoft\Yii\Queue\Tests\App\PriorityJob;
 
 /**
  * CLI Test Case.

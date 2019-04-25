@@ -16,7 +16,7 @@ return [
             // ...
         ],
         'queue' => [
-            'class' => \yii\queue\db\Queue::class,
+            'class' => \Yiisoft\Yii\Queue\Drivers\Db\Queue::class,
             'db' => 'db', // DB connection component or its config 
             'tableName' => '{{%queue}}', // Table name
             'channel' => 'default', // Queue channel key
@@ -60,7 +60,7 @@ To add migrations to your application, edit the console config file to configure
         'migrationPath' => null,
         'migrationNamespaces' => [
             // ...
-            'yii\queue\db\migrations',
+            'Yiisoft\Yii\Queue\Drivers\Db\migrations',
         ],
     ],
 ],

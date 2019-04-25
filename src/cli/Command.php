@@ -6,14 +6,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\cli;
+namespace Yiisoft\Yii\Queue\Cli;
 
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\RuntimeException as ProcessRuntimeException;
 use Symfony\Component\Process\Process;
 use yii\base\Action;
 use yii\console\Controller;
-use yii\queue\ExecEvent;
+use Yiisoft\Yii\Queue\ExecEvent;
 
 /**
  * Base Command.

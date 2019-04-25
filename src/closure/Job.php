@@ -6,10 +6,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\closure;
+namespace Yiisoft\Yii\Queue\Closure;
 
 use SuperClosure\Serializer;
-use yii\queue\JobInterface;
+use Yiisoft\Yii\Queue\JobInterface;
 
 /**
  * Closure Job.

@@ -6,14 +6,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\cli;
+namespace Yiisoft\Yii\Queue\Cli;
 
 use yii\base\BootstrapInterface;
 use yii\console\Application as ConsoleApp;
 use yii\exceptions\InvalidConfigException;
 use Yiisoft\Helpers\InflectorHelper;
 use yii\helpers\Yii;
-use yii\queue\Queue as BaseQueue;
+use Yiisoft\Yii\Queue\Queue as BaseQueue;
 
 /**
  * Queue with CLI.

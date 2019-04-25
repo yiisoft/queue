@@ -7,7 +7,7 @@ return [
             'db'                  => 'mysql',
             'migrationPath'       => null,
             'migrationNamespaces' => [
-                'yii\queue\db\migrations',
+                'Yiisoft\Yii\Queue\Drivers\Db\migrations',
             ],
         ],
         'sqlite-migrate' => [
@@ -15,7 +15,7 @@ return [
             'db'                  => 'sqlite',
             'migrationPath'       => null,
             'migrationNamespaces' => [
-                'yii\queue\db\migrations',
+                'Yiisoft\Yii\Queue\Drivers\Db\migrations',
             ],
         ],
         'pgsql-migrate' => [
@@ -23,9 +23,9 @@ return [
             'db'                  => 'pgsql',
             'migrationPath'       => null,
             'migrationNamespaces' => [
-                'yii\queue\db\migrations',
+                'Yiisoft\Yii\Queue\Drivers\Db\migrations',
             ],
         ],
-        'benchmark' => \yii\queue\tests\app\benchmark\Controller::class,
+        'benchmark' => \Yiisoft\Yii\Queue\Tests\App\Benchmark\Controller::class,
     ],
 ];

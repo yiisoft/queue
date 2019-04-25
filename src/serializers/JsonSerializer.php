@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\serializers;
+namespace Yiisoft\Yii\Queue\Serializers;
 
 use yii\base\BaseObject;
 use yii\exceptions\InvalidConfigException;

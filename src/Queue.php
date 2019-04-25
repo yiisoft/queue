@@ -6,12 +6,12 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue;
+namespace Yiisoft\Yii\Queue;
 
 use yii\base\Component;
 use yii\exceptions\InvalidArgumentException;
 use yii\helpers\VarDumper;
-use yii\queue\serializers\SerializerInterface;
+use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
 
 /**
  * Base Queue.

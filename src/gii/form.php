@@ -2,7 +2,7 @@
 /**
  * @var \yii\web\View
  * @var \yii\widgets\ActiveForm  $form
- * @var \yii\queue\gii\Generator $generator
+ * @var \Yiisoft\Yii\Queue\Gii\Generator $generator
  */
 ?>
 <?= $form->field($generator, 'jobClass')->textInput(['autofocus' => true]) ?>

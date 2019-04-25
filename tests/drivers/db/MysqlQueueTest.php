@@ -6,10 +6,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\tests\drivers\db;
+namespace Yiisoft\Yii\Queue\Tests\drivers\db;
 
 use yii\helpers\Yii;
-use yii\queue\db\Queue;
+use Yiisoft\Yii\Queue\Drivers\Db\Queue;
 
 /**
  * MySQL Queue Test.

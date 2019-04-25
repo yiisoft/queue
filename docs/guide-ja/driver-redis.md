@@ -22,7 +22,7 @@ return [
             'retries' => 1,
         ],
         'queue' => [
-            'class' => \yii\queue\redis\Queue::class,
+            'class' => \Yiisoft\Yii\Queue\redis\Queue::class,
             'redis' => 'redis', // Redis 接続コンポーネントまたはその構成情報
             'channel' => 'queue', // キュー・チャンネル・キー
         ],

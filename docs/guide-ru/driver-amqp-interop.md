@@ -36,12 +36,12 @@ return [
     ],
     'components' => [
         'queue' => [
-            'class' => \yii\queue\amqp_interop\Queue::class,
+            'class' => \Yiisoft\Yii\Queue\Drivers\Interop\Queue::class,
             'port' => 5672,
             'user' => 'guest',
             'password' => 'guest',
             'queueName' => 'queue',
-            'driver' => yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
+            'driver' => Yiisoft\Yii\Queue\Drivers\Interop\Queue::ENQUEUE_AMQP_LIB,
             // или
             'dsn' => 'amqp://guest:guest@localhost:5672/%2F',
             // или

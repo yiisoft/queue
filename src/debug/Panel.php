@@ -6,14 +6,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\debug;
+namespace Yiisoft\Yii\Queue\Debug;
 
 use Yii;
 use yii\exceptions\NotSupportedException;
 use yii\helpers\VarDumper;
-use yii\queue\JobInterface;
-use yii\queue\PushEvent;
-use yii\queue\Queue;
+use Yiisoft\Yii\Queue\JobInterface;
+use Yiisoft\Yii\Queue\PushEvent;
+use Yiisoft\Yii\Queue\Queue;
 use yii\view\ViewContextInterface;
 
 /**

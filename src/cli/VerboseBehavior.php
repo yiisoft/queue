@@ -6,14 +6,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\cli;
+namespace Yiisoft\Yii\Queue\Cli;
 
 use yii\base\Behavior;
 use yii\console\Controller;
 use yii\helpers\Console;
-use yii\queue\ErrorEvent;
-use yii\queue\ExecEvent;
-use yii\queue\JobInterface;
+use Yiisoft\Yii\Queue\ErrorEvent;
+use Yiisoft\Yii\Queue\ExecEvent;
+use Yiisoft\Yii\Queue\JobInterface;
 
 /**
  * Verbose Behavior.

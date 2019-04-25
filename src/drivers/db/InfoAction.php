@@ -6,11 +6,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\db;
+namespace Yiisoft\Yii\Queue\Drivers\Db;
 
 use yii\db\Query;
 use yii\helpers\Console;
-use yii\queue\cli\Action;
+use Yiisoft\Yii\Queue\Cli\Action;
 
 /**
  * Info about queue status.

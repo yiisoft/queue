@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\db\migrations;
+namespace Yiisoft\Yii\Queue\Drivers\Db\migrations;
 
 use yii\db\Migration;
 

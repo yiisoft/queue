@@ -6,10 +6,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\tests\app\benchmark\waiting;
+namespace Yiisoft\Yii\Queue\Tests\App\Benchmark\waiting;
 
 use yii\base\BaseObject;
-use yii\queue\JobInterface;
+use Yiisoft\Yii\Queue\JobInterface;
 
 /**
  * The job calculates waiting time.

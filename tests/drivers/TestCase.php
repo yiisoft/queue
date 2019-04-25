@@ -6,18 +6,18 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\tests\drivers;
+namespace Yiisoft\Yii\Queue\Tests\drivers;
 
 use yii\helpers\Yii;
-use yii\queue\Queue;
-use yii\queue\tests\app\SimpleJob;
+use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\Tests\App\SimpleJob;
 
 /**
  * Driver Test Case.
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-abstract class TestCase extends \yii\queue\tests\TestCase
+abstract class TestCase extends \Yiisoft\Yii\Queue\Tests\TestCase
 {
     /**
      * @return Queue

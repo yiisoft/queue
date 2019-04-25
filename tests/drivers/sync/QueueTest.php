@@ -6,11 +6,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\tests\drivers\sync;
+namespace Yiisoft\Yii\Queue\Tests\drivers\sync;
 
 use yii\helpers\Yii;
-use yii\queue\sync\Queue;
-use yii\queue\tests\drivers\TestCase;
+use Yiisoft\Yii\Queue\Drivers\Sync\Queue;
+use Yiisoft\Yii\Queue\Tests\drivers\TestCase;
 
 /**
  * Sync Queue Test.

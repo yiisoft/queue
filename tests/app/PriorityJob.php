@@ -6,11 +6,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\tests\app;
+namespace Yiisoft\Yii\Queue\Tests\App;
 
 use yii\base\BaseObject;
 use yii\helpers\Yii;
-use yii\queue\JobInterface;
+use Yiisoft\Yii\Queue\JobInterface;
 
 /**
  * Priority Job.
