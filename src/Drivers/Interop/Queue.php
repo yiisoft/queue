@@ -36,13 +36,14 @@ use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
  */
 class Queue extends CliQueue
 {
-    const ATTEMPT = 'yii-attempt';
-    const TTR = 'yii-ttr';
-    const DELAY = 'yii-delay';
-    const PRIORITY = 'yii-priority';
-    const ENQUEUE_AMQP_LIB = 'enqueue/amqp-lib';
-    const ENQUEUE_AMQP_EXT = 'enqueue/amqp-ext';
-    const ENQUEUE_AMQP_BUNNY = 'enqueue/amqp-bunny';
+    private const ATTEMPT = 'yii-attempt';
+    private const TTR = 'yii-ttr';
+    private const DELAY = 'yii-delay';
+    private const PRIORITY = 'yii-priority';
+
+    public const ENQUEUE_AMQP_LIB = 'enqueue/amqp-lib';
+    public const ENQUEUE_AMQP_EXT = 'enqueue/amqp-ext';
+    public const ENQUEUE_AMQP_BUNNY = 'enqueue/amqp-bunny';
 
     /**
      * The connection to the borker could be configured as an array of options

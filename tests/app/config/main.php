@@ -10,14 +10,13 @@ $config = [
             'mysqlQueue',
             'sqliteQueue',
             'pgsqlQueue',
-            //'amqpQueue',
-            //'amqpInteropQueue',
+            'interopQueue',
         ],
     ],
     'request' => [
         '__class' => \yii\console\Request::class,
         'cookieValidationKey' => new \Yiisoft\Arrays\UnsetArrayValue(),
-        'scriptFile' => dirname(dirname(__DIR__)) . '/yii',
+        'scriptFile' => dirname(__DIR__, 2) . '/yii',
         'scriptUrl' =>  new \Yiisoft\Arrays\UnsetArrayValue(),
     ],
     'response' => [
@@ -26,7 +25,7 @@ $config = [
     ],
 
     'aliases' => [
-        '@runtime' => dirname(dirname(__DIR__)) . '/runtime',
+        '@runtime' => dirname(__DIR__, 2) . '/runtime',
     ],
 
     'syncQueue' => [
@@ -95,15 +94,7 @@ $config = [
         ],
         'mutexTimeout' => 0,
     ],
-    'amqpQueue' => [
-        '__class'        => \Yiisoft\Yii\Queue\amqp\Queue::class,
-        'host'         => getenv('RABBITMQ_HOST') ?: 'localhost',
-        'user'         => getenv('RABBITMQ_USER') ?: 'guest',
-        'password'     => getenv('RABBITMQ_PASSWORD') ?: 'guest',
-        'queueName'    => 'queue-basic',
-        'exchangeName' => 'exchange-basic',
-    ],
-    'amqpInteropQueue' => [
+    'interopQueue' => [
         '__class'        => \Yiisoft\Yii\Queue\Drivers\Interop\Queue::class,
         'host'         => getenv('RABBITMQ_HOST') ?: 'localhost',
         'user'         => getenv('RABBITMQ_USER') ?: 'guest',
