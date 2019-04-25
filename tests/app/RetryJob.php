@@ -38,12 +38,12 @@ class RetryJob extends BaseObject implements RetryableJobInterface
         return Yii::getAlias("@runtime/job-{$this->uid}.lock");
     }
 
-    public function getTtr()
+    public function getTtr(): int
     {
         return 2;
     }
 
-    public function canRetry($attempt, $error)
+    public function canRetry($attempt, $error): bool
     {
         return $attempt < 2;
     }

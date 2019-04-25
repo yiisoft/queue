@@ -79,7 +79,7 @@ abstract class Queue extends Component
      *
      * @return $this
      */
-    public function ttr($value)
+    public function ttr(int $value)
     {
         $this->pushTtr = $value;
 

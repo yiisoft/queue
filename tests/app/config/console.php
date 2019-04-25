@@ -27,7 +27,7 @@ return [
                     'Yiisoft\Yii\Queue\Drivers\Db\migrations',
                 ],
             ],
-            'benchmark' => \Yiisoft\Yii\Queue\Tests\app\benchmark\Controller::class,
+            'benchmark' => \Yiisoft\Yii\Queue\Tests\App\Benchmark\Controller::class,
         ],
     ],
 ];

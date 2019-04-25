@@ -9,8 +9,7 @@
 namespace Yiisoft\Yii\Queue\Tests\App\Benchmark\Waiting;
 
 use Symfony\Component\Process\Process;
-use Yii;
-use yii\console\Exception as ConsoleException;
+use yii\console\exceptions\Exception as ConsoleException;
 use yii\helpers\Console;
 use Yiisoft\Yii\Queue\Queue;
 
@@ -27,23 +26,13 @@ class Action extends \yii\base\Action
     public $modes = [
         // Worker will be run in fast mode
         'fast' => [
-            'gearmanQueue'     => 'gearman-queue/listen      --isolate=0',
-            'beanstalkQueue'   => 'beanstalk-queue/listen    --isolate=0',
-            'redisQueue'       => 'redis-queue/listen        --isolate=0',
-            'amqpQueue'        => 'amqp-queue/listen         --isolate=0',
-            'amqpInteropQueue' => 'amqp-interop-queue/listen --isolate=0',
-            'mysqlQueue'       => 'mysql-queue/listen 1      --isolate=0',
-            'fileQueue'        => 'file-queue/listen 1       --isolate=0',
+            'interopQueue' => 'interop-queue/listen --isolate=0',
+            'mysqlQueue' => 'mysql-queue/listen 1   --isolate=0',
         ],
         // Worker will be run in isolate mode
         'isolate' => [
-            'gearmanQueue'     => 'gearman-queue/listen      --isolate=1',
-            'beanstalkQueue'   => 'beanstalk-queue/listen    --isolate=1',
-            'redisQueue'       => 'redis-queue/listen        --isolate=1',
-            'amqpQueue'        => 'amqp-queue/listen         --isolate=1',
-            'amqpInteropQueue' => 'amqp-interop-queue/listen --isolate=1',
-            'mysqlQueue'       => 'mysql-queue/listen 1      --isolate=1',
-            'fileQueue'        => 'file-queue/listen 1       --isolate=1',
+            'interopQueue' => 'interop-queue/listen --isolate=1',
+            'mysqlQueue' => 'mysql-queue/listen 1   --isolate=1',
         ],
     ];
     /**
@@ -54,10 +43,10 @@ class Action extends \yii\base\Action
     /**
      * Runs benchmark of job wait time.
      *
-     * @param string $mode        one of 'fast' or 'isolate'
-     * @param int    $jobCount    number of jobs that will be pushed to a queue
-     * @param int    $workerCount number of workers that listen a queue
-     * @param int    $payloadSize additional job size
+     * @param string $mode one of 'fast' or 'isolate'
+     * @param int $jobCount number of jobs that will be pushed to a queue
+     * @param int $workerCount number of workers that listen a queue
+     * @param int $payloadSize additional job size
      *
      * @throws
      */
@@ -75,10 +64,10 @@ class Action extends \yii\base\Action
 
         foreach ($this->modes[$mode] as $queueName => $workerCommand) {
             /** @var Queue $queue */
-            $queue = Yii::$app->get($queueName);
+            $queue = $this->app->get($queueName);
 
             // Starts worker
-            $stdoutFileName = Yii::getAlias("@runtime/$queueName-out.log");
+            $stdoutFileName = $this->app->getAlias("@runtime/$queueName-out.log");
             file_put_contents($stdoutFileName, '');
             $this->startWorkers($workerCommand, $workerCount, function ($type, $buffer) use ($stdoutFileName) {
                 file_put_contents($stdoutFileName, $buffer, FILE_APPEND | LOCK_EX);
@@ -86,7 +75,7 @@ class Action extends \yii\base\Action
 
             // Prepares result storage
             sleep(2);
-            $resultFileName = Yii::getAlias("@runtime/$queueName-result.log");
+            $resultFileName = $this->app->getAlias("@runtime/$queueName-result.log");
             file_put_contents($resultFileName, '');
 
             try {
@@ -101,7 +90,7 @@ class Action extends \yii\base\Action
                         $jobs[] = $job = new Job();
                         $job->resultFileName = $resultFileName;
                         $lockName = uniqid($queueName);
-                        $job->lockFileName = Yii::getAlias("@runtime/$lockName.lock");
+                        $job->lockFileName = $this->app->getAlias("@runtime/$lockName.lock");
                         touch($job->lockFileName);
                         $job->pushedAt = microtime(true);
                         $job->payload = str_repeat('a', $payloadSize);
@@ -125,7 +114,7 @@ class Action extends \yii\base\Action
                 }
 
                 Console::endProgress(strtr(
-                    'MEDIAN = {median} s; AVG = {avg} s; MIN = {min} s; MAX = {max} s'.PHP_EOL,
+                    'MEDIAN = {median} s; AVG = {avg} s; MIN = {min} s; MAX = {max} s' . PHP_EOL,
                     $this->calcResult($resultFileName, 4)
                 ));
             } finally {
@@ -137,8 +126,8 @@ class Action extends \yii\base\Action
     /**
      * Starts few workers.
      *
-     * @param string   $command
-     * @param int      $count
+     * @param string $command
+     * @param int $count
      * @param callable $callback
      */
     private function startWorkers($command, $count, callable $callback)
@@ -165,7 +154,7 @@ class Action extends \yii\base\Action
      * Calculates aggregated wait time.
      *
      * @param string $fileName of result storage
-     * @param int    $scale
+     * @param int $scale
      *
      * @return array of aggregate results in seconds
      */
@@ -176,7 +165,7 @@ class Action extends \yii\base\Action
 
         $count = count($times);
         sort($times, SORT_NUMERIC);
-        $middleIndex = (int) floor($count / 2);
+        $middleIndex = (int)floor($count / 2);
         $median = $times[$middleIndex];
         if ($count % 2 === 0) {
             $median = ($median + $times[$middleIndex - 1]) / 2;
@@ -186,11 +175,11 @@ class Action extends \yii\base\Action
         $max = max($times);
 
         return [
-            '{count}'  => $count,
+            '{count}' => $count,
             '{median}' => number_format($median, $scale, '.', ''),
-            '{avg}'    => number_format($avg, $scale, '.', ''),
-            '{min}'    => number_format($min, $scale, '.', ''),
-            '{max}'    => number_format($max, $scale, '.', ''),
+            '{avg}' => number_format($avg, $scale, '.', ''),
+            '{min}' => number_format($min, $scale, '.', ''),
+            '{max}' => number_format($max, $scale, '.', ''),
         ];
     }
 }
