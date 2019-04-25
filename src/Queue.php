@@ -30,15 +30,15 @@ abstract class Queue extends Component
     /**
      * @see Queue::isWaiting()
      */
-    const STATUS_WAITING = 1;
+    public const STATUS_WAITING = 1;
     /**
      * @see Queue::isReserved()
      */
-    const STATUS_RESERVED = 2;
+    public const STATUS_RESERVED = 2;
     /**
      * @see Queue::isDone()
      */
-    const STATUS_DONE = 3;
+    public const STATUS_DONE = 3;
 
     /**
      * @var bool whether to enable strict job type control.
@@ -180,6 +180,7 @@ abstract class Queue extends Component
     protected function handleMessage($id, $message, $ttr, $attempt)
     {
         list($job, $error) = $this->unserializeMessage($message);
+
         $event = ExecEvent::before($id, $job, $ttr, $attempt, $error);
         $this->trigger($event);
         if ($event->isPropagationStopped()) {
@@ -246,7 +247,7 @@ abstract class Queue extends Component
         } elseif ($event->job instanceof RetryableJobInterface) {
             $event->retry = $event->job->canRetry($event->attempt, $event->error);
         }
-        $this->trigger(ErrorEvent::after($event));
+        $this->trigger(ExecEvent::after($event));
 
         return !$event->retry;
     }

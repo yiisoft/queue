@@ -25,7 +25,7 @@ class JobEventTest extends TestCase
     public function testInvalidJob()
     {
         $eventCounter = [];
-        $eventHandler = function (JobEvent $event) use (&$eventCounter) {
+        $eventHandler = static function (JobEvent $event) use (&$eventCounter) {
             $eventCounter[$event->id][$event->name] = true;
         };
         $queue = new SyncQueue(new JsonSerializer());
@@ -33,7 +33,7 @@ class JobEventTest extends TestCase
         $queue->on(ExecEvent::BEFORE, $eventHandler);
         $queue->on(ExecEvent::AFTER, $eventHandler);
         $queue->on(ExecEvent::AFTER, function (ExecEvent $event) {
-            $this->assertTrue($event->error instanceof InvalidJobException);
+            $this->assertInstanceOf(InvalidJobException::class, $event->error);
             $this->assertFalse($event->retry);
         });
         $jobId = $queue->push('message that cannot be unserialized');
@@ -52,7 +52,7 @@ class JobEventTest extends TestCase
             $isTriggered = true;
             $this->assertSame(12345, $event->result);
         });
-        $queue->push(function () {
+        $queue->push(static function () {
             return 12345;
         });
         $queue->run();
