@@ -8,7 +8,6 @@
 
 namespace Yiisoft\Yii\Queue\Tests\Drivers\Db;
 
-use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Drivers\Db\Queue;
 
 /**
@@ -23,6 +22,6 @@ class PgsqlQueueTest extends TestCase
      */
     protected function getQueue()
     {
-        return Yii::$app->pgsqlQueue;
+        return $this->container->get('pgsqlQueue');
     }
 }

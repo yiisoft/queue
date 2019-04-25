@@ -41,7 +41,11 @@
         "yiisoft/cache": "^3.0@dev",
         "phpunit/phpunit": "^7.3",
         "aws/aws-sdk-php": ">=2.4",
-        "hiqdev/composer-config-plugin": "^1.0@dev"
+        "hiqdev/composer-config-plugin": "^1.0@dev",
+        "yiisoft/mutex-file": "^3.0@dev",
+        "yiisoft/db-mysql": "^3.0@dev",
+        "yiisoft/db-sqlite": "^3.0@dev",
+        "yiisoft/db-pgsql": "^3.0@dev"
     },
     "suggest": {
         "ext-pcntl": "Need for process signals.",
@@ -70,7 +74,22 @@
             "tests": "config/tests.php",
             "params": "config/params.php",
             "common": "config/common.php",
-            "console": "config/console.php"
+            "console": "config/console.php",
+            "tests-app": ["$common","$console","tests/App/config/main.php", "tests/App/config/console.php"]
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/yiisoft/mutex-file"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/yiisoft/mutex-db-mysql"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/yiisoft/mutex-db-pgsql"
+        }
+    ]
 }

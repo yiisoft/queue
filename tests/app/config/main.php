@@ -55,13 +55,17 @@ $config = [
     ],
     'mysqlQueue' => [
         '__class' => \Yiisoft\Yii\Queue\Drivers\Db\Queue::class,
+        '__construct()' => [
+            'serializer' => \yii\di\Reference::to(\Yiisoft\Yii\Queue\Serializers\SerializerInterface::class),
+            'db' => \yii\di\Reference::to('mysql')
+        ]
         /*'db'    => 'mysql',
         'mutex' => [
             '__class' => \Yiisoft\Mutex\MysqlMutex::class,
             'db'    => 'mysql',
         ],*/
     ],
-    /*'sqlite' => [
+    'sqlite' => [
         '__class' => \yii\db\Connection::class,
         'dsn'   => 'sqlite:@runtime/yii2_queue_test.db',
     ],
@@ -105,7 +109,7 @@ $config = [
         'password'     => getenv('RABBITMQ_PASSWORD') ?: 'guest',
         'queueName'    => 'queue-interop',
         'exchangeName' => 'exchange-interop',
-    ],*/
+    ],
 
 ];
 

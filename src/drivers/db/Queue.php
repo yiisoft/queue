@@ -63,6 +63,11 @@ class Queue extends CliQueue
         $this->mutex = $mutex;
     }
 
+    public function getDb()
+    {
+        return $this->db;
+    }
+
     /**
      * Listens queue and runs each job.
      *

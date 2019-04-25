@@ -74,7 +74,7 @@ abstract class TestCase extends CliTestCase
     public function testRetry()
     {
         $this->startProcess('php yii queue/listen 1');
-        $job = new RetryJob(['uid' => uniqid()]);
+        $job = new RetryJob(uniqid());
         $this->getQueue()->push($job);
         sleep(6);
 
