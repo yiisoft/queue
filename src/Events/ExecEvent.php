@@ -18,11 +18,15 @@ class ExecEvent extends JobEvent
     /**
      * @event ExecEvent
      */
-    const BEFORE = 'before.exec';
+    public const BEFORE = 'before.exec';
     /**
      * @event ExecEvent
      */
-    const AFTER = 'after.exec';
+    public const AFTER = 'after.exec';
+    /**
+     * @event ExecEvent
+     */
+    public const ERROR = 'error.exec';
 
     /**
      * @var int attempt number.
@@ -76,6 +80,22 @@ class ExecEvent extends JobEvent
     public static function after(self $before): self
     {
         $event = new static(static::AFTER, $before->id, $before->job, $before->ttr);
+        $event->attempt = $before->attempt;
+        $event->result = $before->result;
+        $event->error = $before->error;
+        $event->retry = $before->retry;
+
+        return $event;
+    }
+
+    /**
+     * Creates BEFORE event.
+     *
+     * @return self created event
+     */
+    public static function error(self $before): self
+    {
+        $event = new static(static::ERROR, $before->id, $before->job, $before->ttr);
         $event->attempt = $before->attempt;
         $event->result = $before->result;
         $event->error = $before->error;

@@ -11,7 +11,6 @@ namespace Yiisoft\Yii\Queue\Cli;
 use yii\base\Behavior;
 use yii\console\Controller;
 use yii\helpers\Console;
-use Yiisoft\Yii\Queue\Events\ErrorEvent;
 use Yiisoft\Yii\Queue\Events\ExecEvent;
 use Yiisoft\Yii\Queue\JobInterface;
 
@@ -48,7 +47,7 @@ class VerboseBehavior extends Behavior
         return [
             ExecEvent::BEFORE  => 'beforeExec',
             ExecEvent::AFTER   => 'afterExec',
-            ErrorEvent::AFTER  => 'afterError',
+            ExecEvent::ERROR  => 'afterError',
             WorkerEvent::START => 'workerStart',
             WorkerEvent::STOP  => 'workerStop',
         ];

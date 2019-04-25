@@ -31,8 +31,8 @@ class JobEventTest extends TestCase
         $queue = new SyncQueue(new JsonSerializer());
         $queue->strictJobType = false;
         $queue->on(ExecEvent::BEFORE, $eventHandler);
-        $queue->on(ExecEvent::AFTER, $eventHandler);
-        $queue->on(ExecEvent::AFTER, function (ExecEvent $event) {
+        $queue->on(ExecEvent::ERROR, $eventHandler);
+        $queue->on(ExecEvent::ERROR, function (ExecEvent $event) {
             $this->assertInstanceOf(InvalidJobException::class, $event->error);
             $this->assertFalse($event->retry);
         });
@@ -40,7 +40,7 @@ class JobEventTest extends TestCase
         $queue->run();
         $this->assertArrayHasKey($jobId, $eventCounter);
         $this->assertArrayHasKey(ExecEvent::BEFORE, $eventCounter[$jobId]);
-        $this->assertArrayHasKey(ExecEvent::AFTER, $eventCounter[$jobId]);
+        $this->assertArrayHasKey(ExecEvent::ERROR, $eventCounter[$jobId]);
     }
 
     public function testExecResult()

@@ -63,8 +63,6 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
             }
         }
 
-        return 'queue';
-
         throw new InvalidConfigException('Queue must be an application component.');
     }
 
