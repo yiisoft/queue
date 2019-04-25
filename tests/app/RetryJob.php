@@ -21,6 +21,11 @@ class RetryJob extends BaseObject implements RetryableJobInterface
 {
     public $uid;
 
+    public function __construct($uid)
+    {
+        $this->uid = $uid;
+    }
+
     public function execute($queue)
     {
         file_put_contents($this->getFileName(), 'a', FILE_APPEND);

@@ -6,13 +6,13 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue\Tests\drivers\amqp_interop;
+namespace Yiisoft\Yii\Queue\Tests\Drivers\Interop;
 
 use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Drivers\Interop\Queue;
 use Yiisoft\Yii\Queue\Tests\app\PriorityJob;
 use Yiisoft\Yii\Queue\Tests\app\RetryJob;
-use Yiisoft\Yii\Queue\Tests\drivers\CliTestCase;
+use Yiisoft\Yii\Queue\Tests\Drivers\CliTestCase;
 
 /**
  * AMQP Queue Test.
@@ -52,11 +52,11 @@ class QueueTest extends CliTestCase
 
     public function testPriority()
     {
-        $this->getQueue()->priority(3)->push(new PriorityJob(['number' => 1]));
-        $this->getQueue()->priority(1)->push(new PriorityJob(['number' => 5]));
-        $this->getQueue()->priority(2)->push(new PriorityJob(['number' => 3]));
-        $this->getQueue()->priority(2)->push(new PriorityJob(['number' => 4]));
-        $this->getQueue()->priority(3)->push(new PriorityJob(['number' => 2]));
+        $this->getQueue()->priority(3)->push(new PriorityJob(1));
+        $this->getQueue()->priority(1)->push(new PriorityJob(5));
+        $this->getQueue()->priority(2)->push(new PriorityJob(3));
+        $this->getQueue()->priority(2)->push(new PriorityJob(4));
+        $this->getQueue()->priority(3)->push(new PriorityJob(2));
         $this->startProcess('php yii queue/listen');
         sleep(3);
 
@@ -68,7 +68,7 @@ class QueueTest extends CliTestCase
      */
     protected function getQueue()
     {
-        return Yii::$app->amqpInteropQueue;
+        return $this->container->get('app')->amqpInteropQueue;
     }
 
     protected function setUp()

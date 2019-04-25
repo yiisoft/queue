@@ -6,11 +6,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue\Tests\drivers\sync;
+namespace Yiisoft\Yii\Queue\Tests\Drivers\Sync;
 
-use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Drivers\Sync\Queue;
-use Yiisoft\Yii\Queue\Tests\drivers\TestCase;
+use Yiisoft\Yii\Queue\Events\ExecEvent;
+use Yiisoft\Yii\Queue\Tests\Drivers\TestCase;
 
 /**
  * Sync Queue Test.
@@ -24,7 +24,7 @@ class QueueTest extends TestCase
      */
     protected function getQueue()
     {
-        return $this->app->syncQueue;
+        return $this->container->get('syncQueue');
     }
 
     public function testRun()
@@ -45,9 +45,9 @@ class QueueTest extends TestCase
         $beforeExec = function () use ($id, &$isReserved) {
             $isReserved = $this->getQueue()->isReserved($id);
         };
-        $this->getQueue()->on(Queue::EVENT_BEFORE_EXEC, $beforeExec);
+        $this->getQueue()->on(ExecEvent::BEFORE, $beforeExec);
         $this->getQueue()->run();
-        $this->getQueue()->off(Queue::EVENT_BEFORE_EXEC, $beforeExec);
+        $this->getQueue()->off(ExecEvent::BEFORE, $beforeExec);
         $isDone = $this->getQueue()->isDone($id);
 
         $this->assertTrue($isWaiting);

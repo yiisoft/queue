@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue\Tests\drivers;
+namespace Yiisoft\Yii\Queue\Tests\Drivers;
 
 use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Queue;
@@ -29,9 +29,7 @@ abstract class TestCase extends \Yiisoft\Yii\Queue\Tests\TestCase
      */
     protected function createSimpleJob()
     {
-        return new SimpleJob([
-            'uid' => uniqid(),
-        ]);
+        return new SimpleJob(uniqid());
     }
 
     /**

@@ -1,23 +1,33 @@
 <?php
+/**
+ * @link http://www.yiiframework.com/
+ * @copyright Copyright (c) 2008 Yii Software LLC
+ * @license http://www.yiiframework.com/license/
+ */
 
+use hiqdev\composer\config\Builder;
+use yii\di\Container;
+use yii\helpers\Yii;
+
+// ensure we get report on all possible php errors
+error_reporting(-1);
+
+define('YII_ENABLE_ERROR_HANDLER', false);
 define('YII_DEBUG', true);
-$_SERVER['SCRIPT_NAME'] = '/'.__DIR__;
+define('YII_ENV', 'test');
+
+$_SERVER['SCRIPT_NAME'] = '/' . __DIR__;
 $_SERVER['SCRIPT_FILENAME'] = __FILE__;
 
-require_once __DIR__.'/../vendor/autoload.php';
-require_once __DIR__.'/../vendor/yiisoft/yii2/Yii.php';
+(function () {
+    $composerAutoload = getcwd() . '/vendor/autoload.php';
+    if (!is_file($composerAutoload)) {
+        die('You need to set up the project dependencies using Composer');
+    }
 
-Yii::setAlias('@yii/queue', dirname(__DIR__).'/src');
-Yii::setAlias('@yii/queue/amqp', dirname(__DIR__).'/src/drivers/amqp');
-Yii::setAlias('@yii/queue/amqp_interop', dirname(__DIR__).'/src/drivers/amqp_interop');
-Yii::setAlias('@yii/queue/beanstalk', dirname(__DIR__).'/src/drivers/beanstalk');
-Yii::setAlias('@yii/queue/db', dirname(__DIR__).'/src/drivers/db');
-Yii::setAlias('@yii/queue/file', dirname(__DIR__).'/src/drivers/file');
-Yii::setAlias('@yii/queue/gearman', dirname(__DIR__).'/src/drivers/gearman');
-Yii::setAlias('@yii/queue/redis', dirname(__DIR__).'/src/drivers/redis');
-Yii::setAlias('@yii/queue/sync', dirname(__DIR__).'/src/drivers/sync');
-Yii::setAlias('@yii/queue/sqs', dirname(__DIR__).'/src/drivers/sqs');
-Yii::setAlias('@tests', __DIR__);
+    require_once $composerAutoload;
 
-$config = require __DIR__.'/app/config/main.php';
-$app = new \yii\console\Application($config);
+    $container = new Container(require Builder::path('tests'));
+
+    Yii::setContainer($container);
+})();

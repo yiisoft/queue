@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue\Tests\drivers\db;
+namespace Yiisoft\Yii\Queue\Tests\Drivers\Db;
 
 use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Drivers\Db\Queue;

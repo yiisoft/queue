@@ -6,12 +6,12 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue\Tests\drivers\db;
+namespace Yiisoft\Yii\Queue\Tests\Drivers\Db;
 
 use yii\db\Query;
 use Yiisoft\Yii\Queue\Tests\app\PriorityJob;
 use Yiisoft\Yii\Queue\Tests\app\RetryJob;
-use Yiisoft\Yii\Queue\Tests\drivers\CliTestCase;
+use Yiisoft\Yii\Queue\Tests\Drivers\CliTestCase;
 
 /**
  * Db Queue Test Case.
