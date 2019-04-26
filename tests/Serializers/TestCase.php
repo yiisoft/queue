@@ -86,5 +86,4 @@ class TestObject extends BaseObject
         $this->foo = $foo;
         $this->bar = $bar;
     }
-
 }
