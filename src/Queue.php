@@ -244,7 +244,6 @@ abstract class Queue extends Component
         if ($event->error instanceof InvalidJobException) {
             $event->retry = false;
         } elseif ($event->job instanceof RetryableJobInterface) {
-            file_put_contents('/tmp/aaa', $event->attempt . ' -- ' . var_export($event->error, 1));
             $event->retry = $event->job->canRetry($event->attempt, $event->error);
         }
         $this->trigger(ExecEvent::error($event));

@@ -10,7 +10,6 @@ namespace Yiisoft\Yii\Queue;
 
 use yii\base\Behavior;
 use yii\helpers\Yii;
-use Yiisoft\Yii\Queue\Events\ErrorEvent;
 use Yiisoft\Yii\Queue\Events\ExecEvent;
 use Yiisoft\Yii\Queue\Events\JobEvent;
 use Yiisoft\Yii\Queue\Events\PushEvent;
@@ -50,7 +49,7 @@ class LogBehavior extends Behavior
     /**
      * @param PushEvent $event
      */
-    public function afterPush(PushEvent $event)
+    public function afterPush(PushEvent $event): void
     {
         $title = $this->getJobTitle($event);
         Yii::info("$title is pushed.", Queue::class);
@@ -59,7 +58,7 @@ class LogBehavior extends Behavior
     /**
      * @param ExecEvent $event
      */
-    public function beforeExec(ExecEvent $event)
+    public function beforeExec(ExecEvent $event): void
     {
         $title = $this->getExecTitle($event);
         Yii::info("$title is started.", Queue::class);
@@ -68,8 +67,9 @@ class LogBehavior extends Behavior
 
     /**
      * @param ExecEvent $event
+     * @throws \yii\exceptions\InvalidConfigException
      */
-    public function afterExec(ExecEvent $event)
+    public function afterExec(ExecEvent $event): void
     {
         $title = $this->getExecTitle($event);
         Yii::endProfile($title, Queue::class);
@@ -81,8 +81,9 @@ class LogBehavior extends Behavior
 
     /**
      * @param ExecEvent $event
+     * @throws \yii\exceptions\InvalidConfigException
      */
-    public function afterError(ExecEvent $event)
+    public function afterError(ExecEvent $event): void
     {
         $title = $this->getExecTitle($event);
         Yii::endProfile($title, Queue::class);
@@ -93,11 +94,12 @@ class LogBehavior extends Behavior
     }
 
     /**
-     * @param cli\WorkerEvent $event
+     * @param Cli\WorkerEvent $event
      *
+     * @throws \yii\exceptions\InvalidConfigException
      * @since 2.0.2
      */
-    public function workerStart(cli\WorkerEvent $event)
+    public function workerStart(Cli\WorkerEvent $event): void
     {
         $title = 'Worker '.$event->getTarget()->getWorkerPid();
         Yii::info("$title is started.", Queue::class);
@@ -108,11 +110,10 @@ class LogBehavior extends Behavior
     }
 
     /**
-     * @param cli\WorkerEvent $event
-     *
-     * @since 2.0.2
+     * @param Cli\WorkerEvent $event
+     * @throws \yii\exceptions\InvalidConfigException
      */
-    public function workerStop(cli\WorkerEvent $event)
+    public function workerStop(Cli\WorkerEvent $event): void
     {
         $title = 'Worker '.$event->getTarget()->getWorkerPid();
         Yii::endProfile($title, Queue::class);
@@ -129,7 +130,7 @@ class LogBehavior extends Behavior
      *
      * @since 2.0.2
      */
-    protected function getJobTitle(JobEvent $event)
+    protected function getJobTitle(JobEvent $event): string
     {
         $name = $event->job instanceof JobInterface ? get_class($event->job) : 'unknown job';
 
@@ -143,7 +144,7 @@ class LogBehavior extends Behavior
      *
      * @since 2.0.2
      */
-    protected function getExecTitle(ExecEvent $event)
+    protected function getExecTitle(ExecEvent $event): string
     {
         $title = $this->getJobTitle($event);
         $extra = "attempt: $event->attempt";

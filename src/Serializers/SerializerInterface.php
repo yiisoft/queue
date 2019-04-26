@@ -22,7 +22,7 @@ interface SerializerInterface
      *
      * @return string
      */
-    public function serialize($job);
+    public function serialize($job): string;
 
     /**
      * @param string $serialized
