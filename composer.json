@@ -80,15 +80,18 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/yiisoft/mutex-file"
+            "url": "https://github.com/yiisoft/mutex-file",
+            "no-api": true
         },
         {
             "type": "vcs",
-            "url": "https://github.com/yiisoft/mutex-db-mysql"
+            "url": "https://github.com/yiisoft/mutex-db-mysql",
+            "no-api": true
         },
         {
             "type": "vcs",
-            "url": "https://github.com/yiisoft/mutex-db-pgsql"
+            "url": "https://github.com/yiisoft/mutex-db-pgsql",
+            "no-api": true
         }
     ]
 }
