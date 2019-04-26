@@ -10,7 +10,7 @@ namespace Yiisoft\Yii\Queue\Tests\Drivers;
 
 use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Queue;
-use Yiisoft\Yii\Queue\Tests\app\SimpleJob;
+use Yiisoft\Yii\Queue\Tests\App\SimpleJob;
 
 /**
  * Driver Test Case.

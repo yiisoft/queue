@@ -10,8 +10,8 @@ namespace Yiisoft\Yii\Queue\Tests\Drivers\Interop;
 
 use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Drivers\Interop\Queue;
-use Yiisoft\Yii\Queue\Tests\app\PriorityJob;
-use Yiisoft\Yii\Queue\Tests\app\RetryJob;
+use Yiisoft\Yii\Queue\Tests\App\PriorityJob;
+use Yiisoft\Yii\Queue\Tests\App\RetryJob;
 use Yiisoft\Yii\Queue\Tests\Drivers\CliTestCase;
 
 /**

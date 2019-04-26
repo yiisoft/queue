@@ -10,7 +10,7 @@ namespace Yiisoft\Yii\Queue\Tests\Drivers;
 
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
-use Yiisoft\Yii\Queue\Tests\app\PriorityJob;
+use Yiisoft\Yii\Queue\Tests\App\PriorityJob;
 
 /**
  * CLI Test Case.

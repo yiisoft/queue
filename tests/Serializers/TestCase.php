@@ -10,7 +10,7 @@ namespace Yiisoft\Yii\Queue\Tests\serializers;
 
 use yii\base\BaseObject;
 use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
-use Yiisoft\Yii\Queue\Tests\app\SimpleJob;
+use Yiisoft\Yii\Queue\Tests\App\SimpleJob;
 
 /**
  * Serializer Test Case.

@@ -35,7 +35,7 @@ $config = [
     'mutex-file' => [
         '__class' => \Yiisoft\Mutex\FileMutex::class,
         '__construct()' => [
-            'mutexPath' => '/tmp/a.mutex',
+            'mutexPath' => dirname(__DIR__, 2) . '/runtime/mutex',
         ],
     ],
     'mysql' => [

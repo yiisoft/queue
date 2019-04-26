@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue\Tests\app;
+namespace Yiisoft\Yii\Queue\Tests\App;
 
 use yii\base\BaseObject;
 use yii\helpers\Yii;
