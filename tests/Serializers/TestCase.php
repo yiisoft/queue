@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue\Tests\serializers;
+namespace Yiisoft\Yii\Queue\Tests\Serializers;
 
 use yii\base\BaseObject;
 use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
