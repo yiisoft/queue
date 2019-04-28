@@ -20,4 +20,4 @@ Yii::setAlias('@yii/queue/sqs', dirname(__DIR__).'/src/drivers/sqs');
 Yii::setAlias('@tests', __DIR__);
 
 $config = require __DIR__.'/app/config/main.php';
-$app = new \yii\console\Application($config);
+$app = new \Yiisoft\Yii\Console\Application($config);

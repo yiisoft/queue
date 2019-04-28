@@ -13,7 +13,7 @@ namespace yii\queue\tests\app\benchmark;
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-class Controller extends \yii\console\Controller
+class Controller extends \Yiisoft\Yii\Console\Controller
 {
     private $startedAt;
 

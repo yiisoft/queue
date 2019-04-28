@@ -25,6 +25,6 @@ $config = \Yiisoft\Arrays\ArrayHelper::merge(
     require(__DIR__ . '/app/config/console.php')
 );
 
-$app = new \yii\console\Application($config);
+$app = new \Yiisoft\Yii\Console\Application($config);
 $code = $app->run();
 exit($code);

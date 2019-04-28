@@ -55,7 +55,7 @@ CREATE TABLE `queue` (
 'controllerMap' => [
     // ...
     'migrate' => [
-        'class' => 'yii\console\controllers\MigrateController',
+        'class' => 'Yiisoft\Yii\Console\Controllers\MigrateController',
         'migrationPath' => null,
         'migrationNamespaces' => [
             // ...

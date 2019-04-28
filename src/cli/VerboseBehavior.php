@@ -9,7 +9,7 @@
 namespace yii\queue\cli;
 
 use yii\base\Behavior;
-use yii\console\Controller;
+use Yiisoft\Yii\Console\Controller;
 use yii\helpers\Console;
 use yii\queue\ErrorEvent;
 use yii\queue\ExecEvent;

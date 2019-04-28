@@ -12,7 +12,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\RuntimeException as ProcessRuntimeException;
 use Symfony\Component\Process\Process;
 use yii\base\Action;
-use yii\console\Controller;
+use Yiisoft\Yii\Console\Controller;
 use yii\queue\ExecEvent;
 
 /**

@@ -8,7 +8,7 @@
 
 namespace yii\queue\redis;
 
-use yii\console\exceptions\Exception;
+use Yiisoft\Yii\Console\Exceptions\Exception;
 use yii\queue\cli\Command as CliCommand;
 
 /**

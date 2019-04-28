@@ -56,7 +56,7 @@ To add migrations to your application, edit the console config file to configure
 'controllerMap' => [
     // ...
     'migrate' => [
-        'class' => 'yii\console\controllers\MigrateController',
+        'class' => 'Yiisoft\Yii\Console\Controllers\MigrateController',
         'migrationPath' => null,
         'migrationNamespaces' => [
             // ...
