@@ -2,7 +2,7 @@
 
 $config = [
     'app' => [
-        '__class' => \yii\console\Application::class,
+        '__class' => \Yiisoft\Yii\Console\Application::class,
         'id'          => 'yii2-queue-app',
         'basePath'    => dirname(__DIR__),
         'runtimePath' => dirname(dirname(__DIR__)).'/runtime',
@@ -14,13 +14,13 @@ $config = [
         ],
     ],
     'request' => [
-        '__class' => \yii\console\Request::class,
+        '__class' => \Yiisoft\Yii\Console\Request::class,
         'cookieValidationKey' => new \Yiisoft\Arrays\UnsetArrayValue(),
         'scriptFile' => dirname(__DIR__, 2) . '/yii',
         'scriptUrl' =>  new \Yiisoft\Arrays\UnsetArrayValue(),
     ],
     'response' => [
-        '__class' => \yii\console\Response::class,
+        '__class' => \Yiisoft\Yii\Console\Response::class,
         'formatters' =>  new \Yiisoft\Arrays\UnsetArrayValue(),
     ],
 

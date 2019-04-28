@@ -9,7 +9,7 @@
 namespace Yiisoft\Yii\Queue\Cli;
 
 use yii\base\Behavior;
-use yii\console\Controller;
+use Yiisoft\Yii\Console\Controller;
 use yii\helpers\Console;
 use Yiisoft\Yii\Queue\Events\ExecEvent;
 use Yiisoft\Yii\Queue\JobInterface;

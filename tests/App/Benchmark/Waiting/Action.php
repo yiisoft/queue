@@ -9,7 +9,7 @@
 namespace Yiisoft\Yii\Queue\Tests\App\Benchmark\Waiting;
 
 use Symfony\Component\Process\Process;
-use yii\console\exceptions\Exception as ConsoleException;
+use Yiisoft\Yii\Console\Exception as ConsoleException;
 use yii\helpers\Console;
 use Yiisoft\Yii\Queue\Queue;
 

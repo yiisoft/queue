@@ -9,7 +9,7 @@
 namespace Yiisoft\Yii\Queue\Cli;
 
 use yii\base\BootstrapInterface;
-use yii\console\Application as ConsoleApp;
+use Yiisoft\Yii\Console\Application as ConsoleApp;
 use yii\exceptions\InvalidConfigException;
 use yii\helpers\Yii;
 use Yiisoft\Helpers\InflectorHelper;

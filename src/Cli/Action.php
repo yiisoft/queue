@@ -9,7 +9,7 @@
 namespace Yiisoft\Yii\Queue\Cli;
 
 use yii\base\Action as BaseAction;
-use yii\console\Controller as ConsoleController;
+use Yiisoft\Yii\Console\Controller as ConsoleController;
 use yii\exceptions\InvalidConfigException;
 
 /**

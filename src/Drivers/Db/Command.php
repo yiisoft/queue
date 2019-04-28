@@ -8,7 +8,7 @@
 
 namespace Yiisoft\Yii\Queue\Drivers\Db;
 
-use yii\console\exceptions\Exception;
+use Yiisoft\Yii\Console\Exceptions\Exception;
 use Yiisoft\Yii\Queue\Cli\Command as CliCommand;
 
 /**
