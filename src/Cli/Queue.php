@@ -11,8 +11,8 @@ namespace Yiisoft\Yii\Queue\Cli;
 use yii\base\BootstrapInterface;
 use Yiisoft\Yii\Console\Application as ConsoleApp;
 use yii\exceptions\InvalidConfigException;
+use Yiisoft\Inflector\InflectorHelper;
 use yii\helpers\Yii;
-use Yiisoft\Helpers\InflectorHelper;
 use Yiisoft\Yii\Queue\Queue as BaseQueue;
 
 /**
