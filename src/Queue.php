@@ -6,12 +6,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue;
+namespace Yiisoft\Yii\Queue;
 
 use yii\base\Component;
 use yii\exceptions\InvalidArgumentException;
 use yii\helpers\VarDumper;
-use yii\queue\serializers\SerializerInterface;
+use Yiisoft\Yii\Queue\Events\ExecEvent;
+use Yiisoft\Yii\Queue\Events\PushEvent;
+use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
 
 /**
  * Base Queue.
@@ -27,15 +29,15 @@ abstract class Queue extends Component
     /**
      * @see Queue::isWaiting()
      */
-    const STATUS_WAITING = 1;
+    public const STATUS_WAITING = 1;
     /**
      * @see Queue::isReserved()
      */
-    const STATUS_RESERVED = 2;
+    public const STATUS_RESERVED = 2;
     /**
      * @see Queue::isDone()
      */
-    const STATUS_DONE = 3;
+    public const STATUS_DONE = 3;
 
     /**
      * @var bool whether to enable strict job type control.
@@ -76,7 +78,7 @@ abstract class Queue extends Component
      *
      * @return $this
      */
-    public function ttr($value)
+    public function ttr(int $value)
     {
         $this->pushTtr = $value;
 
@@ -176,7 +178,8 @@ abstract class Queue extends Component
      */
     protected function handleMessage($id, $message, $ttr, $attempt)
     {
-        list($job, $error) = $this->unserializeMessage($message);
+        [$job, $error] = $this->unserializeMessage($message);
+
         $event = ExecEvent::before($id, $job, $ttr, $attempt, $error);
         $this->trigger($event);
         if ($event->isPropagationStopped()) {
@@ -243,7 +246,7 @@ abstract class Queue extends Component
         } elseif ($event->job instanceof RetryableJobInterface) {
             $event->retry = $event->job->canRetry($event->attempt, $event->error);
         }
-        $this->trigger(ErrorEvent::after($event));
+        $this->trigger(ExecEvent::error($event));
 
         return !$event->retry;
     }

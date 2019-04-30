@@ -6,9 +6,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\queue\tests;
+namespace Yiisoft\Yii\Queue\Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use yii\helpers\Yii;
 
 /**
  * Base Test Case.
@@ -17,4 +18,11 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
  */
 abstract class TestCase extends BaseTestCase
 {
+    public $container;
+    
+    public function __construct($name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+        $this->container = Yii::getContainer();
+    }
 }

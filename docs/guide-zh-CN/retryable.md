@@ -14,7 +14,7 @@
 ```php
 'components' => [
     'queue' => [
-        'class' => \yii\queue\<driver>\Queue::class,
+        'class' => \Yiisoft\Yii\Queue\<driver>\Queue::class,
         'ttr' => 5 * 60, // Max time for anything job handling 
         'attempts' => 3, // Max number of attempts
     ],

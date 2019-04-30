@@ -16,7 +16,7 @@ return [
             // ...
         ],
         'queue' => [
-            'class' => \yii\queue\db\Queue::class,
+            'class' => \Yiisoft\Yii\Queue\Drivers\Db\Queue::class,
             'db' => 'db', // DB 连接组件或它的配置
             'tableName' => '{{%queue}}', // 表名
             'channel' => 'default', // Queue channel key
@@ -59,7 +59,7 @@ CREATE TABLE `queue` (
         'migrationPath' => null,
         'migrationNamespaces' => [
             // ...
-            'yii\queue\db\migrations',
+            'Yiisoft\Yii\Queue\Drivers\Db\migrations',
         ],
     ],
 ],

@@ -10,7 +10,7 @@
 return [
     'components' => [
         'queue' => [
-            'class' => \yii\queue\sync\Queue::class,
+            'class' => \Yiisoft\Yii\Queue\Drivers\Sync\Queue::class,
             'handle' => false, // タスクを即時に実行するかどうか
         ],
     ],

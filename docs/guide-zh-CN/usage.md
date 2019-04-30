@@ -14,8 +14,8 @@ return [
     ],
     'components' => [
         'queue' => [
-            'class' => \yii\queue\<driver>\Queue::class,
-            'as log' => \yii\queue\LogBehavior::class,
+            'class' => \Yiisoft\Yii\Queue\<driver>\Queue::class,
+            'as log' => \Yiisoft\Yii\Queue\LogBehavior::class,
             // 驱动的其他选项
         ],
     ],
@@ -31,7 +31,7 @@ return [
 例如，如果您需要下载并保存一个文件，该类可能看起来如下:
 
 ```php
-class DownloadJob extends BaseObject implements \yii\queue\JobInterface
+class DownloadJob extends BaseObject implements \Yiisoft\Yii\Queue\JobInterface
 {
     public $url;
     public $file;
@@ -114,9 +114,9 @@ JSON:
 return [
     'components' => [
         'queue' => [
-            'class' => \yii\queue\<driver>\Queue::class,
+            'class' => \Yiisoft\Yii\Queue\<driver>\Queue::class,
             'strictJobType' => false,
-            'serializer' => \yii\queue\serializers\JsonSerializer::class,
+            'serializer' => \Yiisoft\Yii\Queue\Serializers\JsonSerializer::class,
         ],
     ],
 ];
@@ -162,8 +162,8 @@ Yii::$app->queue->on(Queue::EVENT_AFTER_ERROR, function ($event) {
 return [
     'components' => [
         'queue' => [
-            'class' => \yii\queue\redis\Queue::class,
-            'as log' => \yii\queue\LogBehavior::class
+            'class' => \Yiisoft\Yii\Queue\redis\Queue::class,
+            'as log' => \Yiisoft\Yii\Queue\LogBehavior::class
         ],
     ],
 ];
@@ -183,12 +183,12 @@ return [
     ],
     'components' => [
         'queue1' => [
-            'class' => \yii\queue\redis\Queue::class,
+            'class' => \Yiisoft\Yii\Queue\redis\Queue::class,
         ],
         'queue2' => [
-            'class' => \yii\queue\db\Queue::class,
+            'class' => \Yiisoft\Yii\Queue\Drivers\Db\Queue::class,
             'strictJobType' => false,
-            'serializer' => \yii\queue\serializers\JsonSerializer::class,
+            'serializer' => \Yiisoft\Yii\Queue\Serializers\JsonSerializer::class,
         ],
     ],
 ];
@@ -234,7 +234,7 @@ Yii::$app->queue->push(new SomeJob([
 任务类:
 
 ```php
-class SomeJob extends BaseObject implements \yii\queue\JobInterface
+class SomeJob extends BaseObject implements \Yiisoft\Yii\Queue\JobInterface
 {
     public $userId;
     public $bookId;

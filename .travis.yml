@@ -14,7 +14,6 @@ matrix:
 services:
   - mysql
   - postgresql
-  - redis-server
   - rabbitmq
 
 # cache vendor dirs
@@ -24,9 +23,6 @@ cache:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq beanstalkd
-  - sudo beanstalkd -v
-  - sudo service beanstalkd start
   - pecl install igbinary
 
 install:

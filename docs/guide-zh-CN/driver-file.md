@@ -12,7 +12,7 @@ return [
     ],
     'components' => [
         'queue' => [
-            'class' => \yii\queue\file\Queue::class,
+            'class' => \Yiisoft\Yii\Queue\file\Queue::class,
             'path' => '@runtime/queue',
         ],
     ],

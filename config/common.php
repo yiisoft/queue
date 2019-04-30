@@ -4,10 +4,10 @@ use yii\di\Reference;
 
 return [
     'queue' => [
-        '__class' => \yii\queue\sync\Queue::class,
+        '__class' => \Yiisoft\Yii\Queue\Drivers\Sync\Queue::class,
     ],
-    \yii\queue\serializers\SerializerInterface::class => Reference::to('queue.serializer'),
+    \Yiisoft\Yii\Queue\Serializers\SerializerInterface::class => Reference::to('queue.serializer'),
     'queue.serializer'                                => [
-        '__class' => \yii\queue\serializers\PhpSerializer::class,
+        '__class' => \Yiisoft\Yii\Queue\Serializers\PhpSerializer::class,
     ],
 ];

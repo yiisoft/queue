@@ -16,6 +16,7 @@
         "docs": "https://github.com/yiisoft/yii-queue/blob/master/docs/guide"
     },
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "yiisoft/yii-core": "^3.0@dev",
         "yiisoft/yii-console": "^3.0@dev",
@@ -40,7 +41,11 @@
         "yiisoft/cache": "^3.0@dev",
         "phpunit/phpunit": "^7.3",
         "aws/aws-sdk-php": ">=2.4",
-        "hiqdev/composer-config-plugin": "^1.0@dev"
+        "hiqdev/composer-config-plugin": "^1.0@dev",
+        "yiisoft/mutex-file": "^3.0@dev",
+        "yiisoft/db-mysql": "^3.0@dev",
+        "yiisoft/db-sqlite": "^3.0@dev",
+        "yiisoft/db-pgsql": "^3.0@dev"
     },
     "suggest": {
         "ext-pcntl": "Need for process signals.",
@@ -53,20 +58,12 @@
     },
     "autoload": {
         "psr-4": {
-            "yii\\queue\\": "src",
-            "yii\\queue\\amqp_interop\\": "src/drivers/amqp_interop",
-            "yii\\queue\\beanstalk\\": "src/drivers/beanstalk",
-            "yii\\queue\\db\\": "src/drivers/db",
-            "yii\\queue\\file\\": "src/drivers/file",
-            "yii\\queue\\gearman\\": "src/drivers/gearman",
-            "yii\\queue\\redis\\": "src/drivers/redis",
-            "yii\\queue\\sync\\": "src/drivers/sync",
-            "yii\\queue\\sqs\\": "src/drivers/sqs"
+            "Yiisoft\\Yii\\Queue\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "yii\\queue\\tests\\": "tests"
+            "Yiisoft\\Yii\\Queue\\Tests\\": "tests"
         }
     },
     "extra": {
@@ -75,9 +72,9 @@
         },
         "config-plugin": {
             "tests": "config/tests.php",
-            "params": "config/params.php",
             "common": "config/common.php",
-            "console": "config/console.php"
+            "console": "config/console.php",
+            "tests-app": ["$common","$console","tests/App/config/main.php", "tests/App/config/console.php"]
         }
     }
 }

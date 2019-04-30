@@ -16,10 +16,6 @@ tests/docker/wait-for-it.sh redis:6379 -t 180
 
 tests/docker/wait-for-it.sh rabbitmq:5672 -t 180
 
-tests/docker/wait-for-it.sh beanstalk:11300 -t 180
-
-tests/docker/wait-for-it.sh gearmand:4730 -t 180
-
 php --version
 set -x
 exec "$@"

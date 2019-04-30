@@ -14,7 +14,7 @@ return [
         'debug' => [
             'class' => \yii\debug\Module::class,
             'panels' => [
-                'queue' => \yii\queue\debug\Panel::class,
+                'queue' => \Yiisoft\Yii\Queue\Debug\Panel::class,
             ],
         ],
     ],
