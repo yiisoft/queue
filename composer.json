@@ -76,22 +76,5 @@
             "console": "config/console.php",
             "tests-app": ["$common","$console","tests/App/config/main.php", "tests/App/config/console.php"]
         }
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/yiisoft/mutex-file",
-            "no-api": true
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/yiisoft/mutex-db-mysql",
-            "no-api": true
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/yiisoft/mutex-db-pgsql",
-            "no-api": true
-        }
-    ]
+    }
 }
