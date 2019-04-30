@@ -12,7 +12,7 @@ To use the Gii job generator you have to configure it like the following:
 if (!YII_ENV_TEST) {
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
-        'class' => 'yii\gii\Module',
+        'class' => 'Yiisoft\Yii\Gii\Module',
         'generators' => [
             'job' => [
                 'class' => \Yiisoft\Yii\Queue\Gii\Generator::class,

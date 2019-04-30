@@ -9,7 +9,7 @@
 namespace Yiisoft\Yii\Queue\Gii;
 
 use yii\base\BaseObject;
-use yii\gii\CodeFile;
+use Yiisoft\Yii\Gii\CodeFile;
 use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\JobInterface;
 use Yiisoft\Yii\Queue\RetryableJobInterface;
@@ -19,7 +19,7 @@ use Yiisoft\Yii\Queue\RetryableJobInterface;
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-class Generator extends \yii\gii\Generator
+class Generator extends \Yiisoft\Yii\Gii\Generator
 {
     public $jobClass;
     public $properties;

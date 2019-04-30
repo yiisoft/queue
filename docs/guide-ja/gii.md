@@ -12,7 +12,7 @@ Gii ジョブ・ジェネレータを使うためには、以下のように構�
 if (!YII_ENV_TEST) {
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
-        'class' => 'yii\gii\Module',
+        'class' => 'Yiisoft\Yii\Gii\Module',
         'generators' => [
             'job' => [
                 'class' => \Yiisoft\Yii\Queue\Gii\Generator::class,
