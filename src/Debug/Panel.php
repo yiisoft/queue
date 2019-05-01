@@ -20,7 +20,7 @@ use Yiisoft\Yii\Queue\Queue;
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-class Panel extends \Yiisoft\Debug\Panel implements ViewContextInterface
+class Panel extends \Yiisoft\Yii\Debug\Panel implements ViewContextInterface
 {
     private $_jobs = [];
 
