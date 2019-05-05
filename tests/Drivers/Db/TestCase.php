@@ -8,7 +8,7 @@
 
 namespace Yiisoft\Yii\Queue\Tests\Drivers\Db;
 
-use yii\db\Query;
+use Yiisoft\Db\Query;
 use Yiisoft\Yii\Queue\Tests\App\PriorityJob;
 use Yiisoft\Yii\Queue\Tests\App\RetryJob;
 use Yiisoft\Yii\Queue\Tests\Drivers\CliTestCase;

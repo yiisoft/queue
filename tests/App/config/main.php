@@ -39,7 +39,7 @@ $config = [
         ],
     ],
     'mysql' => [
-        '__class' => \yii\db\Connection::class,
+        '__class' => \Yiisoft\Db\Connection::class,
         'dsn'   => sprintf(
             'mysql:host=%s;dbname=%s',
             getenv('MYSQL_HOST') ?: 'localhost',
@@ -65,7 +65,7 @@ $config = [
         ],*/
     ],
     'sqlite' => [
-        '__class' => \yii\db\Connection::class,
+        '__class' => \Yiisoft\Db\Connection::class,
         'dsn'   => 'sqlite:@runtime/yii2_queue_test.db',
     ],
     'sqliteQueue' => [
@@ -76,7 +76,7 @@ $config = [
         ]
     ],
     'pgsql' => [
-        '__class' => \yii\db\Connection::class,
+        '__class' => \Yiisoft\Db\Connection::class,
         'dsn'   => sprintf(
             'pgsql:host=%s;dbname=%s',
             getenv('POSTGRES_HOST') ?: 'localhost',

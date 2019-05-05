@@ -8,9 +8,9 @@
 
 namespace Yiisoft\Yii\Queue\Drivers\Db;
 
-use yii\db\Connection;
-use yii\db\ConnectionInterface;
-use yii\db\Query;
+use Yiisoft\Db\Connection;
+use Yiisoft\Db\ConnectionInterface;
+use Yiisoft\Db\Query;
 use yii\exceptions\Exception;
 use yii\exceptions\InvalidArgumentException;
 use Yiisoft\Mutex\Mutex;

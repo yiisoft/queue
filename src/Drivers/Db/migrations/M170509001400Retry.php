@@ -8,7 +8,7 @@
 
 namespace Yiisoft\Yii\Queue\Drivers\Db\migrations;
 
-use yii\db\Migration;
+use Yiisoft\Db\Migration;
 
 /**
  * Example of migration for queue message storage.

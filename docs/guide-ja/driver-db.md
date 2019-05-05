@@ -12,7 +12,7 @@ return [
     ],
     'components' => [
         'db' => [
-            'class' => \yii\db\Connection::class, 
+            'class' => \Yiisoft\Db\Connection::class, 
             // ...
         ],
         'queue' => [
