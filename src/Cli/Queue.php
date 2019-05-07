@@ -11,7 +11,7 @@ namespace Yiisoft\Yii\Queue\Cli;
 use yii\base\BootstrapInterface;
 use Yiisoft\Yii\Console\Application as ConsoleApp;
 use yii\exceptions\InvalidConfigException;
-use Yiisoft\Inflector\InflectorHelper;
+use Yiisoft\Strings\Inflector;
 use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Queue as BaseQueue;
 
@@ -59,7 +59,7 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
     {
         foreach (Yii::getContainer()->getInstances() as $id => $component) {
             if ($component === $this) {
-                return InflectorHelper::camel2id($id);
+                return Inflector::camel2id($id);
             }
         }
 
