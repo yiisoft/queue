@@ -8,9 +8,10 @@
 
 namespace Yiisoft\Yii\Queue\Debug;
 
+use yii\base\Application;
 use yii\exceptions\NotSupportedException;
 use yii\helpers\VarDumper;
-use yii\view\ViewContextInterface;
+use yii\web\View;
 use Yiisoft\Yii\Queue\Events\PushEvent;
 use Yiisoft\Yii\Queue\JobInterface;
 use Yiisoft\Yii\Queue\Queue;
@@ -20,26 +21,26 @@ use Yiisoft\Yii\Queue\Queue;
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-class Panel extends \Yiisoft\Yii\Debug\Panel implements ViewContextInterface
+class Panel extends \Yiisoft\Yii\Debug\Panel
 {
     private $_jobs = [];
+    private $app;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function __construct(View $view, Application $app)
     {
-        return 'Queue';
+        $this->app = $app;
+        parent::__construct($view);
+        PushEvent::on(Queue::class, PushEvent::AFTER, function (PushEvent $event) {
+            $this->_jobs[] = $this->getPushData($event);
+        });
     }
 
     /**
      * {@inheritdoc}
      */
-    public function init()
+    public function getName(): string
     {
-        PushEvent::on(Queue::class, PushEvent::AFTER, function (PushEvent $event) {
-            $this->_jobs[] = $this->getPushData($event);
-        });
+        return 'Queue';
     }
 
     /**
@@ -50,7 +51,9 @@ class Panel extends \Yiisoft\Yii\Debug\Panel implements ViewContextInterface
     protected function getPushData(PushEvent $event)
     {
         $data = [];
-        foreach ($this->app->getComponents(false) as $id => $component) {
+
+        $data['sender'] = 'FIXME'; // XXX
+        foreach ($this->app->container->getInstances() as $id => $component) {
             if ($component === $event->sender) {
                 $data['sender'] = $id;
                 break;
@@ -92,9 +95,9 @@ class Panel extends \Yiisoft\Yii\Debug\Panel implements ViewContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getSummary()
+    public function getSummary(): string
     {
-        return $this->app->view->render('summary', [
+        return $this->view->render('summary', [
             'url'   => $this->getUrl(),
             'count' => isset($this->data['jobs']) ? count($this->data['jobs']) : 0,
         ], $this);
@@ -103,7 +106,7 @@ class Panel extends \Yiisoft\Yii\Debug\Panel implements ViewContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getDetail()
+    public function getDetail(): string
     {
         $jobs = isset($this->data['jobs']) ? $this->data['jobs'] : [];
         foreach ($jobs as &$job) {
@@ -126,6 +129,6 @@ class Panel extends \Yiisoft\Yii\Debug\Panel implements ViewContextInterface
         }
         unset($job);
 
-        return $this->app->view->render('detail', compact('jobs'), $this);
+        return $this->view->render('detail', compact('jobs'), $this);
     }
 }
