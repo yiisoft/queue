@@ -9,7 +9,7 @@
 namespace Yiisoft\Yii\Queue\Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use yii\helpers\Yii;
+use Yiisoft\Di\Container;
 
 /**
  * Base Test Case.
@@ -19,10 +19,10 @@ use yii\helpers\Yii;
 abstract class TestCase extends BaseTestCase
 {
     public $container;
-    
+
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
-        $this->container = Yii::getContainer();
+        $this->container = new Container();
     }
 }

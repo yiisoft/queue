@@ -8,16 +8,15 @@
 
 namespace Yiisoft\Yii\Queue\Cli;
 
-use yii\base\Action as BaseAction;
+use Yiisoft\Factory\Exceptions\InvalidConfigException;
 use Yiisoft\Yii\Console\Controller as ConsoleController;
-use yii\exceptions\InvalidConfigException;
 
 /**
  * Base Command Action.
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-abstract class Action extends BaseAction
+abstract class Action
 {
     /**
      * @var Queue

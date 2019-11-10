@@ -8,14 +8,12 @@
 
 namespace Yiisoft\Yii\Queue\Events;
 
-use yii\base\Event;
-
 /**
  * Job Event.
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-abstract class JobEvent extends Event
+abstract class JobEvent
 {
     /**
      * @var \Yiisoft\Yii\Queue\Queue

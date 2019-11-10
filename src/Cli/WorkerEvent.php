@@ -8,8 +8,6 @@
 
 namespace Yiisoft\Yii\Queue\Cli;
 
-use yii\base\Event;
-
 /**
  * Worker Event.
  *
@@ -17,7 +15,7 @@ use yii\base\Event;
  *
  * @since 2.0.2
  */
-class WorkerEvent extends Event
+class WorkerEvent
 {
     /**
      * @event WorkerEvent that is triggered when the worker is started.

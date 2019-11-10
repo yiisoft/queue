@@ -8,11 +8,10 @@
 
 namespace Yiisoft\Yii\Queue\Cli;
 
-use yii\base\BootstrapInterface;
-use Yiisoft\Yii\Console\Application as ConsoleApp;
-use yii\exceptions\InvalidConfigException;
-use Yiisoft\Strings\Inflector;
 use yii\helpers\Yii;
+use Yiisoft\Factory\Exceptions\InvalidConfigException;
+use Yiisoft\Strings\Inflector;
+use Yiisoft\Yii\Console\Application as ConsoleApp;
 use Yiisoft\Yii\Queue\Queue as BaseQueue;
 
 /**
@@ -20,7 +19,7 @@ use Yiisoft\Yii\Queue\Queue as BaseQueue;
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-abstract class Queue extends BaseQueue implements BootstrapInterface
+abstract class Queue extends BaseQueue
 {
     /**
      * @var array|string
