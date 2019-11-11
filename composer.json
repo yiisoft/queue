@@ -24,7 +24,8 @@
         "yiisoft/mutex": "^3.0@dev",
         "yiisoft/di": "^3.0@dev",
         "yiisoft/serializer": "^3.0@dev",
-        "symfony/process": "^4.0"
+        "symfony/process": "^4.0",
+        "ext-pcntl": "*"
     },
     "require-dev": {
         "yiisoft/db-redis": "dev-master",
