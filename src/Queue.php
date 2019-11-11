@@ -59,7 +59,6 @@ abstract class Queue
     private $pushDelay;
     private $pushPriority;
 
-
     /**
      * @var \Yiisoft\Serializer\SerializerInterface
      */
@@ -90,7 +89,7 @@ abstract class Queue
      *
      * @return $this
      */
-    public function ttr(int $value)
+    public function ttr(int $value): self
     {
         $this->pushTtr = $value;
 
@@ -100,11 +99,11 @@ abstract class Queue
     /**
      * Sets delay for later execute.
      *
-     * @param int|mixed $value
+     * @param int $value
      *
      * @return $this
      */
-    public function delay($value)
+    public function delay(int $value): self
     {
         $this->pushDelay = $value;
 
@@ -118,7 +117,7 @@ abstract class Queue
      *
      * @return $this
      */
-    public function priority($value)
+    public function priority($value): self
     {
         $this->pushPriority = $value;
 
@@ -186,19 +185,20 @@ abstract class Queue
      * @param int    $ttr     time to reserve
      * @param int    $attempt number
      *
-     * @return bool
+     * @return void
      */
-    protected function handleMessage($id, $message, $ttr, $attempt)
+    protected function handleMessage($id, $message, $ttr, $attempt): void
     {
         [$job, $error] = $this->unserializeMessage($message);
 
         $event = ExecEvent::before($id, $job, $ttr, $attempt, $error);
         $this->trigger($event);
         if ($event->isPropagationStopped()) {
-            return true;
+            return;
         }
         if ($event->error) {
-            return $this->handleError($event);
+            $this->handleError($event);
+            return;
         }
 
         try {
@@ -206,21 +206,20 @@ abstract class Queue
         } catch (\Exception $error) {
             $event->error = $error;
 
-            return $this->handleError($event);
+            $this->handleError($event);
+            return;
         } catch (\Throwable $error) {
             $event->error = $error;
 
-            return $this->handleError($event);
+            $this->handleError($event);
+            return;
         }
         $this->trigger(ExecEvent::after($event));
-
-        return true;
     }
 
     /**
      * Unserializes.
      *
-     * @param string $id         of the job
      * @param string $serialized message
      *
      * @return array pair of a job and error that
@@ -268,7 +267,7 @@ abstract class Queue
      *
      * @return bool
      */
-    public function isWaiting($id)
+    public function isWaiting($id): bool
     {
         return $this->status($id) === self::STATUS_WAITING;
     }
@@ -278,7 +277,7 @@ abstract class Queue
      *
      * @return bool
      */
-    public function isReserved($id)
+    public function isReserved($id): bool
     {
         return $this->status($id) === self::STATUS_RESERVED;
     }
@@ -288,7 +287,7 @@ abstract class Queue
      *
      * @return bool
      */
-    public function isDone($id)
+    public function isDone($id): bool
     {
         return $this->status($id) === self::STATUS_DONE;
     }
