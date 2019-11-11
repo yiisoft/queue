@@ -1,9 +1,11 @@
 <?php
+
 /**
- * @var \yii\web\View
- * @var string        $url
- * @var int           $count
+ * @var \Yiisoft\View\View $this
+ * @var string $url
+ * @var int $count
  */
+
 ?>
 <div class="yii-debug-toolbar__block">
     <a href="<?= $url ?>">

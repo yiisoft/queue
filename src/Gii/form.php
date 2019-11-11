@@ -1,7 +1,7 @@
 <?php
 /**
- * @var \yii\web\View
- * @var \yii\widgets\ActiveForm  $form
+ * @var \Yiisoft\View\View $this
+ * @var \Yiisoft\Widget\ActiveForm $form
  * @var \Yiisoft\Yii\Queue\Gii\Generator $generator
  */
 ?>
