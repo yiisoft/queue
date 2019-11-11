@@ -22,6 +22,10 @@ abstract class JobEvent
      */
     public $sender;
     /**
+     * @var string
+     */
+    public $name;
+    /**
      * @var string|null unique id of a job
      */
     public $id;
@@ -34,10 +38,11 @@ abstract class JobEvent
      */
     public $ttr;
 
-    public function __construct($id, JobInterface $job, int $ttr)
+    public function __construct(string $name, $id, JobInterface $job, int $ttr)
     {
         $this->id = $id;
         $this->job = $job;
         $this->ttr = $ttr;
+        $this->name = $name;
     }
 }
