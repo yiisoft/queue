@@ -8,6 +8,8 @@
 
 namespace Yiisoft\Yii\Queue\Events;
 
+use Yiisoft\Yii\Queue\JobInterface;
+
 /**
  * Push Event.
  *
@@ -29,18 +31,22 @@ class PushEvent extends JobEvent
      */
     public $delay;
     /**
-     * @var mixed
+     * @var int
      */
     public $priority;
 
     /**
      * Creates BEFORE event.
      *
+     * @param \Yiisoft\Yii\Queue\JobInterface $job
+     * @param int $ttr
+     * @param int $delay
+     * @param int $priority
      * @return self created event
      */
-    public static function before($job, $ttr, $delay, $priority): self
+    public static function before(JobInterface $job, int $ttr, int $delay, int $priority): self
     {
-        $event = new static(static::BEFORE, null, $job, $ttr);
+        $event = new static(self::BEFORE, null, $job, $ttr);
         $event->delay = $delay;
         $event->priority = $priority;
 
@@ -50,11 +56,12 @@ class PushEvent extends JobEvent
     /**
      * Creates AFTER event.
      *
+     * @param PushEvent $before
      * @return self created event
      */
     public static function after(self $before): self
     {
-        $event = new static(static::AFTER, $before->id, $before->job, $before->ttr);
+        $event = new static(self::AFTER, $before->id, $before->job, $before->ttr);
         $event->delay = $before->delay;
         $event->priority = $before->priority;
 
