@@ -94,14 +94,14 @@ abstract class Command extends Controller
      *
      * @since 2.0.2
      */
-    abstract protected function isWorkerAction($actionID);
+    abstract protected function isWorkerAction($actionID): bool;
 
     /**
      * @param string $actionID
      *
      * @return bool
      */
-    protected function canVerbose($actionID)
+    protected function canVerbose($actionID): bool
     {
         return $actionID === 'exec' || $this->isWorkerAction($actionID);
     }
@@ -111,7 +111,7 @@ abstract class Command extends Controller
      *
      * @return bool
      */
-    protected function canIsolate($actionID)
+    protected function canIsolate($actionID): bool
     {
         return $this->isWorkerAction($actionID);
     }

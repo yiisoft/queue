@@ -27,7 +27,7 @@ class Command extends CliCommand
     /**
      * {@inheritdoc}
      */
-    protected function isWorkerAction($actionID)
+    protected function isWorkerAction($actionID): bool
     {
         return $actionID === 'listen';
     }
