@@ -8,14 +8,14 @@
 
 namespace Yiisoft\Yii\Queue\Drivers\Db;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use Yiisoft\Db\Connection;
 use Yiisoft\Db\ConnectionInterface;
 use Yiisoft\Db\Query;
-use yii\exceptions\Exception;
-use yii\exceptions\InvalidArgumentException;
 use Yiisoft\Mutex\Mutex;
+use Yiisoft\Serializer\SerializerInterface;
 use Yiisoft\Yii\Queue\Cli\Queue as CliQueue;
-use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
 
 /**
  * Db Queue.
@@ -56,9 +56,14 @@ class Queue extends CliQueue
     /**
      * {@inheritdoc}
      */
-    public function __construct(SerializerInterface $serializer, ConnectionInterface $db, Mutex $mutex)
-    {
-        parent::__construct($serializer);
+    public function __construct(
+        SerializerInterface $serializer,
+        EventDispatcherInterface $eventDispatcher,
+        LoggerInterface $logger,
+        ConnectionInterface $db,
+        Mutex $mutex
+    ) {
+        parent::__construct($serializer, $eventDispatcher, $logger);
         $this->db = $db;
         $this->mutex = $mutex;
     }
@@ -117,7 +122,7 @@ class Queue extends CliQueue
                 return self::STATUS_DONE;
             }
 
-            throw new InvalidArgumentException("Unknown message ID: $id.");
+            throw new \InvalidArgumentException("Unknown message ID: $id.");
         }
 
         if (!$payload['reserved_at']) {
@@ -147,9 +152,8 @@ class Queue extends CliQueue
      * Removes a job by ID.
      *
      * @param int $id of a job
-     *
      * @return bool
-     *
+     * @throws \Yiisoft\Db\Exception
      * @since 2.0.1
      */
     public function remove($id)

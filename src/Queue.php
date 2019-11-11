@@ -8,12 +8,12 @@
 
 namespace Yiisoft\Yii\Queue;
 
-use yii\base\Component;
-use yii\exceptions\InvalidArgumentException;
-use yii\helpers\VarDumper;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
+use Yiisoft\Serializer\SerializerInterface;
+use Yiisoft\VarDumper\VarDumper;
 use Yiisoft\Yii\Queue\Events\ExecEvent;
 use Yiisoft\Yii\Queue\Events\PushEvent;
-use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
 
 /**
  * Base Queue.
@@ -24,7 +24,7 @@ use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-abstract class Queue extends Component
+abstract class Queue
 {
     /**
      * @see Queue::isWaiting()
@@ -47,10 +47,6 @@ abstract class Queue extends Component
      */
     public $strictJobType = true;
     /**
-     * @var SerializerInterface|array
-     */
-    private $serializer;
-    /**
      * @var int default time to reserve a job
      */
     public $ttr = 300;
@@ -63,12 +59,28 @@ abstract class Queue extends Component
     private $pushDelay;
     private $pushPriority;
 
+
     /**
-     * {@inheritdoc}
+     * @var \Yiisoft\Serializer\SerializerInterface
      */
-    public function __construct(SerializerInterface $serializer)
-    {
+    private $serializer;
+    /**
+     * @var \Psr\EventDispatcher\EventDispatcherInterface
+     */
+    private $eventDispatcher;
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(
+        SerializerInterface $serializer,
+        EventDispatcherInterface $eventDispatcher,
+        LoggerInterface $logger
+    ) {
         $this->serializer = $serializer;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->logger = $logger;
     }
 
     /**
@@ -138,7 +150,7 @@ abstract class Queue extends Component
         }
 
         if ($this->strictJobType && !($event->job instanceof JobInterface)) {
-            throw new InvalidArgumentException('Job must be instance of JobInterface.');
+            throw new \InvalidArgumentException('Job must be instance of JobInterface.');
         }
 
         $message = $this->serializer->serialize($event->job);
