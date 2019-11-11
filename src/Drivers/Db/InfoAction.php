@@ -9,7 +9,6 @@
 namespace Yiisoft\Yii\Queue\Drivers\Db;
 
 use Yiisoft\Db\Query;
-use yii\helpers\Console;
 use Yiisoft\Yii\Queue\Cli\Action;
 
 /**

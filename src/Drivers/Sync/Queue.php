@@ -9,7 +9,6 @@
 namespace Yiisoft\Yii\Queue\Drivers\Sync;
 
 use yii\base\RequestEvent;
-use yii\exceptions\InvalidArgumentException;
 use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Queue as BaseQueue;
 
@@ -72,7 +71,7 @@ class Queue extends BaseQueue
     public function run()
     {
         while (($payload = array_shift($this->payloads)) !== null) {
-            list($ttr, $message) = $payload;
+            [$ttr, $message] = $payload;
             $this->startedId = $this->finishedId + 1;
             $this->handleMessage($this->startedId, $message, $ttr, 1);
             $this->finishedId = $this->startedId;
@@ -96,7 +95,7 @@ class Queue extends BaseQueue
     public function status($id)
     {
         if (!is_int($id) || $id <= 0 || $id > $this->pushedId) {
-            throw new InvalidArgumentException("Unknown messages ID: $id.");
+            throw new \InvalidArgumentException("Unknown messages ID: $id.");
         }
 
         if ($id <= $this->finishedId) {

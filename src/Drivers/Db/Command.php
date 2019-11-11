@@ -8,7 +8,6 @@
 
 namespace Yiisoft\Yii\Queue\Drivers\Db;
 
-use Yiisoft\Yii\Console\Exceptions\Exception;
 use Yiisoft\Yii\Queue\Cli\Command as CliCommand;
 
 /**
@@ -62,17 +61,17 @@ class Command extends CliCommand
      *
      * @param int $timeout number of seconds to sleep before next reading of the queue.
      *
-     * @throws Exception when params are invalid.
+     * @throws \Exception when params are invalid.
      *
      * @return null|int exit code.
      */
     public function actionListen($timeout = 3)
     {
         if (!is_numeric($timeout)) {
-            throw new Exception('Timeout must be numeric.');
+            throw new \Exception('Timeout must be numeric.');
         }
         if ($timeout < 1) {
-            throw new Exception('Timeout must be greater than zero.');
+            throw new \Exception('Timeout must be greater than zero.');
         }
 
         return $this->queue->run(true, $timeout);
@@ -85,7 +84,7 @@ class Command extends CliCommand
      */
     public function actionClear()
     {
-        if ($this->confirm('Are you sure?')) {
+        if (Console::confirm('Are you sure?')) {
             $this->queue->clear();
         }
     }
@@ -95,14 +94,14 @@ class Command extends CliCommand
      *
      * @param int $id
      *
-     * @throws Exception when the job is not found.
+     * @throws \Exception when the job is not found.
      *
      * @since 2.0.1
      */
     public function actionRemove($id)
     {
         if (!$this->queue->remove($id)) {
-            throw new Exception('The job is not found.');
+            throw new \Exception('The job is not found.');
         }
     }
 }

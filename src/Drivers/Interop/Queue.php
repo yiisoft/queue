@@ -24,8 +24,8 @@ use yii\base\Application as BaseApp;
 use yii\base\Event;
 use yii\base\RequestEvent;
 use yii\exceptions\NotSupportedException;
+use Yiisoft\Serializer\SerializerInterface;
 use Yiisoft\Yii\Queue\Cli\Queue as CliQueue;
-use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
 
 /**
  * Amqp Queue.
