@@ -69,7 +69,7 @@ class ExecEvent extends JobEvent
      * @param \Throwable|null $error
      * @return self created event
      */
-    public static function before($id,JobInterface $job,int $ttr,int $attempt, ?\Throwable $error): self
+    public static function before($id, JobInterface $job, int $ttr, int $attempt, ?\Throwable $error): self
     {
         $event = new static(static::BEFORE, $id, $job, $ttr);
         $event->attempt = $attempt;
