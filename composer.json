@@ -23,7 +23,9 @@
         "yiisoft/view": "^3.0@dev",
         "yiisoft/mutex": "^3.0@dev",
         "yiisoft/di": "^3.0@dev",
-        "symfony/process": "^4.0"
+        "yiisoft/serializer": "^3.0@dev",
+        "symfony/process": "^4.0",
+        "ext-pcntl": "*"
     },
     "require-dev": {
         "yiisoft/db-redis": "dev-master",
@@ -34,7 +36,6 @@
         "yiisoft/yii-debug": "dev-master",
         "yiisoft/yii-gii": "dev-master",
         "yiisoft/yii-bootstrap4": "dev-master",
-        "yiisoft/di": "^3.0@dev",
         "yiisoft/log": "^3.0@dev",
         "yiisoft/cache": "^3.0@dev",
         "phpunit/phpunit": "^7.3",

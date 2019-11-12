@@ -8,6 +8,8 @@
 
 namespace Yiisoft\Yii\Queue\Events;
 
+use Yiisoft\Yii\Queue\JobInterface;
+
 /**
  * Exec Event.
  *
@@ -44,7 +46,7 @@ class ExecEvent extends JobEvent
      */
     public $result;
     /**
-     * @var null|\Exception|\Throwable
+     * @var \Throwable|null
      *
      * @see ErrorEvent::AFTER
      * @since 2.1.1
@@ -60,10 +62,14 @@ class ExecEvent extends JobEvent
 
     /**
      * Creates BEFORE event.
-     *
+     * @param $id
+     * @param \Yiisoft\Yii\Queue\JobInterface $job
+     * @param int $ttr
+     * @param int $attempt
+     * @param \Throwable|null $error
      * @return self created event
      */
-    public static function before($id, $job, $ttr, $attempt, $error): self
+    public static function before($id, JobInterface $job, int $ttr, int $attempt, ?\Throwable $error): self
     {
         $event = new static(static::BEFORE, $id, $job, $ttr);
         $event->attempt = $attempt;
@@ -75,6 +81,7 @@ class ExecEvent extends JobEvent
     /**
      * Creates AFTER event.
      *
+     * @param \Yiisoft\Yii\Queue\Events\ExecEvent $before
      * @return self created event
      */
     public static function after(self $before): self
@@ -91,6 +98,7 @@ class ExecEvent extends JobEvent
     /**
      * Creates BEFORE event.
      *
+     * @param \Yiisoft\Yii\Queue\Events\ExecEvent $before
      * @return self created event
      */
     public static function error(self $before): self

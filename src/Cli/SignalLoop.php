@@ -8,8 +8,6 @@
 
 namespace Yiisoft\Yii\Queue\Cli;
 
-use yii\base\BaseObject;
-
 /**
  * Signal Loop.
  *
@@ -17,7 +15,7 @@ use yii\base\BaseObject;
  *
  * @since 2.0.2
  */
-class SignalLoop extends BaseObject implements LoopInterface
+class SignalLoop implements LoopInterface
 {
     /**
      * @var array of signals to exit from listening of the queue.

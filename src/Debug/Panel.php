@@ -9,8 +9,8 @@
 namespace Yiisoft\Yii\Queue\Debug;
 
 use yii\exceptions\NotSupportedException;
-use yii\helpers\VarDumper;
-use yii\view\ViewContextInterface;
+use Yiisoft\VarDumper\VarDumper;
+use Yiisoft\View\ViewContextInterface;
 use Yiisoft\Yii\Queue\Events\PushEvent;
 use Yiisoft\Yii\Queue\JobInterface;
 use Yiisoft\Yii\Queue\Queue;
@@ -27,7 +27,7 @@ class Panel extends \Yiisoft\Yii\Debug\Panel implements ViewContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Queue';
     }
@@ -84,18 +84,18 @@ class Panel extends \Yiisoft\Yii\Debug\Panel implements ViewContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getViewPath()
+    public function getViewPath(): string
     {
-        return __DIR__.'/views';
+        return __DIR__ . '/views';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSummary()
+    public function getSummary(): string
     {
-        return $this->app->view->render('summary', [
-            'url'   => $this->getUrl(),
+        return $this->view->render('summary', [
+            'url' => $this->getUrl(),
             'count' => isset($this->data['jobs']) ? count($this->data['jobs']) : 0,
         ], $this);
     }
@@ -103,7 +103,7 @@ class Panel extends \Yiisoft\Yii\Debug\Panel implements ViewContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getDetail()
+    public function getDetail(): string
     {
         $jobs = isset($this->data['jobs']) ? $this->data['jobs'] : [];
         foreach ($jobs as &$job) {
@@ -126,6 +126,6 @@ class Panel extends \Yiisoft\Yii\Debug\Panel implements ViewContextInterface
         }
         unset($job);
 
-        return $this->app->view->render('detail', compact('jobs'), $this);
+        return $this->view->render('detail', compact('jobs'), $this);
     }
 }

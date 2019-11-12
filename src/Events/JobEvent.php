@@ -8,26 +8,29 @@
 
 namespace Yiisoft\Yii\Queue\Events;
 
-use yii\base\Event;
+use Yiisoft\Yii\Queue\JobInterface;
 
 /**
  * Job Event.
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-abstract class JobEvent extends Event
+abstract class JobEvent
 {
     /**
      * @var \Yiisoft\Yii\Queue\Queue
-     *            {@inheritdoc}
      */
     public $sender;
+    /**
+     * @var string
+     */
+    public $name;
     /**
      * @var string|null unique id of a job
      */
     public $id;
     /**
-     * @var \Yiisoft\Yii\Queue\JobInterface|null
+     * @var \Yiisoft\Yii\Queue\JobInterface
      */
     public $job;
     /**
@@ -35,11 +38,11 @@ abstract class JobEvent extends Event
      */
     public $ttr;
 
-    public function __construct(string $name, $id, $job, $ttr)
+    public function __construct(string $name, $id, JobInterface $job, int $ttr)
     {
-        parent::__construct($name);
         $this->id = $id;
         $this->job = $job;
         $this->ttr = $ttr;
+        $this->name = $name;
     }
 }

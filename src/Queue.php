@@ -8,12 +8,12 @@
 
 namespace Yiisoft\Yii\Queue;
 
-use yii\base\Component;
-use yii\exceptions\InvalidArgumentException;
-use yii\helpers\VarDumper;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
+use Yiisoft\Serializer\SerializerInterface;
+use Yiisoft\VarDumper\VarDumper;
 use Yiisoft\Yii\Queue\Events\ExecEvent;
 use Yiisoft\Yii\Queue\Events\PushEvent;
-use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
 
 /**
  * Base Queue.
@@ -24,7 +24,7 @@ use Yiisoft\Yii\Queue\Serializers\SerializerInterface;
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-abstract class Queue extends Component
+abstract class Queue
 {
     /**
      * @see Queue::isWaiting()
@@ -47,10 +47,6 @@ abstract class Queue extends Component
      */
     public $strictJobType = true;
     /**
-     * @var SerializerInterface|array
-     */
-    private $serializer;
-    /**
      * @var int default time to reserve a job
      */
     public $ttr = 300;
@@ -64,11 +60,26 @@ abstract class Queue extends Component
     private $pushPriority;
 
     /**
-     * {@inheritdoc}
+     * @var \Yiisoft\Serializer\SerializerInterface
      */
-    public function __construct(SerializerInterface $serializer)
-    {
+    private $serializer;
+    /**
+     * @var \Psr\EventDispatcher\EventDispatcherInterface
+     */
+    private $eventDispatcher;
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(
+        SerializerInterface $serializer,
+        EventDispatcherInterface $eventDispatcher,
+        LoggerInterface $logger
+    ) {
         $this->serializer = $serializer;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->logger = $logger;
     }
 
     /**
@@ -78,7 +89,7 @@ abstract class Queue extends Component
      *
      * @return $this
      */
-    public function ttr(int $value)
+    public function ttr(int $value): self
     {
         $this->pushTtr = $value;
 
@@ -88,11 +99,11 @@ abstract class Queue extends Component
     /**
      * Sets delay for later execute.
      *
-     * @param int|mixed $value
+     * @param int $value
      *
      * @return $this
      */
-    public function delay($value)
+    public function delay(int $value): self
     {
         $this->pushDelay = $value;
 
@@ -106,7 +117,7 @@ abstract class Queue extends Component
      *
      * @return $this
      */
-    public function priority($value)
+    public function priority($value): self
     {
         $this->pushPriority = $value;
 
@@ -138,7 +149,7 @@ abstract class Queue extends Component
         }
 
         if ($this->strictJobType && !($event->job instanceof JobInterface)) {
-            throw new InvalidArgumentException('Job must be instance of JobInterface.');
+            throw new \InvalidArgumentException('Job must be instance of JobInterface.');
         }
 
         $message = $this->serializer->serialize($event->job);
@@ -174,19 +185,20 @@ abstract class Queue extends Component
      * @param int    $ttr     time to reserve
      * @param int    $attempt number
      *
-     * @return bool
+     * @return void
      */
-    protected function handleMessage($id, $message, $ttr, $attempt)
+    protected function handleMessage($id, $message, $ttr, $attempt): void
     {
         [$job, $error] = $this->unserializeMessage($message);
 
         $event = ExecEvent::before($id, $job, $ttr, $attempt, $error);
         $this->trigger($event);
         if ($event->isPropagationStopped()) {
-            return true;
+            return;
         }
         if ($event->error) {
-            return $this->handleError($event);
+            $this->handleError($event);
+            return;
         }
 
         try {
@@ -194,21 +206,20 @@ abstract class Queue extends Component
         } catch (\Exception $error) {
             $event->error = $error;
 
-            return $this->handleError($event);
+            $this->handleError($event);
+            return;
         } catch (\Throwable $error) {
             $event->error = $error;
 
-            return $this->handleError($event);
+            $this->handleError($event);
+            return;
         }
         $this->trigger(ExecEvent::after($event));
-
-        return true;
     }
 
     /**
      * Unserializes.
      *
-     * @param string $id         of the job
      * @param string $serialized message
      *
      * @return array pair of a job and error that
@@ -256,7 +267,7 @@ abstract class Queue extends Component
      *
      * @return bool
      */
-    public function isWaiting($id)
+    public function isWaiting($id): bool
     {
         return $this->status($id) === self::STATUS_WAITING;
     }
@@ -266,7 +277,7 @@ abstract class Queue extends Component
      *
      * @return bool
      */
-    public function isReserved($id)
+    public function isReserved($id): bool
     {
         return $this->status($id) === self::STATUS_RESERVED;
     }
@@ -276,7 +287,7 @@ abstract class Queue extends Component
      *
      * @return bool
      */
-    public function isDone($id)
+    public function isDone($id): bool
     {
         return $this->status($id) === self::STATUS_DONE;
     }

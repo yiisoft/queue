@@ -8,8 +8,6 @@
 
 namespace Yiisoft\Yii\Queue\Cli;
 
-use yii\base\Event;
-
 /**
  * Worker Event.
  *
@@ -17,7 +15,7 @@ use yii\base\Event;
  *
  * @since 2.0.2
  */
-class WorkerEvent extends Event
+class WorkerEvent
 {
     /**
      * @event WorkerEvent that is triggered when the worker is started.
@@ -40,21 +38,24 @@ class WorkerEvent extends Event
 
     /**
      * @var Queue
-     *            {@inheritdoc}
      */
     public $sender;
+    /**
+     * @var string
+     */
+    public $name;
     /**
      * @var LoopInterface
      */
     public $loop;
     /**
-     * @var null|int exit code
+     * @var int exit code
      */
     public $exitCode;
 
-    public function __construct(string $name, $loop, $exitCode)
+    public function __construct(string $name, LoopInterface $loop, int $exitCode)
     {
-        parent::__construct($name);
+        $this->name = $name;
         $this->loop = $loop;
         $this->exitCode = $exitCode;
     }
@@ -62,9 +63,10 @@ class WorkerEvent extends Event
     /**
      * Creates START event.
      *
+     * @param \Yiisoft\Yii\Queue\Cli\LoopInterface $loop
      * @return self created event
      */
-    public static function start($loop): self
+    public static function start(LoopInterface $loop): self
     {
         return new static(static::START, $loop, null);
     }
@@ -72,6 +74,7 @@ class WorkerEvent extends Event
     /**
      * Creates LOOP event.
      *
+     * @param \Yiisoft\Yii\Queue\Cli\WorkerEvent $before
      * @return self created event
      */
     public static function loop(self $before): self
@@ -82,6 +85,7 @@ class WorkerEvent extends Event
     /**
      * Creates STOP event.
      *
+     * @param \Yiisoft\Yii\Queue\Cli\WorkerEvent $before
      * @return self created event
      */
     public static function stop(self $before): self

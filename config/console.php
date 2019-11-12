@@ -1,6 +1,6 @@
 <?php
 
-use yii\di\Reference;
+use Yiisoft\Factory\Definitions\Reference;
 
 return [
     'app' => [

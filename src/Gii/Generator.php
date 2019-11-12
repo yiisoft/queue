@@ -8,9 +8,8 @@
 
 namespace Yiisoft\Yii\Queue\Gii;
 
-use yii\base\BaseObject;
-use Yiisoft\Yii\Gii\CodeFile;
 use yii\helpers\Yii;
+use Yiisoft\Yii\Gii\CodeFile;
 use Yiisoft\Yii\Queue\JobInterface;
 use Yiisoft\Yii\Queue\RetryableJobInterface;
 
@@ -25,7 +24,7 @@ class Generator extends \Yiisoft\Yii\Gii\Generator
     public $properties;
     public $retryable = false;
     public $ns = 'app\jobs';
-    public $baseClass = BaseObject::class;
+    public $baseClass = \stdClass::class;
 
     /**
      * {@inheritdoc}

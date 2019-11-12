@@ -8,11 +8,10 @@
 
 namespace Yiisoft\Yii\Queue\Cli;
 
-use yii\base\BootstrapInterface;
-use Yiisoft\Yii\Console\Application as ConsoleApp;
-use yii\exceptions\InvalidConfigException;
-use Yiisoft\Strings\Inflector;
 use yii\helpers\Yii;
+use Yiisoft\Factory\Exceptions\InvalidConfigException;
+use Yiisoft\Strings\Inflector;
+use Yiisoft\Yii\Console\Application as ConsoleApp;
 use Yiisoft\Yii\Queue\Queue as BaseQueue;
 
 /**
@@ -20,7 +19,7 @@ use Yiisoft\Yii\Queue\Queue as BaseQueue;
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-abstract class Queue extends BaseQueue implements BootstrapInterface
+abstract class Queue extends BaseQueue
 {
     /**
      * @var array|string
@@ -133,30 +132,28 @@ abstract class Queue extends BaseQueue implements BootstrapInterface
     /**
      * {@inheritdoc}
      */
-    protected function handleMessage($id, $message, $ttr, $attempt)
+    protected function handleMessage($id, $message, $ttr, $attempt): void
     {
         if ($this->messageHandler) {
-            return call_user_func($this->messageHandler, $id, $message, $ttr, $attempt);
+            call_user_func($this->messageHandler, $id, $message, $ttr, $attempt);
+        } else {
+            parent::handleMessage($id, $message, $ttr, $attempt);
         }
-
-        return parent::handleMessage($id, $message, $ttr, $attempt);
     }
 
     /**
-     * @param string   $id        of a message
-     * @param string   $message
-     * @param int      $ttr       time to reserve
-     * @param int      $attempt   number
+     * @param string $id of a message
+     * @param string $message
+     * @param int $ttr time to reserve
+     * @param int $attempt number
      * @param int|null $workerPid of worker process
-     *
-     * @return bool
-     *
+     * @return void
      * @internal for worker command only
      */
-    public function execute($id, $message, $ttr, $attempt, $workerPid)
+    public function execute($id, $message, $ttr, $attempt, $workerPid): void
     {
         $this->_workerPid = $workerPid;
 
-        return parent::handleMessage($id, $message, $ttr, $attempt);
+        parent::handleMessage($id, $message, $ttr, $attempt);
     }
 }

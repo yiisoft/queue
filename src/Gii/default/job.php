@@ -1,13 +1,15 @@
 <?php
+
 /**
- * @var \yii\web\View
+ * @var \Yiisoft\View\View $this
  * @var \Yiisoft\Yii\Queue\Gii\Generator $generator
- * @var string                   $jobClass
+ * @var string $jobClass
  * @var string                   $$ns
- * @var string                   $baseClass
- * @var string[]                 $interfaces
- * @var string[]                 $properties
+ * @var string $baseClass
+ * @var string[] $interfaces
+ * @var string[] $properties
  */
+
 if ($interfaces) {
     $implements = 'implements '.implode(', ', $interfaces);
 } else {
