@@ -2,7 +2,18 @@
     "name": "yiisoft/yii-queue",
     "description": "Yii Queue Extension which supported DB, Redis, RabbitMQ, Beanstalk, SQS and Gearman",
     "type": "library",
-    "keywords": ["yii", "queue", "async", "gii", "db", "redis", "rabbitmq", "beanstalk", "gearman", "sqs"],
+    "keywords": [
+        "yii",
+        "queue",
+        "async",
+        "gii",
+        "db",
+        "redis",
+        "rabbitmq",
+        "beanstalk",
+        "gearman",
+        "sqs"
+    ],
     "license": "BSD-3-Clause",
     "authors": [
         {
@@ -73,7 +84,15 @@
             "tests": "config/tests.php",
             "common": "config/common.php",
             "console": "config/console.php",
-            "tests-app": ["$common","$console","tests/App/config/main.php", "tests/App/config/console.php"]
+            "tests-app": [
+                "$common",
+                "$console",
+                "tests/App/config/main.php",
+                "tests/App/config/console.php"
+            ]
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
