@@ -67,7 +67,7 @@ abstract class TestCase extends \Yiisoft\Yii\Queue\Tests\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         // Removes temp job files
         foreach (glob(Yii::getAlias('@runtime/job-*.lock')) as $fileName) {

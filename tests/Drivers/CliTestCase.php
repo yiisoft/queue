@@ -72,7 +72,7 @@ abstract class CliTestCase extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists(PriorityJob::getFileName())) {
             unlink(PriorityJob::getFileName());
