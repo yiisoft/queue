@@ -1,20 +1,20 @@
 language: php
 
-php:
-  - 7.2
-  - 7.3
+env:
+  global:
+    - DEFAULT_COMPOSER_FLAGS="--prefer-dist --no-interaction --no-progress --optimize-autoloader"
+    - TASK_STATIC_ANALYSIS=0
+    - TASK_TESTS_COVERAGE=0
 
 matrix:
   include:
-    - php: 7.2
-      env: EXCLUDE_AMQP_INTEROP=true
-  fast_finish: true
+    - php: "7.4"
+      env:
+        - TASK_STATIC_ANALYSIS=0 # set to 1 to enable static analysis
+        - TASK_TESTS_COVERAGE=1
 
-
-services:
-  - mysql
-  - postgresql
-  - rabbitmq
+# faster builds on new travis setup not using sudo
+sudo: false
 
 # cache vendor dirs
 cache:
@@ -22,24 +22,44 @@ cache:
     - $HOME/.composer/cache
 
 before_install:
-  - sudo apt-get update -qq
-  - pecl install igbinary
+  - phpenv config-rm xdebug.ini || echo "xdebug is not installed"
 
 install:
   - travis_retry composer self-update && composer --version
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
-  - if [ "$EXCLUDE_AMQP_INTEROP" = true ]; then travis_retry composer remove "enqueue/amqp-lib" "enqueue/amqp-tools" --dev --no-interaction  --no-update; fi
-  - travis_retry composer install --prefer-dist --no-interaction
+  - travis_retry composer install $DEFAULT_COMPOSER_FLAGS
+  - |
+    if [ $TASK_STATIC_ANALYSIS == 1 ]; then
+      pecl install ast
+    fi
 
 before_script:
-  - mysql -e 'CREATE DATABASE yii2_queue_test;'
-  - php tests/yii mysql-migrate --interactive=0
-  - php tests/yii sqlite-migrate --interactive=0
-  - psql -c  'create database yii2_queue_test;' -U postgres
-  - php tests/yii pgsql-migrate --interactive=0
+  - php --version
+  - composer --version
+  # enable code coverage
+  - |
+    if [ $TASK_TESTS_COVERAGE == 1 ]; then
+        PHPUNIT_COVERAGE_FLAG="--coverage-clover=coverage.clover"
+    fi
 
 script:
-  - vendor/bin/phpunit
+  - phpdbg -qrr vendor/bin/phpunit --verbose $PHPUNIT_COVERAGE_FLAG
+  - |
+    if [ $TASK_STATIC_ANALYSIS == 1 ]; then
+      composer phan
+    fi
+  - |
+    if [ $TASK_STATIC_ANALYSIS == 1 ]; then
+      cat analysis.txt
+    fi
+
+after_script:
+  - |
+    if [ $TASK_TESTS_COVERAGE == 1 ]; then
+      travis_retry wget https://scrutinizer-ci.com/ocular.phar
+      php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+    fi
+
 
 notifications:
   slack:
