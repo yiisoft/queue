@@ -15,12 +15,6 @@
         "sqs"
     ],
     "license": "BSD-3-Clause",
-    "authors": [
-        {
-            "name": "Roman Zhuravlev",
-            "email": "zhuravljov@gmail.com"
-        }
-    ],
     "support": {
         "issues": "https://github.com/yiisoft/yii-queue/issues",
         "source": "https://github.com/yiisoft/yii-queue",
@@ -31,32 +25,21 @@
     "require": {
         "yiisoft/yii-console": "^3.0@dev",
         "yiisoft/strings": "^3.0@dev",
-        "yiisoft/view": "^3.0@dev",
         "yiisoft/mutex": "^3.0@dev",
-        "yiisoft/di": "^3.0@dev",
         "yiisoft/serializer": "^3.0@dev",
         "symfony/process": "^4.0",
-        "ext-pcntl": "*",
         "php": "^7.4"
     },
     "require-dev": {
-        "yiisoft/db-redis": "dev-master",
-        "yiisoft/db": "dev-master",
         "enqueue/amqp-lib": "^0.9",
         "pda/pheanstalk": "*",
         "jeremeamia/superclosure": "*",
-        "yiisoft/yii-debug": "dev-master",
-        "yiisoft/yii-gii": "dev-master",
-        "yiisoft/yii-bootstrap4": "dev-master",
         "yiisoft/log": "^3.0@dev",
         "yiisoft/cache": "^3.0@dev",
         "phpunit/phpunit": "^8.4",
         "aws/aws-sdk-php": ">=2.4",
         "hiqdev/composer-config-plugin": "^1.0@dev",
-        "yiisoft/mutex-file": "^3.0@dev",
-        "yiisoft/db-mysql": "^3.0@dev",
-        "yiisoft/db-sqlite": "^3.0@dev",
-        "yiisoft/db-pgsql": "^3.0@dev"
+        "yiisoft/mutex-file": "^3.0@dev"
     },
     "suggest": {
         "ext-pcntl": "Need for process signals.",
