@@ -14,7 +14,7 @@ Documentation is at [docs/guide/README.md](docs/guide/README.md).
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/yii-queue/v/stable.svg)](https://packagist.org/packages/yiisoft/yii-queue)
 [![Total Downloads](https://poser.pugx.org/yiisoft/yii-queue/downloads.svg)](https://packagist.org/packages/yiisoft/yii-queue)
-[![Build Status](https://travis-ci.org/yiisoft/yii-queue.svg?branch=master)](https://travis-ci.org/yiisoft/yii-queue)
+[![Build Status](https://travis-ci.com/yiisoft/yii-queue.svg?branch=master)](https://travis-ci.com/yiisoft/yii-queue)
 
 Installation
 ------------
