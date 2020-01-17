@@ -7,8 +7,8 @@
  */
 
 use hiqdev\composer\config\Builder;
-use yii\di\Container;
-use yii\helpers\Yii;
+use Yiisoft\Di\Container;
+use Yiisoft\Yii\Console\Application;
 
 // ensure we get report on all possible php errors
 error_reporting(-1);
@@ -28,10 +28,9 @@ $_SERVER['SCRIPT_FILENAME'] = __FILE__;
 
     require_once $composerAutoload;
 
+    Builder::rebuild();
+
     $container = new Container(require Builder::path('tests-app'));
 
-    Yii::setContainer($container);
-
-
-    $container->get('app')->run();
+    $container->get(Application::class)->run();
 })();
