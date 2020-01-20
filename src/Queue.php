@@ -22,7 +22,7 @@ use Yiisoft\Yii\Queue\Events\PushEvent;
  *
  * @property null|int $workerPid
  */
-abstract class Queue
+class Queue
 {
     /**
      * @see Queue::isWaiting()
