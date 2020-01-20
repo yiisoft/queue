@@ -8,10 +8,9 @@
 
 namespace Yiisoft\Yii\Queue\Tests\closure;
 
-use yii\helpers\Yii;
+use Yiisoft\Serializer\JsonSerializer;
 use Yiisoft\Yii\Queue\Closure\Behavior;
 use Yiisoft\Yii\Queue\Drivers\Sync\Queue;
-use Yiisoft\Yii\Queue\Serializers\JsonSerializer;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 /**

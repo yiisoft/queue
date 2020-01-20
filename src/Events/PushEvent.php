@@ -20,25 +20,25 @@ class PushEvent extends JobEvent
     /**
      * @event PushEvent
      */
-    const BEFORE = 'before.push';
+    public const BEFORE = 'before.push';
     /**
      * @event PushEvent
      */
-    const AFTER = 'after.push';
+    public const AFTER = 'after.push';
 
     /**
      * @var int
      */
-    public $delay;
+    public int $delay;
     /**
      * @var int
      */
-    public $priority;
+    public int $priority;
 
     /**
      * Creates BEFORE event.
      *
-     * @param \Yiisoft\Yii\Queue\JobInterface $job
+     * @param JobInterface $job
      * @param int $ttr
      * @param int $delay
      * @param int $priority

@@ -13,16 +13,6 @@ services:
     - 8.8.8.8
     - 4.4.4.4
     environment: &php_environment
-      MYSQL_HOST: mysql
-      MYSQL_USER: yii2_queue_test
-      MYSQL_PASSWORD: yii2_queue_test
-      MYSQL_DATABASE: yii2_queue_test
-      POSTGRES_HOST: postgres
-      POSTGRES_USER: yii2_queue_test
-      POSTGRES_PASSWORD: yii2_queue_test
-      POSTGRES_DB: yii2_queue_test
-      REDIS_HOST: redis
-      REDIS_DB: 1
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_USER: guest
       RABBITMQ_PASSWORD: guest

@@ -43,11 +43,11 @@ abstract class TestCase extends CliTestCase
 
     public function testPriority()
     {
-        $this->getQueue()->priority(100)->push(new PriorityJob(['number' => 1]));
-        $this->getQueue()->priority(300)->push(new PriorityJob(['number' => 5]));
-        $this->getQueue()->priority(200)->push(new PriorityJob(['number' => 3]));
-        $this->getQueue()->priority(200)->push(new PriorityJob(['number' => 4]));
-        $this->getQueue()->priority(100)->push(new PriorityJob(['number' => 2]));
+        $this->getQueue()->withPriority(100)->push(new PriorityJob(['number' => 1]));
+        $this->getQueue()->withPriority(300)->push(new PriorityJob(['number' => 5]));
+        $this->getQueue()->withPriority(200)->push(new PriorityJob(['number' => 3]));
+        $this->getQueue()->withPriority(200)->push(new PriorityJob(['number' => 4]));
+        $this->getQueue()->withPriority(100)->push(new PriorityJob(['number' => 2]));
         $this->runProcess('php yii queue/run');
 
         $this->assertEquals('12345', file_get_contents(PriorityJob::getFileName()));
@@ -66,7 +66,7 @@ abstract class TestCase extends CliTestCase
     {
         $this->startProcess('php yii queue/listen 1');
         $job = $this->createSimpleJob();
-        $this->getQueue()->delay(2)->push($job);
+        $this->getQueue()->withDelay(2)->push($job);
 
         $this->assertSimpleJobLaterDone($job, 2);
     }

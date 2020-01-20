@@ -23,11 +23,12 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "yiisoft/strings": "^3.0@dev",
+        "php": "^7.4",
+        "psr/event-dispatcher": "^1.0",
+        "symfony/process": "^4.0",
         "yiisoft/mutex": "^3.0@dev",
         "yiisoft/serializer": "^3.0@dev",
-        "symfony/process": "^4.0",
-        "php": "^7.4"
+        "yiisoft/strings": "^3.0@dev"
     },
     "require-dev": {
         "ext-pdo": "*",
@@ -40,9 +41,6 @@
         "phpunit/phpunit": "^8.4",
         "yiisoft/arrays": "^3.0@dev",
         "yiisoft/cache": "^3.0@dev",
-        "yiisoft/db-mysql": "^3.0@dev",
-        "yiisoft/db-pgsql": "^3.0@dev",
-        "yiisoft/db-sqlite": "^3.0@dev",
         "yiisoft/di": "^3.0@dev",
         "yiisoft/log": "^3.0@dev",
         "yiisoft/mutex-file": "^3.0@dev",

@@ -13,12 +13,9 @@ RUN docker-php-ext-install \
         intl \
         pcntl \
         bcmath \
-        sockets \
-        pdo_mysql \
-        pdo_pgsql \
+        sockets
 
 RUN docker-php-ext-configure intl && \
-    docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql && \
     pecl install igbinary && \
     docker-php-ext-enable igbinary
 

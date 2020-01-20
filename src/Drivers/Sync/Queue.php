@@ -8,8 +8,6 @@
 
 namespace Yiisoft\Yii\Queue\Drivers\Sync;
 
-use yii\base\RequestEvent;
-use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Queue as BaseQueue;
 
 /**
@@ -22,24 +20,24 @@ class Queue extends BaseQueue
     /**
      * @var bool
      */
-    public $handle = false;
+    public bool $handle = false;
 
     /**
      * @var array of payloads
      */
-    private $payloads = [];
+    private array $payloads = [];
     /**
      * @var int last pushed ID
      */
-    private $pushedId = 0;
+    private int $pushedId = 0;
     /**
      * @var int started ID
      */
-    private $startedId = 0;
+    private int $startedId = 0;
     /**
      * @var int last finished ID
      */
-    private $finishedId = 0;
+    private int $finishedId = 0;
 
     /**
      * {@inheritdoc}

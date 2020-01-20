@@ -9,6 +9,7 @@
 namespace Yiisoft\Yii\Queue\Events;
 
 use Yiisoft\Yii\Queue\JobInterface;
+use Yiisoft\Yii\Queue\Queue;
 
 /**
  * Job Event.
@@ -18,28 +19,29 @@ use Yiisoft\Yii\Queue\JobInterface;
 abstract class JobEvent
 {
     /**
-     * @var \Yiisoft\Yii\Queue\Queue
+     * @var Queue
      */
-    public $sender;
+    public Queue $sender;
     /**
      * @var string
      */
-    public $name;
+    public string $name;
     /**
      * @var string|null unique id of a job
      */
-    public $id;
+    public ?string $id;
     /**
-     * @var \Yiisoft\Yii\Queue\JobInterface
+     * @var JobInterface
      */
-    public $job;
+    public ?JobInterface $job;
     /**
      * @var int time to reserve in seconds of the job
      */
-    public $ttr;
+    public int $ttr;
 
-    public function __construct(string $name, $id, JobInterface $job, int $ttr)
+    public function __construct(string $name, string $id, ?JobInterface $job, int $ttr)
     {
+        $this->name = $name;
         $this->id = $id;
         $this->job = $job;
         $this->ttr = $ttr;
