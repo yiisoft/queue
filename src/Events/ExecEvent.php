@@ -10,6 +10,7 @@ namespace Yiisoft\Yii\Queue\Events;
 
 use Throwable;
 use Yiisoft\Yii\Queue\JobInterface;
+use Yiisoft\Yii\Queue\Queue;
 
 /**
  * Exec Event.
@@ -60,6 +61,7 @@ class ExecEvent extends JobEvent
      * @since 2.1.1
      */
     public ?bool $retry = null;
+    protected ?Queue $queue = null;
 
     /**
      * Creates BEFORE event.
@@ -68,15 +70,13 @@ class ExecEvent extends JobEvent
      * @param JobInterface|null $job
      * @param int $ttr
      * @param int $attempt
-     * @param Throwable|null $error
      *
      * @return self created event
      */
-    public static function before($id, ?JobInterface $job, int $ttr, int $attempt, ?Throwable $error): self
+    public static function before($id, ?JobInterface $job, int $ttr, int $attempt): self
     {
         $event = new static(static::BEFORE, $id, $job, $ttr);
         $event->attempt = $attempt;
-        $event->error = $error;
 
         return $event;
     }
@@ -103,18 +103,27 @@ class ExecEvent extends JobEvent
     /**
      * Creates BEFORE event.
      *
+     * @param Queue $queue
      * @param ExecEvent $before
+     *
+     * @param Throwable $error
      *
      * @return self created event
      */
-    public static function error(self $before): self
+    public static function error(Queue $queue, self $before, Throwable $error): self
     {
         $event = new static(static::ERROR, $before->id, $before->job, $before->ttr);
+        $event->queue = $queue;
         $event->attempt = $before->attempt;
         $event->result = $before->result;
-        $event->error = $before->error;
+        $event->error = $error;
         $event->retry = $before->retry;
 
         return $event;
+    }
+
+    public function getQueue(): ?Queue
+    {
+        return $this->queue;
     }
 }

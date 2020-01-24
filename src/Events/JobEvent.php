@@ -10,6 +10,7 @@ namespace Yiisoft\Yii\Queue\Events;
 
 use Yiisoft\Yii\Queue\JobInterface;
 use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\RetryableJobInterface;
 
 /**
  * Job Event.
@@ -31,7 +32,7 @@ abstract class JobEvent
      */
     public ?string $id;
     /**
-     * @var JobInterface
+     * @var JobInterface|RetryableJobInterface
      */
     public ?JobInterface $job;
     /**

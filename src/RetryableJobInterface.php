@@ -8,6 +8,8 @@
 
 namespace Yiisoft\Yii\Queue;
 
+use Throwable;
+
 /**
  * Retryable Job Interface.
  *
@@ -21,10 +23,11 @@ interface RetryableJobInterface extends JobInterface
     public function getTtr(): int;
 
     /**
-     * @param int $attempt number
-     * @param \Exception|\Throwable $error from last execute of the job
+     * @param Throwable|null $error
      *
      * @return bool
      */
-    public function canRetry(int $attempt, $error): bool;
+    public function canRetry(?Throwable $error = null): bool;
+
+    public function retry(): void;
 }
