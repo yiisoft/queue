@@ -9,7 +9,7 @@
 namespace Yiisoft\Yii\Queue\Events;
 
 use Throwable;
-use Yiisoft\Yii\Queue\JobInterface;
+use Yiisoft\Yii\Queue\Jobs\JobInterface;
 use Yiisoft\Yii\Queue\Queue;
 
 /**

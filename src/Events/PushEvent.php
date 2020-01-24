@@ -8,7 +8,7 @@
 
 namespace Yiisoft\Yii\Queue\Events;
 
-use Yiisoft\Yii\Queue\JobInterface;
+use Yiisoft\Yii\Queue\Jobs\JobInterface;
 
 /**
  * Push Event.

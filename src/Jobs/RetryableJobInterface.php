@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue;
+namespace Yiisoft\Yii\Queue\Jobs;
 
 use Throwable;
 

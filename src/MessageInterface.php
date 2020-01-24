@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
+use Yiisoft\Yii\Queue\Jobs\JobInterface;
+
 interface MessageInterface
 {
     /**

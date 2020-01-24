@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue;
+namespace Yiisoft\Yii\Queue\Processors;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Throwable;
 use Yiisoft\Log\Logger;
 use Yiisoft\Yii\Queue\Events\ExecEvent;
+use Yiisoft\Yii\Queue\LogMessageFormatter;
+use Yiisoft\Yii\Queue\MessageInterface;
+use Yiisoft\Yii\Queue\Queue;
 
 class JobProcessor implements JobProcessorInterface
 {

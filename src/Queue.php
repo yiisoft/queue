@@ -16,6 +16,9 @@ use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Events\ExecEvent;
 use Yiisoft\Yii\Queue\Events\PushEvent;
+use Yiisoft\Yii\Queue\Jobs\JobInterface;
+use Yiisoft\Yii\Queue\Jobs\RetryableJobInterface;
+use Yiisoft\Yii\Queue\Processors\JobProcessorInterface;
 
 /**
  * Base Queue.

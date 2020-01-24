@@ -13,6 +13,7 @@ use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Events\ExecEvent;
 use Yiisoft\Yii\Queue\Events\JobEvent;
 use Yiisoft\Yii\Queue\Events\PushEvent;
+use Yiisoft\Yii\Queue\Jobs\JobInterface;
 
 /**
  * Log Behavior.
