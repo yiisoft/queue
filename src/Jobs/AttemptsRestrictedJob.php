@@ -8,8 +8,8 @@ use Throwable;
 
 abstract class AttemptsRestrictedJob implements RetryableJobInterface
 {
-    protected int $attemptsMax;
-    protected int $attempt;
+    protected int $attemptsMax = 1;
+    protected int $attempt = 1;
 
     public function canRetry(?Throwable $error = null): bool
     {
@@ -18,6 +18,6 @@ abstract class AttemptsRestrictedJob implements RetryableJobInterface
 
     public function retry(): void
     {
-        $this->attemptsMax++;
+        $this->attempt++;
     }
 }

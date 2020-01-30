@@ -12,7 +12,7 @@ use Yiisoft\Yii\Queue\LogMessageFormatter;
 use Yiisoft\Yii\Queue\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 
-class JobProcessor implements JobProcessorInterface
+class Worker implements WorkerInterface
 {
     /**
      * @var EventDispatcherInterface

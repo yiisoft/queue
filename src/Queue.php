@@ -18,7 +18,7 @@ use Yiisoft\Yii\Queue\Events\ExecEvent;
 use Yiisoft\Yii\Queue\Events\PushEvent;
 use Yiisoft\Yii\Queue\Jobs\JobInterface;
 use Yiisoft\Yii\Queue\Jobs\RetryableJobInterface;
-use Yiisoft\Yii\Queue\Processors\JobProcessorInterface;
+use Yiisoft\Yii\Queue\Processors\WorkerInterface;
 
 /**
  * Base Queue.
@@ -45,7 +45,7 @@ class Queue
     protected LogMessageFormatter $formatter;
     protected DriverInterface $driver;
     protected LoopInterface $loop;
-    protected JobProcessorInterface $processor;
+    protected WorkerInterface $processor;
     protected Provider $provider;
 
     public function __construct(
@@ -55,7 +55,7 @@ class Queue
         LoggerInterface $logger,
         LogMessageFormatter $formatter,
         LoopInterface $loop,
-        JobProcessorInterface $processor
+        WorkerInterface $processor
     ) {
         $this->driver = $driver;
         $this->eventDispatcher = $dispatcher;
@@ -184,7 +184,7 @@ class Queue
         $message = "Worker $pid is started.";
         $this->logger->info($message);
 
-        $handler = static function (MessageInterface $message) {
+        $handler = function (MessageInterface $message) {
             try {
                 $this->processor->process($message, $this);
             } catch (Throwable $exception) {

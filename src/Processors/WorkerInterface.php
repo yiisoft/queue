@@ -7,7 +7,7 @@ namespace Yiisoft\Yii\Queue\Processors;
 use Yiisoft\Yii\Queue\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 
-interface JobProcessorInterface
+interface WorkerInterface
 {
     public function process(MessageInterface $message, Queue $queue);
 }
