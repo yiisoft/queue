@@ -45,7 +45,7 @@ class Queue
     protected LogMessageFormatter $formatter;
     protected DriverInterface $driver;
     protected LoopInterface $loop;
-    protected WorkerInterface $processor;
+    protected WorkerInterface $worker;
     protected Provider $provider;
 
     public function __construct(
@@ -55,14 +55,14 @@ class Queue
         LoggerInterface $logger,
         LogMessageFormatter $formatter,
         LoopInterface $loop,
-        WorkerInterface $processor
+        WorkerInterface $worker
     ) {
         $this->driver = $driver;
         $this->eventDispatcher = $dispatcher;
         $this->logger = $logger;
         $this->formatter = $formatter;
         $this->loop = $loop;
-        $this->processor = $processor;
+        $this->worker = $worker;
         $this->provider = $provider;
 
         $provider->attach([$this, 'jobRetry']);
@@ -172,7 +172,7 @@ class Queue
 
         while ($this->loop->canContinue() && $message = $this->driver->nextMessage()) {
             try {
-                $this->processor->process($message, $this);
+                $this->worker->process($message, $this);
             } catch (Throwable $exception) {
             }
         }
@@ -186,7 +186,7 @@ class Queue
 
         $handler = function (MessageInterface $message) {
             try {
-                $this->processor->process($message, $this);
+                $this->worker->process($message, $this);
             } catch (Throwable $exception) {
             }
         };
