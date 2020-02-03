@@ -14,9 +14,6 @@ use Yiisoft\Yii\Queue\Queue;
 
 class Worker implements WorkerInterface
 {
-    /**
-     * @var EventDispatcherInterface
-     */
     private EventDispatcherInterface $dispatcher;
     private Logger $logger;
     private LogMessageFormatter $formatter;

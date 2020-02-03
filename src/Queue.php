@@ -27,9 +27,9 @@ use Yiisoft\Yii\Queue\Processors\WorkerInterface;
 class Queue
 {
     /**
-     * @var int default time to reserve a job
+     * @const default time to reserve a job
      */
-    public int $ttrDefault = 300;
+    protected const TTR_DEFAULT = 300;
     /**
      * @var int default attempt count
      */
@@ -141,7 +141,7 @@ class Queue
             if ($job instanceof RetryableJobInterface) {
                 $ttr = $job->getTtr();
             } else {
-                $ttr = $this->ttrDefault;
+                $ttr = static::TTR_DEFAULT;
             }
         } else {
             $ttr = $this->pushTtr;

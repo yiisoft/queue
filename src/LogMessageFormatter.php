@@ -9,11 +9,6 @@ use Yiisoft\Yii\Queue\Events\JobEvent;
 
 class LogMessageFormatter
 {
-    /**
-     * @param JobEvent $event
-     *
-     * @return string
-     */
     public function getJobTitle(JobEvent $event): string
     {
         if ($event->job === null) {
@@ -25,16 +20,11 @@ class LogMessageFormatter
         return "[$event->id] $name";
     }
 
-    /**
-     * @param ExecEvent $event
-     *
-     * @return string
-     */
     public function getExecTitle(ExecEvent $event): string
     {
         $title = $this->getJobTitle($event);
         $extra = "attempt: $event->attempt";
-        if ($pid = $event->sender->getWorkerPid()) {
+        if ($pid = getmypid()) {
             $extra .= ", PID: $pid";
         }
 
