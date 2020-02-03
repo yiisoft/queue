@@ -10,7 +10,6 @@ namespace Yiisoft\Yii\Queue;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Throwable;
 use Yiisoft\EventDispatcher\Dispatcher;
 use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
@@ -171,10 +170,7 @@ class Queue
         $this->logger->info($message);
 
         while ($this->loop->canContinue() && $message = $this->driver->nextMessage()) {
-            try {
-                $this->worker->process($message, $this);
-            } catch (Throwable $exception) {
-            }
+            $this->worker->process($message, $this);
         }
     }
 
@@ -185,10 +181,7 @@ class Queue
         $this->logger->info($message);
 
         $handler = function (MessageInterface $message) {
-            try {
-                $this->worker->process($message, $this);
-            } catch (Throwable $exception) {
-            }
+            $this->worker->process($message, $this);
         };
 
         $this->driver->subscribe($handler);

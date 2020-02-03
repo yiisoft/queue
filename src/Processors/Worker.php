@@ -48,13 +48,6 @@ class Worker implements WorkerInterface
 
         try {
             $this->dispatcher->dispatch($event);
-        } catch (Throwable $exception) {
-            $this->handleError($queue, $event, $exception);
-
-            throw $exception;
-        }
-
-        try {
             $event->result = $event->job->execute();
             $this->dispatcher->dispatch(ExecEvent::after($event));
         } catch (Throwable $exception) {
