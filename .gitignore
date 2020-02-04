@@ -19,3 +19,5 @@ composer.lock
 
 # Env variables
 .env
+
+.phpunit.result.cache

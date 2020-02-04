@@ -13,17 +13,18 @@ use yii\helpers\Yii;
 use Yiisoft\Yii\Queue\Events\ExecEvent;
 use Yiisoft\Yii\Queue\Events\JobEvent;
 use Yiisoft\Yii\Queue\Events\PushEvent;
+use Yiisoft\Yii\Queue\Jobs\JobInterface;
 
 /**
  * Log Behavior.
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-class LogBehavior extends Behavior
+class LogBehavior
 {
     /**
      * @var Queue
-     *            {@inheritdoc}
+     * {@inheritdoc}
      */
     public $owner;
     /**
@@ -44,53 +45,6 @@ class LogBehavior extends Behavior
             Cli\WorkerEvent::START => 'workerStart',
             Cli\WorkerEvent::STOP  => 'workerStop',
         ];
-    }
-
-    /**
-     * @param PushEvent $event
-     */
-    public function afterPush(PushEvent $event): void
-    {
-        $title = $this->getJobTitle($event);
-        Yii::info("$title is pushed.", Queue::class);
-    }
-
-    /**
-     * @param ExecEvent $event
-     */
-    public function beforeExec(ExecEvent $event): void
-    {
-        $title = $this->getExecTitle($event);
-        Yii::info("$title is started.", Queue::class);
-        Yii::beginProfile($title, Queue::class);
-    }
-
-    /**
-     * @param ExecEvent $event
-     * @throws \yii\exceptions\InvalidConfigException
-     */
-    public function afterExec(ExecEvent $event): void
-    {
-        $title = $this->getExecTitle($event);
-        Yii::endProfile($title, Queue::class);
-        Yii::info("$title is finished.", Queue::class);
-        if ($this->autoFlush) {
-            Yii::get('logger')->flush(true);
-        }
-    }
-
-    /**
-     * @param ExecEvent $event
-     * @throws \yii\exceptions\InvalidConfigException
-     */
-    public function afterError(ExecEvent $event): void
-    {
-        $title = $this->getExecTitle($event);
-        Yii::endProfile($title, Queue::class);
-        Yii::error("$title is finished with error: $event->error.", Queue::class);
-        if ($this->autoFlush) {
-            Yii::get('logger')->flush(true);
-        }
     }
 
     /**
@@ -148,7 +102,7 @@ class LogBehavior extends Behavior
     {
         $title = $this->getJobTitle($event);
         $extra = "attempt: $event->attempt";
-        if ($pid = $event->getTarget()->getWorkerPid()) {
+        if ($pid = $event->sender->getWorkerPid()) {
             $extra .= ", PID: $pid";
         }
 

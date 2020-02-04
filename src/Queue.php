@@ -10,76 +10,80 @@ namespace Yiisoft\Yii\Queue;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Yiisoft\Serializer\SerializerInterface;
-use Yiisoft\VarDumper\VarDumper;
+use Yiisoft\EventDispatcher\Dispatcher;
+use Yiisoft\EventDispatcher\Provider\Provider;
+use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Events\ExecEvent;
 use Yiisoft\Yii\Queue\Events\PushEvent;
+use Yiisoft\Yii\Queue\Jobs\JobInterface;
+use Yiisoft\Yii\Queue\Jobs\RetryableJobInterface;
+use Yiisoft\Yii\Queue\Processors\WorkerInterface;
 
 /**
  * Base Queue.
  *
  * @property null|int $workerPid
- *
- * @since 2.0.2
- *
- * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-abstract class Queue
+class Queue
 {
     /**
-     * @see Queue::isWaiting()
+     * @const default time to reserve a job
      */
-    public const STATUS_WAITING = 1;
-    /**
-     * @see Queue::isReserved()
-     */
-    public const STATUS_RESERVED = 2;
-    /**
-     * @see Queue::isDone()
-     */
-    public const STATUS_DONE = 3;
-
-    /**
-     * @var bool whether to enable strict job type control.
-     *           Note that in order to enable type control, a pushing job must be [[JobInterface]] instance.
-     *
-     * @since 2.0.1
-     */
-    public $strictJobType = true;
-    /**
-     * @var int default time to reserve a job
-     */
-    public $ttr = 300;
+    protected const TTR_DEFAULT = 300;
     /**
      * @var int default attempt count
      */
-    public $attempts = 1;
+    public int $attempts = 1;
 
-    private $pushTtr;
-    private $pushDelay;
-    private $pushPriority;
+    private ?int $pushTtr = null;
+    private ?int $pushDelay = null;
+    private ?int $pushPriority = null;
 
-    /**
-     * @var \Yiisoft\Serializer\SerializerInterface
-     */
-    private $serializer;
-    /**
-     * @var \Psr\EventDispatcher\EventDispatcherInterface
-     */
-    private $eventDispatcher;
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
+    protected EventDispatcherInterface $eventDispatcher;
+    protected LoggerInterface $logger;
+    protected LogMessageFormatter $formatter;
+    protected DriverInterface $driver;
+    protected LoopInterface $loop;
+    protected WorkerInterface $worker;
+    protected Provider $provider;
 
     public function __construct(
-        SerializerInterface $serializer,
-        EventDispatcherInterface $eventDispatcher,
-        LoggerInterface $logger
+        DriverInterface $driver,
+        Dispatcher $dispatcher,
+        Provider $provider,
+        LoggerInterface $logger,
+        LogMessageFormatter $formatter,
+        LoopInterface $loop,
+        WorkerInterface $worker
     ) {
-        $this->serializer = $serializer;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->driver = $driver;
+        $this->eventDispatcher = $dispatcher;
         $this->logger = $logger;
+        $this->formatter = $formatter;
+        $this->loop = $loop;
+        $this->worker = $worker;
+        $this->provider = $provider;
+
+        $provider->attach([$this, 'jobRetry']);
+    }
+
+    public function __destruct()
+    {
+        $this->provider->detach(ExecEvent::class);
+    }
+
+    public function jobRetry(ExecEvent $event): void
+    {
+        if (
+            $event->name === ExecEvent::ERROR
+            && !$event->error instanceof InvalidJobException
+            && $event->job instanceof RetryableJobInterface
+            && $event->getQueue() === $this
+            && $event->job->canRetry($event->error)
+        ) {
+            $event->job->retry();
+            $this->push($event->job);
+        }
     }
 
     /**
@@ -103,7 +107,7 @@ abstract class Queue
      *
      * @return $this
      */
-    public function delay(int $value): self
+    public function withDelay(int $value): self
     {
         $this->pushDelay = $value;
 
@@ -117,7 +121,7 @@ abstract class Queue
      *
      * @return $this
      */
-    public function priority($value): self
+    public function withPriority($value): self
     {
         $this->pushPriority = $value;
 
@@ -131,171 +135,61 @@ abstract class Queue
      *
      * @return string|null id of a job message
      */
-    public function push($job)
+    public function push(JobInterface $job): ?string
     {
-        $event = PushEvent::before($job, $this->pushTtr ?: (
-        $job instanceof RetryableJobInterface
-            ? $job->getTtr()
-            : $this->ttr
-        ), $this->pushDelay ?: 0, $this->pushPriority);
+        if ($this->pushTtr === null) {
+            if ($job instanceof RetryableJobInterface) {
+                $ttr = $job->getTtr();
+            } else {
+                $ttr = static::TTR_DEFAULT;
+            }
+        } else {
+            $ttr = $this->pushTtr;
+        }
+
+        $event = PushEvent::before($job, $ttr, $this->pushDelay ?? 0, $this->pushPriority);
 
         $this->pushTtr = null;
         $this->pushDelay = null;
         $this->pushPriority = null;
 
-        $this->trigger($event);
-        if ($event->isPropagationStopped()) {
-            return;
-        }
+        $this->eventDispatcher->dispatch($event);
 
-        if ($this->strictJobType && !($event->job instanceof JobInterface)) {
-            throw new \InvalidArgumentException('Job must be instance of JobInterface.');
-        }
+        $event->id = $this->driver->pushMessage($event->job, $event->ttr, $event->delay, $event->priority);
 
-        $message = $this->serializer->serialize($event->job);
-        $event->id = $this->pushMessage($message, $event->ttr, $event->delay, $event->priority);
-
-        $this->trigger(PushEvent::after($event));
+        $this->logger->info($this->formatter->getJobTitle($event) . ' is pushed');
+        $this->eventDispatcher->dispatch(PushEvent::after($event));
 
         return $event->id;
     }
 
     /**
-     * @param string $message
-     * @param int    $ttr      time to reserve in seconds
-     * @param int    $delay
-     * @param mixed  $priority
-     *
-     * @return string id of a job message
+     * Execute all existing jobs and exit
      */
-    abstract protected function pushMessage($message, $ttr, $delay, $priority);
-
-    /**
-     * Uses for CLI drivers and gets process ID of a worker.
-     *
-     * @since 2.0.2
-     */
-    public function getWorkerPid()
+    public function run(): void
     {
-    }
+        $pid = getmypid();
+        $message = "Worker $pid is started.";
+        $this->logger->info($message);
 
-    /**
-     * @param string $id      of a job message
-     * @param string $message
-     * @param int    $ttr     time to reserve
-     * @param int    $attempt number
-     *
-     * @return void
-     */
-    protected function handleMessage($id, $message, $ttr, $attempt): void
-    {
-        [$job, $error] = $this->unserializeMessage($message);
-
-        $event = ExecEvent::before($id, $job, $ttr, $attempt, $error);
-        $this->trigger($event);
-        if ($event->isPropagationStopped()) {
-            return;
+        while ($this->loop->canContinue() && $message = $this->driver->nextMessage()) {
+            $this->worker->process($message, $this);
         }
-        if ($event->error) {
-            $this->handleError($event);
-            return;
-        }
-
-        try {
-            $event->result = $event->job->execute($this);
-        } catch (\Exception $error) {
-            $event->error = $error;
-
-            $this->handleError($event);
-            return;
-        } catch (\Throwable $error) {
-            $event->error = $error;
-
-            $this->handleError($event);
-            return;
-        }
-        $this->trigger(ExecEvent::after($event));
     }
 
     /**
-     * Unserializes.
-     *
-     * @param string $serialized message
-     *
-     * @return array pair of a job and error that
+     * Listen to the queue and execute jobs as they come
      */
-    public function unserializeMessage($serialized)
+    public function listen(): void
     {
-        try {
-            $job = $this->serializer->unserialize($serialized);
-        } catch (\Exception $e) {
-            return [null, new InvalidJobException($serialized, $e->getMessage(), 0, $e)];
-        }
+        $pid = getmypid();
+        $message = "Worker $pid is started.";
+        $this->logger->info($message);
 
-        if ($job instanceof JobInterface) {
-            return [$job, null];
-        }
+        $handler = function (MessageInterface $message) {
+            $this->worker->process($message, $this);
+        };
 
-        return [null, new InvalidJobException($serialized, sprintf(
-            'Job must be a JobInterface instance instead of %s.',
-            VarDumper::dumpAsString($job)
-        ))];
+        $this->driver->subscribe($handler);
     }
-
-    /**
-     * @param ExecEvent $event
-     *
-     * @return bool
-     *
-     * @internal
-     */
-    public function handleError(ExecEvent $event)
-    {
-        $event->retry = $event->attempt < $this->attempts;
-        if ($event->error instanceof InvalidJobException) {
-            $event->retry = false;
-        } elseif ($event->job instanceof RetryableJobInterface) {
-            $event->retry = $event->job->canRetry($event->attempt, $event->error);
-        }
-        $this->trigger(ExecEvent::error($event));
-
-        return !$event->retry;
-    }
-
-    /**
-     * @param string $id of a job message
-     *
-     * @return bool
-     */
-    public function isWaiting($id): bool
-    {
-        return $this->status($id) === self::STATUS_WAITING;
-    }
-
-    /**
-     * @param string $id of a job message
-     *
-     * @return bool
-     */
-    public function isReserved($id): bool
-    {
-        return $this->status($id) === self::STATUS_RESERVED;
-    }
-
-    /**
-     * @param string $id of a job message
-     *
-     * @return bool
-     */
-    public function isDone($id): bool
-    {
-        return $this->status($id) === self::STATUS_DONE;
-    }
-
-    /**
-     * @param string $id of a job message
-     *
-     * @return int status code
-     */
-    abstract public function status($id);
 }

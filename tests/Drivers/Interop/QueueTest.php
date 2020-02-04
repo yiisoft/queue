@@ -34,7 +34,7 @@ class QueueTest extends CliTestCase
     {
         $this->startProcess('php yii queue/listen');
         $job = $this->createSimpleJob();
-        $this->getQueue()->delay(2)->push($job);
+        $this->getQueue()->withDelay(2)->push($job);
 
         $this->assertSimpleJobLaterDone($job, 2);
     }
@@ -52,11 +52,11 @@ class QueueTest extends CliTestCase
 
     public function testPriority()
     {
-        $this->getQueue()->priority(3)->push(new PriorityJob(1));
-        $this->getQueue()->priority(1)->push(new PriorityJob(5));
-        $this->getQueue()->priority(2)->push(new PriorityJob(3));
-        $this->getQueue()->priority(2)->push(new PriorityJob(4));
-        $this->getQueue()->priority(3)->push(new PriorityJob(2));
+        $this->getQueue()->withPriority(3)->push(new PriorityJob(1));
+        $this->getQueue()->withPriority(1)->push(new PriorityJob(5));
+        $this->getQueue()->withPriority(2)->push(new PriorityJob(3));
+        $this->getQueue()->withPriority(2)->push(new PriorityJob(4));
+        $this->getQueue()->withPriority(3)->push(new PriorityJob(2));
         $this->startProcess('php yii queue/listen');
         sleep(3);
 
