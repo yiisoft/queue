@@ -25,7 +25,7 @@
     "require": {
         "php": "^7.4",
         "psr/event-dispatcher": "^1.0",
-        "symfony/process": "^4.0",
+        "symfony/process": "^4.0 || ^5.0",
         "yiisoft/mutex": "^3.0@dev",
         "yiisoft/serializer": "^3.0@dev",
         "yiisoft/strings": "^3.0@dev"
