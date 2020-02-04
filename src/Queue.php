@@ -163,6 +163,9 @@ class Queue
         return $event->id;
     }
 
+    /**
+     * Execute all existing jobs and exit
+     */
     public function run(): void
     {
         $pid = getmypid();
@@ -174,6 +177,9 @@ class Queue
         }
     }
 
+    /**
+     * Listen to the queue and execute jobs as they come
+     */
     public function listen(): void
     {
         $pid = getmypid();

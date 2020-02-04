@@ -8,9 +8,16 @@ use Yiisoft\Yii\Queue\Jobs\JobInterface;
 
 interface DriverInterface
 {
+    /**
+     * Returns the first message from the queue if it exists (null otherwise)
+     *
+     * @return MessageInterface|null
+     */
     public function nextMessage(): ?MessageInterface;
 
     /**
+     * Returns status code of a message with the given id.
+     *
      * @param string $id of a job message
      *
      * @return int status code
@@ -28,7 +35,7 @@ interface DriverInterface
     public function pushMessage(JobInterface $job, int $ttr, int $delay, ?int $priority): string;
 
     /**
-     * Listen to the queue and execute messages as they come
+     * Listen to the queue and pass messages to the given handler as they come
      *
      * @param callable $handler The handler which will execute jobs
      */
