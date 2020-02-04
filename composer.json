@@ -34,7 +34,7 @@
         "ext-pdo": "*",
 
         "aws/aws-sdk-php": ">=2.4",
-        "enqueue/amqp-lib": "^0.9",
+        "enqueue/amqp-lib": "^0.9 || ^0.10",
         "hiqdev/composer-config-plugin": "^1.0@dev",
         "jeremeamia/superclosure": "*",
         "pda/pheanstalk": "*",
