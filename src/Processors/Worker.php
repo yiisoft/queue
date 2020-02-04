@@ -22,8 +22,7 @@ class Worker implements WorkerInterface
         EventDispatcherInterface $dispatcher,
         Logger $logger,
         LogMessageFormatter $formatter
-    )
-    {
+    ) {
         $this->dispatcher = $dispatcher;
         $this->logger = $logger;
         $this->formatter = $formatter;
