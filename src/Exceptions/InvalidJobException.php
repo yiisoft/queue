@@ -6,8 +6,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue;
+namespace Yiisoft\Yii\Queue\Exceptions;
 
+use Exception;
 use Throwable;
 
 /**
@@ -19,7 +20,7 @@ use Throwable;
  *
  * @since 2.1.1
  */
-class InvalidJobException extends \Exception
+class InvalidJobException extends Exception
 {
     /**
      * @var string

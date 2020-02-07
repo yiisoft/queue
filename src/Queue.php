@@ -9,14 +9,15 @@
 namespace Yiisoft\Yii\Queue;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Log\LoggerInterface;
-use Yiisoft\EventDispatcher\Dispatcher;
 use Yiisoft\EventDispatcher\Provider\Provider;
+use Yiisoft\Factory\Factory;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
-use Yiisoft\Yii\Queue\Events\ExecEvent;
-use Yiisoft\Yii\Queue\Events\PushEvent;
+use Yiisoft\Yii\Queue\Events\AfterPushInterface;
+use Yiisoft\Yii\Queue\Events\BeforePushInterface;
+use Yiisoft\Yii\Queue\Events\JobFailureInterface;
+use Yiisoft\Yii\Queue\Exceptions\InvalidJobException;
+use Yiisoft\Yii\Queue\Exceptions\JobNotSupportedException;
 use Yiisoft\Yii\Queue\Jobs\JobInterface;
-use Yiisoft\Yii\Queue\Jobs\RetryableJobInterface;
 use Yiisoft\Yii\Queue\Processors\WorkerInterface;
 
 /**
@@ -26,106 +27,44 @@ use Yiisoft\Yii\Queue\Processors\WorkerInterface;
  */
 class Queue
 {
-    /**
-     * @const default time to reserve a job
-     */
-    protected const TTR_DEFAULT = 300;
-    /**
-     * @var int default attempt count
-     */
-    public int $attempts = 1;
-
-    private ?int $pushTtr = null;
-    private ?int $pushDelay = null;
-    private ?int $pushPriority = null;
-
     protected EventDispatcherInterface $eventDispatcher;
-    protected LoggerInterface $logger;
-    protected LogMessageFormatter $formatter;
     protected DriverInterface $driver;
-    protected LoopInterface $loop;
     protected WorkerInterface $worker;
     protected Provider $provider;
+    protected Factory $factory;
 
     public function __construct(
         DriverInterface $driver,
-        Dispatcher $dispatcher,
+        EventDispatcherInterface $dispatcher,
         Provider $provider,
-        LoggerInterface $logger,
-        LogMessageFormatter $formatter,
-        LoopInterface $loop,
-        WorkerInterface $worker
+        WorkerInterface $worker,
+        Factory $factory
     ) {
         $this->driver = $driver;
         $this->eventDispatcher = $dispatcher;
-        $this->logger = $logger;
-        $this->formatter = $formatter;
-        $this->loop = $loop;
         $this->worker = $worker;
         $this->provider = $provider;
+        $this->factory = $factory;
 
         $provider->attach([$this, 'jobRetry']);
     }
 
     public function __destruct()
     {
-        $this->provider->detach(ExecEvent::class);
+        $this->provider->detach(JobFailureInterface::class);
     }
 
-    public function jobRetry(ExecEvent $event): void
+    public function jobRetry(JobFailureInterface $event): void
     {
         if (
-            $event->name === ExecEvent::ERROR
-            && !$event->error instanceof InvalidJobException
-            && $event->job instanceof RetryableJobInterface
+            !$event->getException() instanceof InvalidJobException
+            && !$event->getException() instanceof JobNotSupportedException
             && $event->getQueue() === $this
-            && $event->job->canRetry($event->error)
+            && $event->getMessage()->getJob()->canRetry($event->getException())
         ) {
-            $event->job->retry();
-            $this->push($event->job);
+            $event->getMessage()->getJob()->retry();
+            $this->push($event->getMessage()->getJob());
         }
-    }
-
-    /**
-     * Sets TTR for job execute.
-     *
-     * @param int|mixed $value
-     *
-     * @return $this
-     */
-    public function ttr(int $value): self
-    {
-        $this->pushTtr = $value;
-
-        return $this;
-    }
-
-    /**
-     * Sets delay for later execute.
-     *
-     * @param int $value
-     *
-     * @return $this
-     */
-    public function withDelay(int $value): self
-    {
-        $this->pushDelay = $value;
-
-        return $this;
-    }
-
-    /**
-     * Sets job priority.
-     *
-     * @param mixed $value
-     *
-     * @return $this
-     */
-    public function withPriority($value): self
-    {
-        $this->pushPriority = $value;
-
-        return $this;
     }
 
     /**
@@ -137,42 +76,31 @@ class Queue
      */
     public function push(JobInterface $job): ?string
     {
-        if ($this->pushTtr === null) {
-            if ($job instanceof RetryableJobInterface) {
-                $ttr = $job->getTtr();
-            } else {
-                $ttr = static::TTR_DEFAULT;
-            }
-        } else {
-            $ttr = $this->pushTtr;
-        }
-
-        $event = PushEvent::before($job, $ttr, $this->pushDelay ?? 0, $this->pushPriority);
-
-        $this->pushTtr = null;
-        $this->pushDelay = null;
-        $this->pushPriority = null;
-
+        /** @var BeforePushInterface $event */
+        $event = $this->factory->create(BeforePushInterface::class, [$this, $job]);
         $this->eventDispatcher->dispatch($event);
 
-        $event->id = $this->driver->pushMessage($event->job, $event->ttr, $event->delay, $event->priority);
+        if ($this->driver->canPush($job)) {
+            $message = $this->driver->pushMessage($job);
+        } else {
+            throw new JobNotSupportedException($this->driver, $job);
+        }
 
-        $this->logger->info($this->formatter->getJobTitle($event) . ' is pushed');
-        $this->eventDispatcher->dispatch(PushEvent::after($event));
+        /** @var AfterPushInterface $event */
+        $event = $this->factory->create(AfterPushInterface::class, [$this, $message]);
+        $this->eventDispatcher->dispatch($event);
 
-        return $event->id;
+        return $message->getId();
     }
 
     /**
      * Execute all existing jobs and exit
+     *
+     * @param LoopInterface $loop
      */
-    public function run(): void
+    public function run(LoopInterface $loop): void
     {
-        $pid = getmypid();
-        $message = "Worker $pid is started.";
-        $this->logger->info($message);
-
-        while ($this->loop->canContinue() && $message = $this->driver->nextMessage()) {
+        while ($loop->canContinue() && $message = $this->driver->nextMessage()) {
             $this->worker->process($message, $this);
         }
     }
@@ -182,10 +110,6 @@ class Queue
      */
     public function listen(): void
     {
-        $pid = getmypid();
-        $message = "Worker $pid is started.";
-        $this->logger->info($message);
-
         $handler = function (MessageInterface $message) {
             $this->worker->process($message, $this);
         };
