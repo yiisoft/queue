@@ -11,17 +11,8 @@ use Yiisoft\Yii\Queue\Queue;
 class JobFailure implements JobFailureInterface
 {
     protected bool $stop = false;
-    /**
-     * @var Queue
-     */
     private Queue $queue;
-    /**
-     * @var MessageInterface
-     */
     private MessageInterface $message;
-    /**
-     * @var Throwable
-     */
     private Throwable $exception;
 
     public function __construct(Queue $queue, MessageInterface $message, Throwable $exception)

@@ -9,13 +9,7 @@ use Yiisoft\Yii\Queue\Queue;
 
 class AfterPush implements AfterPushInterface
 {
-    /**
-     * @var Queue
-     */
     private Queue $queue;
-    /**
-     * @var MessageInterface
-     */
     private MessageInterface $message;
 
     public function __construct(Queue $queue, MessageInterface $message)

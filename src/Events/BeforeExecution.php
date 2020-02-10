@@ -10,14 +10,7 @@ use Yiisoft\Yii\Queue\Queue;
 class BeforeExecution implements BeforeExecutionInterface
 {
     protected bool $stop = false;
-
-    /**
-     * @var Queue
-     */
     private Queue $queue;
-    /**
-     * @var MessageInterface
-     */
     private MessageInterface $message;
 
     public function __construct(Queue $queue, MessageInterface $message)

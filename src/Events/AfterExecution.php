@@ -9,13 +9,7 @@ use Yiisoft\Yii\Queue\Queue;
 
 class AfterExecution implements AfterExecutionInterface
 {
-    /**
-     * @var Queue
-     */
     private Queue $queue;
-    /**
-     * @var MessageInterface
-     */
     private MessageInterface $message;
 
     public function __construct(Queue $queue, MessageInterface $message)

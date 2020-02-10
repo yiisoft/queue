@@ -10,13 +10,7 @@ use Yiisoft\Yii\Queue\Queue;
 class BeforePush implements BeforePushInterface
 {
     protected bool $stop = false;
-    /**
-     * @var Queue
-     */
     private Queue $queue;
-    /**
-     * @var JobInterface
-     */
     private JobInterface $job;
 
     public function __construct(Queue $queue, JobInterface $job)

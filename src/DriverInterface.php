@@ -28,6 +28,8 @@ interface DriverInterface
     public function status(string $id): int;
 
     /**
+     * Pushing a job to the queue
+     *
      * @param JobInterface $job
      *
      * @return MessageInterface
