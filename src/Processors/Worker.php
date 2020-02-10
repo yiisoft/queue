@@ -46,7 +46,7 @@ final class Worker implements WorkerInterface
                 $this->dispatcher->dispatch($event);
             }
         } catch (Throwable $exception) {
-            $event = $this->factory->create(JobFailureInterface::class, [$queue, $message]);
+            $event = $this->factory->create(JobFailureInterface::class, [$queue, $message, $exception]);
             $this->dispatcher->dispatch($event);
 
             throw $exception;
