@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Processors;
+namespace Yiisoft\Yii\Queue\Workers;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Throwable;

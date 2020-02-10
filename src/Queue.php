@@ -18,7 +18,7 @@ use Yiisoft\Yii\Queue\Events\JobFailureInterface;
 use Yiisoft\Yii\Queue\Exceptions\InvalidJobException;
 use Yiisoft\Yii\Queue\Exceptions\JobNotSupportedException;
 use Yiisoft\Yii\Queue\Jobs\JobInterface;
-use Yiisoft\Yii\Queue\Processors\WorkerInterface;
+use Yiisoft\Yii\Queue\Workers\WorkerInterface;
 
 /**
  * Base Queue.
