@@ -24,36 +24,18 @@
     "prefer-stable": true,
     "require": {
         "php": "^7.4",
-        "psr/event-dispatcher": "^1.0",
-        "symfony/process": "^4.0",
-        "yiisoft/mutex": "^3.0@dev",
-        "yiisoft/serializer": "^3.0@dev",
-        "yiisoft/strings": "^3.0@dev"
+        "psr/event-dispatcher": "^1.0"
     },
     "require-dev": {
-        "ext-pdo": "*",
-
-        "aws/aws-sdk-php": ">=2.4",
-        "enqueue/amqp-lib": "^0.9",
         "hiqdev/composer-config-plugin": "^1.0@dev",
-        "jeremeamia/superclosure": "*",
         "pda/pheanstalk": "*",
         "phpunit/phpunit": "^8.4",
-        "yiisoft/arrays": "^3.0@dev",
-        "yiisoft/cache": "^3.0@dev",
         "yiisoft/di": "^3.0@dev",
         "yiisoft/log": "^3.0@dev",
-        "yiisoft/mutex-file": "^3.0@dev",
         "yiisoft/yii-console": "^3.0@dev"
     },
     "suggest": {
-        "ext-pcntl": "Need for process signals.",
-        "yiisoft/db-redis": "Need for Redis queue.",
-        "pda/pheanstalk": "Need for Beanstalk queue.",
-        "php-amqplib/php-amqplib": "Need for AMQP queue.",
-        "enqueue/amqp-lib": "Need for AMQP interop queue.",
-        "ext-gearman": "Need for Gearman queue.",
-        "aws/aws-sdk-php": "Need for aws SQS."
+        "ext-pcntl": "Need for process signals."
     },
     "autoload": {
         "psr-4": {
