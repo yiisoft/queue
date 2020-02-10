@@ -81,7 +81,7 @@ class Queue
         $this->eventDispatcher->dispatch($event);
 
         if ($this->driver->canPush($job)) {
-            $message = $this->driver->pushMessage($job);
+            $message = $this->driver->push($job);
         } else {
             throw new JobNotSupportedException($this->driver, $job);
         }

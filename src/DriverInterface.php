@@ -32,7 +32,7 @@ interface DriverInterface
      *
      * @return MessageInterface
      */
-    public function pushMessage(JobInterface $job): MessageInterface;
+    public function push(JobInterface $job): MessageInterface;
 
     /**
      * Listen to the queue and pass messages to the given handler as they come
