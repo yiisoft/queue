@@ -1,27 +1,31 @@
 <?php
 
-use Yiisoft\Factory\Definitions\Reference;
+use Yiisoft\Factory\Factory;
+use Yiisoft\Yii\Queue\Events\AfterExecution;
+use Yiisoft\Yii\Queue\Events\AfterExecutionInterface;
+use Yiisoft\Yii\Queue\Events\AfterPush;
+use Yiisoft\Yii\Queue\Events\AfterPushInterface;
+use Yiisoft\Yii\Queue\Events\BeforeExecution;
+use Yiisoft\Yii\Queue\Events\BeforeExecutionInterface;
+use Yiisoft\Yii\Queue\Events\BeforePush;
+use Yiisoft\Yii\Queue\Events\BeforePushInterface;
+use Yiisoft\Yii\Queue\Events\JobFailure;
+use Yiisoft\Yii\Queue\Events\JobFailureInterface;
+use Yiisoft\Yii\Queue\Workers\WorkerInterface;
 
 return [
-//    'app' => [
-//        'bootstrap' => [
-//            'queue' => 'queue',
-//        ],
-//    ],
-//    \PDO::class => Reference::to('pdo'),
-//    'pdo'       => [
-//        '__class'       => \PDO::class,
-//        '__construct()' => [
-//            'dsn'       => 'pgsql:dbname='.$params['db.name']
-//                .(!empty($params['db.host']) ? (';host='.$params['db.host']) : '')
-//                .(!empty($params['db.port']) ? (';port='.$params['db.port']) : ''),
-//            'username'  => $params['db.user'],
-//            'password'  => $params['db.password'],
-//            'options'   => [],
-//        ],
-//    ],
-//    \yii\mutex\Mutex::class => Reference::to('mutex'),
-//    'mutex'                 => [
-//        '__class' => \yii\mutex\MysqlMutex::class,
-//    ],
+    Factory::class => [
+        '__construct' => [
+            1 => [
+                AfterExecutionInterface::class => AfterExecution::class,
+                AfterPushInterface::class => AfterPush::class,
+                BeforeExecutionInterface::class => BeforeExecution::class,
+                BeforePushInterface::class => BeforePush::class,
+                JobFailureInterface::class => JobFailure::class,
+            ],
+        ],
+    ],
+    \Psr\EventDispatcher\EventDispatcherInterface::class => \Yiisoft\EventDispatcher\Dispatcher::class,
+    WorkerInterface::class => \Yiisoft\Yii\Queue\Workers\Worker::class,
+
 ];
