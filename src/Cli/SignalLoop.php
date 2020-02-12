@@ -60,13 +60,13 @@ class SignalLoop implements LoopInterface
         $this->queue = $queue;
         if (extension_loaded('pcntl')) {
             foreach ($this->exitSignals as $signal) {
-                pcntl_signal($signal, fn() => $this->exit = true);
+                pcntl_signal($signal, fn () => $this->exit = true);
             }
             foreach ($this->suspendSignals as $signal) {
-                pcntl_signal($signal, fn() => $this->pause = true);
+                pcntl_signal($signal, fn () => $this->pause = true);
             }
             foreach ($this->resumeSignals as $signal) {
-                pcntl_signal($signal, fn() => $this->pause = false);
+                pcntl_signal($signal, fn () => $this->pause = false);
             }
         }
     }
