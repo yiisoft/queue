@@ -10,7 +10,7 @@ use Yiisoft\Yii\Queue\Queue;
 
 final class JobFailure
 {
-    private bool $stop = false;
+    private bool $throw = true;
     private Queue $queue;
     private MessageInterface $message;
     private Throwable $exception;
@@ -37,13 +37,13 @@ final class JobFailure
         return $this->exception;
     }
 
-    public function isPropagationStopped(): bool
+    public function shouldThrowException(): bool
     {
-        return $this->stop;
+        return $this->throw;
     }
 
-    public function stopPropagation(): void
+    public function stopThrowing(): void
     {
-        $this->stop = true;
+        $this->throw = false;
     }
 }
