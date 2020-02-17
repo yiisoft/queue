@@ -22,10 +22,7 @@ use Throwable;
  */
 class InvalidJobException extends Exception
 {
-    /**
-     * @var string
-     */
-    private $serialized;
+    private string $serialized;
 
     /**
      * @param string         $serialized
@@ -42,7 +39,7 @@ class InvalidJobException extends Exception
     /**
      * @return string of serialized message that cannot be unserialized to a job
      */
-    final public function getSerialized()
+    final public function getSerialized(): string
     {
         return $this->serialized;
     }
