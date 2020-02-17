@@ -45,7 +45,7 @@ final class Worker implements WorkerInterface
             $event = new JobFailure($queue, $message, $exception);
             $this->dispatcher->dispatch($event);
 
-            if ($event->isPropagationStopped() === false) {
+            if ($event->shouldThrowException() === true) {
                 throw $exception;
             }
         }
