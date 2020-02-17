@@ -10,11 +10,10 @@ namespace Yiisoft\Yii\Queue;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Yiisoft\EventDispatcher\Provider\Provider;
-use Yiisoft\Factory\Factory;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
-use Yiisoft\Yii\Queue\Events\AfterPushInterface;
-use Yiisoft\Yii\Queue\Events\BeforePushInterface;
-use Yiisoft\Yii\Queue\Events\JobFailureInterface;
+use Yiisoft\Yii\Queue\Events\AfterPush;
+use Yiisoft\Yii\Queue\Events\BeforePush;
+use Yiisoft\Yii\Queue\Events\JobFailure;
 use Yiisoft\Yii\Queue\Exceptions\InvalidJobException;
 use Yiisoft\Yii\Queue\Exceptions\JobNotSupportedException;
 use Yiisoft\Yii\Queue\Jobs\JobInterface;
@@ -31,30 +30,27 @@ class Queue
     protected DriverInterface $driver;
     protected WorkerInterface $worker;
     protected Provider $provider;
-    protected Factory $factory;
 
     public function __construct(
         DriverInterface $driver,
         EventDispatcherInterface $dispatcher,
         Provider $provider,
-        WorkerInterface $worker,
-        Factory $factory
+        WorkerInterface $worker
     ) {
         $this->driver = $driver;
         $this->eventDispatcher = $dispatcher;
         $this->worker = $worker;
         $this->provider = $provider;
-        $this->factory = $factory;
 
         $provider->attach([$this, 'jobRetry']);
     }
 
     public function __destruct()
     {
-        $this->provider->detach(JobFailureInterface::class);
+        $this->provider->detach(JobFailure::class);
     }
 
-    public function jobRetry(JobFailureInterface $event): void
+    public function jobRetry(JobFailure $event): void
     {
         if (
             !$event->getException() instanceof InvalidJobException
@@ -76,8 +72,7 @@ class Queue
      */
     public function push(JobInterface $job): ?string
     {
-        /** @var BeforePushInterface $event */
-        $event = $this->factory->create(BeforePushInterface::class, [$this, $job]);
+        $event = new BeforePush($this, $job);
         $this->eventDispatcher->dispatch($event);
 
         if ($this->driver->canPush($job)) {
@@ -86,8 +81,7 @@ class Queue
             throw new JobNotSupportedException($this->driver, $job);
         }
 
-        /** @var AfterPushInterface $event */
-        $event = $this->factory->create(AfterPushInterface::class, [$this, $message]);
+        $event = new AfterPush($this, $message);
         $this->eventDispatcher->dispatch($event);
 
         return $message->getId();

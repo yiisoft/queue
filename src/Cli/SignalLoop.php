@@ -8,6 +8,8 @@
 
 namespace Yiisoft\Yii\Queue\Cli;
 
+use Yiisoft\Yii\Queue\Queue;
+
 /**
  * Signal Loop.
  *
@@ -20,7 +22,7 @@ class SignalLoop implements LoopInterface
     /**
      * @var array of signals to exit from listening of the queue.
      */
-    public $exitSignals = [
+    protected array $exitSignals = [
         15, // SIGTERM
         2,  // SIGINT
         1,  // SIGHUP
@@ -29,49 +31,42 @@ class SignalLoop implements LoopInterface
      * @var array of signals to suspend listening of the queue.
      *            For example: SIGTSTP
      */
-    public $suspendSignals = [];
+    protected array $suspendSignals = [];
     /**
      * @var array of signals to resume listening of the queue.
      *            For example: SIGCONT
      */
-    public $resumeSignals = [];
+    protected array $resumeSignals = [];
 
     /**
      * @var Queue
      */
-    protected $queue;
+    protected Queue $queue;
 
     /**
      * @var bool status when exit signal was got.
      */
-    private static $exit = false;
+    protected bool $exit = false;
     /**
      * @var bool status when suspend or resume signal was got.
      */
-    private static $pause = false;
+    protected bool $pause = false;
 
     /**
      * @param Queue $queue
-     *                     {@inheritdoc}
      */
     public function __construct($queue)
     {
         $this->queue = $queue;
         if (extension_loaded('pcntl')) {
             foreach ($this->exitSignals as $signal) {
-                pcntl_signal($signal, function () {
-                    self::$exit = true;
-                });
+                pcntl_signal($signal, fn () => $this->exit = true);
             }
             foreach ($this->suspendSignals as $signal) {
-                pcntl_signal($signal, function () {
-                    self::$pause = true;
-                });
+                pcntl_signal($signal, fn () => $this->pause = true);
             }
             foreach ($this->resumeSignals as $signal) {
-                pcntl_signal($signal, function () {
-                    self::$pause = false;
-                });
+                pcntl_signal($signal, fn () => $this->pause = false);
             }
         }
     }
@@ -86,12 +81,22 @@ class SignalLoop implements LoopInterface
         if (extension_loaded('pcntl')) {
             pcntl_signal_dispatch();
             // Wait for resume signal until loop is suspended
-            while (self::$pause && !self::$exit) {
+            while ($this->pause && !$this->exit) {
                 usleep(10000);
                 pcntl_signal_dispatch();
             }
         }
 
-        return !self::$exit;
+        return !$this->exit;
+    }
+
+    public function setResumeSignals(array $resumeSignals): void
+    {
+        $this->resumeSignals = $resumeSignals;
+    }
+
+    public function setSuspendSignals(array $suspendSignals): void
+    {
+        $this->suspendSignals = $suspendSignals;
     }
 }
