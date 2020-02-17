@@ -29,12 +29,12 @@ final class BeforeExecution
         return $this->queue;
     }
 
-    public function isPropagationStopped(): bool
+    public function isExecutionStopped(): bool
     {
         return $this->stop;
     }
 
-    public function stopPropagation(): void
+    public function stopExecution(): void
     {
         $this->stop = true;
     }

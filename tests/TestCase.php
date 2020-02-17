@@ -8,7 +8,9 @@
 
 namespace Yiisoft\Yii\Queue\Tests;
 
+use hiqdev\composer\config\Builder;
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use Yiisoft\Di\Container;
 
 /**
  * Base Test Case.
@@ -22,6 +24,7 @@ abstract class TestCase extends BaseTestCase
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
-        //$this->container = new Container();
+        Builder::rebuild();
+        $this->container = new Container(require Builder::path('tests-app'));
     }
 }

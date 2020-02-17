@@ -1,16 +1,14 @@
 <?php
 
-use Yiisoft\Factory\Definitions\Reference;
-use Yiisoft\Serializer\PhpSerializer;
-use Yiisoft\Serializer\SerializerInterface;
-use Yiisoft\Yii\Queue\Drivers\Sync\Queue;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
+use Yiisoft\EventDispatcher\Dispatcher;
+use Yiisoft\EventDispatcher\Provider\Provider;
+use Yiisoft\Yii\Queue\Workers\Worker as QueueWorker;
+use Yiisoft\Yii\Queue\Workers\WorkerInterface;
 
 return [
-//    'queue' => [
-//        '__class' => Queue::class,
-//    ],
-//    SerializerInterface::class => Reference::to('queue.serializer'),
-//    'queue.serializer' => [
-//        '__class' => PhpSerializer::class,
-//    ],
+    EventDispatcherInterface::class => Dispatcher::class,
+    WorkerInterface::class => QueueWorker::class,
+    ListenerProviderInterface::class => Provider::class,
 ];
