@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Yii\Queue;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
