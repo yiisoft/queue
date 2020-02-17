@@ -7,7 +7,7 @@ namespace Yiisoft\Yii\Queue\Events;
 use Yiisoft\Yii\Queue\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 
-class AfterExecution implements AfterExecutionInterface
+final class AfterExecution
 {
     private Queue $queue;
     private MessageInterface $message;
