@@ -7,9 +7,9 @@ namespace Yiisoft\Yii\Queue\Events;
 use Yiisoft\Yii\Queue\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 
-class BeforeExecution implements BeforeExecutionInterface
+final class BeforeExecution
 {
-    protected bool $stop = false;
+    private bool $stop = false;
     private Queue $queue;
     private MessageInterface $message;
 
@@ -29,9 +29,6 @@ class BeforeExecution implements BeforeExecutionInterface
         return $this->queue;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isPropagationStopped(): bool
     {
         return $this->stop;

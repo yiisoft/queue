@@ -11,7 +11,7 @@ use Yiisoft\Yii\Queue\Jobs\JobInterface;
 
 class JobNotSupportedException extends UnexpectedValueException
 {
-    public function __construct(DriverInterface $driver, JobInterface $job, $code = 0, Throwable $previous = null)
+    public function __construct(DriverInterface $driver, JobInterface $job, int $code = 0, Throwable $previous = null)
     {
         $driverClass = get_class($driver);
         $jobClass = get_class($job);

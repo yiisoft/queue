@@ -8,9 +8,9 @@ use Throwable;
 use Yiisoft\Yii\Queue\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 
-class JobFailure implements JobFailureInterface
+final class JobFailure
 {
-    protected bool $stop = false;
+    private bool $stop = false;
     private Queue $queue;
     private MessageInterface $message;
     private Throwable $exception;
@@ -37,9 +37,6 @@ class JobFailure implements JobFailureInterface
         return $this->exception;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isPropagationStopped(): bool
     {
         return $this->stop;

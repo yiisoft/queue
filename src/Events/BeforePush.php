@@ -7,9 +7,9 @@ namespace Yiisoft\Yii\Queue\Events;
 use Yiisoft\Yii\Queue\Jobs\JobInterface;
 use Yiisoft\Yii\Queue\Queue;
 
-class BeforePush implements BeforePushInterface
+final class BeforePush
 {
-    protected bool $stop = false;
+    private bool $stop = false;
     private Queue $queue;
     private JobInterface $job;
 
@@ -29,9 +29,6 @@ class BeforePush implements BeforePushInterface
         return $this->queue;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isPropagationStopped(): bool
     {
         return $this->stop;
