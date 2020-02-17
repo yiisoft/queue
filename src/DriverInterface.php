@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
+use Yiisoft\Yii\Queue\Jobs\DelayableJobInterface;
 use Yiisoft\Yii\Queue\Jobs\JobInterface;
+use Yiisoft\Yii\Queue\Jobs\PrioritisedJobInterface;
+use Yiisoft\Yii\Queue\Jobs\RetryableJobInterface;
 
 interface DriverInterface
 {
@@ -25,14 +28,13 @@ interface DriverInterface
     public function status(string $id): int;
 
     /**
-     * @param JobInterface $job
-     * @param int $ttr time to reserve in seconds
-     * @param int $delay
-     * @param int|null $priority
+     * Pushing a job to the queue
      *
-     * @return string id of a job message
+     * @param JobInterface $job
+     *
+     * @return MessageInterface
      */
-    public function pushMessage(JobInterface $job, int $ttr, int $delay, ?int $priority): string;
+    public function push(JobInterface $job): MessageInterface;
 
     /**
      * Listen to the queue and pass messages to the given handler as they come
@@ -40,4 +42,14 @@ interface DriverInterface
      * @param callable $handler The handler which will execute jobs
      */
     public function subscribe(callable $handler): void;
+
+    /**
+     * Takes care about supporting {@see DelayableJobInterface}, {@see PrioritisedJobInterface}
+     * and {@see RetryableJobInterface} and any other conditions.
+     *
+     * @param JobInterface $job
+     *
+     * @return bool
+     */
+    public function canPush(JobInterface $job): bool;
 }

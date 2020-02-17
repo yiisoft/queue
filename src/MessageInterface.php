@@ -21,18 +21,4 @@ interface MessageInterface
      * @return JobInterface
      */
     public function getJob(): JobInterface;
-
-    /**
-     * Returns time to reserve
-     *
-     * @return int
-     */
-    public function getTtr(): int;
-
-    /**
-     * Returns current job execution attempt number
-     *
-     * @return int
-     */
-    public function getAttempt(): int;
 }
