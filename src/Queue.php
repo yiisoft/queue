@@ -24,17 +24,20 @@ class Queue
     protected DriverInterface $driver;
     protected WorkerInterface $worker;
     protected Provider $provider;
+    protected LoopInterface $loop;
 
     public function __construct(
         DriverInterface $driver,
         EventDispatcherInterface $dispatcher,
         Provider $provider,
-        WorkerInterface $worker
+        WorkerInterface $worker,
+        LoopInterface $loop
     ) {
         $this->driver = $driver;
         $this->eventDispatcher = $dispatcher;
         $this->worker = $worker;
         $this->provider = $provider;
+        $this->loop = $loop;
 
         $provider->attach([$this, 'jobRetry']);
     }
@@ -83,12 +86,10 @@ class Queue
 
     /**
      * Execute all existing jobs and exit
-     *
-     * @param LoopInterface $loop
      */
-    public function run(LoopInterface $loop): void
+    public function run(): void
     {
-        while ($loop->canContinue() && $message = $this->driver->nextMessage()) {
+        while ($this->loop->canContinue() && $message = $this->driver->nextMessage()) {
             $this->worker->process($message, $this);
         }
     }
