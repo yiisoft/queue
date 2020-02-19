@@ -36,6 +36,10 @@ class Queue
         $this->worker = $worker;
         $this->provider = $provider;
 
+        if ($this->driver instanceof QueueDependentInterface) {
+            $driver->setQueue($this);
+        }
+
         $provider->attach([$this, 'jobRetry']);
     }
 
