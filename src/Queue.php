@@ -2,9 +2,11 @@
 
 namespace Yiisoft\Yii\Queue;
 
+use InvalidArgumentException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
+use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Events\AfterPush;
 use Yiisoft\Yii\Queue\Events\BeforePush;
 use Yiisoft\Yii\Queue\Events\JobFailure;
@@ -108,5 +110,17 @@ class Queue
         };
 
         $this->driver->subscribe($handler);
+    }
+
+    /**
+     * @param string $id A job id
+     *
+     * @return JobStatus
+     *
+     * @throws InvalidArgumentException when there is no such id in the driver
+     */
+    public function status(string $id): JobStatus
+    {
+        return $this->driver->status($id);
     }
 }
