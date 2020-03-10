@@ -2,7 +2,7 @@
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
-use Yiisoft\EventDispatcher\Dispatcher;
+use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
 use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Yii\Queue\Workers\Worker as QueueWorker;
 use Yiisoft\Yii\Queue\Workers\WorkerInterface;
