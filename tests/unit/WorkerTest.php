@@ -47,7 +47,7 @@ class WorkerTest extends TestCase
      */
     public function testJobNotExecuted(): void
     {
-        $handler = fn(BeforeExecution $event) => $event->stopExecution();
+        $handler = fn (BeforeExecution $event) => $event->stopExecution();
         /** @var Provider $provider */
         $provider = $this->container->get(ListenerProviderInterface::class);
         $provider->attach($handler);
@@ -78,7 +78,7 @@ class WorkerTest extends TestCase
      */
     public function testThrowExceptionPrevented(): void
     {
-        $handler = fn(JobFailure $event) => $event->stopThrowing();
+        $handler = fn (JobFailure $event) => $event->stopThrowing();
         /** @var Provider $provider */
         $provider = $this->container->get(ListenerProviderInterface::class);
         $provider->attach($handler);
