@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
+use InvalidArgumentException;
+use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Jobs\DelayableJobInterface;
 use Yiisoft\Yii\Queue\Jobs\JobInterface;
 use Yiisoft\Yii\Queue\Jobs\PrioritisedJobInterface;
@@ -23,9 +25,11 @@ interface DriverInterface
      *
      * @param string $id of a job message
      *
-     * @return int status code
+     * @return JobStatus
+     *
+     * @throws InvalidArgumentException when there is no such id in the driver
      */
-    public function status(string $id): int;
+    public function status(string $id): JobStatus;
 
     /**
      * Pushing a job to the queue

@@ -2,9 +2,11 @@
 
 namespace Yiisoft\Yii\Queue;
 
+use InvalidArgumentException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
+use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Events\AfterPush;
 use Yiisoft\Yii\Queue\Events\BeforePush;
 use Yiisoft\Yii\Queue\Events\JobFailure;
@@ -24,17 +26,24 @@ class Queue
     protected DriverInterface $driver;
     protected WorkerInterface $worker;
     protected Provider $provider;
+    protected LoopInterface $loop;
 
     public function __construct(
         DriverInterface $driver,
         EventDispatcherInterface $dispatcher,
         Provider $provider,
-        WorkerInterface $worker
+        WorkerInterface $worker,
+        LoopInterface $loop
     ) {
         $this->driver = $driver;
         $this->eventDispatcher = $dispatcher;
         $this->worker = $worker;
         $this->provider = $provider;
+        $this->loop = $loop;
+
+        if ($this->driver instanceof QueueDependentInterface) {
+            $driver->setQueue($this);
+        }
 
         $provider->attach([$this, 'jobRetry']);
     }
@@ -83,12 +92,10 @@ class Queue
 
     /**
      * Execute all existing jobs and exit
-     *
-     * @param LoopInterface $loop
      */
-    public function run(LoopInterface $loop): void
+    public function run(): void
     {
-        while ($loop->canContinue() && $message = $this->driver->nextMessage()) {
+        while ($this->loop->canContinue() && $message = $this->driver->nextMessage()) {
             $this->worker->process($message, $this);
         }
     }
@@ -103,5 +110,17 @@ class Queue
         };
 
         $this->driver->subscribe($handler);
+    }
+
+    /**
+     * @param string $id A job id
+     *
+     * @return JobStatus
+     *
+     * @throws InvalidArgumentException when there is no such id in the driver
+     */
+    public function status(string $id): JobStatus
+    {
+        return $this->driver->status($id);
     }
 }
