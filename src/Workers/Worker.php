@@ -35,7 +35,7 @@ final class Worker implements WorkerInterface
         try {
             $this->dispatcher->dispatch($event);
 
-            if ($event->isPropagationStopped() === false) {
+            if ($event->isExecutionStopped() === false) {
                 $message->getJob()->execute();
 
                 $event = new AfterExecution($queue, $message);

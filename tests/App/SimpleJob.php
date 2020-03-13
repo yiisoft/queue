@@ -8,31 +8,19 @@
 
 namespace Yiisoft\Yii\Queue\Tests\App;
 
-use yii\base\BaseObject;
-use yii\helpers\Yii;
-use Yiisoft\Yii\Queue\JobInterface;
+use Yiisoft\Yii\Queue\Jobs\JobInterface;
 
 /**
  * Simple Job.
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-class SimpleJob extends BaseObject implements JobInterface
+class SimpleJob implements JobInterface
 {
-    public $uid;
+    public bool $executed = false;
 
-    public function __construct($uid = null)
+    public function execute(): void
     {
-        $this->uid = $uid;
-    }
-
-    public function execute($queue)
-    {
-        file_put_contents($this->getFileName(), '');
-    }
-
-    public function getFileName()
-    {
-        return Yii::getAlias("@runtime/job-{$this->uid}.lock");
+        $this->executed = true;
     }
 }
