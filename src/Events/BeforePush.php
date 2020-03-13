@@ -29,7 +29,7 @@ final class BeforePush
         return $this->queue;
     }
 
-    public function isExecutionnStopped(): bool
+    public function isExecutionStopped(): bool
     {
         return $this->stop;
     }
