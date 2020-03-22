@@ -8,7 +8,7 @@
 
 namespace Yiisoft\Yii\Queue\Tests;
 
-use hiqdev\composer\config\Builder;
+use Yiisoft\Composer\Config\Builder;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Yiisoft\Di\Container;
 
