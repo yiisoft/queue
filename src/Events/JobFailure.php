@@ -42,7 +42,7 @@ final class JobFailure
         return $this->throw;
     }
 
-    public function stopThrowing(): void
+    public function preventThrowing(): void
     {
         $this->throw = false;
     }
