@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Events;
+namespace Yiisoft\Yii\Queue\Event;
 
 use Yiisoft\Yii\Queue\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 
-final class AfterExecution
+final class AfterPush
 {
     private Queue $queue;
     private MessageInterface $message;

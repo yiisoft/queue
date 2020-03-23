@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Workers;
+namespace Yiisoft\Yii\Queue\Worker;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
-use Yiisoft\Yii\Queue\Events\AfterExecution;
-use Yiisoft\Yii\Queue\Events\BeforeExecution;
-use Yiisoft\Yii\Queue\Events\JobFailure;
+use Yiisoft\Yii\Queue\Event\AfterExecution;
+use Yiisoft\Yii\Queue\Event\BeforeExecution;
+use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 

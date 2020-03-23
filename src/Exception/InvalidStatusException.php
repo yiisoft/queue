@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Exceptions;
+namespace Yiisoft\Yii\Queue\Exception;
 
 use InvalidArgumentException;
 use Throwable;

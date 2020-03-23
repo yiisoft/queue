@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Events;
+namespace Yiisoft\Yii\Queue\Event;
 
 use Throwable;
 use Yiisoft\Yii\Queue\MessageInterface;

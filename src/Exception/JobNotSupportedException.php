@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Exceptions;
+namespace Yiisoft\Yii\Queue\Exception;
 
 use Throwable;
 use UnexpectedValueException;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 use Yiisoft\Yii\Queue\DriverInterface;
-use Yiisoft\Yii\Queue\Jobs\DelayableJobInterface;
-use Yiisoft\Yii\Queue\Jobs\JobInterface;
-use Yiisoft\Yii\Queue\Jobs\PrioritisedJobInterface;
-use Yiisoft\Yii\Queue\Jobs\RetryableJobInterface;
+use Yiisoft\Yii\Queue\Job\DelayableJobInterface;
+use Yiisoft\Yii\Queue\Job\JobInterface;
+use Yiisoft\Yii\Queue\Job\PrioritisedJobInterface;
+use Yiisoft\Yii\Queue\Job\RetryableJobInterface;
 
 class JobNotSupportedException extends UnexpectedValueException implements FriendlyExceptionInterface
 {

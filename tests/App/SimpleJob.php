@@ -8,7 +8,7 @@
 
 namespace Yiisoft\Yii\Queue\Tests\App;
 
-use Yiisoft\Yii\Queue\Jobs\JobInterface;
+use Yiisoft\Yii\Queue\Job\JobInterface;
 
 /**
  * Simple Job.

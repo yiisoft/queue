@@ -7,14 +7,14 @@ namespace Yiisoft\Yii\Queue\Tests\unit;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use RuntimeException;
 use Yiisoft\EventDispatcher\Provider\Provider;
-use Yiisoft\Yii\Queue\Events\BeforeExecution;
-use Yiisoft\Yii\Queue\Events\JobFailure;
+use Yiisoft\Yii\Queue\Event\BeforeExecution;
+use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Message;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\Tests\App\ExceptionalSimpleJob;
 use Yiisoft\Yii\Queue\Tests\App\SimpleJob;
 use Yiisoft\Yii\Queue\Tests\TestCase;
-use Yiisoft\Yii\Queue\Workers\Worker;
+use Yiisoft\Yii\Queue\Worker\Worker;
 
 class WorkerTest extends TestCase
 {

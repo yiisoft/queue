@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Events;
+namespace Yiisoft\Yii\Queue\Event;
 
-use Yiisoft\Yii\Queue\MessageInterface;
+use Yiisoft\Yii\Queue\Job\JobInterface;
 use Yiisoft\Yii\Queue\Queue;
 
-final class BeforeExecution
+final class BeforePush
 {
     private bool $stop = false;
     private Queue $queue;
-    private MessageInterface $message;
+    private JobInterface $job;
 
-    public function __construct(Queue $queue, MessageInterface $message)
+    public function __construct(Queue $queue, JobInterface $job)
     {
         $this->queue = $queue;
-        $this->message = $message;
+        $this->job = $job;
     }
 
-    public function getMessage(): MessageInterface
+    public function getJob(): JobInterface
     {
-        return $this->message;
+        return $this->job;
     }
 
     public function getQueue(): Queue
