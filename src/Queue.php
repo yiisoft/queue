@@ -4,6 +4,7 @@ namespace Yiisoft\Yii\Queue;
 
 use InvalidArgumentException;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
@@ -27,19 +28,22 @@ class Queue
     protected WorkerInterface $worker;
     protected Provider $provider;
     protected LoopInterface $loop;
+    private LoggerInterface $logger;
 
     public function __construct(
         DriverInterface $driver,
         EventDispatcherInterface $dispatcher,
         Provider $provider,
         WorkerInterface $worker,
-        LoopInterface $loop
+        LoopInterface $loop,
+        LoggerInterface $logger
     ) {
         $this->driver = $driver;
         $this->eventDispatcher = $dispatcher;
         $this->worker = $worker;
         $this->provider = $provider;
         $this->loop = $loop;
+        $this->logger = $logger;
 
         if ($this->driver instanceof QueueDependentInterface) {
             $driver->setQueue($this);
@@ -61,6 +65,7 @@ class Queue
             && $event->getQueue() === $this
             && $event->getMessage()->getJob()->canRetry($event->getException())
         ) {
+            $this->logger->debug('Retrying job "{job}".', ['job' => get_class($event->getMessage()->getJob())]);
             $event->getMessage()->getJob()->retry();
             $this->push($event->getMessage()->getJob());
         }
@@ -75,12 +80,20 @@ class Queue
      */
     public function push(JobInterface $job): ?string
     {
+        $this->logger->debug('Preparing to push job "{job}".', ['job' => get_class($job)]);
         $event = new BeforePush($this, $job);
         $this->eventDispatcher->dispatch($event);
 
         if ($this->driver->canPush($job)) {
             $message = $this->driver->push($job);
+            $this->logger->debug('Successfully pushed job "{job}" to the queue.', ['job' => get_class($job)]);
         } else {
+            $context = [
+                'job' => get_class($job),
+                'driver' => get_class($this->driver),
+            ];
+            $this->logger->error('Job "{job}" is not supported by driver "{driver}"', $context);
+
             throw new JobNotSupportedException($this->driver, $job);
         }
 
@@ -95,9 +108,18 @@ class Queue
      */
     public function run(): void
     {
+        $this->logger->debug('Start processing queue messages.');
+        $count = 0;
+
         while ($this->loop->canContinue() && $message = $this->driver->nextMessage()) {
             $this->worker->process($message, $this);
+            $count++;
         }
+
+        $this->logger->debug(
+            'Finish processing queue messages. There were {count} messages to work with.',
+            ['count' => $count]
+        );
     }
 
     /**
@@ -105,11 +127,13 @@ class Queue
      */
     public function listen(): void
     {
+        $this->logger->debug('Start listening to the queue.');
         $handler = function (MessageInterface $message) {
             $this->worker->process($message, $this);
         };
 
         $this->driver->subscribe($handler);
+        $this->logger->debug('Finish listening to the queue.');
     }
 
     /**
