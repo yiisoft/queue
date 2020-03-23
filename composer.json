@@ -25,15 +25,15 @@
     "require": {
         "php": "^7.4",
         "psr/event-dispatcher": "^1.0",
-        "yiisoft/event-dispatcher": "^3.0@dev"
+        "yiisoft/event-dispatcher": "^3.0@dev",
+        "yiisoft/yii-console": "^3.0@dev"
     },
     "require-dev": {
         "yiisoft/composer-config-plugin": "^1.0@dev",
         "pda/pheanstalk": "*",
         "phpunit/phpunit": "^9.0",
         "yiisoft/di": "^3.0@dev",
-        "yiisoft/log": "^3.0@dev",
-        "yiisoft/yii-console": "^3.0@dev"
+        "yiisoft/log": "^3.0@dev"
     },
     "suggest": {
         "ext-pcntl": "Need for process signals."
@@ -56,6 +56,10 @@
             "tests": "config/tests.php",
             "common": "config/common.php",
             "console": "config/console.php",
+            "params": [
+                "$params",
+                "config/params.php"
+            ],
             "tests-app": [
                 "$common",
                 "$console",
