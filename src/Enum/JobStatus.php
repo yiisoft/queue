@@ -17,7 +17,7 @@ class JobStatus
     protected function __construct(int $status)
     {
         if (!in_array($status, $this->available(), true)) {
-            throw new InvalidStatusException();
+            throw new InvalidStatusException($status);
         }
 
         $this->status = $status;
