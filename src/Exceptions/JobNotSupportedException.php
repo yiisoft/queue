@@ -36,7 +36,7 @@ class JobNotSupportedException extends UnexpectedValueException implements Frien
     {
         return <<<SOLUTION
             Try to use another driver which supports the given job.
-            Give your attention to the interfaces this job implements.
+            Pay attention to the interfaces this job implements.
             There are a few additional job interfaces available for your comfort:
             - AttemptsRestrictedJob
             - DelayableJobInterface
