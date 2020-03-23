@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Enum;
 
-use InvalidArgumentException;
+use Yiisoft\Yii\Queue\Exceptions\InvalidStatusException;
 
 class JobStatus
 {
@@ -17,7 +17,7 @@ class JobStatus
     protected function __construct(int $status)
     {
         if (!in_array($status, $this->available(), true)) {
-            throw new InvalidArgumentException('Invalid status provided');
+            throw new InvalidStatusException($status);
         }
 
         $this->status = $status;
