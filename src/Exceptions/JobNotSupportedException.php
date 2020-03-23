@@ -24,8 +24,7 @@ class JobNotSupportedException extends UnexpectedValueException implements Frien
         string $message = '',
         int $code = 0,
         Throwable $previous = null
-    )
-    {
+    ) {
         if ($message === '') {
             $driverClass = get_class($driver);
             $jobClass = get_class($job);
