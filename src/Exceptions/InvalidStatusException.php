@@ -21,17 +21,11 @@ class InvalidStatusException extends InvalidArgumentException implements Friendl
         $this->status = $status;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getName(): string
     {
         return 'Invalid job status provided';
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getSolution(): ?string
     {
         return <<<SOLUTION

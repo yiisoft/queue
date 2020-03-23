@@ -28,7 +28,7 @@ class JobNotSupportedException extends UnexpectedValueException implements Frien
         if ($message === '') {
             $driverClass = get_class($driver);
             $jobClass = get_class($job);
-            $message = "$driverClass doesn't support jobs of $jobClass.";
+            $message = "$driverClass does not support jobs of $jobClass.";
         }
 
         parent::__construct($message, $code, $previous);
@@ -37,18 +37,11 @@ class JobNotSupportedException extends UnexpectedValueException implements Frien
         $this->job = $job;
     }
 
-
-    /**
-     * @inheritDoc
-     */
     public function getName(): string
     {
         return 'Job is not supported by current queue driver';
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getSolution(): ?string
     {
         $defaultInterfaces = [
