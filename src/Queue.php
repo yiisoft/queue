@@ -45,7 +45,7 @@ class Queue
         $this->loop = $loop;
         $this->logger = $logger;
 
-        if ($this->driver instanceof QueueDependentInterface) {
+        if ($driver instanceof QueueDependentInterface) {
             $driver->setQueue($this);
         }
 
@@ -92,7 +92,7 @@ class Queue
                 'job' => get_class($job),
                 'driver' => get_class($this->driver),
             ];
-            $this->logger->error('Job "{job}" is not supported by driver "{driver}"', $context);
+            $this->logger->error('Job "{job}" is not supported by driver "{driver}."', $context);
 
             throw new JobNotSupportedException($this->driver, $job);
         }
