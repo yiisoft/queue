@@ -7,13 +7,13 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Events\AfterPush;
-use Yiisoft\Yii\Queue\Events\BeforePush;
-use Yiisoft\Yii\Queue\Events\JobFailure;
-use Yiisoft\Yii\Queue\Exceptions\InvalidJobException;
-use Yiisoft\Yii\Queue\Exceptions\JobNotSupportedException;
-use Yiisoft\Yii\Queue\Jobs\JobInterface;
-use Yiisoft\Yii\Queue\Workers\WorkerInterface;
+use Yiisoft\Yii\Queue\Event\AfterPush;
+use Yiisoft\Yii\Queue\Event\BeforePush;
+use Yiisoft\Yii\Queue\Event\JobFailure;
+use Yiisoft\Yii\Queue\Exception\InvalidJobException;
+use Yiisoft\Yii\Queue\Exception\JobNotSupportedException;
+use Yiisoft\Yii\Queue\Job\JobInterface;
+use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 /**
  * Base Queue.

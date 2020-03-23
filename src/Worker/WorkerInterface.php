@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Workers;
+namespace Yiisoft\Yii\Queue\Worker;
 
 use Yiisoft\Yii\Queue\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;

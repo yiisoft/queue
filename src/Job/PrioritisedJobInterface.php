@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Jobs;
+namespace Yiisoft\Yii\Queue\Job;
 
 interface PrioritisedJobInterface extends JobInterface
 {

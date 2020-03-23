@@ -6,10 +6,10 @@ namespace Yiisoft\Yii\Queue;
 
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Jobs\DelayableJobInterface;
-use Yiisoft\Yii\Queue\Jobs\JobInterface;
-use Yiisoft\Yii\Queue\Jobs\PrioritisedJobInterface;
-use Yiisoft\Yii\Queue\Jobs\RetryableJobInterface;
+use Yiisoft\Yii\Queue\Job\DelayableJobInterface;
+use Yiisoft\Yii\Queue\Job\JobInterface;
+use Yiisoft\Yii\Queue\Job\PrioritisedJobInterface;
+use Yiisoft\Yii\Queue\Job\RetryableJobInterface;
 
 interface DriverInterface
 {
