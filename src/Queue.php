@@ -88,11 +88,13 @@ class Queue
             $message = $this->driver->push($job);
             $this->logger->debug('Successfully pushed job "{job}" to the queue.', ['job' => get_class($job)]);
         } else {
-            $context = [
-                'job' => get_class($job),
-                'driver' => get_class($this->driver),
-            ];
-            $this->logger->error('Job "{job}" is not supported by driver "{driver}."', $context);
+            $this->logger->error(
+                'Job "{job}" is not supported by driver "{driver}."',
+                [
+                    'job' => get_class($job),
+                    'driver' => get_class($this->driver),
+                ]
+            );
 
             throw new JobNotSupportedException($this->driver, $job);
         }
