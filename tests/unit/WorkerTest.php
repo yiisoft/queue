@@ -78,7 +78,7 @@ class WorkerTest extends TestCase
      */
     public function testThrowExceptionPrevented(): void
     {
-        $handler = fn (JobFailure $event) => $event->stopThrowing();
+        $handler = fn (JobFailure $event) => $event->preventThrowing();
         /** @var Provider $provider */
         $provider = $this->container->get(ListenerProviderInterface::class);
         $provider->attach($handler);
