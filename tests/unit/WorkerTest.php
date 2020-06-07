@@ -7,6 +7,7 @@ namespace Yiisoft\Yii\Queue\Tests\unit;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use RuntimeException;
 use Yiisoft\EventDispatcher\Provider\Provider;
+use Yiisoft\Yii\Console\Config\EventConfigurator;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Message;
@@ -48,9 +49,9 @@ class WorkerTest extends TestCase
     public function testJobNotExecuted(): void
     {
         $handler = fn (BeforeExecution $event) => $event->stopExecution();
-        /** @var Provider $provider */
-        $provider = $this->container->get(ListenerProviderInterface::class);
-        $provider->attach($handler);
+        /** @var EventConfigurator $configurator */
+        $configurator = $this->container->get(EventConfigurator::class);
+        $configurator->registerListeners([BeforeExecution::class => [$handler]]);
 
         $job = new SimpleJob();
         $message = new Message('', $job);
@@ -79,9 +80,9 @@ class WorkerTest extends TestCase
     public function testThrowExceptionPrevented(): void
     {
         $handler = fn (JobFailure $event) => $event->preventThrowing();
-        /** @var Provider $provider */
-        $provider = $this->container->get(ListenerProviderInterface::class);
-        $provider->attach($handler);
+        /** @var EventConfigurator $configurator */
+        $configurator = $this->container->get(EventConfigurator::class);
+        $configurator->registerListeners([JobFailure::class => [$handler]]);
 
         $job = new ExceptionalSimpleJob();
         $message = new Message('', $job);

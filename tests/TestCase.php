@@ -21,10 +21,8 @@ abstract class TestCase extends BaseTestCase
 {
     public $container;
 
-    public function __construct($name = null, array $data = [], $dataName = '')
+    protected function setUp(): void
     {
-        parent::__construct($name, $data, $dataName);
-        Builder::rebuild();
         $this->container = new Container(require Builder::path('tests-app'));
     }
 }

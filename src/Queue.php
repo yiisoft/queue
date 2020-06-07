@@ -48,20 +48,12 @@ class Queue
         if ($driver instanceof QueueDependentInterface) {
             $driver->setQueue($this);
         }
-
-        $provider->attach([$this, 'jobRetry']);
-    }
-
-    public function __destruct()
-    {
-        $this->provider->detach(JobFailure::class);
     }
 
     public function jobRetry(JobFailure $event): void
     {
         if (
-            !$event->getException() instanceof InvalidJobException
-            && !$event->getException() instanceof JobNotSupportedException
+            !$event->getException() instanceof JobNotSupportedException
             && $event->getQueue() === $this
             && $event->getMessage()->getJob()->canRetry($event->getException())
         ) {
