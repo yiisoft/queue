@@ -27,6 +27,7 @@
         "psr/event-dispatcher": "^1.0",
         "psr/log": "^1.1",
         "yiisoft/friendly-exception": "^1.0",
+        "yiisoft/serializer": "^3.0@dev",
         "yiisoft/yii-console": "^3.0@dev"
     },
     "require-dev": {
