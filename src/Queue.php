@@ -11,9 +11,9 @@ use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
-use Yiisoft\Yii\Queue\Exception\InvalidJobException;
 use Yiisoft\Yii\Queue\Exception\JobNotSupportedException;
 use Yiisoft\Yii\Queue\Job\JobInterface;
+use Yiisoft\Yii\Queue\Job\RetryableJobInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 /**
@@ -48,26 +48,20 @@ class Queue
         if ($driver instanceof QueueDependentInterface) {
             $driver->setQueue($this);
         }
-
-        $provider->attach([$this, 'jobRetry']);
-    }
-
-    public function __destruct()
-    {
-        $this->provider->detach(JobFailure::class);
     }
 
     public function jobRetry(JobFailure $event): void
     {
+        $job = $event->getMessage()->getJob();
         if (
-            !$event->getException() instanceof InvalidJobException
+            $job instanceof RetryableJobInterface
             && !$event->getException() instanceof JobNotSupportedException
             && $event->getQueue() === $this
-            && $event->getMessage()->getJob()->canRetry($event->getException())
+            && $job->canRetry($event->getException())
         ) {
-            $this->logger->debug('Retrying job "{job}".', ['job' => get_class($event->getMessage()->getJob())]);
-            $event->getMessage()->getJob()->retry();
-            $this->push($event->getMessage()->getJob());
+            $this->logger->debug('Retrying job "{job}".', ['job' => get_class($job)]);
+            $job->retry();
+            $this->push($job);
         }
     }
 
