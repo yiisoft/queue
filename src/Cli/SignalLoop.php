@@ -39,11 +39,6 @@ class SignalLoop implements LoopInterface
     protected array $resumeSignals = [];
 
     /**
-     * @var Queue
-     */
-    protected Queue $queue;
-
-    /**
      * @var bool status when exit signal was got.
      */
     protected bool $exit = false;
@@ -52,12 +47,8 @@ class SignalLoop implements LoopInterface
      */
     protected bool $pause = false;
 
-    /**
-     * @param Queue $queue
-     */
-    public function __construct($queue)
+    public function __construct()
     {
-        $this->queue = $queue;
         if (extension_loaded('pcntl')) {
             foreach ($this->exitSignals as $signal) {
                 pcntl_signal($signal, fn () => $this->exit = true);
