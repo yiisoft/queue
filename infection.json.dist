@@ -4,11 +4,13 @@
             "src"
         ]
     },
-    "timeout": 10,
     "logs": {
-        "text": "tests/runtime/infection.log",
-        "summary": "tests/runtime/summary.log",
-        "perMutator": "tests/runtime/per-mutator.md"
+        "text": "php:\/\/stderr",
+        "badge": {
+            "branch": "master"
+        }
     },
-    "testFrameworkOptions": "-vvv"
+    "mutators": {
+        "@default": true
+    }
 }
