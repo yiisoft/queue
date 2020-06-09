@@ -11,6 +11,7 @@ namespace Yiisoft\Yii\Queue\Tests;
 use Yiisoft\Composer\Config\Builder;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Yiisoft\Di\Container;
+use Yiisoft\Yii\Console\Config\EventConfigurator;
 
 /**
  * Base Test Case.
@@ -19,10 +20,12 @@ use Yiisoft\Di\Container;
  */
 abstract class TestCase extends BaseTestCase
 {
-    public $container;
+    public Container $container;
 
     protected function setUp(): void
     {
         $this->container = new Container(require Builder::path('tests-app'));
+        $eventConfigurator = $this->container->get(EventConfigurator::class);
+        $eventConfigurator->registerListeners(require Builder::path('events-console'));
     }
 }

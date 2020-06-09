@@ -49,7 +49,6 @@ class WorkerTest extends TestCase
     public function testJobNotExecuted(): void
     {
         $handler = fn (BeforeExecution $event) => $event->stopExecution();
-        /** @var EventConfigurator $configurator */
         $configurator = $this->container->get(EventConfigurator::class);
         $configurator->registerListeners([BeforeExecution::class => [$handler]]);
 
