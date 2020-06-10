@@ -20,7 +20,7 @@ jobs:
           - windows-latest
 
         php-version:
-          - "7.4"
+          - "7.4.5"
           - "8.0"
 
     steps:
