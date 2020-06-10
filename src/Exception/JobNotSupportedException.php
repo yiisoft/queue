@@ -7,7 +7,7 @@ namespace Yiisoft\Yii\Queue\Exception;
 use Throwable;
 use UnexpectedValueException;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
-use Yiisoft\Yii\Queue\DriverInterface;
+use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Job\DelayableJobInterface;
 use Yiisoft\Yii\Queue\Job\JobInterface;
 use Yiisoft\Yii\Queue\Job\PrioritisedJobInterface;

@@ -5,8 +5,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Yiisoft\Yii\Console\Application;
+use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Driver\SynchronousDriver;
-use Yiisoft\Yii\Queue\DriverInterface;
 use Yiisoft\Yii\Queue\Tests\App\Benchmark\Controller;
 
 return [
