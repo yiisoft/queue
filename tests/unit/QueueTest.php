@@ -48,7 +48,7 @@ class QueueTest extends TestCase
         $job = $this->container->get(SimpleJob::class);
         $id = $queue->push($job);
 
-        $this->assertNotEmpty($id, 'Pushed message should has an id');
+        $this->assertNotEquals('', $id, 'Pushed message should has an id');
     }
 
     public function testPushNotSuccessful(): void
@@ -80,6 +80,11 @@ class QueueTest extends TestCase
         $job = $this->container->get(SimpleJob::class);
         $id = $queue->push($job);
 
-        $queue->status($id);
+        $status = $queue->status($id);
+        $this->assertEquals(true, $status->isWaiting());
+
+        $queue->run();
+        $status = $queue->status($id);
+        $this->assertEquals(true, $status->isDone());
     }
 }
