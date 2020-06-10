@@ -43,6 +43,9 @@ class QueueTest extends TestCase
     {
         $this->eventManager->expects(self::once())->method('beforePushHandler');
         $this->eventManager->expects(self::once())->method('afterPushHandler');
+        $this->eventManager->expects(self::never())->method('beforeExecutionHandler');
+        $this->eventManager->expects(self::never())->method('afterExecutionHandler');
+        $this->eventManager->expects(self::never())->method('jobFailureHandler');
 
         $queue = $this->container->get(Queue::class);
         $job = $this->container->get(SimpleJob::class);
@@ -56,6 +59,9 @@ class QueueTest extends TestCase
         $this->expectException(JobNotSupportedException::class);
         $this->eventManager->expects(self::once())->method('beforePushHandler');
         $this->eventManager->expects(self::never())->method('afterPushHandler');
+        $this->eventManager->expects(self::never())->method('beforeExecutionHandler');
+        $this->eventManager->expects(self::never())->method('afterExecutionHandler');
+        $this->eventManager->expects(self::never())->method('jobFailureHandler');
 
         $queue = $this->container->get(Queue::class);
         $job = $this->container->get(DelayableJob::class);
@@ -64,6 +70,10 @@ class QueueTest extends TestCase
 
     public function testJobRetry(): void
     {
+        $this->eventManager->expects(self::exactly(2))->method('beforePushHandler');
+        $this->eventManager->expects(self::exactly(2))->method('afterPushHandler');
+        $this->eventManager->expects(self::exactly(2))->method('beforeExecutionHandler');
+        $this->eventManager->expects(self::once())->method('afterExecutionHandler');
         $this->eventManager->expects(self::once())->method('jobFailureHandler');
 
         $queue = $this->container->get(Queue::class);
