@@ -10,6 +10,7 @@ jobs:
     env:
       extensions: curl, mbstring, dom, intl, json, libxml, xml, xmlwriter
       key: cache-v1
+      update: true
 
     runs-on: ${{ matrix.os }}
 
