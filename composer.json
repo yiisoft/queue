@@ -66,9 +66,9 @@
             "tests-app": [
                 "$common",
                 "$console",
-                "tests/App/config/main.php",
                 "tests/App/config/console.php"
-            ]
+            ],
+            "events-console": "config/events-console.php"
         }
     },
     "config": {

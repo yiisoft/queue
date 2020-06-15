@@ -7,6 +7,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
+use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
@@ -59,6 +60,7 @@ class Queue
             && $event->getQueue() === $this
             && $job->canRetry($event->getException())
         ) {
+            $event->preventThrowing();
             $this->logger->debug('Retrying job "{job}".', ['job' => get_class($job)]);
             $job->retry();
             $this->push($job);
@@ -70,9 +72,9 @@ class Queue
      *
      * @param JobInterface|mixed $job
      *
-     * @return string|null id of a job message
+     * @return string id of a job message
      */
-    public function push(JobInterface $job): ?string
+    public function push(JobInterface $job): string
     {
         $this->logger->debug('Preparing to push job "{job}".', ['job' => get_class($job)]);
         $event = new BeforePush($this, $job);
