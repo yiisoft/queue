@@ -68,6 +68,63 @@ class QueueTest extends TestCase
         $queue->push($job);
     }
 
+    public function testRun(): void
+    {
+        $this->eventManager->expects(self::exactly(2))->method('beforePushHandler');
+        $this->eventManager->expects(self::exactly(2))->method('afterPushHandler');
+        $this->eventManager->expects(self::exactly(2))->method('beforeExecutionHandler');
+        $this->eventManager->expects(self::exactly(2))->method('afterExecutionHandler');
+        $this->eventManager->expects(self::never())->method('jobFailureHandler');
+
+        $queue = $this->container->get(Queue::class);
+        $job = $this->container->get(SimpleJob::class);
+        $job2 = clone $job;
+        $queue->push($job);
+        $queue->push($job2);
+        $queue->run();
+
+        $this->assertTrue($job->executed);
+        $this->assertTrue($job2->executed);
+    }
+
+    public function testRunPartly(): void
+    {
+        $this->eventManager->expects(self::exactly(2))->method('beforePushHandler');
+        $this->eventManager->expects(self::exactly(2))->method('afterPushHandler');
+        $this->eventManager->expects(self::once())->method('beforeExecutionHandler');
+        $this->eventManager->expects(self::once())->method('afterExecutionHandler');
+        $this->eventManager->expects(self::never())->method('jobFailureHandler');
+
+        $queue = $this->container->get(Queue::class);
+        $job = $this->container->get(SimpleJob::class);
+        $job2 = clone $job;
+        $queue->push($job);
+        $queue->push($job2);
+        $queue->run(1);
+
+        $this->assertTrue($job->executed);
+        $this->assertFalse($job2->executed);
+    }
+
+    public function testListen(): void
+    {
+        $this->eventManager->expects(self::exactly(2))->method('beforePushHandler');
+        $this->eventManager->expects(self::exactly(2))->method('afterPushHandler');
+        $this->eventManager->expects(self::exactly(2))->method('beforeExecutionHandler');
+        $this->eventManager->expects(self::exactly(2))->method('afterExecutionHandler');
+        $this->eventManager->expects(self::never())->method('jobFailureHandler');
+
+        $queue = $this->container->get(Queue::class);
+        $job = $this->container->get(SimpleJob::class);
+        $job2 = clone $job;
+        $queue->push($job);
+        $queue->push($job2);
+        $queue->listen();
+
+        $this->assertTrue($job->executed);
+        $this->assertTrue($job2->executed);
+    }
+
     public function testJobRetry(): void
     {
         $this->eventManager->expects(self::exactly(2))->method('beforePushHandler');

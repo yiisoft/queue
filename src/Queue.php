@@ -103,13 +103,17 @@ class Queue
 
     /**
      * Execute all existing jobs and exit
+     *
+     * @param int $max
      */
-    public function run(): void
+    public function run(int $max = 0): void
     {
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
-        while ($this->loop->canContinue() && $message = $this->driver->nextMessage()) {
+        while (
+            ($max <= 0 || $max > $count)
+            && $this->loop->canContinue() && $message = $this->driver->nextMessage()) {
             $this->worker->process($message, $this);
             $count++;
         }
