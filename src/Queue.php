@@ -110,7 +110,7 @@ class Queue
         $count = 0;
 
         while ($this->loop->canContinue() && $message = $this->driver->nextMessage()) {
-            $this->worker->process($message, $this);
+            $this->handle($message);
             $count++;
         }
 
@@ -126,11 +126,7 @@ class Queue
     public function listen(): void
     {
         $this->logger->debug('Start listening to the queue.');
-        $handler = function (MessageInterface $message) {
-            $this->worker->process($message, $this);
-        };
-
-        $this->driver->subscribe($handler);
+        $this->driver->subscribe([$this, 'handle']);
         $this->logger->debug('Finish listening to the queue.');
     }
 
@@ -144,5 +140,10 @@ class Queue
     public function status(string $id): JobStatus
     {
         return $this->driver->status($id);
+    }
+
+    protected function handle(MessageInterface $message): void
+    {
+        $this->worker->process($message, $this);
     }
 }
