@@ -16,7 +16,7 @@ return [
     EventDispatcherInterface::class => Dispatcher::class,
     WorkerInterface::class => QueueWorker::class,
     ListenerProviderInterface::class => Provider::class,
-    ContainerInterface::class => fn(ContainerInterface $container) => $container,
+    ContainerInterface::class => fn (ContainerInterface $container) => $container,
     LoopInterface::class => SignalLoop::class,
     SerializerInterface::class => JsonSerializer::class,
 ];

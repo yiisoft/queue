@@ -16,7 +16,7 @@ class CallableJobTest extends TestCase
     public function testExecuteLambda(): void
     {
         $result = false;
-        $callable = static function() use (&$result) {
+        $callable = static function () use (&$result) {
             $result = true;
         };
 
@@ -30,7 +30,7 @@ class CallableJobTest extends TestCase
     {
         $result = new stdClass();
         $result->executed = false;
-        $callable = static fn() => $result->executed = true;
+        $callable = static fn () => $result->executed = true;
 
         $job = new CallableJob($callable);
         $job->execute();
