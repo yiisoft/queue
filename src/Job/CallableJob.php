@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Job;
 
-use Yiisoft\Serializer\SerializerInterface;
-
 class CallableJob implements JobInterface
 {
-    private string $serialized;
-    private SerializerInterface $serializer;
+    /**
+     * @var callable
+     */
+    private $callable;
 
-    public function __construct(callable $callable, SerializerInterface $serializer)
+    public function __construct(callable $callable)
     {
-        $this->serializer = $serializer;
-        $this->serialized = $serializer->serialize($callable);
+        $this->callable = $callable;
     }
 
     public function execute(): void
     {
-        $callable = $this->serializer->unserialize($this->serialized);
+        $callable = $this->callable;
         $callable();
     }
 }
