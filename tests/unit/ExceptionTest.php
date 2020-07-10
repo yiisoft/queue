@@ -7,8 +7,6 @@ namespace Yiisoft\Yii\Queue\Tests\unit;
 use Yiisoft\Yii\Queue\Driver\SynchronousDriver;
 use Yiisoft\Yii\Queue\Exception\JobNotSupportedException;
 use Yiisoft\Yii\Queue\Job\DelayableJobInterface;
-use Yiisoft\Yii\Queue\Job\PrioritisedJobInterface;
-use Yiisoft\Yii\Queue\Job\RetryableJobInterface;
 use Yiisoft\Yii\Queue\Tests\App\DelayableJob;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
