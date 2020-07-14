@@ -44,7 +44,7 @@ Each task which is sent to queue should be defined as a separate class.
 For example, if you need to download and save a file the class may look like the following:
 
 ```php
-class DownloadJob extends BaseObject implements \Yiisoft\Yii\Queue\JobInterface
+class DownloadJob implements \Yiisoft\Yii\Queue\JobInterface
 {
     public $url;
     public $file;
