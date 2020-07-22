@@ -31,8 +31,7 @@ final class Worker implements WorkerInterface
         LoggerInterface $logger,
         Injector $injector,
         ContainerInterface $container
-    )
-    {
+    ) {
         $this->dispatcher = $dispatcher;
         $this->logger = $logger;
         $this->handlers = $handlers;
