@@ -48,10 +48,6 @@ class Queue
         $this->provider = $provider;
         $this->loop = $loop;
         $this->logger = $logger;
-
-        if ($driver instanceof QueueDependentInterface) {
-            $driver->setQueue($this);
-        }
     }
 
     public function jobRetry(JobFailure $event): void
