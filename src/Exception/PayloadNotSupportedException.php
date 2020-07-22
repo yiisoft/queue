@@ -11,7 +11,7 @@ use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
-use Yiisoft\Yii\Queue\Payload\RetryablePayloadInterface;
+use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 
 class PayloadNotSupportedException extends UnexpectedValueException implements FriendlyExceptionInterface
 {
@@ -47,7 +47,7 @@ class PayloadNotSupportedException extends UnexpectedValueException implements F
         $defaultInterfaces = [
             DelayablePayloadInterface::class,
             PrioritisedPayloadInterface::class,
-            RetryablePayloadInterface::class,
+            AttemptsRestrictedPayloadInterface::class,
         ];
         $interfaces = array_intersect($defaultInterfaces, class_implements($this->payload));
         $interfaces = implode(', ', $interfaces);
@@ -62,7 +62,7 @@ class PayloadNotSupportedException extends UnexpectedValueException implements F
             Here is a list of all default interfaces which can be unsupported by different queue drivers:
             - DelayablePayloadInterface (allows to execute job with a delay)
             - PrioritisedPayloadInterface (is used to prioritize job execution)
-            - RetryablePayloadInterface (allows to execute the job multiple times while it fails)
+            - AttemptsRestrictedPayloadInterface (allows to execute the job multiple times while it fails)
 
             The given driver $driverClass does not support one of them, or even more.
             The solution is in one of these:

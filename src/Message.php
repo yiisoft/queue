@@ -8,13 +8,22 @@ use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 
 class Message implements MessageInterface
 {
-    private string $id;
-    private PayloadInterface $payload;
+    private ?string $id;
+    private string $payloadName;
+    private $payloadData;
+    private array $payloadMeta;
 
-    public function __construct(string $id, PayloadInterface $payload)
+    public function __construct(string $payloadName, $payloadData, array $payloadMeta, ?string $id = null)
     {
         $this->id = $id;
-        $this->payload = $payload;
+        $this->payloadName = $payloadName;
+        $this->payloadData = $payloadData;
+        $this->payloadMeta = $payloadMeta;
+    }
+
+    public function setId(?string $id): void
+    {
+        $this->id = $id;
     }
 
     /**
@@ -28,8 +37,24 @@ class Message implements MessageInterface
     /**
      * @inheritDoc
      */
-    public function getPayload(): PayloadInterface
+    public function getPayloadName(): string
     {
-        return $this->payload;
+        return $this->payloadName;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPayloadData()
+    {
+        return $this->payloadData;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPayloadMeta(): array
+    {
+        return $this->payloadMeta;
     }
 }

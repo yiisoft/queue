@@ -13,8 +13,11 @@ use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
+use Yiisoft\Yii\Queue\Payload\BasicPayload;
+use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PayloadInterface;
-use Yiisoft\Yii\Queue\Payload\RetryablePayloadInterface;
+use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
+use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 /**
@@ -53,16 +56,19 @@ class Queue
 
     public function jobRetry(JobFailure $event): void
     {
-        $payload = $event->getMessage()->getPayload();
         if (
-            $payload instanceof RetryablePayloadInterface
+            $event->getQueue() === $this
             && !$event->getException() instanceof PayloadNotSupportedException
-            && $event->getQueue() === $this
-            && $payload->canRetry($event->getException())
+            && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) > 0
         ) {
             $event->preventThrowing();
-            $this->logger->debug('Retrying payload "{payload}".', ['payload' => $payload->getName()]);
-            $payload->retry();
+            $attemptsLeft = $event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] - 1;
+            $payload = $this->messageConvert($event->getMessage(), [PayloadInterface::META_KEY_ATTEMPTS => $attemptsLeft]);
+            $this->logger->debug(
+                'Retrying payload "{payload}".',
+                ['payload' => $event->getMessage()->getPayloadName()]
+            );
+
             $this->push($payload);
         }
     }
@@ -70,19 +76,23 @@ class Queue
     /**
      * Pushes job into queue.
      *
-     * @param PayloadInterface|mixed $payload
+     * @param PayloadInterface $payload
      *
      * @return string|null id of the pushed message
      */
     public function push(PayloadInterface $payload): ?string
     {
         $this->logger->debug('Preparing to push payload "{payload}".', ['payload' => $payload->getName()]);
-        $event = new BeforePush($this, $payload);
+        $message = $this->payloadConvert($payload);
+        $event = new BeforePush($this, $message);
         $this->eventDispatcher->dispatch($event);
 
-        if ($this->driver->canPush($payload)) {
-            $message = $this->driver->push($payload);
-            $this->logger->debug('Successfully pushed payload "{payload}" to the queue.', ['payload' => $payload->getName()]);
+        if ($this->driver->canPush($message)) {
+            $message->setId($this->driver->push($message));
+            $this->logger->debug(
+                'Successfully pushed message "{name}" to the queue.',
+                ['name' => $message->getPayloadName()]
+            );
         } else {
             $this->logger->error(
                 'Payload "{payload}" is not supported by driver "{driver}."',
@@ -145,5 +155,31 @@ class Queue
     protected function handle(MessageInterface $message): void
     {
         $this->worker->process($message, $this);
+    }
+
+    protected function payloadConvert(PayloadInterface $payload): MessageInterface
+    {
+        $meta = $payload->getMeta();
+
+        if (is_subclass_of($payload, DelayablePayloadInterface::class)) {
+            $meta[PayloadInterface::META_KEY_DELAY] = $payload->getDelay();
+        }
+
+        if (is_subclass_of($payload, PrioritisedPayloadInterface::class)) {
+            $meta[PayloadInterface::META_KEY_PRIORITY] = $payload->getPriority();
+        }
+
+        if (is_subclass_of($payload, AttemptsRestrictedPayloadInterface::class)) {
+            $meta[PayloadInterface::META_KEY_ATTEMPTS] = $payload->getAttempts();
+        }
+
+        return new Message($payload->getName(), $payload->getData(), $meta);
+    }
+
+    protected function messageConvert(MessageInterface $message, array $metaOverwrite): PayloadInterface
+    {
+        $meta = array_merge($message->getPayloadMeta(), $metaOverwrite);
+
+        return new BasicPayload($message->getPayloadName(), $message->getPayloadData(), $meta);
     }
 }

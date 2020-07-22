@@ -10,4 +10,9 @@ abstract class AbstractPayload implements PayloadInterface
     {
         return static::class;
     }
+
+    public function getMeta(): array
+    {
+        return [];
+    }
 }

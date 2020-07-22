@@ -67,13 +67,12 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
         throw new InvalidArgumentException('There is no message with the given id.');
     }
 
-    public function push(PayloadInterface $payload): MessageInterface
+    public function push(MessageInterface $message): ?string
     {
         $key = count($this->messages) + $this->current;
-        $message = new Message((string) $key, $payload);
         $this->messages[] = $message;
 
-        return $message;
+        return (string) $key;
     }
 
     public function subscribe(callable $handler): void
@@ -81,9 +80,11 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
         $this->run($handler);
     }
 
-    public function canPush(PayloadInterface $payload): bool
+    public function canPush(MessageInterface $message): bool
     {
-        return !($payload instanceof DelayablePayloadInterface || $payload instanceof PrioritisedPayloadInterface);
+        $meta = $message->getPayloadMeta();
+
+        return !isset($meta[PayloadInterface::META_KEY_DELAY]) && !isset($meta[PayloadInterface::META_KEY_PRIORITY]);
     }
 
     public function setQueue(Queue $queue): void

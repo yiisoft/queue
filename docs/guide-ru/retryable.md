@@ -37,14 +37,14 @@
 заданий, существуют дополнительные возможности.
 
 
-RetryablePayloadInterface
+AttemptsRestrictedPayloadInterface
 ---------------------
 
-Индивидуальный контроль повторного выполнения реализован интерфейсом `RetryablePayloadInterface`, код
+Индивидуальный контроль повторного выполнения реализован интерфейсом `AttemptsRestrictedPayloadInterface`, код
 такого job-объекта может выглядеть следующим образом:
 
 ```php
-class SomeJob extends BaseObject implements RetryablePayloadInterface
+class SomeJob extends BaseObject implements AttemptsRestrictedPayloadInterface
 {
     public function execute($queue)
     {
@@ -94,7 +94,7 @@ Yii::$app->queue->on(Queue::EVENT_AFTER_ERROR, function (ExecEvent $event) {
 });
 ```
 
-Обработчики событий выполняются после методов `RetryablePayloadInterface` и, следовательно, имеют
+Обработчики событий выполняются после методов `AttemptsRestrictedPayloadInterface` и, следовательно, имеют
 наивысший приоритет.
 
 

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
-use Yiisoft\Yii\Queue\Payload\PayloadInterface;
-
 interface MessageInterface
 {
+    public function setId(?string $id): void;
+
     /**
      * Returns unique message id
      *
@@ -18,7 +18,11 @@ interface MessageInterface
     /**
      * Returns a job to execute
      *
-     * @return PayloadInterface
+     * @return string
      */
-    public function getPayload(): PayloadInterface;
+    public function getPayloadName(): string;
+
+    public function getPayloadData();
+
+    public function getPayloadMeta(): array;
 }

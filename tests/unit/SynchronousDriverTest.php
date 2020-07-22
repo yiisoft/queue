@@ -12,7 +12,7 @@ use Yiisoft\Yii\Queue\Tests\TestCase;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
 use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
-use Yiisoft\Yii\Queue\Payload\RetryablePayloadInterface;
+use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 use Yiisoft\Yii\Queue\Queue;
 
 class SynchronousDriverTest extends TestCase
@@ -54,7 +54,7 @@ class SynchronousDriverTest extends TestCase
                 PrioritizedJob::class,
                 false,
             ],
-            RetryablePayloadInterface::class => [
+            AttemptsRestrictedPayloadInterface::class => [
                 RetryablePayload::class,
                 true,
             ],

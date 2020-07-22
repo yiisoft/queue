@@ -30,10 +30,10 @@
 重试作业接口
 ----------------------
 
-Separate control of retry is implemented by `RetryablePayloadInterface` 接口。 示例:
+Separate control of retry is implemented by `AttemptsRestrictedPayloadInterface` 接口。 示例:
 
 ```php
-class SomeJob extends BaseObject implements RetryablePayloadInterface
+class SomeJob extends BaseObject implements AttemptsRestrictedPayloadInterface
 {
     public function execute($queue)
     {
@@ -80,7 +80,7 @@ Yii::$app->queue->on(Queue::EVENT_AFTER_ERROR, function (ExecEvent $event) {
 });
 ```
 
-事件处理程序在 `RetryablePayloadInterface` 方法之后执行，因此具有最高优先级。
+事件处理程序在 `AttemptsRestrictedPayloadInterface` 方法之后执行，因此具有最高优先级。
 
 限制
 ------------

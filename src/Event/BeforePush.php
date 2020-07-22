@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Event;
 
-use Yiisoft\Yii\Queue\Payload\PayloadInterface;
+use Yiisoft\Yii\Queue\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 
 final class BeforePush
 {
     private bool $stop = false;
     private Queue $queue;
-    private PayloadInterface $payload;
+    private MessageInterface $message;
 
-    public function __construct(Queue $queue, PayloadInterface $payload)
+    public function __construct(Queue $queue, MessageInterface $message)
     {
         $this->queue = $queue;
-        $this->payload = $payload;
+        $this->message = $message;
     }
 
-    public function getPayload(): PayloadInterface
+    public function getMessage(): MessageInterface
     {
-        return $this->payload;
+        return $this->message;
     }
 
     public function getQueue(): Queue
