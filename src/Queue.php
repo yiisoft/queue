@@ -12,9 +12,9 @@ use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
-use Yiisoft\Yii\Queue\Exception\JobNotSupportedException;
-use Yiisoft\Yii\Queue\Job\JobInterface;
-use Yiisoft\Yii\Queue\Job\RetryableJobInterface;
+use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
+use Yiisoft\Yii\Queue\Payload\PayloadInterface;
+use Yiisoft\Yii\Queue\Payload\RetryablePayloadInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 /**
@@ -53,46 +53,46 @@ class Queue
 
     public function jobRetry(JobFailure $event): void
     {
-        $job = $event->getMessage()->getJob();
+        $payload = $event->getMessage()->getPayload();
         if (
-            $job instanceof RetryableJobInterface
-            && !$event->getException() instanceof JobNotSupportedException
+            $payload instanceof RetryablePayloadInterface
+            && !$event->getException() instanceof PayloadNotSupportedException
             && $event->getQueue() === $this
-            && $job->canRetry($event->getException())
+            && $payload->canRetry($event->getException())
         ) {
             $event->preventThrowing();
-            $this->logger->debug('Retrying job "{job}".', ['job' => get_class($job)]);
-            $job->retry();
-            $this->push($job);
+            $this->logger->debug('Retrying payload "{payload}".', ['payload' => $payload->getName()]);
+            $payload->retry();
+            $this->push($payload);
         }
     }
 
     /**
      * Pushes job into queue.
      *
-     * @param JobInterface|mixed $job
+     * @param PayloadInterface|mixed $payload
      *
-     * @return string id of a job message
+     * @return string|null id of the pushed message
      */
-    public function push(JobInterface $job): string
+    public function push(PayloadInterface $payload): ?string
     {
-        $this->logger->debug('Preparing to push job "{job}".', ['job' => get_class($job)]);
-        $event = new BeforePush($this, $job);
+        $this->logger->debug('Preparing to push payload "{payload}".', ['payload' => $payload->getName()]);
+        $event = new BeforePush($this, $payload);
         $this->eventDispatcher->dispatch($event);
 
-        if ($this->driver->canPush($job)) {
-            $message = $this->driver->push($job);
-            $this->logger->debug('Successfully pushed job "{job}" to the queue.', ['job' => get_class($job)]);
+        if ($this->driver->canPush($payload)) {
+            $message = $this->driver->push($payload);
+            $this->logger->debug('Successfully pushed payload "{payload}" to the queue.', ['payload' => $payload->getName()]);
         } else {
             $this->logger->error(
-                'Job "{job}" is not supported by driver "{driver}."',
+                'Payload "{payload}" is not supported by driver "{driver}."',
                 [
-                    'job' => get_class($job),
+                    'payload' => $payload->getName(),
                     'driver' => get_class($this->driver),
                 ]
             );
 
-            throw new JobNotSupportedException($this->driver, $job);
+            throw new PayloadNotSupportedException($this->driver, $payload);
         }
 
         $event = new AfterPush($this, $message);
@@ -131,7 +131,7 @@ class Queue
     }
 
     /**
-     * @param string $id A job id
+     * @param string $id A message id
      *
      * @return JobStatus
      *

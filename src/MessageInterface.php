@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
-use Yiisoft\Yii\Queue\Job\JobInterface;
+use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 
 interface MessageInterface
 {
@@ -18,7 +18,7 @@ interface MessageInterface
     /**
      * Returns a job to execute
      *
-     * @return JobInterface
+     * @return PayloadInterface
      */
-    public function getJob(): JobInterface;
+    public function getPayload(): PayloadInterface;
 }

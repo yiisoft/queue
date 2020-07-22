@@ -45,14 +45,14 @@ reached, and the job still isn't done, it will be removed from the queue as comp
 These options apply to all jobs in the queue. If you need to change this behavior for specific
 jobs, see the following method.
 
-RetryableJobInterface
+RetryablePayloadInterface
 ---------------------
 
-To have more control over the retry logic a job can implement the `RetryableJobInterface`.
+To have more control over the retry logic a job can implement the `RetryablePayloadInterface`.
 For example:
 
 ```php
-class SomeJob extends BaseObject implements RetryableJobInterface
+class SomeJob extends BaseObject implements RetryablePayloadInterface
 {
     public function execute($queue)
     {
@@ -99,7 +99,7 @@ Yii::$app->queue->on(Queue::EVENT_AFTER_ERROR, function (ExecEvent $event) {
 });
 ```
 
-Event handlers are executed after the `RetryableJobInterface` methods, and therefore have the highest
+Event handlers are executed after the `RetryablePayloadInterface` methods, and therefore have the highest
 priority.
 
 Restrictions

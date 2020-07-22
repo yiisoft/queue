@@ -11,12 +11,12 @@ use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
-use Yiisoft\Yii\Queue\Exception\JobNotSupportedException;
+use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\Tests\App\DelayableJob;
 use Yiisoft\Yii\Queue\Tests\App\EventManager;
-use Yiisoft\Yii\Queue\Tests\App\RetryableJob;
-use Yiisoft\Yii\Queue\Tests\App\SimpleJob;
+use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
+use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 class QueueTest extends TestCase
@@ -48,7 +48,7 @@ class QueueTest extends TestCase
         $this->eventManager->expects(self::never())->method('jobFailureHandler');
 
         $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimpleJob::class);
+        $job = $this->container->get(SimplePayload::class);
         $id = $queue->push($job);
 
         $this->assertNotEquals('', $id, 'Pushed message should has an id');
@@ -56,7 +56,7 @@ class QueueTest extends TestCase
 
     public function testPushNotSuccessful(): void
     {
-        $this->expectException(JobNotSupportedException::class);
+        $this->expectException(PayloadNotSupportedException::class);
         $this->eventManager->expects(self::once())->method('beforePushHandler');
         $this->eventManager->expects(self::never())->method('afterPushHandler');
         $this->eventManager->expects(self::never())->method('beforeExecutionHandler');
@@ -77,7 +77,7 @@ class QueueTest extends TestCase
         $this->eventManager->expects(self::once())->method('jobFailureHandler');
 
         $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(RetryableJob::class);
+        $job = $this->container->get(RetryablePayload::class);
         $queue->push($job);
         $queue->run();
 
@@ -87,7 +87,7 @@ class QueueTest extends TestCase
     public function testStatus(): void
     {
         $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimpleJob::class);
+        $job = $this->container->get(SimplePayload::class);
         $id = $queue->push($job);
 
         $status = $queue->status($id);

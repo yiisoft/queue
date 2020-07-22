@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\App;
 
-use Yiisoft\Yii\Queue\Job\JobInterface;
+use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 
 /**
- * Simple Job.
+ * Simple Payload.
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-class SimpleJob implements JobInterface
+class SimplePayload implements PayloadInterface
 {
     public bool $executed = false;
 

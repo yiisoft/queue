@@ -13,7 +13,7 @@ use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Message;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\Tests\App\ExceptionalSimpleJob;
-use Yiisoft\Yii\Queue\Tests\App\SimpleJob;
+use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 use Yiisoft\Yii\Queue\Worker\Worker;
 
@@ -35,7 +35,7 @@ class WorkerTest extends TestCase
      */
     public function testJobExecuted(): void
     {
-        $job = new SimpleJob();
+        $job = new SimplePayload();
         $message = new Message('', $job);
         $queue = $this->createMock(Queue::class);
 
@@ -52,7 +52,7 @@ class WorkerTest extends TestCase
         $configurator = $this->container->get(EventConfigurator::class);
         $configurator->registerListeners([BeforeExecution::class => [$handler]]);
 
-        $job = new SimpleJob();
+        $job = new SimplePayload();
         $message = new Message('', $job);
         $queue = $this->createMock(Queue::class);
 

@@ -6,14 +6,15 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yiisoft\Yii\Queue\Job;
+namespace Yiisoft\Yii\Queue\Payload;
 
 /**
- * Job Interface.
+ * Payload Interface.
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-interface JobInterface
+interface PayloadInterface
 {
-    public function execute();
+    public function getName(): string;
+    public function getData();
 }

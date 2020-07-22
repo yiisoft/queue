@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Event;
 
-use Yiisoft\Yii\Queue\Job\JobInterface;
+use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\Queue;
 
 final class BeforePush
 {
     private bool $stop = false;
     private Queue $queue;
-    private JobInterface $job;
+    private PayloadInterface $payload;
 
-    public function __construct(Queue $queue, JobInterface $job)
+    public function __construct(Queue $queue, PayloadInterface $payload)
     {
         $this->queue = $queue;
-        $this->job = $job;
+        $this->payload = $payload;
     }
 
-    public function getJob(): JobInterface
+    public function getPayload(): PayloadInterface
     {
-        return $this->job;
+        return $this->payload;
     }
 
     public function getQueue(): Queue

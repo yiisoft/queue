@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Job;
+namespace Yiisoft\Yii\Queue\Payload;
 
 use Throwable;
 
 /**
- * Retryable Job Interface.
+ * Retryable Payload Interface.
  *
  * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
-interface RetryableJobInterface extends JobInterface
+interface RetryablePayloadInterface extends PayloadInterface
 {
     /**
      * @return int time to reserve in seconds

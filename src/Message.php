@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
-use Yiisoft\Yii\Queue\Job\JobInterface;
+use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 
 class Message implements MessageInterface
 {
     private string $id;
-    private JobInterface $job;
+    private PayloadInterface $payload;
 
-    public function __construct(string $id, JobInterface $job)
+    public function __construct(string $id, PayloadInterface $payload)
     {
         $this->id = $id;
-        $this->job = $job;
+        $this->payload = $payload;
     }
 
     /**
@@ -28,8 +28,8 @@ class Message implements MessageInterface
     /**
      * @inheritDoc
      */
-    public function getJob(): JobInterface
+    public function getPayload(): PayloadInterface
     {
-        return $this->job;
+        return $this->payload;
     }
 }

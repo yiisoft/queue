@@ -45,14 +45,14 @@
 これらのオプションはキューの中の全てのジョブに適用されます。この振る舞いを特定のジョブについて変更したい場合は、
 次の方法を参照して下さい。
 
-RetryableJobInterface
+RetryablePayloadInterface
 ---------------------
 
-再試行のロジックをもっと詳細に制御するために、ジョブは `RetryableJobInterface` を実装することが出来ます。
+再試行のロジックをもっと詳細に制御するために、ジョブは `RetryablePayloadInterface` を実装することが出来ます。
 例えば、
 
 ```php
-class SomeJob extends BaseObject implements RetryableJobInterface
+class SomeJob extends BaseObject implements RetryablePayloadInterface
 {
     public function execute($queue)
     {
@@ -99,7 +99,7 @@ Yii::$app->queue->on(Queue::EVENT_AFTER_ERROR, function (ExecEvent $event) {
 });
 ```
 
-イベント・ハンドラは `RetryableJobInterface` のメソッドの後で実行され、従って、
+イベント・ハンドラは `RetryablePayloadInterface` のメソッドの後で実行され、従って、
 最も高い優先度を持ちます。
 
 制約

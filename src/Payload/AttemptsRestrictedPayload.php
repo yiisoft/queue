@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Job;
+namespace Yiisoft\Yii\Queue\Payload;
 
 use Throwable;
 
-abstract class AttemptsRestrictedJob implements RetryableJobInterface
+abstract class AttemptsRestrictedPayload implements RetryablePayloadInterface
 {
     protected int $attemptsMax = 1;
     protected int $attempt = 1;

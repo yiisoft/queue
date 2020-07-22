@@ -7,9 +7,9 @@ namespace Yiisoft\Yii\Queue\Driver;
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Job\DelayableJobInterface;
-use Yiisoft\Yii\Queue\Job\JobInterface;
-use Yiisoft\Yii\Queue\Job\PrioritisedJobInterface;
+use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
+use Yiisoft\Yii\Queue\Payload\PayloadInterface;
+use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
 use Yiisoft\Yii\Queue\Message;
 use Yiisoft\Yii\Queue\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
@@ -64,13 +64,13 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
             return JobStatus::waiting();
         }
 
-        throw new InvalidArgumentException('There is no job with the given id.');
+        throw new InvalidArgumentException('There is no message with the given id.');
     }
 
-    public function push(JobInterface $job): MessageInterface
+    public function push(PayloadInterface $payload): MessageInterface
     {
         $key = count($this->messages) + $this->current;
-        $message = new Message((string) $key, $job);
+        $message = new Message((string) $key, $payload);
         $this->messages[] = $message;
 
         return $message;
@@ -81,9 +81,9 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
         $this->run($handler);
     }
 
-    public function canPush(JobInterface $job): bool
+    public function canPush(PayloadInterface $payload): bool
     {
-        return !($job instanceof DelayableJobInterface || $job instanceof PrioritisedJobInterface);
+        return !($payload instanceof DelayablePayloadInterface || $payload instanceof PrioritisedPayloadInterface);
     }
 
     public function setQueue(Queue $queue): void

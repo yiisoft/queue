@@ -6,7 +6,7 @@ namespace Yiisoft\Yii\Queue\Tests\App;
 
 use RuntimeException;
 
-class ExceptionalSimpleJob extends SimpleJob
+class ExceptionalSimpleJob extends SimplePayload
 {
     public function execute(): void
     {

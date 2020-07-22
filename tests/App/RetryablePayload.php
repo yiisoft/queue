@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Tests\App;
 
 use RuntimeException;
-use Yiisoft\Yii\Queue\Job\AttemptsRestrictedJob;
+use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayload;
 
-class RetryableJob extends AttemptsRestrictedJob
+class RetryablePayload extends AttemptsRestrictedPayload
 {
     public bool $executed = false;
 

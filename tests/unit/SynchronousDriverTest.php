@@ -6,13 +6,13 @@ namespace Yiisoft\Yii\Queue\Tests\unit;
 
 use Yiisoft\Yii\Queue\Tests\App\DelayableJob;
 use Yiisoft\Yii\Queue\Tests\App\PrioritizedJob;
-use Yiisoft\Yii\Queue\Tests\App\RetryableJob;
-use Yiisoft\Yii\Queue\Tests\App\SimpleJob;
+use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
+use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
 use Yiisoft\Yii\Queue\Tests\TestCase;
-use Yiisoft\Yii\Queue\Exception\JobNotSupportedException;
-use Yiisoft\Yii\Queue\Job\DelayableJobInterface;
-use Yiisoft\Yii\Queue\Job\PrioritisedJobInterface;
-use Yiisoft\Yii\Queue\Job\RetryableJobInterface;
+use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
+use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
+use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
+use Yiisoft\Yii\Queue\Payload\RetryablePayloadInterface;
 use Yiisoft\Yii\Queue\Queue;
 
 class SynchronousDriverTest extends TestCase
@@ -29,7 +29,7 @@ class SynchronousDriverTest extends TestCase
         $job = $this->container->get($class);
 
         if (!$available) {
-            $this->expectException(JobNotSupportedException::class);
+            $this->expectException(PayloadNotSupportedException::class);
         }
 
         $id = $queue->push($job);
@@ -43,19 +43,19 @@ class SynchronousDriverTest extends TestCase
     {
         return [
             'Simple job' => [
-                SimpleJob::class,
+                SimplePayload::class,
                 true,
             ],
-            DelayableJobInterface::class => [
+            DelayablePayloadInterface::class => [
                 DelayableJob::class,
                 false,
             ],
-            PrioritisedJobInterface::class => [
+            PrioritisedPayloadInterface::class => [
                 PrioritizedJob::class,
                 false,
             ],
-            RetryableJobInterface::class => [
-                RetryableJob::class,
+            RetryablePayloadInterface::class => [
+                RetryablePayload::class,
                 true,
             ],
         ];

@@ -56,7 +56,7 @@ class Action extends \yii\base\Action
             throw new ConsoleException("Unknown mode: $mode.");
         }
         if ($jobCount <= 0) {
-            throw new ConsoleException('Job count must be greater than zero.');
+            throw new ConsoleException('Payload count must be greater than zero.');
         }
         if ($workerCount <= 0) {
             throw new ConsoleException('Worker count must be greater than zero.');

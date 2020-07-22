@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\App;
 
-use Yiisoft\Yii\Queue\Job\DelayableJobInterface;
+use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 
-class DelayableJob extends SimpleJob implements DelayableJobInterface
+class DelayableJob extends SimplePayload implements DelayablePayloadInterface
 {
     public function getDelay(): int
     {
