@@ -31,7 +31,7 @@ return [
 例如，如果您需要下载并保存一个文件，该类可能看起来如下:
 
 ```php
-class DownloadJob extends BaseObject implements \Yiisoft\Yii\Queue\PayloadInterface
+class DownloadJob extends BaseObject implements \Yiisoft\Yii\Queue\JobInterface
 {
     public $url;
     public $file;
@@ -234,7 +234,7 @@ Yii::$app->queue->push(new SomeJob([
 任务类:
 
 ```php
-class SomeJob extends BaseObject implements \Yiisoft\Yii\Queue\PayloadInterface
+class SomeJob extends BaseObject implements \Yiisoft\Yii\Queue\JobInterface
 {
     public $userId;
     public $bookId;
