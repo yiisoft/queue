@@ -64,7 +64,7 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
         throw new InvalidArgumentException('There is no message with the given id.');
     }
 
-    public function push(MessageInterface $message): ?string
+    public function push(MessageInterface $message): string
     {
         $key = count($this->messages) + $this->current;
         $this->messages[] = $message;
