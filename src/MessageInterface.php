@@ -16,13 +16,23 @@ interface MessageInterface
     public function getId(): ?string;
 
     /**
-     * Returns a job to execute
+     * Returns payload name
      *
      * @return string
      */
     public function getPayloadName(): string;
 
+    /**
+     * Returns data for job payload
+     *
+     * @return mixed
+     */
     public function getPayloadData();
 
+    /**
+     * Returns metadata for job payload
+     *
+     * @return array
+     */
     public function getPayloadMeta(): array;
 }

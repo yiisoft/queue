@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
-use Yiisoft\Yii\Queue\Payload\PayloadInterface;
-
 class Message implements MessageInterface
 {
     private ?string $id;
