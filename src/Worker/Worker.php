@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Worker;
 
-use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Throwable;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Yii\Queue\Event\AfterExecution;
@@ -59,7 +59,7 @@ final class Worker implements WorkerInterface
         $name = $message->getPayloadName();
         $handler = $this->getHandler($name);
         if ($handler === null) {
-            throw new InvalidArgumentException("No handler for message $name");
+            throw new RuntimeException("No handler for message $name");
         }
 
         try {
