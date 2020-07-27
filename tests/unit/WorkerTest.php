@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\unit;
 
-use Psr\EventDispatcher\ListenerProviderInterface;
 use RuntimeException;
-use Yiisoft\EventDispatcher\Provider\Provider;
-use Yiisoft\Yii\Console\Config\EventConfigurator;
+use Yiisoft\Yii\Event\EventConfigurator;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Message;
 use Yiisoft\Yii\Queue\Queue;
-use Yiisoft\Yii\Queue\Tests\App\ExceptionalSimpleJob;
-use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
+use Yiisoft\Yii\Queue\Tests\App\QueueHandler;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 use Yiisoft\Yii\Queue\Worker\Worker;
 
@@ -35,12 +32,13 @@ class WorkerTest extends TestCase
      */
     public function testJobExecuted(): void
     {
-        $job = new SimplePayload();
-        $message = new Message('', $job);
+        $this->worker->registerHandlers(['simple' => [QueueHandler::class, 'simple']]);
+
+        $message = new Message('simple', '', []);
         $queue = $this->createMock(Queue::class);
 
         $this->worker->process($message, $queue);
-        $this->assertEquals(true, $job->executed);
+        $this->assertEquals(1, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
     }
 
     /**
@@ -48,16 +46,15 @@ class WorkerTest extends TestCase
      */
     public function testJobNotExecuted(): void
     {
-        $handler = fn (BeforeExecution $event) => $event->stopExecution();
-        $configurator = $this->container->get(EventConfigurator::class);
-        $configurator->registerListeners([BeforeExecution::class => [$handler]]);
+        $handler = fn(BeforeExecution $event) => $event->stopExecution();
+        $this->container->get(EventConfigurator::class)->registerListeners([BeforeExecution::class => [$handler]]);
+        $this->worker->registerHandlers(['simple' => [QueueHandler::class, 'simple']]);
 
-        $job = new SimplePayload();
-        $message = new Message('', $job);
+        $message = new Message('simple', '', []);
         $queue = $this->createMock(Queue::class);
-
         $this->worker->process($message, $queue);
-        $this->assertEquals(false, $job->executed);
+
+        $this->assertEquals(0, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
     }
 
     /**
@@ -67,8 +64,8 @@ class WorkerTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
 
-        $job = new ExceptionalSimpleJob();
-        $message = new Message('', $job);
+        $this->worker->registerHandlers(['exceptional' => [QueueHandler::class, 'exceptional']]);
+        $message = new Message('exceptional', '', []);
         $queue = $this->createMock(Queue::class);
         $this->worker->process($message, $queue);
     }
@@ -78,15 +75,15 @@ class WorkerTest extends TestCase
      */
     public function testThrowExceptionPrevented(): void
     {
-        $handler = fn (JobFailure $event) => $event->preventThrowing();
-        /** @var EventConfigurator $configurator */
-        $configurator = $this->container->get(EventConfigurator::class);
-        $configurator->registerListeners([JobFailure::class => [$handler]]);
+        $this->worker->registerHandlers(['exceptional' => [QueueHandler::class, 'exceptional']]);
 
-        $job = new ExceptionalSimpleJob();
-        $message = new Message('', $job);
+        $handler = fn (JobFailure $event) => $event->preventThrowing();
+        $this->container->get(EventConfigurator::class)->registerListeners([JobFailure::class => [$handler]]);
+
+        $message = new Message('exceptional', '', []);
         $queue = $this->createMock(Queue::class);
         $this->worker->process($message, $queue);
-        $this->assertEquals(true, $job->executed);
+
+        $this->assertEquals(1, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
     }
 }

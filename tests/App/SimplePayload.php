@@ -15,8 +15,18 @@ class SimplePayload implements PayloadInterface
 {
     public bool $executed = false;
 
-    public function execute(): void
+    public function getName(): string
     {
-        $this->executed = true;
+        return 'simple';
+    }
+
+    public function getData(): string
+    {
+        return '';
+    }
+
+    public function getMeta(): array
+    {
+        return [];
     }
 }

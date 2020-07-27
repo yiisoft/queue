@@ -6,7 +6,7 @@ namespace Yiisoft\Yii\Queue\Tests\App;
 
 use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
 
-class PrioritizedJob extends SimplePayload implements PrioritisedPayloadInterface
+class PrioritizedPayload extends SimplePayload implements PrioritisedPayloadInterface
 {
     public function getPriority(): int
     {

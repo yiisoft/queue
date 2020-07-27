@@ -9,11 +9,14 @@ use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\MessageInterface;
+use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueDependentInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
-final class SynchronousDriver implements DriverInterface
+final class SynchronousDriver implements DriverInterface, QueueDependentInterface
 {
     private array $messages = [];
+    private Queue $queue;
     private LoopInterface $loop;
     private WorkerInterface $worker;
     private int $current = 0;
@@ -81,10 +84,15 @@ final class SynchronousDriver implements DriverInterface
         return !isset($meta[PayloadInterface::META_KEY_DELAY]) && !isset($meta[PayloadInterface::META_KEY_PRIORITY]);
     }
 
+    public function setQueue(Queue $queue): void
+    {
+        $this->queue = $queue;
+    }
+
     private function run(callable $handler): void
     {
         while ($this->loop->canContinue() && $message = $this->nextMessage()) {
-            $handler($message);
+            $handler($message, $this->queue);
         }
     }
 }

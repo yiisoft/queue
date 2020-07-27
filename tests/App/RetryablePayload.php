@@ -5,28 +5,17 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Tests\App;
 
 use RuntimeException;
-use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayload;
+use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 
-class RetryablePayload extends AttemptsRestrictedPayload
+class RetryablePayload extends SimplePayload implements AttemptsRestrictedPayloadInterface
 {
-    public bool $executed = false;
-
-    public function __construct(int $attemptsMax = 2)
+    public function getAttempts(): int
     {
-        $this->attemptsMax = $attemptsMax;
+        return 2;
     }
 
-    public function getTtr(): int
+    public function getName(): string
     {
-        return 1;
-    }
-
-    public function execute(): void
-    {
-        if ($this->canRetry()) {
-            throw new RuntimeException('Test exception');
-        }
-
-        $this->executed = true;
+        return 'retryable';
     }
 }

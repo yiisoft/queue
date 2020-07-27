@@ -13,7 +13,7 @@ interface MessageInterface
      *
      * @return string
      */
-    public function getId(): string;
+    public function getId(): ?string;
 
     /**
      * Returns a job to execute

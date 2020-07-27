@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\unit;
 
-use Yiisoft\Yii\Queue\Tests\App\DelayableJob;
-use Yiisoft\Yii\Queue\Tests\App\PrioritizedJob;
+use Yiisoft\Yii\Queue\Tests\App\DelayablePayload;
+use Yiisoft\Yii\Queue\Tests\App\PrioritizedPayload;
+use Yiisoft\Yii\Queue\Tests\App\QueueHandler;
 use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
 use Yiisoft\Yii\Queue\Tests\TestCase;
@@ -14,9 +15,20 @@ use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
 use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 class SynchronousDriverTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $handlers = [
+            'simple' => [QueueHandler::class, 'simple'],
+            'retryable' => [QueueHandler::class, 'simple'],
+        ];
+        $this->container->get(WorkerInterface::class)->registerHandlers($handlers);
+    }
+
     /**
      * @dataProvider getJobTypes
      *
@@ -47,11 +59,11 @@ class SynchronousDriverTest extends TestCase
                 true,
             ],
             DelayablePayloadInterface::class => [
-                DelayableJob::class,
+                DelayablePayload::class,
                 false,
             ],
             PrioritisedPayloadInterface::class => [
-                PrioritizedJob::class,
+                PrioritizedPayload::class,
                 false,
             ],
             AttemptsRestrictedPayloadInterface::class => [

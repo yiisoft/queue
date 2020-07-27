@@ -39,6 +39,13 @@ final class Worker implements WorkerInterface
         $this->container = $container;
     }
 
+    public function registerHandlers(array $handlers): void
+    {
+        foreach ($handlers as $event => $handler) {
+            $this->handlers[$event] = $handler;
+        }
+    }
+
     /**
      * @param MessageInterface $message
      * @param Queue $queue
@@ -52,7 +59,6 @@ final class Worker implements WorkerInterface
         $name = $message->getPayloadName();
         $handler = $this->getHandler($name);
         if ($handler === null) {
-            // TODO custom exception
             throw new InvalidArgumentException("No handler for message $name");
         }
 
