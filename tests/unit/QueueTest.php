@@ -19,7 +19,6 @@ use Yiisoft\Yii\Queue\Tests\App\QueueHandler;
 use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
 use Yiisoft\Yii\Queue\Tests\TestCase;
-use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 class QueueTest extends TestCase
 {
@@ -43,8 +42,6 @@ class QueueTest extends TestCase
 
     public function testPushSuccessful(): void
     {
-        $this->container->get(WorkerInterface::class)->registerHandlers(['simple' => [QueueHandler::class, 'simple']]);
-
         $this->eventManager->expects(self::once())->method('beforePushHandler');
         $this->eventManager->expects(self::once())->method('afterPushHandler');
         $this->eventManager->expects(self::never())->method('beforeExecutionHandler');
@@ -60,8 +57,6 @@ class QueueTest extends TestCase
 
     public function testPushNotSuccessful(): void
     {
-        $this->container->get(WorkerInterface::class)->registerHandlers(['simple' => [QueueHandler::class, 'simple']]);
-
         $this->expectException(PayloadNotSupportedException::class);
         $this->eventManager->expects(self::once())->method('beforePushHandler');
         $this->eventManager->expects(self::never())->method('afterPushHandler');
@@ -76,8 +71,6 @@ class QueueTest extends TestCase
 
     public function testJobRetry(): void
     {
-        $this->container->get(WorkerInterface::class)->registerHandlers(['retryable' => [QueueHandler::class, 'retryable']]);
-
         $this->eventManager->expects(self::exactly(2))->method('beforePushHandler');
         $this->eventManager->expects(self::exactly(2))->method('afterPushHandler');
         $this->eventManager->expects(self::exactly(2))->method('beforeExecutionHandler');
@@ -94,8 +87,6 @@ class QueueTest extends TestCase
 
     public function testStatus(): void
     {
-        $this->container->get(WorkerInterface::class)->registerHandlers(['simple' => [QueueHandler::class, 'simple']]);
-
         $queue = $this->container->get(Queue::class);
         $job = $this->container->get(SimplePayload::class);
         $id = $queue->push($job);

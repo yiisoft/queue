@@ -39,13 +39,6 @@ final class Worker implements WorkerInterface
         $this->container = $container;
     }
 
-    public function registerHandlers(array $handlers): void
-    {
-        foreach ($handlers as $event => $handler) {
-            $this->handlers[$event] = $handler;
-        }
-    }
-
     /**
      * @param MessageInterface $message
      * @param Queue $queue

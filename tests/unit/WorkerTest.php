@@ -32,8 +32,6 @@ class WorkerTest extends TestCase
      */
     public function testJobExecuted(): void
     {
-        $this->worker->registerHandlers(['simple' => [QueueHandler::class, 'simple']]);
-
         $message = new Message('simple', '', []);
         $queue = $this->createMock(Queue::class);
 
@@ -48,7 +46,6 @@ class WorkerTest extends TestCase
     {
         $handler = fn (BeforeExecution $event) => $event->stopExecution();
         $this->container->get(EventConfigurator::class)->registerListeners([BeforeExecution::class => [$handler]]);
-        $this->worker->registerHandlers(['simple' => [QueueHandler::class, 'simple']]);
 
         $message = new Message('simple', '', []);
         $queue = $this->createMock(Queue::class);
@@ -64,7 +61,6 @@ class WorkerTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
 
-        $this->worker->registerHandlers(['exceptional' => [QueueHandler::class, 'exceptional']]);
         $message = new Message('exceptional', '', []);
         $queue = $this->createMock(Queue::class);
         $this->worker->process($message, $queue);
@@ -75,8 +71,6 @@ class WorkerTest extends TestCase
      */
     public function testThrowExceptionPrevented(): void
     {
-        $this->worker->registerHandlers(['exceptional' => [QueueHandler::class, 'exceptional']]);
-
         $handler = fn (JobFailure $event) => $event->preventThrowing();
         $this->container->get(EventConfigurator::class)->registerListeners([JobFailure::class => [$handler]]);
 

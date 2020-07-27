@@ -1,29 +1,26 @@
 <?php
 
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
-use Yiisoft\Yii\Console\Application;
+use Yiisoft\Arrays\Modifier\ReplaceValue;
 use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Driver\SynchronousDriver;
-use Yiisoft\Yii\Queue\Tests\App\Benchmark\Controller;
+use Yiisoft\Yii\Queue\Tests\App\QueueHandler;
+use Yiisoft\Yii\Queue\Worker\Worker;
 
 return [
-    Application::class => static function (ContainerInterface $container) {
-        $commands = [
-            'benchmark' => Controller::class,
-        ];
-
-        $app = new Application();
-        $loader = new ContainerCommandLoader(
-            $container,
-            $commands
-        );
-        $app->setCommandLoader($loader);
-
-        return $app;
-    },
     LoggerInterface::class => NullLogger::class,
     DriverInterface::class => SynchronousDriver::class,
+    Worker::class => new ReplaceValue(
+        [
+            '__class' => Worker::class,
+            '__construct()' => [
+                [
+                    'simple' => [QueueHandler::class, 'simple'],
+                    'exceptional' => [QueueHandler::class, 'exceptional'],
+                    'retryable' => [QueueHandler::class, 'retryable'],
+                ],
+            ],
+        ]
+    ),
 ];

@@ -10,6 +10,4 @@ use Yiisoft\Yii\Queue\Queue;
 interface WorkerInterface
 {
     public function process(MessageInterface $message, Queue $queue);
-
-    public function registerHandlers(array $handlers): void;
 }
