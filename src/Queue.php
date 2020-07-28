@@ -161,15 +161,15 @@ class Queue
     {
         $meta = $payload->getMeta();
 
-        if (is_subclass_of($payload, DelayablePayloadInterface::class)) {
+        if ($payload instanceof DelayablePayloadInterface) {
             $meta[PayloadInterface::META_KEY_DELAY] = $payload->getDelay();
         }
 
-        if (is_subclass_of($payload, PrioritisedPayloadInterface::class)) {
+        if ($payload instanceof PrioritisedPayloadInterface) {
             $meta[PayloadInterface::META_KEY_PRIORITY] = $payload->getPriority();
         }
 
-        if (is_subclass_of($payload, AttemptsRestrictedPayloadInterface::class)) {
+        if ($payload instanceof AttemptsRestrictedPayloadInterface) {
             $meta[PayloadInterface::META_KEY_ATTEMPTS] = $payload->getAttempts();
         }
 
