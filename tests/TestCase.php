@@ -11,7 +11,7 @@ namespace Yiisoft\Yii\Queue\Tests;
 use Yiisoft\Composer\Config\Builder;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Yiisoft\Di\Container;
-use Yiisoft\Yii\Console\Config\EventConfigurator;
+use Yiisoft\Yii\Event\EventConfigurator;
 
 /**
  * Base Test Case.

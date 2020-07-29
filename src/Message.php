@@ -4,23 +4,30 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
-use Yiisoft\Yii\Queue\Job\JobInterface;
-
 class Message implements MessageInterface
 {
-    private string $id;
-    private JobInterface $job;
+    private ?string $id;
+    private string $payloadName;
+    private $payloadData;
+    private array $payloadMeta;
 
-    public function __construct(string $id, JobInterface $job)
+    public function __construct(string $payloadName, $payloadData, array $payloadMeta, ?string $id = null)
     {
         $this->id = $id;
-        $this->job = $job;
+        $this->payloadName = $payloadName;
+        $this->payloadData = $payloadData;
+        $this->payloadMeta = $payloadMeta;
+    }
+
+    public function setId(?string $id): void
+    {
+        $this->id = $id;
     }
 
     /**
      * @inheritDoc
      */
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -28,8 +35,24 @@ class Message implements MessageInterface
     /**
      * @inheritDoc
      */
-    public function getJob(): JobInterface
+    public function getPayloadName(): string
     {
-        return $this->job;
+        return $this->payloadName;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPayloadData()
+    {
+        return $this->payloadData;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPayloadMeta(): array
+    {
+        return $this->payloadMeta;
     }
 }

@@ -4,21 +4,35 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
-use Yiisoft\Yii\Queue\Job\JobInterface;
-
 interface MessageInterface
 {
+    public function setId(?string $id): void;
+
     /**
      * Returns unique message id
      *
      * @return string
      */
-    public function getId(): string;
+    public function getId(): ?string;
 
     /**
-     * Returns a job to execute
+     * Returns payload name
      *
-     * @return JobInterface
+     * @return string
      */
-    public function getJob(): JobInterface;
+    public function getPayloadName(): string;
+
+    /**
+     * Returns data for job payload
+     *
+     * @return mixed
+     */
+    public function getPayloadData();
+
+    /**
+     * Returns metadata for job payload
+     *
+     * @return array
+     */
+    public function getPayloadMeta(): array;
 }

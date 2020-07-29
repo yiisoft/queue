@@ -8,8 +8,6 @@
 
 namespace Yiisoft\Yii\Queue\Cli;
 
-use Yiisoft\Yii\Queue\Queue;
-
 /**
  * Signal Loop.
  *

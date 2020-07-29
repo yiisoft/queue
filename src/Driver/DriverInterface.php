@@ -6,10 +6,9 @@ namespace Yiisoft\Yii\Queue\Driver;
 
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Job\DelayableJobInterface;
-use Yiisoft\Yii\Queue\Job\JobInterface;
-use Yiisoft\Yii\Queue\Job\PrioritisedJobInterface;
-use Yiisoft\Yii\Queue\Job\RetryableJobInterface;
+use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
+use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
+use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 use Yiisoft\Yii\Queue\MessageInterface;
 
 interface DriverInterface
@@ -35,11 +34,11 @@ interface DriverInterface
     /**
      * Pushing a job to the queue
      *
-     * @param JobInterface $job
+     * @param MessageInterface $message
      *
-     * @return MessageInterface
+     * @return string Id of a pushed message
      */
-    public function push(JobInterface $job): MessageInterface;
+    public function push(MessageInterface $message): ?string;
 
     /**
      * Listen to the queue and pass messages to the given handler as they come
@@ -49,12 +48,12 @@ interface DriverInterface
     public function subscribe(callable $handler): void;
 
     /**
-     * Takes care about supporting {@see DelayableJobInterface}, {@see PrioritisedJobInterface}
-     * and {@see RetryableJobInterface} and any other conditions.
+     * Takes care about supporting {@see DelayablePayloadInterface}, {@see PrioritisedPayloadInterface}
+     * and {@see AttemptsRestrictedPayloadInterface} and any other conditions.
      *
-     * @param JobInterface $job
+     * @param MessageInterface $message
      *
      * @return bool
      */
-    public function canPush(JobInterface $job): bool;
+    public function canPush(MessageInterface $message): bool;
 }
