@@ -121,5 +121,5 @@ final class Worker implements WorkerInterface
         return is_array($handler)
             && array_keys($handler) === [0, 1]
             && is_string($handler[0]);
-}
+    }
 }
