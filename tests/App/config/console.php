@@ -11,15 +11,16 @@ use Yiisoft\Yii\Queue\Worker\Worker;
 return [
     LoggerInterface::class => NullLogger::class,
     DriverInterface::class => SynchronousDriver::class,
-    Worker::class => [
-        '__construct()' => [
-            new ReplaceValue(
+    Worker::class => new ReplaceValue(
+        [
+            '__class' => Worker::class,
+            '__construct()' => [
                 [
                     'simple' => [QueueHandler::class, 'simple'],
                     'exceptional' => [QueueHandler::class, 'exceptional'],
                     'retryable' => [QueueHandler::class, 'retryable'],
-                ]
-            ),
-        ],
-    ],
+                ],
+            ],
+        ]
+    ),
 ];
