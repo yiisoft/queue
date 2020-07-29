@@ -5,7 +5,6 @@ namespace Yiisoft\Yii\Queue;
 use InvalidArgumentException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
@@ -30,14 +29,12 @@ class Queue
     protected EventDispatcherInterface $eventDispatcher;
     protected DriverInterface $driver;
     protected WorkerInterface $worker;
-    protected Provider $provider;
     protected LoopInterface $loop;
     private LoggerInterface $logger;
 
     public function __construct(
         DriverInterface $driver,
         EventDispatcherInterface $dispatcher,
-        Provider $provider,
         WorkerInterface $worker,
         LoopInterface $loop,
         LoggerInterface $logger
@@ -45,7 +42,6 @@ class Queue
         $this->driver = $driver;
         $this->eventDispatcher = $dispatcher;
         $this->worker = $worker;
-        $this->provider = $provider;
         $this->loop = $loop;
         $this->logger = $logger;
 
