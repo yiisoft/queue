@@ -101,15 +101,25 @@ final class Worker implements WorkerInterface
             $this->handlersCached[$name] = $handler;
         }
 
-        if (
-            is_array($handler)
-            && array_keys($handler) === [0, 1]
-            && is_string($handler[0])
-        ) {
+        if ($this->isAlias($handler)) {
             $handler[0] = $this->container->get($handler[0]);
             $this->handlersCached[$name] = $handler;
         }
 
         return $this->handlersCached[$name];
     }
+
+    /**
+     * Checks if the handler is a DI container alias
+     *
+     * @param callable|array|null $handler
+     *
+     * @return bool
+     */
+    private function isAlias($handler): bool
+    {
+        return is_array($handler)
+            && array_keys($handler) === [0, 1]
+            && is_string($handler[0]);
+}
 }
