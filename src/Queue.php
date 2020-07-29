@@ -80,8 +80,7 @@ class Queue
     {
         $this->logger->debug('Preparing to push payload "{payload}".', ['payload' => $payload->getName()]);
         $message = $this->payloadConvert($payload);
-        $event = new BeforePush($this, $message);
-        $this->eventDispatcher->dispatch($event);
+        $this->eventDispatcher->dispatch(new BeforePush($this, $message));
 
         if ($this->driver->canPush($message)) {
             $message->setId($this->driver->push($message));
@@ -101,8 +100,7 @@ class Queue
             throw new PayloadNotSupportedException($this->driver, $payload);
         }
 
-        $event = new AfterPush($this, $message);
-        $this->eventDispatcher->dispatch($event);
+        $this->eventDispatcher->dispatch(new AfterPush($this, $message));
 
         return $message->getId();
     }
