@@ -22,8 +22,10 @@ class RunCommand extends Command
         $this->setDescription('Runs all the existing messages in the queue. Exits once messages are over.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->queue->run();
+
+        return 0;
     }
 }
