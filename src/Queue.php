@@ -130,7 +130,7 @@ class Queue
     public function listen(): void
     {
         $this->logger->debug('Start listening to the queue.');
-        $this->driver->subscribe([$this, 'handle']);
+        $this->driver->subscribe(fn (MessageInterface $message) => $this->handle($message));
         $this->logger->debug('Finish listening to the queue.');
     }
 
@@ -146,7 +146,7 @@ class Queue
         return $this->driver->status($id);
     }
 
-    public function handle(MessageInterface $message): void
+    protected function handle(MessageInterface $message): void
     {
         $this->worker->process($message, $this);
     }
