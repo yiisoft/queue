@@ -44,9 +44,15 @@ class SignalLoop implements LoopInterface
      * @var bool status when suspend or resume signal was got.
      */
     protected bool $pause = false;
+    private int $memorySoftLimit;
 
-    public function __construct()
+    /**
+     * @param int $memorySoftLimit Soft RAM limit in bytes. The loop won't let you continue to execute the program if soft limit is reached. Zero means no limit.
+     */
+    public function __construct($memorySoftLimit = 0)
     {
+        $this->memorySoftLimit = $memorySoftLimit;
+
         if (extension_loaded('pcntl')) {
             foreach ($this->exitSignals as $signal) {
                 pcntl_signal($signal, fn () => $this->exit = true);
@@ -67,6 +73,8 @@ class SignalLoop implements LoopInterface
      */
     public function canContinue(): bool
     {
+        $this->exit = $this->memorySoftLimit === 0 || memory_get_usage(true) < $this->memorySoftLimit;
+
         if (extension_loaded('pcntl')) {
             pcntl_signal_dispatch();
             // Wait for resume signal until loop is suspended
