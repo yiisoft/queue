@@ -59,8 +59,7 @@ class SignalLoop implements LoopInterface
         $exitSignals = [1, 2, 15], // SIGHUP, SIGINT, SIGTERM
         $suspendSignals = [17, 20, 23, 24], // partly SIGSTOP, SIGTSTP
         $resumeSignals = [25] // partly SIGCONT
-    )
-    {
+    ) {
         $this->dispatcher = $dispatcher;
         $this->memorySoftLimit = $memorySoftLimit;
         $this->exitSignals = $exitSignals;
