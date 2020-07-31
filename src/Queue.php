@@ -146,7 +146,7 @@ class Queue
         return $this->driver->status($id);
     }
 
-    protected function handle(MessageInterface $message): void
+    public function handle(MessageInterface $message): void
     {
         $this->worker->process($message, $this);
     }
