@@ -8,6 +8,9 @@
 
 namespace Yiisoft\Yii\Queue\Cli;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Yiisoft\Yii\Queue\Event\MemoryLimitReached;
+
 /**
  * Signal Loop.
  *
@@ -20,21 +23,17 @@ class SignalLoop implements LoopInterface
     /**
      * @var array of signals to exit from listening of the queue.
      */
-    protected array $exitSignals = [
-        15, // SIGTERM
-        2,  // SIGINT
-        1,  // SIGHUP
-    ];
+    protected array $exitSignals;
     /**
      * @var array of signals to suspend listening of the queue.
      *            For example: SIGTSTP
      */
-    protected array $suspendSignals = [];
+    protected array $suspendSignals;
     /**
      * @var array of signals to resume listening of the queue.
      *            For example: SIGCONT
      */
-    protected array $resumeSignals = [];
+    protected array $resumeSignals;
 
     /**
      * @var bool status when exit signal was got.
@@ -45,13 +44,28 @@ class SignalLoop implements LoopInterface
      */
     protected bool $pause = false;
     private int $memorySoftLimit;
+    private EventDispatcherInterface $dispatcher;
 
     /**
+     * @param EventDispatcherInterface $dispatcher
      * @param int $memorySoftLimit Soft RAM limit in bytes. The loop won't let you continue to execute the program if soft limit is reached. Zero means no limit.
+     * @param int[] $exitSignals pcntl signal codes to exit the loop
+     * @param int[] $suspendSignals pcntl signal codes to pause loop execution
+     * @param int[] $resumeSignals pcntl signal codes to resume loop execution
      */
-    public function __construct($memorySoftLimit = 0)
+    public function __construct(
+        EventDispatcherInterface $dispatcher,
+        $memorySoftLimit = 0,
+        $exitSignals = [1, 2, 15], // SIGHUP, SIGINT, SIGTERM
+        $suspendSignals = [17, 20, 23, 24], // partly SIGSTOP, SIGTSTP
+        $resumeSignals = [25] // partly SIGCONT
+    )
     {
+        $this->dispatcher = $dispatcher;
         $this->memorySoftLimit = $memorySoftLimit;
+        $this->exitSignals = $exitSignals;
+        $this->suspendSignals = $suspendSignals;
+        $this->resumeSignals = $resumeSignals;
 
         if (extension_loaded('pcntl')) {
             foreach ($this->exitSignals as $signal) {
@@ -73,7 +87,11 @@ class SignalLoop implements LoopInterface
      */
     public function canContinue(): bool
     {
-        $this->exit = $this->memorySoftLimit === 0 || memory_get_usage(true) < $this->memorySoftLimit;
+        $memoryUsage = memory_get_usage(true);
+        if ($this->memorySoftLimit !== 0 && $memoryUsage >= $this->memorySoftLimit) {
+            $this->exit = true;
+            $this->dispatcher->dispatch(new MemoryLimitReached($this->memorySoftLimit, $memoryUsage));
+        }
 
         if (extension_loaded('pcntl')) {
             pcntl_signal_dispatch();
