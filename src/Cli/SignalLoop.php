@@ -103,14 +103,4 @@ class SignalLoop implements LoopInterface
 
         return !$this->exit;
     }
-
-    public function setResumeSignals(array $resumeSignals): void
-    {
-        $this->resumeSignals = $resumeSignals;
-    }
-
-    public function setSuspendSignals(array $suspendSignals): void
-    {
-        $this->suspendSignals = $suspendSignals;
-    }
 }
