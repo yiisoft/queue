@@ -6,17 +6,17 @@ namespace Yiisoft\Yii\Queue\Driver;
 
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
+use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
-use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
-use Yiisoft\Yii\Queue\MessageInterface;
 
 interface DriverInterface
 {
     /**
      * Returns the first message from the queue if it exists (null otherwise)
      *
-     * @return MessageInterface|null
+     * @return \Yiisoft\Yii\Queue\Message\MessageInterface|null
      */
     public function nextMessage(): ?MessageInterface;
 
@@ -34,7 +34,7 @@ interface DriverInterface
     /**
      * Pushing a job to the queue
      *
-     * @param MessageInterface $message
+     * @param \Yiisoft\Yii\Queue\Message\MessageInterface $message
      *
      * @return string Id of a pushed message
      */

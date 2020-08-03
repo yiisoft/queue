@@ -9,13 +9,10 @@ use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 
 class RetryablePayload extends SimplePayload implements AttemptsRestrictedPayloadInterface
 {
+    protected string $name = 'retryable';
+
     public function getAttempts(): int
     {
         return 2;
-    }
-
-    public function getName(): string
-    {
-        return 'retryable';
     }
 }

@@ -8,10 +8,7 @@ use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 
 class DelayablePayload extends SimplePayload implements DelayablePayloadInterface
 {
-    public function getName(): string
-    {
-        return 'delayable';
-    }
+    protected string $name = 'delayable';
 
     public function getDelay(): int
     {

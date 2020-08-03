@@ -8,7 +8,7 @@ use RuntimeException;
 use Yiisoft\Yii\Event\EventConfigurator;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\JobFailure;
-use Yiisoft\Yii\Queue\Message;
+use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\Tests\App\QueueHandler;
 use Yiisoft\Yii\Queue\Tests\TestCase;

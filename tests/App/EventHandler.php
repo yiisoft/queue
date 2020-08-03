@@ -10,7 +10,7 @@ use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 
-interface EventManager
+interface EventHandler
 {
     public function beforePushHandler(BeforePush $event);
     public function afterPushHandler(AfterPush $event);

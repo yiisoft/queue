@@ -14,7 +14,7 @@ use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\Tests\App\DelayablePayload;
-use Yiisoft\Yii\Queue\Tests\App\EventManager;
+use Yiisoft\Yii\Queue\Tests\App\EventHandler;
 use Yiisoft\Yii\Queue\Tests\App\QueueHandler;
 use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
@@ -23,14 +23,14 @@ use Yiisoft\Yii\Queue\Tests\TestCase;
 class QueueTest extends TestCase
 {
     /**
-     * @var MockObject|EventManager
+     * @var MockObject|EventHandler
      */
     private MockObject $eventManager;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->eventManager = $this->createMock(EventManager::class);
+        $this->eventManager = $this->createMock(EventHandler::class);
 
         $configurator = $this->container->get(EventConfigurator::class);
         $configurator->registerListeners([BeforePush::class => [[$this->eventManager, 'beforePushHandler']]]);
@@ -133,6 +133,24 @@ class QueueTest extends TestCase
 
         $queue = $this->container->get(Queue::class);
         $payload = $this->container->get(RetryablePayload::class);
+        $queue->push($payload);
+        $queue->run();
+
+        $this->assertEquals(1, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
+    }
+
+    public function testJobRetryFail(): void
+    {
+        $this->eventManager->expects(self::once())->method('beforePushHandler');
+        $this->eventManager->expects(self::once())->method('afterPushHandler');
+        $this->eventManager->expects(self::once())->method('beforeExecutionHandler');
+        $this->eventManager->expects(self::never())->method('afterExecutionHandler');
+        $this->eventManager->expects(self::once())->method('jobFailureHandler');
+        $this->expectException(PayloadNotSupportedException::class);
+
+        $queue = $this->container->get(Queue::class);
+        $payload = $this->container->get(RetryablePayload::class);
+        $payload->setName('not-supported');
         $queue->push($payload);
         $queue->run();
 

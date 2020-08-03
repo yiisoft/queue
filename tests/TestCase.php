@@ -24,6 +24,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUp(): void
     {
+        Builder::rebuild();
         $this->container = new Container(require Builder::path('tests-app'));
         $eventConfigurator = $this->container->get(EventConfigurator::class);
         $eventConfigurator->registerListeners(require Builder::path('events-console'));

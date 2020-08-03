@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Event;
 
-use Yiisoft\Yii\Queue\MessageInterface;
+use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 
 final class BeforeExecution
