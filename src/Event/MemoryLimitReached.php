@@ -15,17 +15,11 @@ class MemoryLimitReached
         $this->actual = $actual;
     }
 
-    /**
-     * @return int
-     */
     public function getActualUsage(): int
     {
         return $this->actual;
     }
 
-    /**
-     * @return int
-     */
     public function getLimit(): int
     {
         return $this->limit;
