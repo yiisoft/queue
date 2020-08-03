@@ -55,10 +55,10 @@ class SignalLoop implements LoopInterface
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
-        $memorySoftLimit = 0,
-        $exitSignals = [1, 2, 15], // SIGHUP, SIGINT, SIGTERM
-        $suspendSignals = [17, 20, 23, 24], // partly SIGSTOP, SIGTSTP
-        $resumeSignals = [25] // partly SIGCONT
+        int $memorySoftLimit = 0,
+        array $exitSignals = [1, 2, 15], // SIGHUP, SIGINT, SIGTERM
+        array $suspendSignals = [17, 20, 23, 24], // partly SIGSTOP, SIGTSTP
+        array $resumeSignals = [25] // partly SIGCONT
     ) {
         $this->dispatcher = $dispatcher;
         $this->memorySoftLimit = $memorySoftLimit;
