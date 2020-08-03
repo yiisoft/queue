@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\App;
 
-use Yiisoft\Yii\Queue\Job\PrioritisedJobInterface;
+use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
 
-class PrioritizedJob extends SimpleJob implements PrioritisedJobInterface
+class PrioritizedPayload extends SimplePayload implements PrioritisedPayloadInterface
 {
     public function getPriority(): int
     {

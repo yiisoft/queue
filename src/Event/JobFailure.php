@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Event;
 
+use Psr\EventDispatcher\StoppableEventInterface;
 use Throwable;
 use Yiisoft\Yii\Queue\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 
-final class JobFailure
+final class JobFailure implements StoppableEventInterface
 {
+    private bool $stop = false;
     private bool $throw = true;
     private Queue $queue;
     private MessageInterface $message;
@@ -45,5 +47,15 @@ final class JobFailure
     public function preventThrowing(): void
     {
         $this->throw = false;
+    }
+
+    public function stopPropagation(): void
+    {
+        $this->stop = true;
+    }
+
+    public function isPropagationStopped(): bool
+    {
+        return $this->stop;
     }
 }

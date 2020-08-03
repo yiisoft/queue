@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Tests\unit;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Yiisoft\Yii\Console\Config\EventConfigurator;
+use Yiisoft\Yii\Event\EventConfigurator;
 use Yiisoft\Yii\Queue\Event\AfterExecution;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
-use Yiisoft\Yii\Queue\Exception\JobNotSupportedException;
+use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
 use Yiisoft\Yii\Queue\Queue;
-use Yiisoft\Yii\Queue\Tests\App\DelayableJob;
+use Yiisoft\Yii\Queue\Tests\App\DelayablePayload;
 use Yiisoft\Yii\Queue\Tests\App\EventManager;
-use Yiisoft\Yii\Queue\Tests\App\RetryableJob;
-use Yiisoft\Yii\Queue\Tests\App\SimpleJob;
+use Yiisoft\Yii\Queue\Tests\App\QueueHandler;
+use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
+use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 class QueueTest extends TestCase
@@ -48,7 +49,7 @@ class QueueTest extends TestCase
         $this->eventManager->expects(self::never())->method('jobFailureHandler');
 
         $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimpleJob::class);
+        $job = $this->container->get(SimplePayload::class);
         $id = $queue->push($job);
 
         $this->assertNotEquals('', $id, 'Pushed message should has an id');
@@ -56,7 +57,7 @@ class QueueTest extends TestCase
 
     public function testPushNotSuccessful(): void
     {
-        $this->expectException(JobNotSupportedException::class);
+        $this->expectException(PayloadNotSupportedException::class);
         $this->eventManager->expects(self::once())->method('beforePushHandler');
         $this->eventManager->expects(self::never())->method('afterPushHandler');
         $this->eventManager->expects(self::never())->method('beforeExecutionHandler');
@@ -64,7 +65,7 @@ class QueueTest extends TestCase
         $this->eventManager->expects(self::never())->method('jobFailureHandler');
 
         $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(DelayableJob::class);
+        $job = $this->container->get(DelayablePayload::class);
         $queue->push($job);
     }
 
@@ -134,17 +135,17 @@ class QueueTest extends TestCase
         $this->eventManager->expects(self::once())->method('jobFailureHandler');
 
         $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(RetryableJob::class);
-        $queue->push($job);
+        $payload = $this->container->get(RetryablePayload::class);
+        $queue->push($payload);
         $queue->run();
 
-        $this->assertTrue($job->executed);
+        $this->assertEquals(1, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
     }
 
     public function testStatus(): void
     {
         $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimpleJob::class);
+        $job = $this->container->get(SimplePayload::class);
         $id = $queue->push($job);
 
         $status = $queue->status($id);

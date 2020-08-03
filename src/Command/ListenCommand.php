@@ -24,8 +24,10 @@ class ListenCommand extends Command
         $this->setDescription('Listens the queue and executes messages as they come. Needs to be stopped manually.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->queue->listen();
+
+        return 0;
     }
 }

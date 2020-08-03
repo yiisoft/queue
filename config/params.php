@@ -6,10 +6,14 @@ use Yiisoft\Yii\Queue\Command\ListenCommand;
 use Yiisoft\Yii\Queue\Command\RunCommand;
 
 return [
-    'console' => [
+    'yiisoft/yii-console' => [
         'commands' => [
             'queue/run' => RunCommand::class,
             'queue/listen' => ListenCommand::class,
+        ],
+    ],
+    'yiisoft/yii-queue' => [
+        'handlers' => [
         ],
     ],
 ];
