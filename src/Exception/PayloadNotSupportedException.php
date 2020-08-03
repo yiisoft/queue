@@ -68,7 +68,7 @@ class PayloadNotSupportedException extends UnexpectedValueException implements F
             The solution is in one of these:
             - Check which interfaces does $driverClass support and remove not supported interfaces from $payloadName.
             - Use another driver which supports all interfaces you need. Officially supported drivers are:
-                - None yet :) Work is in progress.
+                - yiisoft/yii-queue-amqp
             SOLUTION;
     }
 }

@@ -78,14 +78,13 @@ class QueueTest extends TestCase
         $this->eventManager->expects(self::never())->method('jobFailureHandler');
 
         $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimpleJob::class);
+        $job = $this->container->get(SimplePayload::class);
         $job2 = clone $job;
         $queue->push($job);
         $queue->push($job2);
         $queue->run();
 
-        $this->assertTrue($job->executed);
-        $this->assertTrue($job2->executed);
+        $this->assertEquals(2, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
     }
 
     public function testRunPartly(): void
@@ -97,14 +96,13 @@ class QueueTest extends TestCase
         $this->eventManager->expects(self::never())->method('jobFailureHandler');
 
         $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimpleJob::class);
+        $job = $this->container->get(SimplePayload::class);
         $job2 = clone $job;
         $queue->push($job);
         $queue->push($job2);
         $queue->run(1);
 
-        $this->assertTrue($job->executed);
-        $this->assertFalse($job2->executed);
+        $this->assertEquals(1, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
     }
 
     public function testListen(): void
@@ -116,14 +114,13 @@ class QueueTest extends TestCase
         $this->eventManager->expects(self::never())->method('jobFailureHandler');
 
         $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimpleJob::class);
+        $job = $this->container->get(SimplePayload::class);
         $job2 = clone $job;
         $queue->push($job);
         $queue->push($job2);
         $queue->listen();
 
-        $this->assertTrue($job->executed);
-        $this->assertTrue($job2->executed);
+        $this->assertEquals(2, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
     }
 
     public function testJobRetry(): void
