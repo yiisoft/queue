@@ -11,7 +11,7 @@ namespace Yiisoft\Yii\Queue\Tests;
 use Yiisoft\Composer\Config\Builder;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Yiisoft\Di\Container;
-use Yiisoft\Yii\Event\EventConfigurator;
+use Yiisoft\Yii\Event\EventDispatcherProvider;
 
 /**
  * Base Test Case.
@@ -25,7 +25,7 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         $this->container = new Container(require Builder::path('tests-app'));
-        $eventConfigurator = $this->container->get(EventConfigurator::class);
-        $eventConfigurator->registerListeners(require Builder::path('events-console'));
+        $eventConfigurator = $this->container->get(EventDispatcherProvider::class);
+        $eventConfigurator->register($this->container);
     }
 }

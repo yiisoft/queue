@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Tests\unit;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Yiisoft\Yii\Event\EventConfigurator;
+use Yiisoft\Yii\Event\EventDispatcherProvider;
 use Yiisoft\Yii\Queue\Event\AfterExecution;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
@@ -30,14 +30,25 @@ final class QueueTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->eventsRegister();
+    }
+
+    private function eventsRegister(): void
+    {
         $this->eventManager = $this->createMock(EventHandler::class);
 
-        $configurator = $this->container->get(EventConfigurator::class);
-        $configurator->registerListeners([BeforePush::class => [[$this->eventManager, 'beforePushHandler']]]);
-        $configurator->registerListeners([AfterPush::class => [[$this->eventManager, 'afterPushHandler']]]);
-        $configurator->registerListeners([BeforeExecution::class => [[$this->eventManager, 'beforeExecutionHandler']]]);
-        $configurator->registerListeners([AfterExecution::class => [[$this->eventManager, 'afterExecutionHandler']]]);
-        $configurator->registerListeners([JobFailure::class => [[$this->eventManager, 'jobFailureHandler']]]);
+        $events = [
+            BeforePush::class => [[$this->eventManager, 'beforePushHandler']],
+            AfterPush::class => [[$this->eventManager, 'afterPushHandler']],
+            BeforeExecution::class => [[$this->eventManager, 'beforeExecutionHandler']],
+            AfterExecution::class => [[$this->eventManager, 'afterExecutionHandler']],
+            JobFailure::class => [
+                [Queue::class, 'jobRetry'],
+                [$this->eventManager, 'jobFailureHandler'],
+            ],
+        ];
+        $eventProvider = new EventDispatcherProvider($events);
+        $eventProvider->register($this->container);
     }
 
     public function testPushSuccessful(): void

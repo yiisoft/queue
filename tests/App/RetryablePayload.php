@@ -13,6 +13,6 @@ class RetryablePayload extends SimplePayload implements AttemptsRestrictedPayloa
 
     public function getAttempts(): int
     {
-        return 2;
+        return 1;
     }
 }

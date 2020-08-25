@@ -3,6 +3,8 @@
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Yiisoft\Arrays\Modifier\ReplaceValue;
+use Yiisoft\Composer\Config\Builder;
+use Yiisoft\Yii\Event\EventDispatcherProvider;
 use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Driver\SynchronousDriver;
 use Yiisoft\Yii\Queue\Tests\App\QueueHandler;
@@ -24,4 +26,8 @@ return [
             ],
         ]
     ),
+    EventDispatcherProvider::class => [
+        '__class' => EventDispatcherProvider::class,
+        '__construct()' => [Builder::require('events-console')],
+    ],
 ];
