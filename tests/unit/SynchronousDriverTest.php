@@ -8,7 +8,6 @@ use Yiisoft\Yii\Queue\Driver\SynchronousDriver;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
 use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
@@ -78,6 +77,7 @@ class SynchronousDriverTest extends TestCase
     {
         $message = new Message('simple', [], []);
         $driver = $this->container->get(SynchronousDriver::class);
+        $driver->setQueue($this->createMock(Queue::class));
 
         $ids = [];
         $ids[] = $driver->push($message);
