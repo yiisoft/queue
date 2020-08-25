@@ -10,7 +10,7 @@ use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 use Yiisoft\Yii\Queue\Tests\App\DelayablePayload;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
-class ExceptionTest extends TestCase
+final class ExceptionTest extends TestCase
 {
     public function testJobNotSupported(): void
     {

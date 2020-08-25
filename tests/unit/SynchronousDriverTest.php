@@ -18,7 +18,7 @@ use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
-class SynchronousDriverTest extends TestCase
+final class SynchronousDriverTest extends TestCase
 {
     /**
      * @dataProvider getJobTypes

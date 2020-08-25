@@ -20,7 +20,7 @@ use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
-class QueueTest extends TestCase
+final class QueueTest extends TestCase
 {
     /**
      * @var MockObject|EventHandler

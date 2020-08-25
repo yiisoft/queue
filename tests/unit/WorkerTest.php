@@ -14,7 +14,7 @@ use Yiisoft\Yii\Queue\Tests\App\QueueHandler;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 use Yiisoft\Yii\Queue\Worker\Worker;
 
-class WorkerTest extends TestCase
+final class WorkerTest extends TestCase
 {
     /**
      * @var Worker

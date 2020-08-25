@@ -7,7 +7,7 @@ namespace Yiisoft\Yii\Queue\Tests\unit;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
-class JobStatusTest extends TestCase
+final class JobStatusTest extends TestCase
 {
     public function getStatusPairs(): array
     {
