@@ -30,7 +30,7 @@
         "yiisoft/serializer": "^3.0@dev"
     },
     "require-dev": {
-        "infection/infection": "^0.16.0",
+        "infection/infection": "^0.17.0",
         "pda/pheanstalk": "*",
         "phpunit/phpunit": "^9.0",
         "yiisoft/composer-config-plugin": "^1.0@dev",
