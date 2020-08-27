@@ -17,7 +17,7 @@ class JobFailureException extends RuntimeException
         $this->queueMessage = $message;
 
         $error = $previous->getMessage();
-        $messageId = $message->getId();
+        $messageId = $message->getId() ?? 'null';
         $messageText = "Processing of message #$messageId is stopped because of an exception:\n$error.";
 
         parent::__construct($messageText, 0, $previous);
