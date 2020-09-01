@@ -3,12 +3,12 @@
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
-use Yiisoft\Di\Container;
 use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
 use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Factory\Definitions\Reference;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Cli\SignalLoop;
+use Yiisoft\Yii\Queue\Cli\SimpleLoop;
 use Yiisoft\Yii\Queue\Worker\Worker as QueueWorker;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
@@ -20,6 +20,10 @@ return [
     ],
     WorkerInterface::class => Reference::to(QueueWorker::class),
     ListenerProviderInterface::class => Provider::class,
-    ContainerInterface::class => fn (ContainerInterface $container) => $container,
-    LoopInterface::class => SignalLoop::class
+    ContainerInterface::class => fn(ContainerInterface $container) => $container,
+    LoopInterface::class => static function (ContainerInterface $container) {
+        return extension_loaded('pcntl')
+            ? $container->get(SignalLoop::class)
+            : $container->get(SimpleLoop::class);
+    },
 ];
