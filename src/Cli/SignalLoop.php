@@ -28,18 +28,19 @@ class SignalLoop implements LoopInterface
      * @param int $memorySoftLimit Soft RAM limit in bytes. The loop won't let you continue to execute the program if
      *     soft limit is reached. Zero means no limit.
      */
-    public function __construct(EventDispatcherInterface $dispatcher, int $memorySoftLimit = 0) {
+    public function __construct(EventDispatcherInterface $dispatcher, int $memorySoftLimit = 0)
+    {
         $this->dispatcher = $dispatcher;
         $this->memorySoftLimit = $memorySoftLimit;
 
         foreach (self::SIGNALS_EXIT as $signal) {
-            pcntl_signal($signal, fn() => $this->exit = true);
+            pcntl_signal($signal, fn () => $this->exit = true);
         }
         foreach (self::SIGNALS_SUSPEND as $signal) {
-            pcntl_signal($signal, fn() => $this->pause = true);
+            pcntl_signal($signal, fn () => $this->pause = true);
         }
         foreach (self::SIGNALS_RESUME as $signal) {
-            pcntl_signal($signal, fn() => $this->pause = false);
+            pcntl_signal($signal, fn () => $this->pause = false);
         }
     }
 

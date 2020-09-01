@@ -20,7 +20,7 @@ return [
     ],
     WorkerInterface::class => Reference::to(QueueWorker::class),
     ListenerProviderInterface::class => Provider::class,
-    ContainerInterface::class => fn(ContainerInterface $container) => $container,
+    ContainerInterface::class => fn (ContainerInterface $container) => $container,
     LoopInterface::class => static function (ContainerInterface $container) {
         return extension_loaded('pcntl')
             ? $container->get(SignalLoop::class)
