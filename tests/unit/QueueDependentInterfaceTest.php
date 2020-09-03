@@ -16,31 +16,51 @@ class QueueDependentInterfaceTest extends TestCase
 {
     public function getClasses()
     {
-        $dependent = new class implements QueueDependentInterface, DriverInterface {
+        $dependent = new class() implements QueueDependentInterface, DriverInterface {
             public ?Queue $queue = null;
 
             public function setQueue(Queue $queue): void
             {
                 $this->queue = $queue;
             }
-            public function nextMessage(): ?MessageInterface {}
-            public function status(string $id): JobStatus {}
-            public function push(MessageInterface $message): ?string {}
-            public function subscribe(callable $handler): void {}
-            public function canPush(MessageInterface $message): bool {}
+            public function nextMessage(): ?MessageInterface
+            {
+            }
+            public function status(string $id): JobStatus
+            {
+            }
+            public function push(MessageInterface $message): ?string
+            {
+            }
+            public function subscribe(callable $handler): void
+            {
+            }
+            public function canPush(MessageInterface $message): bool
+            {
+            }
         };
-        $independent = new class implements DriverInterface {
+        $independent = new class() implements DriverInterface {
             public ?Queue $queue = null;
 
             public function setQueue(Queue $queue): void
             {
                 $this->queue = $queue;
             }
-            public function nextMessage(): ?MessageInterface {}
-            public function status(string $id): JobStatus {}
-            public function push(MessageInterface $message): ?string {}
-            public function subscribe(callable $handler): void {}
-            public function canPush(MessageInterface $message): bool {}
+            public function nextMessage(): ?MessageInterface
+            {
+            }
+            public function status(string $id): JobStatus
+            {
+            }
+            public function push(MessageInterface $message): ?string
+            {
+            }
+            public function subscribe(callable $handler): void
+            {
+            }
+            public function canPush(MessageInterface $message): bool
+            {
+            }
         };
 
         return [
