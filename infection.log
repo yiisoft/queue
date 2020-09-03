@@ -16,52 +16,7 @@ Escaped mutants:
      }
 
 
-2) /app/src/Enum/JobStatus.php:17    [M] ProtectedVisibility
-
---- Original
-+++ New
-@@ @@
-     public const RESERVED = 2;
-     public const DONE = 3;
-     protected int $status;
--    protected function __construct(int $status)
-+    private function __construct(int $status)
-     {
-         if (!in_array($status, $this->available(), true)) {
-             throw new InvalidStatusException($status);
-
-
-3) /app/src/Enum/JobStatus.php:26    [M] ProtectedVisibility
-
---- Original
-+++ New
-@@ @@
-         }
-         $this->status = $status;
-     }
--    protected function available() : array
-+    private function available() : array
-     {
-         return [self::WAITING, self::RESERVED, self::DONE];
-     }
-
-
-4) /app/src/Exception/PayloadNotSupportedException.php:25    [M] DecrementInteger
-
---- Original
-+++ New
-@@ @@
- {
-     private DriverInterface $driver;
-     private PayloadInterface $payload;
--    public function __construct(DriverInterface $driver, PayloadInterface $payload, string $message = '', int $code = 0, Throwable $previous = null)
-+    public function __construct(DriverInterface $driver, PayloadInterface $payload, string $message = '', int $code = -1, Throwable $previous = null)
-     {
-         if ($message === '') {
-             $driverClass = get_class($driver);
-
-
-5) /app/src/Exception/PayloadNotSupportedException.php:25    [M] OneZeroInteger
+2) /app/src/Exception/PayloadNotSupportedException.php:25    [M] OneZeroInteger
 
 --- Original
 +++ New
@@ -76,67 +31,22 @@ Escaped mutants:
              $driverClass = get_class($driver);
 
 
-6) /app/src/Queue.php:56    [M] LogicalAnd
+3) /app/src/Exception/PayloadNotSupportedException.php:25    [M] DecrementInteger
 
 --- Original
 +++ New
 @@ @@
-     }
-     public function jobRetry(JobFailure $event) : void
+ {
+     private DriverInterface $driver;
+     private PayloadInterface $payload;
+-    public function __construct(DriverInterface $driver, PayloadInterface $payload, string $message = '', int $code = 0, Throwable $previous = null)
++    public function __construct(DriverInterface $driver, PayloadInterface $payload, string $message = '', int $code = -1, Throwable $previous = null)
      {
--        if ($event->getQueue() === $this && !$event->getException() instanceof PayloadNotSupportedException && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) > 0) {
-+        if (($event->getQueue() === $this || !$event->getException() instanceof PayloadNotSupportedException) && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) > 0) {
-             $event->preventThrowing();
-             $attemptsLeft = $event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] - 1;
-             $payload = $this->messageConvert($event->getMessage(), [PayloadInterface::META_KEY_ATTEMPTS => $attemptsLeft]);
+         if ($message === '') {
+             $driverClass = get_class($driver);
 
 
-7) /app/src/Queue.php:56    [M] LogicalAnd
-
---- Original
-+++ New
-@@ @@
-     }
-     public function jobRetry(JobFailure $event) : void
-     {
--        if ($event->getQueue() === $this && !$event->getException() instanceof PayloadNotSupportedException && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) > 0) {
-+        if ($event->getQueue() === $this && !$event->getException() instanceof PayloadNotSupportedException || ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) > 0) {
-             $event->preventThrowing();
-             $attemptsLeft = $event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] - 1;
-             $payload = $this->messageConvert($event->getMessage(), [PayloadInterface::META_KEY_ATTEMPTS => $attemptsLeft]);
-
-
-8) /app/src/Queue.php:58    [M] GreaterThan
-
---- Original
-+++ New
-@@ @@
-     }
-     public function jobRetry(JobFailure $event) : void
-     {
--        if ($event->getQueue() === $this && !$event->getException() instanceof PayloadNotSupportedException && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) > 0) {
-+        if ($event->getQueue() === $this && !$event->getException() instanceof PayloadNotSupportedException && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) >= 0) {
-             $event->preventThrowing();
-             $attemptsLeft = $event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] - 1;
-             $payload = $this->messageConvert($event->getMessage(), [PayloadInterface::META_KEY_ATTEMPTS => $attemptsLeft]);
-
-
-9) /app/src/Queue.php:58    [M] OneZeroInteger
-
---- Original
-+++ New
-@@ @@
-     }
-     public function jobRetry(JobFailure $event) : void
-     {
--        if ($event->getQueue() === $this && !$event->getException() instanceof PayloadNotSupportedException && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) > 0) {
-+        if ($event->getQueue() === $this && !$event->getException() instanceof PayloadNotSupportedException && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 1) > 0) {
-             $event->preventThrowing();
-             $attemptsLeft = $event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] - 1;
-             $payload = $this->messageConvert($event->getMessage(), [PayloadInterface::META_KEY_ATTEMPTS => $attemptsLeft]);
-
-
-10) /app/src/Queue.php:58    [M] DecrementInteger
+4) /app/src/Queue.php:60    [M] DecrementInteger
 
 --- Original
 +++ New
@@ -151,7 +61,37 @@ Escaped mutants:
              $payload = $this->messageConvert($event->getMessage(), [PayloadInterface::META_KEY_ATTEMPTS => $attemptsLeft]);
 
 
-11) /app/src/Queue.php:61    [M] IncrementInteger
+5) /app/src/Queue.php:60    [M] GreaterThan
+
+--- Original
++++ New
+@@ @@
+     }
+     public function jobRetry(JobFailure $event) : void
+     {
+-        if ($event->getQueue() === $this && !$event->getException() instanceof PayloadNotSupportedException && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) > 0) {
++        if ($event->getQueue() === $this && !$event->getException() instanceof PayloadNotSupportedException && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) >= 0) {
+             $event->preventThrowing();
+             $attemptsLeft = $event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] - 1;
+             $payload = $this->messageConvert($event->getMessage(), [PayloadInterface::META_KEY_ATTEMPTS => $attemptsLeft]);
+
+
+6) /app/src/Queue.php:60    [M] OneZeroInteger
+
+--- Original
++++ New
+@@ @@
+     }
+     public function jobRetry(JobFailure $event) : void
+     {
+-        if ($event->getQueue() === $this && !$event->getException() instanceof PayloadNotSupportedException && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) > 0) {
++        if ($event->getQueue() === $this && !$event->getException() instanceof PayloadNotSupportedException && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 1) > 0) {
+             $event->preventThrowing();
+             $attemptsLeft = $event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] - 1;
+             $payload = $this->messageConvert($event->getMessage(), [PayloadInterface::META_KEY_ATTEMPTS => $attemptsLeft]);
+
+
+7) /app/src/Queue.php:63    [M] IncrementInteger
 
 --- Original
 +++ New
@@ -166,7 +106,7 @@ Escaped mutants:
              $this->push($payload);
 
 
-12) /app/src/Queue.php:63    [M] MethodCallRemoval
+8) /app/src/Queue.php:65    [M] MethodCallRemoval
 
 --- Original
 +++ New
@@ -181,7 +121,7 @@ Escaped mutants:
      }
 
 
-13) /app/src/Queue.php:65    [M] ArrayItemRemoval
+9) /app/src/Queue.php:67    [M] ArrayItemRemoval
 
 --- Original
 +++ New
@@ -196,7 +136,7 @@ Escaped mutants:
      }
 
 
-14) /app/src/Queue.php:65    [M] ArrayItem
+10) /app/src/Queue.php:67    [M] ArrayItem
 
 --- Original
 +++ New
@@ -211,7 +151,7 @@ Escaped mutants:
      }
 
 
-15) /app/src/Queue.php:81    [M] MethodCallRemoval
+11) /app/src/Queue.php:83    [M] MethodCallRemoval
 
 --- Original
 +++ New
@@ -226,22 +166,7 @@ Escaped mutants:
          if ($this->driver->canPush($message)) {
 
 
-16) /app/src/Queue.php:81    [M] ArrayItemRemoval
-
---- Original
-+++ New
-@@ @@
-      */
-     public function push(PayloadInterface $payload) : ?string
-     {
--        $this->logger->debug('Preparing to push payload "{payload}".', ['payload' => $payload->getName()]);
-+        $this->logger->debug('Preparing to push payload "{payload}".', []);
-         $message = $this->payloadConvert($payload);
-         $this->eventDispatcher->dispatch(new BeforePush($this, $message));
-         if ($this->driver->canPush($message)) {
-
-
-17) /app/src/Queue.php:81    [M] ArrayItem
+12) /app/src/Queue.php:83    [M] ArrayItem
 
 --- Original
 +++ New
@@ -256,7 +181,22 @@ Escaped mutants:
          if ($this->driver->canPush($message)) {
 
 
-18) /app/src/Queue.php:87    [M] MethodCallRemoval
+13) /app/src/Queue.php:83    [M] ArrayItemRemoval
+
+--- Original
++++ New
+@@ @@
+      */
+     public function push(PayloadInterface $payload) : ?string
+     {
+-        $this->logger->debug('Preparing to push payload "{payload}".', ['payload' => $payload->getName()]);
++        $this->logger->debug('Preparing to push payload "{payload}".', []);
+         $message = $this->payloadConvert($payload);
+         $this->eventDispatcher->dispatch(new BeforePush($this, $message));
+         if ($this->driver->canPush($message)) {
+
+
+14) /app/src/Queue.php:89    [M] MethodCallRemoval
 
 --- Original
 +++ New
@@ -271,7 +211,7 @@ Escaped mutants:
              throw new PayloadNotSupportedException($this->driver, $payload);
 
 
-19) /app/src/Queue.php:89    [M] ArrayItem
+15) /app/src/Queue.php:91    [M] ArrayItem
 
 --- Original
 +++ New
@@ -286,7 +226,7 @@ Escaped mutants:
              throw new PayloadNotSupportedException($this->driver, $payload);
 
 
-20) /app/src/Queue.php:89    [M] ArrayItemRemoval
+16) /app/src/Queue.php:91    [M] ArrayItemRemoval
 
 --- Original
 +++ New
@@ -301,7 +241,7 @@ Escaped mutants:
              throw new PayloadNotSupportedException($this->driver, $payload);
 
 
-21) /app/src/Queue.php:92    [M] MethodCallRemoval
+17) /app/src/Queue.php:94    [M] MethodCallRemoval
 
 --- Original
 +++ New
@@ -316,7 +256,7 @@ Escaped mutants:
          $this->eventDispatcher->dispatch(new AfterPush($this, $message));
 
 
-22) /app/src/Queue.php:94    [M] ArrayItemRemoval
+18) /app/src/Queue.php:96    [M] ArrayItemRemoval
 
 --- Original
 +++ New
@@ -331,7 +271,7 @@ Escaped mutants:
          $this->eventDispatcher->dispatch(new AfterPush($this, $message));
 
 
-23) /app/src/Queue.php:95    [M] ArrayItem
+19) /app/src/Queue.php:97    [M] ArrayItem
 
 --- Original
 +++ New
@@ -346,7 +286,7 @@ Escaped mutants:
          $this->eventDispatcher->dispatch(new AfterPush($this, $message));
 
 
-24) /app/src/Queue.php:96    [M] ArrayItem
+20) /app/src/Queue.php:98    [M] ArrayItem
 
 --- Original
 +++ New
@@ -361,7 +301,7 @@ Escaped mutants:
          $this->eventDispatcher->dispatch(new AfterPush($this, $message));
 
 
-25) /app/src/Queue.php:113    [M] DecrementInteger
+21) /app/src/Queue.php:115    [M] DecrementInteger
 
 --- Original
 +++ New
@@ -376,7 +316,7 @@ Escaped mutants:
          $count = 0;
 
 
-26) /app/src/Queue.php:115    [M] MethodCallRemoval
+22) /app/src/Queue.php:117    [M] MethodCallRemoval
 
 --- Original
 +++ New
@@ -391,7 +331,7 @@ Escaped mutants:
              $this->handle($message);
 
 
-27) /app/src/Queue.php:127    [M] MethodCallRemoval
+23) /app/src/Queue.php:129    [M] MethodCallRemoval
 
 --- Original
 +++ New
@@ -406,7 +346,7 @@ Escaped mutants:
       * Listen to the queue and execute jobs as they come
 
 
-28) /app/src/Queue.php:129    [M] ArrayItemRemoval
+24) /app/src/Queue.php:131    [M] ArrayItemRemoval
 
 --- Original
 +++ New
@@ -421,7 +361,7 @@ Escaped mutants:
       * Listen to the queue and execute jobs as they come
 
 
-29) /app/src/Queue.php:138    [M] MethodCallRemoval
+25) /app/src/Queue.php:140    [M] MethodCallRemoval
 
 --- Original
 +++ New
@@ -436,7 +376,7 @@ Escaped mutants:
      }
 
 
-30) /app/src/Queue.php:140    [M] MethodCallRemoval
+26) /app/src/Queue.php:142    [M] MethodCallRemoval
 
 --- Original
 +++ New
@@ -451,54 +391,7 @@ Escaped mutants:
       * @param string $id A message id
 
 
-31) /app/src/Queue.php:155    [M] ProtectedVisibility
-
---- Original
-+++ New
-@@ @@
-     {
-         return $this->driver->status($id);
-     }
--    protected function handle(MessageInterface $message) : void
-+    private function handle(MessageInterface $message) : void
-     {
-         $this->worker->process($message, $this);
-     }
-
-
-32) /app/src/Queue.php:160    [M] ProtectedVisibility
-
---- Original
-+++ New
-@@ @@
-     {
-         $this->worker->process($message, $this);
-     }
--    protected function payloadConvert(PayloadInterface $payload) : MessageInterface
-+    private function payloadConvert(PayloadInterface $payload) : MessageInterface
-     {
-         $meta = $payload->getMeta();
-         if ($payload instanceof DelayablePayloadInterface) {
-
-
-33) /app/src/Queue.php:179    [M] ProtectedVisibility
-
---- Original
-+++ New
-@@ @@
-         }
-         return new Message($payload->getName(), $payload->getData(), $meta);
-     }
--    protected function messageConvert(MessageInterface $message, array $metaOverwrite) : PayloadInterface
-+    private function messageConvert(MessageInterface $message, array $metaOverwrite) : PayloadInterface
-     {
-         $meta = array_merge($message->getPayloadMeta(), $metaOverwrite);
-         return new BasicPayload($message->getPayloadName(), $message->getPayloadData(), $meta);
-     }
- }
-
-
-34) /app/src/Queue.php:181    [M] UnwrapArrayMerge
+27) /app/src/Queue.php:183    [M] UnwrapArrayMerge
 
 --- Original
 +++ New
@@ -513,7 +406,7 @@ Escaped mutants:
  }
 
 
-35) /app/src/Worker/Worker.php:50    [M] ArrayItem
+28) /app/src/Worker/Worker.php:50    [M] ArrayItem
 
 --- Original
 +++ New
@@ -528,7 +421,7 @@ Escaped mutants:
          if ($handler === null) {
 
 
-36) /app/src/Worker/Worker.php:50    [M] ArrayItemRemoval
+29) /app/src/Worker/Worker.php:50    [M] ArrayItemRemoval
 
 --- Original
 +++ New
@@ -543,7 +436,7 @@ Escaped mutants:
          if ($handler === null) {
 
 
-37) /app/src/Worker/Worker.php:50    [M] MethodCallRemoval
+30) /app/src/Worker/Worker.php:50    [M] MethodCallRemoval
 
 --- Original
 +++ New
@@ -558,7 +451,7 @@ Escaped mutants:
          if ($handler === null) {
 
 
-38) /app/src/Worker/Worker.php:68    [M] MethodCallRemoval
+31) /app/src/Worker/Worker.php:68    [M] MethodCallRemoval
 
 --- Original
 +++ New
@@ -573,7 +466,7 @@ Escaped mutants:
              $this->logger->error("Processing of message #{message} is stopped because of an exception:\n{exception}.", ['message' => $message->getId(), 'exception' => $exception->getMessage()]);
 
 
-39) /app/src/Worker/Worker.php:70    [M] ArrayItem
+32) /app/src/Worker/Worker.php:70    [M] ArrayItem
 
 --- Original
 +++ New
@@ -588,7 +481,7 @@ Escaped mutants:
              $this->logger->error("Processing of message #{message} is stopped because of an exception:\n{exception}.", ['message' => $message->getId(), 'exception' => $exception->getMessage()]);
 
 
-40) /app/src/Worker/Worker.php:70    [M] ArrayItemRemoval
+33) /app/src/Worker/Worker.php:70    [M] ArrayItemRemoval
 
 --- Original
 +++ New
@@ -603,7 +496,7 @@ Escaped mutants:
              $this->logger->error("Processing of message #{message} is stopped because of an exception:\n{exception}.", ['message' => $message->getId(), 'exception' => $exception->getMessage()]);
 
 
-41) /app/src/Worker/Worker.php:74    [M] MethodCallRemoval
+34) /app/src/Worker/Worker.php:74    [M] MethodCallRemoval
 
 --- Original
 +++ New
@@ -618,7 +511,7 @@ Escaped mutants:
              if ($event->shouldThrowException() === true) {
 
 
-42) /app/src/Worker/Worker.php:76    [M] ArrayItemRemoval
+35) /app/src/Worker/Worker.php:76    [M] ArrayItemRemoval
 
 --- Original
 +++ New
@@ -633,7 +526,7 @@ Escaped mutants:
              if ($event->shouldThrowException() === true) {
 
 
-43) /app/src/Worker/Worker.php:77    [M] ArrayItem
+36) /app/src/Worker/Worker.php:77    [M] ArrayItem
 
 --- Original
 +++ New
@@ -648,7 +541,7 @@ Escaped mutants:
              if ($event->shouldThrowException() === true) {
 
 
-44) /app/src/Worker/Worker.php:78    [M] ArrayItem
+37) /app/src/Worker/Worker.php:78    [M] ArrayItem
 
 --- Original
 +++ New
@@ -663,7 +556,7 @@ Escaped mutants:
              if ($event->shouldThrowException() === true) {
 
 
-45) /app/src/Worker/Worker.php:121    [M] LogicalAnd
+38) /app/src/Worker/Worker.php:121    [M] LogicalAnd
 
 --- Original
 +++ New
@@ -677,7 +570,7 @@ Escaped mutants:
  }
 
 
-46) /app/src/Worker/Worker.php:121    [M] LogicalAnd
+39) /app/src/Worker/Worker.php:121    [M] LogicalAnd
 
 --- Original
 +++ New
@@ -691,7 +584,7 @@ Escaped mutants:
  }
 
 
-47) /app/src/Worker/Worker.php:123    [M] OneZeroInteger
+40) /app/src/Worker/Worker.php:123    [M] OneZeroInteger
 
 --- Original
 +++ New
@@ -707,6 +600,9 @@ Escaped mutants:
 
 Timed Out mutants:
 ==================
+
+Skipped mutants:
+================
 
 Not Covered mutants:
 ====================
