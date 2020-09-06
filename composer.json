@@ -40,7 +40,7 @@
         "phan/phan": "^3.0"
     },
     "suggest": {
-        "ext-pcntl": "Need for process signals."
+        "ext-pcntl": "Need for process signals"
     },
     "autoload": {
         "psr-4": {
