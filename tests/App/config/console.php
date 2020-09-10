@@ -20,7 +20,7 @@ return [
                 [
                     'simple' => [QueueHandler::class, 'simple'],
                     'exceptional' => [QueueHandler::class, 'exceptional'],
-                    'retryable' => [QueueHandler::class, 'retryable'],
+                    'retryable' => [QueueHandler::class, 'exceptional'],
                     'not-supported' => [QueueHandler::class, 'notSupported']
                 ],
             ],

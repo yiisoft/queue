@@ -7,8 +7,6 @@ namespace Yiisoft\Yii\Queue\Tests\App;
 use RuntimeException;
 use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 
 class QueueHandler
 {
@@ -34,15 +32,6 @@ class QueueHandler
     {
         $this->jobExecutionTimes++;
         throw new RuntimeException('Test exception');
-    }
-
-    public function retryable(MessageInterface $message): void
-    {
-        if ($message->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] > 0) {
-            throw new RuntimeException('Test exception');
-        }
-
-        $this->jobExecutionTimes++;
     }
 
     public function notSupported(): void

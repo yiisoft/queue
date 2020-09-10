@@ -28,6 +28,8 @@ final class SynchronousDriverTest extends TestCase
      */
     public function testJobType(string $class, bool $available): void
     {
+        $this->markTestSkipped('Needs to be moved to the QueueTest and to replace real driver with a mock');
+
         $queue = $this->container->get(Queue::class);
         $job = $this->container->get($class);
 

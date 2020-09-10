@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Tests\unit;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use RuntimeException;
 use Yiisoft\Yii\Event\EventDispatcherProvider;
+use Yiisoft\Yii\Queue\Driver\SynchronousDriver;
 use Yiisoft\Yii\Queue\Event\AfterExecution;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
@@ -139,15 +141,20 @@ final class QueueTest extends TestCase
         $this->eventManager->expects(self::exactly(2))->method('beforePushHandler');
         $this->eventManager->expects(self::exactly(2))->method('afterPushHandler');
         $this->eventManager->expects(self::exactly(2))->method('beforeExecutionHandler');
-        $this->eventManager->expects(self::once())->method('afterExecutionHandler');
-        $this->eventManager->expects(self::once())->method('jobFailureHandler');
+        $this->eventManager->expects(self::exactly(2))->method('jobFailureHandler');
+        $this->eventManager->expects(self::never())->method('afterExecutionHandler');
 
         $queue = $this->container->get(Queue::class);
         $payload = $this->container->get(RetryablePayload::class);
         $queue->push($payload);
-        $queue->run();
 
-        $this->assertEquals(1, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
+        try {
+            $queue->run();
+        } catch (RuntimeException $exception) {
+            $this->assertEquals('Test exception', $exception->getMessage());
+        }
+
+        $this->assertEquals(2, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
     }
 
     public function testJobRetryFail(): void
@@ -157,15 +164,20 @@ final class QueueTest extends TestCase
         $this->eventManager->expects(self::once())->method('beforeExecutionHandler');
         $this->eventManager->expects(self::never())->method('afterExecutionHandler');
         $this->eventManager->expects(self::once())->method('jobFailureHandler');
-        $this->expectException(PayloadNotSupportedException::class);
 
         $queue = $this->container->get(Queue::class);
         $payload = $this->container->get(RetryablePayload::class);
         $payload->setName('not-supported');
         $queue->push($payload);
-        $queue->run();
 
-        $this->assertEquals(1, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
+        try {
+            $queue->run();
+        } catch (PayloadNotSupportedException $exception) {
+            $message = SynchronousDriver::class . ' does not support payload "retryable".';
+            $this->assertEquals($message, $exception->getMessage());
+        }
+
+        $this->assertEquals(0, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
     }
 
     public function testStatus(): void
