@@ -13,7 +13,8 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Yii\Queue\Event\AfterExecution;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\JobFailure;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\Exception\JobFailureException;
+use Yiisoft\Yii\Queue\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 
 final class Worker implements WorkerInterface
@@ -71,13 +72,9 @@ final class Worker implements WorkerInterface
                 );
             }
         } catch (Throwable $exception) {
-            $this->logger->error(
-                "Processing of message #{message} is stopped because of an exception:\n{exception}.",
-                [
-                    'message' => $message->getId(),
-                    'exception' => $exception->getMessage(),
-                ]
-            );
+            $exception = new JobFailureException($message, $exception);
+            $this->logger->error($exception);
+
             $event = new JobFailure($queue, $message, $exception);
             $this->dispatcher->dispatch($event);
 
