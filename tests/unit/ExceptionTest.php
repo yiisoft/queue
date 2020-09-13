@@ -52,8 +52,7 @@ final class ExceptionTest extends TestCase
 
     private function getPayload(): PayloadInterface
     {
-        return new class extends DelayablePayload implements DummyInterface
-        {
+        return new class() extends DelayablePayload implements DummyInterface {
         };
     }
 }

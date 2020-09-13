@@ -40,7 +40,6 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUp(): void
     {
-
     }
 
     protected function getQueue(): Queue
