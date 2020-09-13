@@ -14,7 +14,7 @@ use Yiisoft\Yii\Queue\Tests\TestCase;
 
 class QueueDependentInterfaceTest extends TestCase
 {
-    public function getClasses()
+    public function driverProvider()
     {
         $dependent = new class() implements QueueDependentInterface, DriverInterface {
             public ?Queue $queue = null;
@@ -70,15 +70,20 @@ class QueueDependentInterfaceTest extends TestCase
     }
 
     /**
-     * @dataProvider getClasses
+     * @dataProvider driverProvider
      *
      * @param DriverInterface $driver
      * @param bool $implements
      */
     public function testDependencyResolved(DriverInterface $driver, bool $implements)
     {
-        $this->containerConfigurator->set(DriverInterface::class, $driver);
-        $this->container->get(Queue::class);
+        $queue = new Queue(
+            $driver,
+            $this->getEventDispatcher(),
+            $this->getWorker(),
+            $this->getLoop(),
+            new NullLogger()
+        );
 
         $this->assertEquals($implements, $driver->queue instanceof Queue);
     }

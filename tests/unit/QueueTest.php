@@ -35,11 +35,12 @@ final class QueueTest extends TestCase
         $this->eventsRegister();
     }
 
-    private function eventsRegister(): void
+    protected function getEventHandlers(): array
     {
-        $this->eventManager = $this->createMock(EventHandler::class);
+        // TODO check if we need any of these handlers
+        // TODO new event provider doesn't support division of handlers by event
 
-        $events = [
+        return [
             BeforePush::class => [[$this->eventManager, 'beforePushHandler']],
             AfterPush::class => [[$this->eventManager, 'afterPushHandler']],
             BeforeExecution::class => [[$this->eventManager, 'beforeExecutionHandler']],
@@ -49,8 +50,6 @@ final class QueueTest extends TestCase
                 [$this->eventManager, 'jobFailureHandler'],
             ],
         ];
-        $eventProvider = new EventDispatcherProvider($events);
-        $eventProvider->register($this->container);
     }
 
     public function testPushSuccessful(): void

@@ -8,6 +8,7 @@
 
 namespace Yiisoft\Yii\Queue\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\NullLogger;
@@ -30,21 +31,85 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
  */
 abstract class TestCase extends BaseTestCase
 {
-    public Container $container;
-    protected ContainerConfigurator $containerConfigurator;
+    protected ?ContainerInterface $container;
+    protected ?Queue $queue = null;
+    protected ?DriverInterface $driver = null;
+    protected ?LoopInterface $loop = null;
+    protected ?WorkerInterface $worker = null;
+    protected ?EventDispatcherInterface $dispatcher = null;
 
     protected function setUp(): void
     {
-        $this->container = new Container(require Builder::path('tests-app'));
-        $this->containerConfigurator = new ContainerConfigurator($this->container);
-        $eventConfigurator = $this->container->get(EventDispatcherProvider::class);
-        $eventConfigurator->register($this->container);
+
     }
 
     protected function getQueue(): Queue
     {
+        if ($this->queue === null) {
+            $this->queue = $this->createQueue();
+        }
+
+        return $this->queue;
+    }
+
+    /**
+     * @param bool $driverMock
+     *
+     * @return DriverInterface|MockObject
+     */
+    protected function getDriver(bool $driverMock = true): DriverInterface
+    {
+        if ($this->driver === null) {
+            $this->driver = $this->createDriver($driverMock);
+        } elseif ($driverMock && !$this->driver instanceof MockObject) {
+            $this->driver = $this->createDriver($driverMock);
+        } elseif ($driverMock === false && $this->driver instanceof MockObject) {
+            $this->driver = $this->createDriver($driverMock);
+        }
+
+        return $this->driver;
+    }
+
+    protected function getLoop(): LoopInterface
+    {
+        if ($this->loop === null) {
+            $this->loop = $this->createLoop();
+        }
+
+        return $this->loop;
+    }
+
+    protected function getWorker(): WorkerInterface
+    {
+        if ($this->worker === null) {
+            $this->worker = $this->createWorker();
+        }
+
+        return $this->worker;
+    }
+
+    protected function getEventDispatcher(): EventDispatcherInterface
+    {
+        if ($this->dispatcher === null) {
+            $this->dispatcher = $this->createEventDispatcher();
+        }
+
+        return $this->dispatcher;
+    }
+
+    protected function getContainer(): ContainerInterface
+    {
+        if ($this->container === null) {
+            $this->container = $this->createContainer();
+        }
+
+        return $this->container;
+    }
+
+    protected function createQueue(bool $driverMock = true): Queue
+    {
         return new Queue(
-            $this->getDriver(),
+            $this->getDriver($driverMock),
             $this->getEventDispatcher(),
             $this->getWorker(),
             $this->getLoop(),
@@ -52,20 +117,20 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
-    protected function getDriver(): DriverInterface
+    protected function createDriver(): DriverInterface
     {
         return $this->createMock(DriverInterface::class);
     }
 
-    protected function getLoop(): LoopInterface
+    protected function createLoop(): LoopInterface
     {
         return new SignalLoop();
     }
 
-    protected function getWorker(): WorkerInterface
+    protected function createWorker(): WorkerInterface
     {
         return new Worker(
-            $this->getEventHandlers(),
+            $this->getMessageHandlers(),
             $this->getEventDispatcher(),
             new NullLogger(),
             new Injector($this->getContainer()),
@@ -73,22 +138,27 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
-    protected function getEventDispatcher(): EventDispatcherInterface
+    protected function createEventDispatcher(): EventDispatcherInterface
     {
-        return new SimpleEventDispatcher();
+        return new SimpleEventDispatcher($this->getEventHandlers());
     }
 
-    private function getEventHandlers(): array
-    {
-        return [];
-    }
-
-    protected function getContainer(): ContainerInterface
+    protected function createContainer(): ContainerInterface
     {
         return new SimpleContainer($this->getContainerDefinitions());
     }
 
     protected function getContainerDefinitions(): array
+    {
+        return [];
+    }
+
+    protected function getEventHandlers(): array
+    {
+        return [];
+    }
+
+    protected function getMessageHandlers(): array
     {
         return [];
     }
