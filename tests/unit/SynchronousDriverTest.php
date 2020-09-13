@@ -45,7 +45,7 @@ final class SynchronousDriverTest extends TestCase
         $id = $queue->push($job);
 
         if ($available) {
-            $this->assertTrue($id >= 0);
+            self::assertTrue($id >= 0);
         }
     }
 
@@ -77,7 +77,7 @@ final class SynchronousDriverTest extends TestCase
         $job = new SimplePayload();
         $id = $queue->push($job);
         $wrongId = "$id ";
-        $this->assertEquals(JobStatus::waiting(), $queue->status($wrongId));
+        self::assertEquals(JobStatus::waiting(), $queue->status($wrongId));
     }
 
     public function testIdSetting(): void
@@ -91,6 +91,6 @@ final class SynchronousDriverTest extends TestCase
         $ids[] = $driver->push($message);
         $ids[] = $driver->push($message);
 
-        $this->assertCount(3, array_unique($ids));
+        self::assertCount(3, array_unique($ids));
     }
 }

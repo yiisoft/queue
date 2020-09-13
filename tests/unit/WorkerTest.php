@@ -23,7 +23,7 @@ final class WorkerTest extends TestCase
         $queue = $this->createMock(Queue::class);
         $this->getWorker()->process($message, $queue);
 
-        $this->assertEquals(1, $this->executionTimes);
+        self::assertEquals(1, $this->executionTimes);
     }
 
     /**
@@ -42,7 +42,7 @@ final class WorkerTest extends TestCase
         $queue = $this->createMock(Queue::class);
         $this->getWorker()->process($message, $queue);
 
-        $this->assertEquals(0, $this->executionTimes);
+        self::assertEquals(0, $this->executionTimes);
     }
 
     /**
@@ -73,6 +73,6 @@ final class WorkerTest extends TestCase
         $queue = $this->createMock(Queue::class);
         $this->getWorker()->process($message, $queue);
 
-        $this->assertEquals(1, $this->executionTimes);
+        self::assertEquals(1, $this->executionTimes);
     }
 }

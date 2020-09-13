@@ -22,32 +22,32 @@ final class ExceptionTest extends TestCase
         $driverClass = get_class($driver);
 
         $exception = new PayloadNotSupportedException($driver, $payload);
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             $payload->getName(),
             $exception->getMessage(),
             'Payload name must be included'
         );
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             $driverClass,
             $exception->getMessage(),
             'Driver class must be included'
         );
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             DelayablePayloadInterface::class,
             $exception->getSolution(),
             'DelayablePayloadInterface must be included to the exception message as it is a default interface and the payload implements it'
         );
-        $this->assertStringNotContainsString(
+        self::assertStringNotContainsString(
             PrioritisedPayloadInterface::class,
             $exception->getSolution(),
             'PrioritisedPayloadInterface must not be included as it is not implemented in the payload'
         );
-        $this->assertStringNotContainsString(
+        self::assertStringNotContainsString(
             DummyInterface::class,
             $exception->getMessage(),
             'DummyInterface must not be included as it is not a part of yii-queue package yet it is implemented in the payload'
         );
-        $this->assertEquals("Payload is not supported by current queue driver", $exception->getName());
+        self::assertEquals("Payload is not supported by current queue driver", $exception->getName());
     }
 
     private function getPayload(): PayloadInterface

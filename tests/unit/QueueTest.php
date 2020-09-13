@@ -71,7 +71,7 @@ final class QueueTest extends TestCase
         $queue->push($job2);
         $queue->run();
 
-        $this->assertEquals(2, $this->executionTimes);
+        self::assertEquals(2, $this->executionTimes);
 
         $events = [
             BeforePush::class => 2,
@@ -91,7 +91,7 @@ final class QueueTest extends TestCase
         $queue->push($job2);
         $queue->run(1);
 
-        $this->assertEquals(1, $this->executionTimes);
+        self::assertEquals(1, $this->executionTimes);
 
         $events = [
             BeforePush::class => 2,
@@ -111,7 +111,7 @@ final class QueueTest extends TestCase
         $queue->push($job2);
         $queue->listen();
 
-        $this->assertEquals(2, $this->executionTimes);
+        self::assertEquals(2, $this->executionTimes);
 
         $events = [
             BeforePush::class => 2,
@@ -124,7 +124,7 @@ final class QueueTest extends TestCase
 
     public function testJobRetry(): void
     {
-        $this->markTestSkipped('The logic will be refactored in https://github.com/yiisoft/yii-queue/issues/59');
+        self::markTestSkipped('The logic will be refactored in https://github.com/yiisoft/yii-queue/issues/59');
 
         $exception = null;
 
@@ -136,12 +136,12 @@ final class QueueTest extends TestCase
             $queue->run();
         } catch (RuntimeException $exception) {
         } finally {
-            $this->assertInstanceOf(RuntimeException::class, $exception);
-            $this->assertEquals(
+            self::assertInstanceOf(RuntimeException::class, $exception);
+            self::assertEquals(
                 "Processing of message #0 is stopped because of an exception:\ntest.",
                 $exception->getMessage()
             );
-            $this->assertEquals(2, $this->executionTimes);
+            self::assertEquals(2, $this->executionTimes);
 
             $events = [
                 BeforePush::class => 2,
@@ -155,7 +155,7 @@ final class QueueTest extends TestCase
 
     public function testJobRetryFail(): void
     {
-        $this->markTestSkipped('The logic will be refactored in https://github.com/yiisoft/yii-queue/issues/59');
+        self::markTestSkipped('The logic will be refactored in https://github.com/yiisoft/yii-queue/issues/59');
 
         $queue = $this->getQueue();
         $payload = new RetryablePayload();
@@ -168,9 +168,9 @@ final class QueueTest extends TestCase
         } catch (PayloadNotSupportedException $exception) {
         } finally {
             $message = SynchronousDriver::class . ' does not support payload "retryable".';
-            $this->assertInstanceOf(PayloadNotSupportedException::class, $exception);
-            $this->assertEquals($message, $exception->getMessage());
-            $this->assertEquals(0, $this->executionTimes);
+            self::assertInstanceOf(PayloadNotSupportedException::class, $exception);
+            self::assertEquals($message, $exception->getMessage());
+            self::assertEquals(0, $this->executionTimes);
 
             $events = [
                 BeforePush::class => 1,
@@ -189,10 +189,10 @@ final class QueueTest extends TestCase
         $id = $queue->push($job);
 
         $status = $queue->status($id);
-        $this->assertTrue($status->isWaiting());
+        self::assertTrue($status->isWaiting());
 
         $queue->run();
         $status = $queue->status($id);
-        $this->assertTrue($status->isDone());
+        self::assertTrue($status->isDone());
     }
 }

@@ -46,9 +46,9 @@ final class JobStatusTest extends TestCase
     {
         $status = JobStatus::$statusName();
 
-        $this->assertTrue($status->$positiveMethod(), "$positiveMethod must be true for status $statusName");
+        self::assertTrue($status->$positiveMethod(), "$positiveMethod must be true for status $statusName");
         foreach ($negatives as $negative) {
-            $this->assertFalse($status->$negative(), "$negative must be false for status $statusName");
+            self::assertFalse($status->$negative(), "$negative must be false for status $statusName");
         }
     }
 }

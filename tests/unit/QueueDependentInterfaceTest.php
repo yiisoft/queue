@@ -85,6 +85,6 @@ class QueueDependentInterfaceTest extends TestCase
             new NullLogger()
         );
 
-        $this->assertEquals($driver instanceof QueueDependentInterface, $driver->queue instanceof Queue);
+        self::assertEquals($driver instanceof QueueDependentInterface, $driver->queue instanceof Queue);
     }
 }
