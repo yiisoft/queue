@@ -13,14 +13,23 @@ use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\NullLogger;
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use RuntimeException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\EventDispatcher\SimpleEventDispatcher;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Cli\SignalLoop;
 use Yiisoft\Yii\Queue\Driver\DriverInterface;
+use Yiisoft\Yii\Queue\Driver\SynchronousDriver;
+use Yiisoft\Yii\Queue\Event\AfterExecution;
+use Yiisoft\Yii\Queue\Event\AfterPush;
+use Yiisoft\Yii\Queue\Event\BeforeExecution;
+use Yiisoft\Yii\Queue\Event\BeforePush;
+use Yiisoft\Yii\Queue\Event\JobFailure;
+use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\Tests\App\ContainerConfigurator;
+use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Worker\Worker;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
@@ -31,15 +40,27 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
  */
 abstract class TestCase extends BaseTestCase
 {
-    protected ?ContainerInterface $container;
+    protected ?ContainerInterface $container = null;
     protected ?Queue $queue = null;
     protected ?DriverInterface $driver = null;
     protected ?LoopInterface $loop = null;
     protected ?WorkerInterface $worker = null;
     protected ?EventDispatcherInterface $dispatcher = null;
+    protected array $eventHandlers = [];
+    protected int $executionTimes;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
+        $this->container = null;
+        $this->queue = null;
+        $this->driver = null;
+        $this->loop = null;
+        $this->worker = null;
+        $this->dispatcher = null;
+        $this->eventHandlers = [];
+        $this->executionTimes = 0;
     }
 
     protected function getQueue(): Queue
@@ -52,18 +73,12 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * @param bool $driverMock
-     *
      * @return DriverInterface|MockObject
      */
-    protected function getDriver(bool $driverMock = true): DriverInterface
+    protected function getDriver(): DriverInterface
     {
         if ($this->driver === null) {
-            $this->driver = $this->createDriver($driverMock);
-        } elseif ($driverMock && !$this->driver instanceof MockObject) {
-            $this->driver = $this->createDriver($driverMock);
-        } elseif ($driverMock === false && $this->driver instanceof MockObject) {
-            $this->driver = $this->createDriver($driverMock);
+            $this->driver = $this->createDriver($this->needsRealDriver());
         }
 
         return $this->driver;
@@ -87,7 +102,7 @@ abstract class TestCase extends BaseTestCase
         return $this->worker;
     }
 
-    protected function getEventDispatcher(): EventDispatcherInterface
+    protected function getEventDispatcher(): SimpleEventDispatcher
     {
         if ($this->dispatcher === null) {
             $this->dispatcher = $this->createEventDispatcher();
@@ -116,8 +131,12 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
-    protected function createDriver(): DriverInterface
+    protected function createDriver(bool $realDriver = false): DriverInterface
     {
+        if ($realDriver) {
+            return new SynchronousDriver($this->getLoop(), $this->getWorker());
+        }
+
         return $this->createMock(DriverInterface::class);
     }
 
@@ -137,9 +156,9 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
-    protected function createEventDispatcher(): EventDispatcherInterface
+    protected function createEventDispatcher(): SimpleEventDispatcher
     {
-        return new SimpleEventDispatcher($this->getEventHandlers());
+        return new SimpleEventDispatcher(...$this->getEventHandlers());
     }
 
     protected function createContainer(): ContainerInterface
@@ -152,13 +171,64 @@ abstract class TestCase extends BaseTestCase
         return [];
     }
 
+    protected function setEventHandlers(callable ...$handlers): void
+    {
+        $this->eventHandlers = $handlers;
+    }
+
     protected function getEventHandlers(): array
     {
-        return [];
+        return $this->eventHandlers;
     }
 
     protected function getMessageHandlers(): array
     {
-        return [];
+        return [
+            'simple' => fn() => $this->executionTimes++,
+            'exceptional' => function () {
+                $this->executionTimes++;
+
+                throw new RuntimeException('test');
+            },
+            'retryable' => function () {
+                $this->executionTimes++;
+
+                throw new RuntimeException('test');
+            },
+            'not-supported' => function () {
+                throw new PayloadNotSupportedException($this->driver, new RetryablePayload());
+            },
+        ];
+    }
+
+    protected function needsRealDriver(): bool
+    {
+        return false;
+    }
+
+    protected function assertEvents(array $events = []): void
+    {
+        $default = [
+            BeforePush::class => 0,
+            AfterPush::class => 0,
+            BeforeExecution::class => 0,
+            AfterExecution::class => 0,
+            JobFailure::class => 0,
+        ];
+        foreach (array_merge($default, $events) as $event => $timesExecuted) {
+            $this->assertEquals($timesExecuted, $this->getEventsCount($event));
+        }
+    }
+
+    protected function getEventsCount(string $className): int
+    {
+        $result = 0;
+        foreach ($this->getEventDispatcher()->getEvents() as $event) {
+            if ($event instanceof $className) {
+                $result++;
+            }
+        }
+
+        return $result;
     }
 }

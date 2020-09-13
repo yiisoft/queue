@@ -47,7 +47,7 @@ final class ExceptionTest extends TestCase
             $exception->getMessage(),
             'DummyInterface must not be included as it is not a part of yii-queue package yet it is implemented in the payload'
         );
-        $this->assertEquals("$driverClass does not support payload \"delayable\".", $exception->getName());
+        $this->assertEquals("Payload is not supported by current queue driver", $exception->getName());
     }
 
     private function getPayload(): PayloadInterface

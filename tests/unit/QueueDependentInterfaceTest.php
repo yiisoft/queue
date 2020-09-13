@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Tests\unit;
 
 use InvalidArgumentException;
+use Psr\Log\NullLogger;
 use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
@@ -64,8 +65,8 @@ class QueueDependentInterfaceTest extends TestCase
         };
 
         return [
-            [$dependent, true],
-            [$independent, false],
+            [$dependent],
+            [$independent],
         ];
     }
 
@@ -73,11 +74,10 @@ class QueueDependentInterfaceTest extends TestCase
      * @dataProvider driverProvider
      *
      * @param DriverInterface $driver
-     * @param bool $implements
      */
-    public function testDependencyResolved(DriverInterface $driver, bool $implements)
+    public function testDependencyResolved(DriverInterface $driver): void
     {
-        $queue = new Queue(
+        new Queue(
             $driver,
             $this->getEventDispatcher(),
             $this->getWorker(),
@@ -85,6 +85,6 @@ class QueueDependentInterfaceTest extends TestCase
             new NullLogger()
         );
 
-        $this->assertEquals($implements, $driver->queue instanceof Queue);
+        $this->assertEquals($driver instanceof QueueDependentInterface, $driver->queue instanceof Queue);
     }
 }

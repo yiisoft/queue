@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\unit;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use RuntimeException;
-use Yiisoft\Yii\Event\EventDispatcherProvider;
 use Yiisoft\Yii\Queue\Driver\SynchronousDriver;
 use Yiisoft\Yii\Queue\Event\AfterExecution;
 use Yiisoft\Yii\Queue\Event\AfterPush;
@@ -14,182 +12,185 @@ use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
-use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\Tests\App\DelayablePayload;
-use Yiisoft\Yii\Queue\Tests\App\EventHandler;
-use Yiisoft\Yii\Queue\Tests\App\QueueHandler;
 use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 final class QueueTest extends TestCase
 {
-    /**
-     * @var MockObject|EventHandler
-     */
-    private MockObject $eventManager;
+    private bool $needsRealDriver = true;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->eventsRegister();
+
+        $this->needsRealDriver = true;
     }
 
-    protected function getEventHandlers(): array
+    protected function needsRealDriver(): bool
     {
-        // TODO check if we need any of these handlers
-        // TODO new event provider doesn't support division of handlers by event
-
-        return [
-            BeforePush::class => [[$this->eventManager, 'beforePushHandler']],
-            AfterPush::class => [[$this->eventManager, 'afterPushHandler']],
-            BeforeExecution::class => [[$this->eventManager, 'beforeExecutionHandler']],
-            AfterExecution::class => [[$this->eventManager, 'afterExecutionHandler']],
-            JobFailure::class => [
-                [Queue::class, 'jobRetry'],
-                [$this->eventManager, 'jobFailureHandler'],
-            ],
-        ];
+        return $this->needsRealDriver;
     }
 
     public function testPushSuccessful(): void
     {
-        $this->eventManager->expects(self::once())->method('beforePushHandler');
-        $this->eventManager->expects(self::once())->method('afterPushHandler');
-        $this->eventManager->expects(self::never())->method('beforeExecutionHandler');
-        $this->eventManager->expects(self::never())->method('afterExecutionHandler');
-        $this->eventManager->expects(self::never())->method('jobFailureHandler');
+        $this->needsRealDriver = false;
+        $this->getDriver()->method('canPush')->willReturn(true);
 
-        $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimplePayload::class);
-        $id = $queue->push($job);
+        $queue = $this->getQueue();
+        $job = new SimplePayload();
+        $queue->push($job);
 
-        $this->assertNotEquals('', $id, 'Pushed message should has an id');
+        $this->assertEvents([BeforePush::class => 1, AfterPush::class => 1]);
     }
 
     public function testPushNotSuccessful(): void
     {
-        $this->expectException(PayloadNotSupportedException::class);
-        $this->eventManager->expects(self::once())->method('beforePushHandler');
-        $this->eventManager->expects(self::never())->method('afterPushHandler');
-        $this->eventManager->expects(self::never())->method('beforeExecutionHandler');
-        $this->eventManager->expects(self::never())->method('afterExecutionHandler');
-        $this->eventManager->expects(self::never())->method('jobFailureHandler');
+        $this->needsRealDriver = false;
+        $this->getDriver()->method('canPush')->willReturn(false);
+        $exception = null;
 
-        $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(DelayablePayload::class);
-        $queue->push($job);
+        $queue = $this->getQueue();
+        $job = new DelayablePayload();
+        try {
+            $queue->push($job);
+        } catch (PayloadNotSupportedException $exception) {
+        } finally {
+            self::assertInstanceOf(PayloadNotSupportedException::class, $exception);
+            $this->assertEvents([BeforePush::class => 1]);
+        }
     }
 
     public function testRun(): void
     {
-        $this->eventManager->expects(self::exactly(2))->method('beforePushHandler');
-        $this->eventManager->expects(self::exactly(2))->method('afterPushHandler');
-        $this->eventManager->expects(self::exactly(2))->method('beforeExecutionHandler');
-        $this->eventManager->expects(self::exactly(2))->method('afterExecutionHandler');
-        $this->eventManager->expects(self::never())->method('jobFailureHandler');
-
-        $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimplePayload::class);
+        $queue = $this->getQueue();
+        $job = new SimplePayload();
         $job2 = clone $job;
         $queue->push($job);
         $queue->push($job2);
         $queue->run();
 
-        $this->assertEquals(2, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
+        $this->assertEquals(2, $this->executionTimes);
+
+        $events = [
+            BeforePush::class => 2,
+            AfterPush::class => 2,
+            BeforeExecution::class => 2,
+            AfterExecution::class => 2,
+        ];
+        $this->assertEvents($events);
     }
 
     public function testRunPartly(): void
     {
-        $this->eventManager->expects(self::exactly(2))->method('beforePushHandler');
-        $this->eventManager->expects(self::exactly(2))->method('afterPushHandler');
-        $this->eventManager->expects(self::once())->method('beforeExecutionHandler');
-        $this->eventManager->expects(self::once())->method('afterExecutionHandler');
-        $this->eventManager->expects(self::never())->method('jobFailureHandler');
-
-        $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimplePayload::class);
+        $queue = $this->getQueue();
+        $job = new SimplePayload();
         $job2 = clone $job;
         $queue->push($job);
         $queue->push($job2);
         $queue->run(1);
 
-        $this->assertEquals(1, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
+        $this->assertEquals(1, $this->executionTimes);
+
+        $events = [
+            BeforePush::class => 2,
+            AfterPush::class => 2,
+            BeforeExecution::class => 1,
+            AfterExecution::class => 1,
+        ];
+        $this->assertEvents($events);
     }
 
     public function testListen(): void
     {
-        $this->eventManager->expects(self::exactly(2))->method('beforePushHandler');
-        $this->eventManager->expects(self::exactly(2))->method('afterPushHandler');
-        $this->eventManager->expects(self::exactly(2))->method('beforeExecutionHandler');
-        $this->eventManager->expects(self::exactly(2))->method('afterExecutionHandler');
-        $this->eventManager->expects(self::never())->method('jobFailureHandler');
-
-        $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimplePayload::class);
+        $queue = $this->getQueue();
+        $job = new SimplePayload();
         $job2 = clone $job;
         $queue->push($job);
         $queue->push($job2);
         $queue->listen();
 
-        $this->assertEquals(2, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
+        $this->assertEquals(2, $this->executionTimes);
+
+        $events = [
+            BeforePush::class => 2,
+            AfterPush::class => 2,
+            BeforeExecution::class => 2,
+            AfterExecution::class => 2,
+        ];
+        $this->assertEvents($events);
     }
 
     public function testJobRetry(): void
     {
-        $this->eventManager->expects(self::exactly(2))->method('beforePushHandler');
-        $this->eventManager->expects(self::exactly(2))->method('afterPushHandler');
-        $this->eventManager->expects(self::exactly(2))->method('beforeExecutionHandler');
-        $this->eventManager->expects(self::exactly(2))->method('jobFailureHandler');
-        $this->eventManager->expects(self::never())->method('afterExecutionHandler');
+        $exception = null;
 
-        $queue = $this->container->get(Queue::class);
-        $payload = $this->container->get(RetryablePayload::class);
+        $queue = $this->getQueue();
+        $payload = new RetryablePayload();
         $queue->push($payload);
 
         try {
             $queue->run();
         } catch (RuntimeException $exception) {
-            $this->assertEquals('Test exception', $exception->getMessage());
+        } finally {
+            $this->assertInstanceOf(RuntimeException::class, $exception);
+            $this->assertEquals(
+                "Processing of message #0 is stopped because of an exception:\ntest.",
+                $exception->getMessage()
+            );
+            $this->assertEquals(2, $this->executionTimes);
+
+            $events = [
+                BeforePush::class => 2,
+                AfterPush::class => 2,
+                BeforeExecution::class => 2,
+                JobFailure::class => 2,
+            ];
+            $this->assertEvents($events);
         }
 
-        $this->assertEquals(2, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
+
     }
 
     public function testJobRetryFail(): void
     {
-        $this->eventManager->expects(self::once())->method('beforePushHandler');
-        $this->eventManager->expects(self::once())->method('afterPushHandler');
-        $this->eventManager->expects(self::once())->method('beforeExecutionHandler');
-        $this->eventManager->expects(self::never())->method('afterExecutionHandler');
-        $this->eventManager->expects(self::once())->method('jobFailureHandler');
-
-        $queue = $this->container->get(Queue::class);
-        $payload = $this->container->get(RetryablePayload::class);
+        $queue = $this->getQueue();
+        $payload = new RetryablePayload();
         $payload->setName('not-supported');
         $queue->push($payload);
+        $exception = null;
 
         try {
             $queue->run();
         } catch (PayloadNotSupportedException $exception) {
+        } finally {
             $message = SynchronousDriver::class . ' does not support payload "retryable".';
+            $this->assertInstanceOf(PayloadNotSupportedException::class, $exception);
             $this->assertEquals($message, $exception->getMessage());
-        }
+            $this->assertEquals(0, $this->executionTimes);
 
-        $this->assertEquals(0, $this->container->get(QueueHandler::class)->getJobExecutionTimes());
+            $events = [
+                BeforePush::class => 1,
+                AfterPush::class => 1,
+                BeforeExecution::class => 1,
+                JobFailure::class => 1,
+            ];
+            $this->assertEvents($events);
+        }
     }
 
     public function testStatus(): void
     {
-        $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimplePayload::class);
+        $queue = $this->getQueue();
+        $job = new SimplePayload();
         $id = $queue->push($job);
 
         $status = $queue->status($id);
-        $this->assertEquals(true, $status->isWaiting());
+        $this->assertTrue($status->isWaiting());
 
         $queue->run();
         $status = $queue->status($id);
-        $this->assertEquals(true, $status->isDone());
+        $this->assertTrue($status->isDone());
     }
 }

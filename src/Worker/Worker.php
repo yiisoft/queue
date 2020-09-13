@@ -14,7 +14,7 @@ use Yiisoft\Yii\Queue\Event\AfterExecution;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\JobFailureException;
-use Yiisoft\Yii\Queue\MessageInterface;
+use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 
 final class Worker implements WorkerInterface

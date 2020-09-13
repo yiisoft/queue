@@ -20,8 +20,13 @@ use Yiisoft\Yii\Queue\Tests\TestCase;
 
 final class SynchronousDriverTest extends TestCase
 {
+    protected function needsRealDriver(): bool
+    {
+        return true;
+    }
+
     /**
-     * @dataProvider getJobTypes
+     * @dataProvider jobTypesProvider
      *
      * @param string $class
      * @param bool $available
@@ -44,7 +49,7 @@ final class SynchronousDriverTest extends TestCase
         }
     }
 
-    public static function getJobTypes(): array
+    public static function jobTypesProvider(): array
     {
         return [
             'Simple job' => [
@@ -68,8 +73,8 @@ final class SynchronousDriverTest extends TestCase
 
     public function testNonIntegerId(): void
     {
-        $queue = $this->container->get(Queue::class);
-        $job = $this->container->get(SimplePayload::class);
+        $queue = $this->getQueue();
+        $job = new SimplePayload();
         $id = $queue->push($job);
         $wrongId = "$id ";
         $this->assertEquals(JobStatus::waiting(), $queue->status($wrongId));
@@ -78,7 +83,7 @@ final class SynchronousDriverTest extends TestCase
     public function testIdSetting(): void
     {
         $message = new Message('simple', [], []);
-        $driver = $this->container->get(SynchronousDriver::class);
+        $driver = $this->getDriver();
         $driver->setQueue($this->createMock(Queue::class));
 
         $ids = [];
@@ -86,6 +91,6 @@ final class SynchronousDriverTest extends TestCase
         $ids[] = $driver->push($message);
         $ids[] = $driver->push($message);
 
-        $this->assertEqualsCanonicalizing(3, count(array_unique($ids)));
+        $this->assertCount(3, array_unique($ids));
     }
 }
