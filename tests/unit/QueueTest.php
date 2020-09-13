@@ -149,8 +149,6 @@ final class QueueTest extends TestCase
             ];
             $this->assertEvents($events);
         }
-
-
     }
 
     public function testJobRetryFail(): void

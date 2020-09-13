@@ -184,7 +184,7 @@ abstract class TestCase extends BaseTestCase
     protected function getMessageHandlers(): array
     {
         return [
-            'simple' => fn() => $this->executionTimes++,
+            'simple' => fn () => $this->executionTimes++,
             'exceptional' => function () {
                 $this->executionTimes++;
 
