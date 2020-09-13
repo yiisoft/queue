@@ -124,6 +124,8 @@ final class QueueTest extends TestCase
 
     public function testJobRetry(): void
     {
+        $this->markTestSkipped('The logic will be refactored in https://github.com/yiisoft/yii-queue/issues/59');
+
         $exception = null;
 
         $queue = $this->getQueue();
@@ -153,6 +155,8 @@ final class QueueTest extends TestCase
 
     public function testJobRetryFail(): void
     {
+        $this->markTestSkipped('The logic will be refactored in https://github.com/yiisoft/yii-queue/issues/59');
+
         $queue = $this->getQueue();
         $payload = new RetryablePayload();
         $payload->setName('not-supported');
