@@ -25,52 +25,6 @@ final class SynchronousDriverTest extends TestCase
         return true;
     }
 
-    /**
-     * @dataProvider jobTypesProvider
-     *
-     * @param string $class
-     * @param bool $available
-     */
-    public function testJobType(string $class, bool $available): void
-    {
-        $this->markTestSkipped('Needs to be moved to the QueueTest and to replace real driver with a mock');
-
-        $queue = $this->container->get(Queue::class);
-        $job = $this->container->get($class);
-
-        if (!$available) {
-            $this->expectException(PayloadNotSupportedException::class);
-        }
-
-        $id = $queue->push($job);
-
-        if ($available) {
-            self::assertTrue($id >= 0);
-        }
-    }
-
-    public static function jobTypesProvider(): array
-    {
-        return [
-            'Simple job' => [
-                SimplePayload::class,
-                true,
-            ],
-            DelayablePayloadInterface::class => [
-                DelayablePayload::class,
-                false,
-            ],
-            PrioritisedPayloadInterface::class => [
-                PrioritizedPayload::class,
-                false,
-            ],
-            AttemptsRestrictedPayloadInterface::class => [
-                RetryablePayload::class,
-                true,
-            ],
-        ];
-    }
-
     public function testNonIntegerId(): void
     {
         $queue = $this->getQueue();
