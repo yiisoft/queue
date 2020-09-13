@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\unit;
 
-use InvalidArgumentException;
 use Psr\Log\NullLogger;
 use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
@@ -24,18 +23,23 @@ class QueueDependentInterfaceTest extends TestCase
             {
                 $this->queue = $queue;
             }
+
             public function nextMessage(): ?MessageInterface
             {
             }
+
             public function status(string $id): JobStatus
             {
             }
+
             public function push(MessageInterface $message): ?string
             {
             }
+
             public function subscribe(callable $handler): void
             {
             }
+
             public function canPush(MessageInterface $message): bool
             {
             }
@@ -47,18 +51,23 @@ class QueueDependentInterfaceTest extends TestCase
             {
                 $this->queue = $queue;
             }
+
             public function nextMessage(): ?MessageInterface
             {
             }
+
             public function status(string $id): JobStatus
             {
             }
+
             public function push(MessageInterface $message): ?string
             {
             }
+
             public function subscribe(callable $handler): void
             {
             }
+
             public function canPush(MessageInterface $message): bool
             {
             }
