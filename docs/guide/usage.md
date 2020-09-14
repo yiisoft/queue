@@ -5,24 +5,26 @@ Usage basics
 Configuration
 -------------
 
-In order to use the extension you have to configure it like the following:
+In order to use the extension you can configure it with DI container like the following:
 
 ```php
-return [
-    'bootstrap' => [
-        'queue', // The component registers its own console commands
-    ],
-    'components' => [
-        'queue' => [
-            'class' => \Yiisoft\Yii\Queue\<driver>\Queue::class,
-            'as log' => \Yiisoft\Yii\Queue\LogBehavior::class,
-            // Other driver options
-        ],
-    ],
-];
+$eventDisptacher = $DIcontainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
+$logger = $DIcontainer->get(\Psr\Log\LoggerInterface::class);
+
+$worker = $DIcontainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);
+$loop = $DIcontainer->get(\Yiisoft\Yii\Queue\Cli\LoopInterface::class);
+$driver = $DIcontainer->get(\Yiisoft\Yii\Queue\Driver\DriverInterface::class);
+
+$queue = new Queue(
+    $driver,
+    $eventDisptacher,
+    $worker,
+    $loop,
+    $logger
+);
 ```
 
-A list of available drivers and their docs is available in the [table of contents](README.md).
+Documentation for drivers([synchronous driver](driver-sync.md), AMQP driver), loops, workers
 
 
 Usage
@@ -32,14 +34,30 @@ Each task which is sent to the queue should be defined as a separate class.
 For example, if you need to download and save a file the class may look like the following:
 
 ```php
-class DownloadJob extends BaseObject implements \Yiisoft\Yii\Queue\JobInterface
+class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
 {
     public $url;
     public $file;
     
-    public function execute($queue)
+    public function __construct(string $url, string $file)
+    {
+        $this->url = $url;
+        $this->file = $file;
+    }
+    
+    public function getName(): string
+    {
+        return 'earlyDefinedQueueHandlerName';
+    }
+
+    public function getData()
     {
         file_put_contents($this->file, file_get_contents($this->url));
+    }
+
+    public function getMeta(): array
+    {
+        return [];
     }
 }
 ```
@@ -47,21 +65,26 @@ class DownloadJob extends BaseObject implements \Yiisoft\Yii\Queue\JobInterface
 Here's how to send a task to the queue:
 
 ```php
-Yii::$app->queue->push(new DownloadJob([
-    'url' => 'http://example.com/image.jpg',
-    'file' => '/tmp/image.jpg',
-]));
+$queue->push(
+    new DownloadJob('http://example.com/image.jpg', '/tmp/image.jpg')
+);
 ```
 To push a job into the queue that should run after 5 minutes:
 
 ```php
-Yii::$app->queue->delay(5 * 60)->push(new DownloadJob([
-    'url' => 'http://example.com/image.jpg',
-    'file' => '/tmp/image.jpg',
-]));
+$queue->push(
+    new class('http://example.com/image.jpg', '/tmp/image.jpg') extends DownloadJob 
+    implements \Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface {
+
+        public function getDelay(): int
+        {
+            return 5 * 60;
+        }
+    }
+);
 ```
 
-**Important:** Not all drivers support delayed running.
+**Important:** Not all drivers(i.e. synchronous driver) support delayed running.
 
 
 Queue handling
@@ -75,82 +98,36 @@ driver documentation.
 Job status
 ----------
 
-The component can track the status of a job that was pushed into the queue.
-
 ```php
 // Push a job into the queue and get a message ID.
-$id = Yii::$app->queue->push(new SomeJob());
+$id = $queue->push(new SomeJob());
+
+//Get status of job
+$status = $queue->status($id);
 
 // Check whether the job is waiting for execution.
-Yii::$app->queue->isWaiting($id);
+$status->isWaiting();
 
 // Check whether a worker got the job from the queue and executes it.
-Yii::$app->queue->isReserved($id);
+$status->isReserved($id);
 
 // Check whether a worker has executed the job.
-Yii::$app->queue->isDone($id);
+$status->isDone($id);
 ```
 
-**Important:** The RabbitMQ and AWS SQS drivers don't support job statuses.
-
-
-Messaging third party workers
------------------------------
-
-You may pass any data to the queue:
-
-```php
-Yii::$app->queue->push([
-    'function' => 'download',
-    'url' => 'http://example.com/image.jpg',
-    'file' => '/tmp/image.jpg',
-]);
-```
-
-This is useful if the queue is processed using a custom third party worker.
-
-If the worker is not implemented in PHP you have to change the way data is serialized.
-For example to serialize to JSON:
-
-```php
-return [
-    'components' => [
-        'queue' => [
-            'class' => \Yiisoft\Yii\Queue\<driver>\Queue::class,
-            'strictJobType' => false,
-            'serializer' => \Yiisoft\Yii\Queue\Serializers\JsonSerializer::class,
-        ],
-    ],
-];
-```
 
 Handling events
 ---------------
 
 The queue triggers the following events:
 
-| Event name                   | Event class | Triggered                                                 |
-|------------------------------|-------------|-----------------------------------------------------------|
-| Queue::EVENT_BEFORE_PUSH     | PushEvent   | before adding a job to queue using `Queue::push()` method |
-| Queue::EVENT_AFTER_PUSH      | PushEvent   | after adding a job to queue using `Queue::push()` method  |
-| Queue::EVENT_BEFORE_EXEC     | ExecEvent   | before executing a job                                    |
-| Queue::EVENT_AFTER_EXEC      | ExecEvent   | after successful job execution                            |
-| Queue::EVENT_AFTER_ERROR     | ExecEvent   | on uncaught exception during the job execution            |
-| cli\Queue:EVENT_WORKER_START | WorkerEvent | when worker has been started                              |
-| cli\Queue:EVENT_WORKER_LOOP  | WorkerEvent | on each iteration between requests to queue               |
-| cli\Queue:EVENT_WORKER_STOP  | WorkerEvent | when worker has been stopped                              |
-
-You can easily attach your own handler to any of these events.
-For example, let's delay the job, if its execution failed with a special exception:
-
-```php
-Yii::$app->queue->on(Queue::EVENT_AFTER_ERROR, function ($event) {
-    if ($event->error instanceof TemporaryUnprocessableJobException) {
-        $queue = $event->sender;
-        $queue->delay(7200)->push($event->job);
-    }
-});
-```
+| Event class        | Triggered                                                 |
+|--------------------|-----------------------------------------------------------|
+| BeforePush         | before adding a job to queue using `Queue::push()` method |
+| AfterPush          | after adding a job to queue using `Queue::push()` method  |
+| BeforeExecution    | before executing a job                                    |
+| AfterExecution     | after successful job execution                            |
+| JobFailure         | on uncaught exception during the job execution            |
 
 Logging events
 --------------
@@ -170,49 +147,6 @@ return [
     ],
 ];
 ```
-
-
-Multiple queues
----------------
-
-Configuration example:
-
-```php
-return [
-    'bootstrap' => [
-        'queue1', // First component registers its own console commands
-        'queue2', // Second component registers its own console commands
-    ],
-    'components' => [
-        'queue1' => [
-            'class' => \Yiisoft\Yii\Queue\redis\Queue::class,
-        ],
-        'queue2' => [
-            'class' => \Yiisoft\Yii\Queue\Drivers\Db\Queue::class,
-            'strictJobType' => false,
-            'serializer' => \Yiisoft\Yii\Queue\Serializers\JsonSerializer::class,
-        ],
-    ],
-];
-```
-
-Usage example:
-
-```php
-// Sending a task to the queue to be processed via standard worker
-Yii::$app->queue1->push(new DownloadJob([
-    'url' => 'http://example.com/image.jpg',
-    'file' => '/tmp/image.jpg',
-]));
-
-// Sending a task to another queue to be processed by a third party worker
-Yii::$app->queue2->push([
-    'function' => 'download',
-    'url' => 'http://example.com/image.jpg',
-    'file' => '/tmp/image.jpg',
-]);
-```
-
 
 Limitations
 -----------

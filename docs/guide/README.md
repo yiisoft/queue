@@ -1,4 +1,4 @@
-Yii2 Queue extension
+Yii3 Queue extension
 ====================
 
 An extension for running tasks asynchronously via queues.
@@ -14,17 +14,3 @@ Queue Drivers
 -------------
 
 * [Synchronous](driver-sync.md)
-* [File](driver-file.md)
-* [Db](driver-db.md)
-* [Redis](driver-redis.md)
-* [RabbitMQ](driver-amqp.md)
-* [AMQP Interop](driver-amqp-interop.md)
-* [Beanstalk](driver-beanstalk.md)
-* [Gearman](driver-gearman.md)
-* [AWS SQS](driver-sqs.md)
-
-Developer tools
----------------
-
-* [Debugging](debug.md)
-* [Code generator Gii](gii.md)
