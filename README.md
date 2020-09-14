@@ -92,7 +92,7 @@ $queue->push(
 );
 ```
 
-**Important:** Not all drivers(i.e. synchronous driver) support delayed running.
+**Important:** Not every driver (such as synchronous driver) supports delayed execution.
 
 The exact way a task is executed depends on the used driver. Most drivers can be run using
 console commands, which the component automatically registers in your application.
@@ -117,7 +117,7 @@ The component also has the ability to track the status of a job which was pushed
 // Push a job into the queue and get a message ID.
 $id = $queue->push(new SomeJob());
 
-//Get status of job
+// Get status of the job
 $status = $queue->status($id);
 
 // Check whether the job is waiting for execution.
