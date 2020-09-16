@@ -12,7 +12,7 @@ use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueDependentInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
-class QueueDependentInterfaceTest extends TestCase
+final class QueueDependentInterfaceTest extends TestCase
 {
     public function driverProvider(): array
     {
