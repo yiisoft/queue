@@ -11,8 +11,8 @@ namespace Yiisoft\Yii\Queue\Tests;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Log\NullLogger;
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use Psr\Log\NullLogger;
 use RuntimeException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
@@ -28,7 +28,6 @@ use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
 use Yiisoft\Yii\Queue\Queue;
-use Yiisoft\Yii\Queue\Tests\App\ContainerConfigurator;
 use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Worker\Worker;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
@@ -120,10 +119,10 @@ abstract class TestCase extends BaseTestCase
         return $this->container;
     }
 
-    protected function createQueue(bool $driverMock = true): Queue
+    protected function createQueue(): Queue
     {
         return new Queue(
-            $this->getDriver($driverMock),
+            $this->getDriver(),
             $this->getEventDispatcher(),
             $this->getWorker(),
             $this->getLoop(),
@@ -216,7 +215,7 @@ abstract class TestCase extends BaseTestCase
             JobFailure::class => 0,
         ];
         foreach (array_merge($default, $events) as $event => $timesExecuted) {
-            $this->assertEquals($timesExecuted, $this->getEventsCount($event));
+            self::assertEquals($timesExecuted, $this->getEventsCount($event));
         }
     }
 

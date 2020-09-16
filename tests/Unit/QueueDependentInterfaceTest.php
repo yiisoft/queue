@@ -14,7 +14,7 @@ use Yiisoft\Yii\Queue\Tests\TestCase;
 
 class QueueDependentInterfaceTest extends TestCase
 {
-    public function driverProvider()
+    public function driverProvider(): array
     {
         $dependent = new class() implements QueueDependentInterface, DriverInterface {
             public ?Queue $queue = null;

@@ -16,7 +16,7 @@ interface DriverInterface
     /**
      * Returns the first message from the queue if it exists (null otherwise)
      *
-     * @return \Yiisoft\Yii\Queue\Message\MessageInterface|null
+     * @return MessageInterface|null
      */
     public function nextMessage(): ?MessageInterface;
 
@@ -34,7 +34,7 @@ interface DriverInterface
     /**
      * Pushing a job to the queue
      *
-     * @param \Yiisoft\Yii\Queue\Message\MessageInterface $message
+     * @param MessageInterface $message
      *
      * @return string Id of a pushed message
      */
