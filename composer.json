@@ -32,9 +32,9 @@
     },
     "require-dev": {
         "infection/infection": "^0.17.0",
+        "phan/phan": "^3.0",
         "phpunit/phpunit": "^9.3",
-        "yiisoft/test-support": "3.0.x-dev",
-        "phan/phan": "^3.0"
+        "yiisoft/test-support": "3.0.x-dev"
     },
     "suggest": {
         "ext-pcntl": "Need for process signals"
