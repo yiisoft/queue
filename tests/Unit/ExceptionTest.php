@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\unit;
+namespace Yiisoft\Yii\Queue\Tests\Unit;
 
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
 use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;

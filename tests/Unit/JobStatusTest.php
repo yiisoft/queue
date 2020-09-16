@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\unit;
+namespace Yiisoft\Yii\Queue\Tests\Unit;
 
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Tests\TestCase;
