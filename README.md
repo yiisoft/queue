@@ -60,7 +60,9 @@ class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
 
     public function getData()
     {
-        file_put_contents($this->file, file_get_contents($this->url));
+        return function() {
+            file_put_contents($this->file, file_get_contents($this->url));
+        };
     }
 
     public function getMeta(): array

@@ -24,7 +24,8 @@ $queue = new Queue(
 );
 ```
 
-Documentation for drivers([synchronous driver](driver-sync.md), AMQP driver), loops, workers
+Documentation for drivers([synchronous driver](driver-sync.md), [AMQP driver](https://github.com/yiisoft/yii-queue-amqp)), 
+[loops](loops.md), [workers](worker.md)
 
 
 Usage
@@ -52,7 +53,9 @@ class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
 
     public function getData()
     {
-        file_put_contents($this->file, file_get_contents($this->url));
+        return function () {
+            file_put_contents($this->file, file_get_contents($this->url));
+        };
     }
 
     public function getMeta(): array
@@ -132,21 +135,8 @@ The queue triggers the following events:
 Logging events
 --------------
 
-The component provides the `LogBehavior` to log Queue events using
-[Yii's built-in Logger](http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html).
-
-To enable it, simply configure the queue component as follows:
-
-```php
-return [
-    'components' => [
-        'queue' => [
-            'class' => \Yiisoft\Yii\Queue\redis\Queue::class,
-            'as log' => \Yiisoft\Yii\Queue\LogBehavior::class
-        ],
-    ],
-];
-```
+In order to log events, please refer to documentation of implementation of EventDispatcherInterface
+(i.e. [Yii Event Dispatcher](https://github.com/yiisoft/event-dispatcher#events-hierarchy))
 
 Limitations
 -----------
@@ -155,35 +145,4 @@ When using queues it's important to remember that tasks are put into and obtaine
 processes. Therefore avoid external dependencies when executing a task if you're not sure if they are available in
 the environment where the worker does its job.
 
-All the data to process the task should be put into properties of your job object and be sent into the queue along with it.
-
-If you need to process an `ActiveRecord` then send its ID instead of the object itself. When processing you have to extract
-it from DB.
-
-For example:
-
-```php
-Yii::$app->queue->push(new SomeJob([
-    'userId' => Yii::$app->user->id,
-    'bookId' => $book->id,
-    'someUrl' => Url::to(['controller/action']),
-]));
-```
-
-Task class:
-
-```php
-class SomeJob extends BaseObject implements \Yiisoft\Yii\Queue\JobInterface
-{
-    public $userId;
-    public $bookId;
-    public $someUrl;
-
-    public function execute($queue)
-    {
-        $user = User::findOne($this->userId);
-        $book = Book::findOne($this->bookId);
-        //...
-    }
-}
-```
+All the data to process the task should be provided with data of your payload
