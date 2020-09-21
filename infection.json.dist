@@ -5,12 +5,13 @@
         ]
     },
     "logs": {
-        "text": "php:\/\/stderr",
+        "text": "infection.log",
         "badge": {
             "branch": "master"
         }
     },
     "mutators": {
-        "@default": true
+        "@default": true,
+        "ProtectedVisibility": false
     }
 }
