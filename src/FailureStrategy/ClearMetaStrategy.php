@@ -18,10 +18,15 @@ final class ClearMetaStrategy implements FailureStrategyInterface
         $this->metaKeys = $metaKeys;
     }
 
-    public function handle(MessageInterface $message, $stack): void
+    public function handle(MessageInterface $message, ?PipelineInterface $pipeline): bool
     {
+        if ($pipeline === null) {
+            return false;
+        }
+
         $messageNew = $this->wrap($message);
-        $stack->continue($messageNew);
+
+        return $pipeline->handle($messageNew);
     }
 
     private function wrap(MessageInterface $message)

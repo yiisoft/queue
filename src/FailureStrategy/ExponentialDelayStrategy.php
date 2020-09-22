@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\FailureStrategy;
 
 use InvalidArgumentException;
-use RuntimeException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\PayloadFactory;
@@ -58,16 +57,22 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
         return $this->maxAttempts < $this->getAttempts($message->getPayloadMeta());
     }
 
-    public function handle(MessageInterface $message, $stack): void
+    public function handle(MessageInterface $message, ?PipelineInterface $pipeline): bool
     {
         if ($this->suites($message)) {
             $meta = $message->getPayloadMeta();
             $metaNew = $this->formNewMeta($meta);
             $payload = $this->factory->createPayload($message, $metaNew);
             $this->queue->push($payload);
-        } else {
-            $stack->continue($message);
+
+            return true;
         }
+
+        if ($pipeline === null) {
+            return false;
+        }
+
+        return $pipeline->handle($message);
     }
 
     private function formNewMeta(array $meta): array

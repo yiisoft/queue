@@ -6,7 +6,7 @@ namespace Yiisoft\Yii\Queue\FailureStrategy;
 
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 
-interface FailureStrategyInterface
+interface PipelineInterface
 {
-    public function handle(MessageInterface $message, ?PipelineInterface $pipeline): bool;
+    public function handle(MessageInterface $message): bool;
 }
