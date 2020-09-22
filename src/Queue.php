@@ -12,11 +12,13 @@ use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
+use Yiisoft\Yii\Queue\Message\Message;
+use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 use Yiisoft\Yii\Queue\Payload\BasicPayload;
 use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
-use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 /**
@@ -107,13 +109,19 @@ class Queue
 
     /**
      * Execute all existing jobs and exit
+     *
+     * @param int $max
      */
-    public function run(): void
+    public function run(int $max = 0): void
     {
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
-        while ($this->loop->canContinue() && $message = $this->driver->nextMessage()) {
+        while (
+            ($max <= 0 || $max > $count)
+            && $this->loop->canContinue()
+            && $message = $this->driver->nextMessage()
+        ) {
             $this->handle($message);
             $count++;
         }
@@ -130,7 +138,7 @@ class Queue
     public function listen(): void
     {
         $this->logger->debug('Start listening to the queue.');
-        $this->driver->subscribe([$this, 'handle']);
+        $this->driver->subscribe(fn (MessageInterface $message) => $this->handle($message));
         $this->logger->debug('Finish listening to the queue.');
     }
 
@@ -146,7 +154,7 @@ class Queue
         return $this->driver->status($id);
     }
 
-    public function handle(MessageInterface $message): void
+    protected function handle(MessageInterface $message): void
     {
         $this->worker->process($message, $this);
     }

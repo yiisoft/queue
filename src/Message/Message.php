@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue;
+namespace Yiisoft\Yii\Queue\Message;
 
 class Message implements MessageInterface
 {

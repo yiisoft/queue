@@ -13,11 +13,11 @@ use Yiisoft\Yii\Queue\Payload\PayloadInterface;
  */
 class SimplePayload implements PayloadInterface
 {
-    public bool $executed = false;
+    protected string $name = 'simple';
 
     public function getName(): string
     {
-        return 'simple';
+        return $this->name;
     }
 
     public function getData(): string
@@ -28,5 +28,10 @@ class SimplePayload implements PayloadInterface
     public function getMeta(): array
     {
         return [];
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
     }
 }

@@ -8,8 +8,6 @@
 
 An extension for running tasks asynchronously via queues.
 
-It supports queues based on **DB**, **Redis**, **RabbitMQ**, **AMQP**, **Beanstalk** and **Gearman**.
-
 Documentation is at [docs/guide/README.md](docs/guide/README.md).
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/yii-queue/v/stable.svg)](https://packagist.org/packages/yiisoft/yii-queue)
@@ -44,7 +42,7 @@ Each task which is sent to queue should be defined as a separate class.
 For example, if you need to download and save a file the class may look like the following:
 
 ```php
-class DownloadJob implements \Yiisoft\Yii\Queue\JobInterface
+class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
 {
     public $url;
     public $file;
@@ -55,9 +53,19 @@ class DownloadJob implements \Yiisoft\Yii\Queue\JobInterface
         $this->file = $file;
     }
     
-    public function execute($queue)
+    public function getName(): string
+    {
+        return 'earlyDefinedQueueHandlerName';
+    }
+
+    public function getData()
     {
         file_put_contents($this->file, file_get_contents($this->url));
+    }
+
+    public function getMeta(): array
+    {
+        return [];
     }
 }
 ```
@@ -65,17 +73,26 @@ class DownloadJob implements \Yiisoft\Yii\Queue\JobInterface
 Here's how to send a task into the queue:
 
 ```php
-Yii::$app->queue->push(
+$queue->push(
     new DownloadJob('http://example.com/image.jpg', '/tmp/image.jpg')
 );
 ```
 To push a job into the queue that should run after 5 minutes:
 
 ```php
-Yii::$app->queue->delay(5 * 60)->push(
-    new DownloadJob('http://example.com/image.jpg', '/tmp/image.jpg')
+$queue->push(
+    new class('http://example.com/image.jpg', '/tmp/image.jpg') extends DownloadJob 
+    implements \Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface {
+
+        public function getDelay(): int
+        {
+            return 5 * 60;
+        }
+    }
 );
 ```
+
+**Important:** Not every driver (such as synchronous driver) supports delayed execution.
 
 The exact way a task is executed depends on the used driver. Most drivers can be run using
 console commands, which the component automatically registers in your application.
@@ -98,16 +115,19 @@ The component also has the ability to track the status of a job which was pushed
 
 ```php
 // Push a job into the queue and get a message ID.
-$id = Yii::$app->queue->push(new SomeJob());
+$id = $queue->push(new SomeJob());
+
+// Get status of the job
+$status = $queue->status($id);
 
 // Check whether the job is waiting for execution.
-Yii::$app->queue->isWaiting($id);
+$status->isWaiting();
 
 // Check whether a worker got the job from the queue and executes it.
-Yii::$app->queue->isReserved($id);
+$status->isReserved($id);
 
 // Check whether a worker has executed the job.
-Yii::$app->queue->isDone($id);
+$status->isDone($id);
 ```
 
 For more details see [the guide](docs/guide/README.md).
