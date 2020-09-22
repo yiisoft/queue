@@ -54,17 +54,10 @@
             "dev-master": "3.x-dev"
         },
         "config-plugin": {
-            "tests": "config/tests.php",
             "common": "config/common.php",
-            "console": "config/console.php",
             "params": [
                 "$params",
                 "config/params.php"
-            ],
-            "tests-app": [
-                "$common",
-                "$console",
-                "tests/App/config/console.php"
             ],
             "events-console": "config/events-console.php"
         }
