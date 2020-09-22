@@ -8,8 +8,6 @@ use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 
 /**
  * Simple Payload.
- *
- * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
 class SimplePayload implements PayloadInterface
 {

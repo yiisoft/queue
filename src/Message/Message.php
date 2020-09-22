@@ -24,33 +24,21 @@ class Message implements MessageInterface
         $this->id = $id;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getId(): ?string
     {
         return $this->id;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getPayloadName(): string
     {
         return $this->payloadName;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getPayloadData()
     {
         return $this->payloadData;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getPayloadMeta(): array
     {
         return $this->payloadMeta;

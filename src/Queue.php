@@ -21,11 +21,6 @@ use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
-/**
- * Base Queue.
- *
- * @property null|int $workerPid
- */
 class Queue
 {
     protected EventDispatcherInterface $eventDispatcher;

@@ -6,8 +6,6 @@ namespace Yiisoft\Yii\Queue\Payload;
 
 /**
  * Retryable Payload Interface.
- *
- * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
 interface AttemptsRestrictedPayloadInterface extends PayloadInterface
 {

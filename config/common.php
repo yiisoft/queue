@@ -7,6 +7,8 @@ use Yiisoft\Yii\Queue\Cli\SimpleLoop;
 use Yiisoft\Yii\Queue\Worker\Worker as QueueWorker;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
+/* @var array $params */
+
 return [
     QueueWorker::class => [
         '__class' => QueueWorker::class,
