@@ -2,7 +2,10 @@ Configuration
 ================
 ```php
 $eventDisptacher = $DIcontainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
-$handlers = [];
+$handlers = [
+    'simple' => fn() => 'someWork',
+    'anotherHandler' => [QueueHandlerCollection::class, 'methodName']
+];
 $worker = new Worker(
        $handlers,
        $eventDisptacher,
