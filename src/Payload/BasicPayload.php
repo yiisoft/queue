@@ -7,6 +7,9 @@ namespace Yiisoft\Yii\Queue\Payload;
 class BasicPayload implements PayloadInterface
 {
     protected string $name;
+    /**
+     * @var mixed $data It can be anything what can be serialized with the queue driver serializer
+     */
     protected $data;
     protected array $meta;
 

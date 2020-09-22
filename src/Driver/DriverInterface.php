@@ -6,10 +6,10 @@ namespace Yiisoft\Yii\Queue\Driver;
 
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
+use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
-use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
-use Yiisoft\Yii\Queue\MessageInterface;
 
 interface DriverInterface
 {

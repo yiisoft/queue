@@ -6,7 +6,7 @@ namespace Yiisoft\Yii\Queue\Exception;
 
 use RuntimeException;
 use Throwable;
-use Yiisoft\Yii\Queue\MessageInterface;
+use Yiisoft\Yii\Queue\Message\MessageInterface;
 
 class JobFailureException extends RuntimeException
 {

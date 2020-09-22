@@ -69,6 +69,11 @@ class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
     {
         return [];
     }
+
+    public function getMeta(): array
+    {
+        return [];
+    }
 }
 ```
 
