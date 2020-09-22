@@ -25,7 +25,7 @@ $queue = new Queue(
 ```
 
 Documentation for drivers([synchronous driver](driver-sync.md), [AMQP driver](https://github.com/yiisoft/yii-queue-amqp)), 
-[loops](loops.md), [workers](worker.md)
+[workers](worker.md)
 
 
 Usage

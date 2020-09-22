@@ -9,7 +9,6 @@ Introduction
 * [Usage basics](usage.md)
 * [Errors and retryable jobs](retryable.md)
 * [Workers](worker.md)
-* [Loops]()
 
 Queue Drivers
 -------------

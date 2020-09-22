@@ -1,6 +1,16 @@
 Configuration
 ================
-
+```php
+$eventDisptacher = $DIcontainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
+$handlers = [];
+$worker = new Worker(
+       $handlers,
+       $eventDisptacher,
+       new \Psr\Log\NullLogger(),
+       new \Yiisoft\Injector\Injector($DIcontainer),
+       $DIcontainer
+);
+```
 
 Starting Workers
 ================
