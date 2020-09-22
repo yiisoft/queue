@@ -87,7 +87,7 @@ $queue->push(
 );
 ```
 
-**Important:** Not all drivers(i.e. synchronous driver) support delayed running.
+**Important:** Not every driver (such as synchronous driver) supports delayed execution.
 
 
 Queue handling
