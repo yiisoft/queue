@@ -7,11 +7,11 @@ It could be used when developing and debugging an application.
 Configuration example:
 
 ```php
-$eventDisptacher = $DIcontainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
-$logger = $DIcontainer->get(\Psr\Log\LoggerInterface::class);
+$eventDisptacher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
+$logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
 
-$worker = $DIcontainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);
-$loop = $DIcontainer->get(\Yiisoft\Yii\Queue\Cli\LoopInterface::class);
+$worker = $DIContainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);
+$loop = $DIContainer->get(\Yiisoft\Yii\Queue\Cli\LoopInterface::class);
 $driver = new Yiisoft\Yii\Queue\Driver\SynchronousDriver($loop, $worker);
 
 $queue = new Yiisoft\Yii\Queue\Queue(

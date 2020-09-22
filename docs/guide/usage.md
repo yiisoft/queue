@@ -8,12 +8,12 @@ Configuration
 In order to use the extension you can configure it with DI container like the following:
 
 ```php
-$eventDisptacher = $DIcontainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
-$logger = $DIcontainer->get(\Psr\Log\LoggerInterface::class);
+$eventDisptacher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
+$logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
 
-$worker = $DIcontainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);
-$loop = $DIcontainer->get(\Yiisoft\Yii\Queue\Cli\LoopInterface::class);
-$driver = $DIcontainer->get(\Yiisoft\Yii\Queue\Driver\DriverInterface::class);
+$worker = $DIContainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);
+$loop = $DIContainer->get(\Yiisoft\Yii\Queue\Cli\LoopInterface::class);
+$driver = $DIContainer->get(\Yiisoft\Yii\Queue\Driver\DriverInterface::class);
 
 $queue = new Queue(
     $driver,

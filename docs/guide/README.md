@@ -14,4 +14,4 @@ Queue Drivers
 -------------
 
 * [Synchronous](driver-sync.md)
-* [AMPQ](https://github.com/yiisoft/yii-queue-amqp)
+* [AMQP](https://github.com/yiisoft/yii-queue-amqp)
