@@ -6,5 +6,4 @@ namespace Yiisoft\Yii\Queue\FailureStrategy;
 
 class Dispatcher
 {
-
 }
