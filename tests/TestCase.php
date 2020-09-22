@@ -18,7 +18,7 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\EventDispatcher\SimpleEventDispatcher;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
-use Yiisoft\Yii\Queue\Cli\SignalLoop;
+use Yiisoft\Yii\Queue\Cli\SimpleLoop;
 use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Driver\SynchronousDriver;
 use Yiisoft\Yii\Queue\Event\AfterExecution;
@@ -141,7 +141,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function createLoop(): LoopInterface
     {
-        return new SignalLoop();
+        return new SimpleLoop($this->getEventDispatcher());
     }
 
     protected function createWorker(): WorkerInterface
