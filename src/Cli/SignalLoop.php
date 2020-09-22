@@ -8,55 +8,39 @@
 
 namespace Yiisoft\Yii\Queue\Cli;
 
-/**
- * Signal Loop.
- *
- * @author Roman Zhuravlev <zhuravljov@gmail.com>
- *
- * @since 2.0.2
- */
+use Psr\EventDispatcher\EventDispatcherInterface;
+
 class SignalLoop implements LoopInterface
 {
-    /**
-     * @var array of signals to exit from listening of the queue.
-     */
-    protected array $exitSignals = [
-        15, // SIGTERM
-        2,  // SIGINT
-        1,  // SIGHUP
-    ];
-    /**
-     * @var array of signals to suspend listening of the queue.
-     *            For example: SIGTSTP
-     */
-    protected array $suspendSignals = [];
-    /**
-     * @var array of signals to resume listening of the queue.
-     *            For example: SIGCONT
-     */
-    protected array $resumeSignals = [];
+    use SoftLimitTrait;
+
+    protected const SIGNALS_EXIT = [SIGHUP, SIGINT, SIGTERM];
+    protected const SIGNALS_SUSPEND = [SIGTSTP];
+    protected const SIGNALS_RESUME = [SIGCONT];
+
+    protected int $memorySoftLimit;
+    protected EventDispatcherInterface $dispatcher;
+    protected bool $pause;
+    protected bool $exit;
 
     /**
-     * @var bool status when exit signal was got.
+     * @param EventDispatcherInterface $dispatcher
+     * @param int $memorySoftLimit Soft RAM limit in bytes. The loop won't let you continue to execute the program if
+     *     soft limit is reached. Zero means no limit.
      */
-    protected bool $exit = false;
-    /**
-     * @var bool status when suspend or resume signal was got.
-     */
-    protected bool $pause = false;
-
-    public function __construct()
+    public function __construct(EventDispatcherInterface $dispatcher, int $memorySoftLimit = 0)
     {
-        if (extension_loaded('pcntl')) {
-            foreach ($this->exitSignals as $signal) {
-                pcntl_signal($signal, fn () => $this->exit = true);
-            }
-            foreach ($this->suspendSignals as $signal) {
-                pcntl_signal($signal, fn () => $this->pause = true);
-            }
-            foreach ($this->resumeSignals as $signal) {
-                pcntl_signal($signal, fn () => $this->pause = false);
-            }
+        $this->dispatcher = $dispatcher;
+        $this->memorySoftLimit = $memorySoftLimit;
+
+        foreach (self::SIGNALS_EXIT as $signal) {
+            pcntl_signal($signal, fn () => $this->exit = true);
+        }
+        foreach (self::SIGNALS_SUSPEND as $signal) {
+            pcntl_signal($signal, fn () => $this->pause = true);
+        }
+        foreach (self::SIGNALS_RESUME as $signal) {
+            pcntl_signal($signal, fn () => $this->pause = false);
         }
     }
 
@@ -67,25 +51,36 @@ class SignalLoop implements LoopInterface
      */
     public function canContinue(): bool
     {
-        if (extension_loaded('pcntl')) {
+        if ($this->memoryLimitReached()) {
+            return false;
+        }
+
+        return $this->dispatchSignals();
+    }
+
+    protected function dispatchSignals(): bool
+    {
+        $this->pause = false;
+        $this->exit = false;
+
+        pcntl_signal_dispatch();
+
+        // Wait for resume signal until loop is suspended
+        while ($this->pause && !$this->exit) {
+            usleep(10000);
             pcntl_signal_dispatch();
-            // Wait for resume signal until loop is suspended
-            while ($this->pause && !$this->exit) {
-                usleep(10000);
-                pcntl_signal_dispatch();
-            }
         }
 
         return !$this->exit;
     }
 
-    public function setResumeSignals(array $resumeSignals): void
+    protected function getMemoryLimit(): int
     {
-        $this->resumeSignals = $resumeSignals;
+        return $this->memorySoftLimit;
     }
 
-    public function setSuspendSignals(array $suspendSignals): void
+    protected function getEventDispatcher(): EventDispatcherInterface
     {
-        $this->suspendSignals = $suspendSignals;
+        return $this->dispatcher;
     }
 }
