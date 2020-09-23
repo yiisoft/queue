@@ -1,4 +1,4 @@
-Yii3 Queue extension
+Yii Queue extension
 ====================
 
 An extension for running tasks asynchronously via queues.
