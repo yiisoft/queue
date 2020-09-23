@@ -27,5 +27,5 @@ class RetryablePayload extends SimplePayload implements AttemptsRestrictedPayloa
 Restrictions
 ------------
 
-Full support for retryable payload is implemented in the [AMQP Interop](https://github.com/yiisoft/yii-queue-amqp) driver.
+Full support for retryable payload is implemented in the [AMQP](https://github.com/yiisoft/yii-queue-amqp) driver.
 The [Sync](driver-sync.md) driver will not retry failed jobs

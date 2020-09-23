@@ -44,13 +44,13 @@ For example, if you need to download and save a file the class may look like the
 ```php
 class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
 {
-    public $url;
-    public $file;
+    public string $url;
+    public string $filePath;
     
-    public function __construct(string $url, string $file)
+    public function __construct(string $url, string $filePath)
     {
         $this->url = $url;
-        $this->file = $file;
+        $this->filePath = $filePath;
     }
     
     public function getName(): string
@@ -60,14 +60,10 @@ class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
 
     public function getData()
     {
-        return function() {
-            file_put_contents($this->file, file_get_contents($this->url));
-        };
-    }
-
-    public function getMeta(): array
-    {
-        return [];
+        return [
+            'destinationFile' => $this->filePath,
+            'url' => $this->url
+        ];
     }
 
     public function getMeta(): array

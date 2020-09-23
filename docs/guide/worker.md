@@ -50,9 +50,6 @@ to the specified log file.
 
 For more info about Supervisor's configuration and usage see its [documentation](http://supervisord.org).
 
-Note that worker daemons started with `queue/listen` are only supported by the 
-[AMQP Interop](https://github.com/yiisoft/yii-queue-amqp) driver. For additional options see driver guide.
-
 Systemd
 -------
 

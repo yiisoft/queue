@@ -5,7 +5,7 @@ Usage basics
 Configuration
 -------------
 
-In order to use the extension you can configure it with DI container like the following:
+In order to use the extension you can configure it with a DI container in the following way:
 
 ```php
 $eventDisptacher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
@@ -24,8 +24,8 @@ $queue = new Queue(
 );
 ```
 
-Documentation for drivers([synchronous driver](driver-sync.md), [AMQP driver](https://github.com/yiisoft/yii-queue-amqp)), 
-[workers](worker.md)
+See also the documentation for concrete drivers ([synchronous driver](driver-sync.md), 
+[AMQP driver](https://github.com/yiisoft/yii-queue-amqp)) and [workers](worker.md)
 
 
 Usage
@@ -37,13 +37,13 @@ For example, if you need to download and save a file the class may look like the
 ```php
 class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
 {
-    public $url;
-    public $file;
+    public string $url;
+    public string $filePath;
     
-    public function __construct(string $url, string $file)
+    public function __construct(string $url, string $filePath)
     {
         $this->url = $url;
-        $this->file = $file;
+        $this->filePath = $filePath;
     }
     
     public function getName(): string
@@ -53,9 +53,10 @@ class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
 
     public function getData()
     {
-        return function () {
-            file_put_contents($this->file, file_get_contents($this->url));
-        };
+        return [
+            'destinationFile' => $this->filePath,
+            'url' => $this->url
+        ];
     }
 
     public function getMeta(): array
@@ -105,7 +106,7 @@ Job status
 // Push a job into the queue and get a message ID.
 $id = $queue->push(new SomeJob());
 
-//Get status of job
+//Get job status
 $status = $queue->status($id);
 
 // Check whether the job is waiting for execution.
@@ -135,7 +136,7 @@ The queue triggers the following events:
 Logging events
 --------------
 
-In order to log events, please refer to documentation of implementation of EventDispatcherInterface
+In order to log events, please refer to EventDispatcherInterface implementation documentation
 (i.e. [Yii Event Dispatcher](https://github.com/yiisoft/event-dispatcher#events-hierarchy))
 
 Limitations
@@ -145,4 +146,4 @@ When using queues it's important to remember that tasks are put into and obtaine
 processes. Therefore avoid external dependencies when executing a task if you're not sure if they are available in
 the environment where the worker does its job.
 
-All the data to process the task should be provided with data of your payload
+All the data to process the task should be provided with your payload `getData()` method.
