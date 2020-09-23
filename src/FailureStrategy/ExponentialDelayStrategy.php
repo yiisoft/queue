@@ -52,7 +52,7 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
         $this->queue = $queue;
     }
 
-    public function suites(MessageInterface $message): bool
+    private function suites(MessageInterface $message): bool
     {
         return $this->maxAttempts < $this->getAttempts($message->getPayloadMeta());
     }
