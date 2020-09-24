@@ -27,6 +27,7 @@ use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
+use Yiisoft\Yii\Queue\PayloadFactory;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Worker\Worker;
@@ -126,7 +127,8 @@ abstract class TestCase extends BaseTestCase
             $this->getEventDispatcher(),
             $this->getWorker(),
             $this->getLoop(),
-            new NullLogger()
+            new NullLogger(),
+            new PayloadFactory()
         );
     }
 

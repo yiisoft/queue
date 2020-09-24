@@ -8,6 +8,7 @@ use Psr\Log\NullLogger;
 use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\PayloadFactory;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueDependentInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
@@ -91,7 +92,8 @@ final class QueueDependentInterfaceTest extends TestCase
             $this->getEventDispatcher(),
             $this->getWorker(),
             $this->getLoop(),
-            new NullLogger()
+            new NullLogger(),
+            new PayloadFactory()
         );
 
         self::assertEquals($driver instanceof QueueDependentInterface, $driver->queue instanceof Queue);
