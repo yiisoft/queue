@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
-use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
