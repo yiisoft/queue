@@ -13,20 +13,34 @@ use Yiisoft\Yii\Queue\Tests\TestCase;
 
 class ClearMetaStrategyTest extends TestCase
 {
-    public function testTest(): void
+    public function strategyProvider(): array
     {
-        $resultAssertion = static function (MessageInterface $message) {
-            Assert::assertEquals([], $message->getPayloadMeta());
+        return [
+            [
+                new ClearMetaStrategy('testMeta'),
+                ['testMeta' =>'value'],
+                [],
+                true,
+            ],
+        ];
+    }
+    /**
+     * @dataProvider strategyProvider
+     */
+    public function testTest(\Yiisoft\Yii\Queue\FailureStrategy\FailureStrategyInterface $strategy, array $metaInitial, array $metaResult, bool $executionResult): void
+    {
+        $resultAssertion = static function (MessageInterface $message) use ($metaResult) {
+            Assert::assertEquals($metaResult, $message->getPayloadMeta());
 
             return true;
         };
-        $mock = $this->createMock(PipelineInterface::class);
-        $mock->expects(self::once())
+        $pipeline = $this->createMock(PipelineInterface::class);
+        $pipeline->expects(self::once())
             ->method('handle')
             ->willReturnCallback($resultAssertion);
 
-        $testMetaKey = 'testMeta';
-        $message = new Message('test', null, [$testMetaKey => 'testMetaValue']);
-        (new ClearMetaStrategy($testMetaKey))->handle($message, $mock);
+        $message = new Message('test', null, $metaInitial);
+        $result = $strategy->handle($message, $pipeline);
+        self::assertEquals($executionResult, $result);
     }
 }
