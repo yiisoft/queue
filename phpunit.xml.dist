@@ -3,10 +3,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     bootstrap="./tests/bootstrap.php"
     colors="true"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
-    stopOnFailure="false"
     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
 >
     <coverage>
@@ -15,8 +11,11 @@
         </include>
     </coverage>
     <testsuites>
-        <testsuite name="Test Suite">
+        <testsuite name="Unit tests">
             <directory>./tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integrational tests">
+            <directory>./tests/Integrational</directory>
         </testsuite>
     </testsuites>
 </phpunit>
