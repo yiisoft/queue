@@ -4,6 +4,8 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Cli\SignalLoop;
 use Yiisoft\Yii\Queue\Cli\SimpleLoop;
+use Yiisoft\Yii\Queue\Payload\PayloadFactory;
+use Yiisoft\Yii\Queue\Payload\PayloadFactoryInterface;
 use Yiisoft\Yii\Queue\Worker\Worker as QueueWorker;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
@@ -20,4 +22,5 @@ return [
             ? $container->get(SignalLoop::class)
             : $container->get(SimpleLoop::class);
     },
+    PayloadFactoryInterface::class => PayloadFactory::class
 ];
