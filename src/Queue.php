@@ -24,9 +24,6 @@ class Queue
     protected WorkerInterface $worker;
     protected LoopInterface $loop;
     private LoggerInterface $logger;
-    /**
-     * @var PayloadFactoryInterface
-     */
     private PayloadFactoryInterface $payloadFactory;
 
     public function __construct(

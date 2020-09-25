@@ -31,9 +31,7 @@ class PayloadFactory implements PayloadFactoryInterface
     public function createPayload(MessageInterface $message, array $metaOverwrite): PayloadInterface
     {
         $metaOriginal = $message->getPayloadMeta();
-        if (isset($metaOriginal[PayloadInterface::META_KEY_DELAY])) {
-            unset($metaOriginal[PayloadInterface::META_KEY_DELAY]);
-        }
+        unset($metaOriginal[PayloadInterface::META_KEY_DELAY]);
 
         $meta = array_merge($metaOriginal, $metaOverwrite);
 
