@@ -12,13 +12,9 @@ use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
-use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
-use Yiisoft\Yii\Queue\Payload\BasicPayload;
-use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
+use Yiisoft\Yii\Queue\Payload\PayloadFactoryInterface;
 use Yiisoft\Yii\Queue\Payload\PayloadInterface;
-use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 class Queue
@@ -28,19 +24,25 @@ class Queue
     protected WorkerInterface $worker;
     protected LoopInterface $loop;
     private LoggerInterface $logger;
+    /**
+     * @var PayloadFactoryInterface
+     */
+    private PayloadFactoryInterface $payloadFactory;
 
     public function __construct(
         DriverInterface $driver,
         EventDispatcherInterface $dispatcher,
         WorkerInterface $worker,
         LoopInterface $loop,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        PayloadFactoryInterface $payloadFactory
     ) {
         $this->driver = $driver;
         $this->eventDispatcher = $dispatcher;
         $this->worker = $worker;
         $this->loop = $loop;
         $this->logger = $logger;
+        $this->payloadFactory = $payloadFactory;
 
         if ($driver instanceof QueueDependentInterface) {
             $driver->setQueue($this);
@@ -56,7 +58,10 @@ class Queue
         ) {
             $event->preventThrowing();
             $attemptsLeft = $event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] - 1;
-            $payload = $this->messageConvert($event->getMessage(), [PayloadInterface::META_KEY_ATTEMPTS => $attemptsLeft]);
+            $payload = $this->payloadFactory->createPayload(
+                $event->getMessage(),
+                [PayloadInterface::META_KEY_ATTEMPTS => $attemptsLeft]
+            );
             $this->logger->debug(
                 'Retrying payload "{payload}".',
                 ['payload' => $event->getMessage()->getPayloadName()]
@@ -76,7 +81,7 @@ class Queue
     public function push(PayloadInterface $payload): ?string
     {
         $this->logger->debug('Preparing to push payload "{payload}".', ['payload' => $payload->getName()]);
-        $message = $this->payloadConvert($payload);
+        $message = $this->payloadFactory->createMessage($payload);
         $this->eventDispatcher->dispatch(new BeforePush($this, $message));
 
         if ($this->driver->canPush($message)) {
@@ -152,31 +157,5 @@ class Queue
     protected function handle(MessageInterface $message): void
     {
         $this->worker->process($message, $this);
-    }
-
-    protected function payloadConvert(PayloadInterface $payload): MessageInterface
-    {
-        $meta = $payload->getMeta();
-
-        if ($payload instanceof DelayablePayloadInterface) {
-            $meta[PayloadInterface::META_KEY_DELAY] = $payload->getDelay();
-        }
-
-        if ($payload instanceof PrioritisedPayloadInterface) {
-            $meta[PayloadInterface::META_KEY_PRIORITY] = $payload->getPriority();
-        }
-
-        if ($payload instanceof AttemptsRestrictedPayloadInterface) {
-            $meta[PayloadInterface::META_KEY_ATTEMPTS] = $payload->getAttempts();
-        }
-
-        return new Message($payload->getName(), $payload->getData(), $meta);
-    }
-
-    protected function messageConvert(MessageInterface $message, array $metaOverwrite): PayloadInterface
-    {
-        $meta = array_merge($message->getPayloadMeta(), $metaOverwrite);
-
-        return new BasicPayload($message->getPayloadName(), $message->getPayloadData(), $meta);
     }
 }
