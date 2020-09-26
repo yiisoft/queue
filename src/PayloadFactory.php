@@ -33,13 +33,9 @@ class PayloadFactory
         return new Message($payload->getName(), $payload->getData(), $meta);
     }
 
-    public function createPayload(MessageInterface $message, array $metaOverwrite): PayloadInterface
+    public function createPayload(MessageInterface $message, array $metaOverwrite = []): PayloadInterface
     {
         $metaOriginal = $message->getPayloadMeta();
-        if (isset($metaOriginal[PayloadInterface::META_KEY_DELAY])) {
-            unset($metaOriginal[PayloadInterface::META_KEY_DELAY]);
-        }
-
         $meta = array_merge($metaOriginal, $metaOverwrite);
 
         return new BasicPayload($message->getPayloadName(), $message->getPayloadData(), $meta);
