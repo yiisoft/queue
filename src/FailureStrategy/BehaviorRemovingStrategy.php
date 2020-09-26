@@ -5,17 +5,22 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\FailureStrategy;
 
 use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 
-final class ClearMetaStrategy implements FailureStrategyInterface
+final class BehaviorRemovingStrategy implements FailureStrategyInterface
 {
     /**
      * @var string[]
      */
     private array $metaKeys;
 
-    public function __construct(string ...$metaKeys)
+    /**
+     * @param string ...$behaviors Behaviors are the keys in the payload metadata that should be removed
+     *                             (e.g. {@see PayloadInterface::META_KEY_DELAY}]
+     */
+    public function __construct(string ...$behaviors)
     {
-        $this->metaKeys = $metaKeys;
+        $this->metaKeys = $behaviors;
     }
 
     public function handle(MessageInterface $message, ?PipelineInterface $pipeline): bool

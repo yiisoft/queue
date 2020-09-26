@@ -5,40 +5,40 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
 use PHPUnit\Framework\Assert;
-use Yiisoft\Yii\Queue\FailureStrategy\ClearMetaStrategy;
+use Yiisoft\Yii\Queue\FailureStrategy\BehaviorRemovingStrategy;
 use Yiisoft\Yii\Queue\FailureStrategy\FailureStrategyInterface;
 use Yiisoft\Yii\Queue\FailureStrategy\PipelineInterface;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
-class ClearMetaStrategyTest extends TestCase
+class BehaviorRemovingStrategyTest extends TestCase
 {
     public function strategyProvider(): array
     {
         return [
             [
-                new ClearMetaStrategy('testKey'),
+                new BehaviorRemovingStrategy('testKey'),
                 ['testKey' =>'testValue'],
                 [],
             ],
             [
-                new ClearMetaStrategy(),
+                new BehaviorRemovingStrategy(),
                 ['testKey' =>'testValue'],
                 ['testKey' =>'testValue'],
             ],
             [
-                new ClearMetaStrategy('non-existing'),
+                new BehaviorRemovingStrategy('non-existing'),
                 ['testKey' =>'testValue'],
                 ['testKey' =>'testValue'],
             ],
             [
-                new ClearMetaStrategy('non-existing'),
+                new BehaviorRemovingStrategy('non-existing'),
                 [],
                 [],
             ],
             [
-                new ClearMetaStrategy('testKey', 'non-existing'),
+                new BehaviorRemovingStrategy('testKey', 'non-existing'),
                 ['testKey' =>'testValue', 'testKey2' =>'testValue2'],
                 ['testKey2' =>'testValue2'],
             ],
@@ -52,7 +52,7 @@ class ClearMetaStrategyTest extends TestCase
      * @param array $metaInitial
      * @param array $metaResult
      */
-    public function testClearMetaStrategy(FailureStrategyInterface $strategy, array $metaInitial, array $metaResult): void
+    public function testBehaviorRemovingStrategy(FailureStrategyInterface $strategy, array $metaInitial, array $metaResult): void
     {
         $resultAssertion = static function (MessageInterface $message) use ($metaResult) {
             Assert::assertEquals($metaResult, $message->getPayloadMeta());
@@ -76,7 +76,7 @@ class ClearMetaStrategyTest extends TestCase
      * @param array $metaInitial
      * @param array $metaResult
      */
-    public function testClearMetaStrategyReturnFalse(FailureStrategyInterface $strategy, array $metaInitial, array $metaResult): void
+    public function testBehaviorRemovingStrategyReturnFalse(FailureStrategyInterface $strategy, array $metaInitial, array $metaResult): void
     {
         $resultAssertion = static function (MessageInterface $message) use ($metaResult) {
             Assert::assertEquals($metaResult, $message->getPayloadMeta());
