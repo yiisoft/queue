@@ -19,18 +19,18 @@ class BehaviorRemovingStrategyTest extends TestCase
         return [
             [
                 new BehaviorRemovingStrategy('testKey'),
-                ['testKey' =>'testValue'],
+                ['testKey' => 'testValue'],
                 [],
             ],
             [
                 new BehaviorRemovingStrategy(),
-                ['testKey' =>'testValue'],
-                ['testKey' =>'testValue'],
+                ['testKey' => 'testValue'],
+                ['testKey' => 'testValue'],
             ],
             [
                 new BehaviorRemovingStrategy('non-existing'),
-                ['testKey' =>'testValue'],
-                ['testKey' =>'testValue'],
+                ['testKey' => 'testValue'],
+                ['testKey' => 'testValue'],
             ],
             [
                 new BehaviorRemovingStrategy('non-existing'),
@@ -39,8 +39,8 @@ class BehaviorRemovingStrategyTest extends TestCase
             ],
             [
                 new BehaviorRemovingStrategy('testKey', 'non-existing'),
-                ['testKey' =>'testValue', 'testKey2' =>'testValue2'],
-                ['testKey2' =>'testValue2'],
+                ['testKey' => 'testValue', 'testKey2' => 'testValue2'],
+                ['testKey2' => 'testValue2'],
             ],
         ];
     }
@@ -52,8 +52,11 @@ class BehaviorRemovingStrategyTest extends TestCase
      * @param array $metaInitial
      * @param array $metaResult
      */
-    public function testBehaviorRemovingStrategy(FailureStrategyInterface $strategy, array $metaInitial, array $metaResult): void
-    {
+    public function testBehaviorRemovingStrategy(
+        FailureStrategyInterface $strategy,
+        array $metaInitial,
+        array $metaResult
+    ): void {
         $resultAssertion = static function (MessageInterface $message) use ($metaResult) {
             Assert::assertEquals($metaResult, $message->getPayloadMeta());
 
@@ -76,13 +79,45 @@ class BehaviorRemovingStrategyTest extends TestCase
      * @param array $metaInitial
      * @param array $metaResult
      */
-    public function testBehaviorRemovingStrategyReturnFalse(FailureStrategyInterface $strategy, array $metaInitial, array $metaResult): void
-    {
+    public function testBehaviorRemovingStrategyReturnFalse(
+        FailureStrategyInterface $strategy,
+        array $metaInitial,
+        array $metaResult
+    ): void {
         $resultAssertion = static function (MessageInterface $message) use ($metaResult) {
             Assert::assertEquals($metaResult, $message->getPayloadMeta());
 
             return false;
         };
+        $pipeline = $this->createMock(PipelineInterface::class);
+        $pipeline->expects(self::once())
+            ->method('handle')
+            ->willReturnCallback($resultAssertion);
+
+        $message = new Message('test', null, $metaInitial);
+        $result = $strategy->handle($message, $pipeline);
+        self::assertFalse($result);
+    }
+
+    public function testQueueSendingStrategies(
+        FailureStrategyInterface $strategy,
+        bool $suites, // флаг, что сообщение будет отправлено в очередь, и что не будет выполнен дальнейший пайплайн
+        array $metaInitial,
+        array $metaResult
+    ): void {
+        $this->markTestIncomplete('It is just a draft for a real test');
+        // 1. Проверить отправляемые в очередь meta
+        // 2. Проверить возвращаемый результат
+        // 3. Проверить, что сообщения, которые не должны попасть в очередь, туда не попадают
+        // 4. Проверить, что дальнейшее выполнение пайплайна происходит только, если сообщение больше никуда не отправлено
+        // Очередь можно сделать в отдельном методе, замокав все зависимости (все равно они не нужны, бгг)
+
+        $resultAssertion = static function (MessageInterface $message) use ($metaResult) {
+            Assert::assertEquals($metaResult, $message->getPayloadMeta());
+
+            return false;
+        };
+
         $pipeline = $this->createMock(PipelineInterface::class);
         $pipeline->expects(self::once())
             ->method('handle')
