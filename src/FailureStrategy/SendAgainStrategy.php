@@ -61,5 +61,5 @@ final class SendAgainStrategy implements FailureStrategyInterface
         $result = $message->getPayloadMeta()[$this->getMetaKey()] ?? 0;
 
         return (int) $result;
-}
+    }
 }
