@@ -54,7 +54,7 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
 
     private function suites(MessageInterface $message): bool
     {
-        return $this->maxAttempts < $this->getAttempts($message->getPayloadMeta());
+        return $this->maxAttempts > $this->getAttempts($message->getPayloadMeta());
     }
 
     public function handle(MessageInterface $message, ?PipelineInterface $pipeline): bool

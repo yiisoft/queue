@@ -11,7 +11,7 @@ use Yiisoft\Yii\Queue\Queue;
 
 final class SendAgainStrategy implements FailureStrategyInterface
 {
-    private const META_KEY_RESEND = 'failure-strategy-resend-attempts';
+    public const META_KEY_RESEND = 'failure-strategy-resend-attempts';
 
     private string $id;
     private int $maxAttempts;
@@ -59,6 +59,9 @@ final class SendAgainStrategy implements FailureStrategyInterface
     private function getAttempts(MessageInterface $message): int
     {
         $result = $message->getPayloadMeta()[$this->getMetaKey()] ?? 0;
+        if ($result < 0) {
+            $result = 0;
+        }
 
         return (int) $result;
     }
