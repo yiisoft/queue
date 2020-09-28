@@ -1,5 +1,25 @@
 Configuration
 ================
+
+In order to use implemented worker, you should resolve it's dependencies (e.g. through DI container) 
+and define handlers for each message which will be consumed by this worker;
+
+Handlers are callables indexed by payload names. When a message will be consumed from the queue, a callable associated with it's payload name will be called.
+
+#### Handler format
+Handler can be any callable with a couple of additions:
+
+- If handler is given as an array of two strings, it will be treated a DI container service id and its method.
+E.g. `[ClassName::class, 'handle']` will be resolved to `$container->get(ClassName::class)->handle()`.
+
+- The second important thing to know is that an `Injector` is used to call the handlers.
+This means you can define handlers as closures with their own dependenies which will be resolved with DI container.
+In the example below you can see a closure in which `message` will be taken from the queue 
+and `ClientInterface` will be resolved via DI container.
+```php
+'payloadName' => fn (MessageInterface $message, ClientInterface $client) => $client->send($message->getPayloadData()),
+```
+
 ```php
 $eventDisptacher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
 $handlers = [
