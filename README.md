@@ -33,34 +33,42 @@ or add
 "yiisoft/yii-queue": "~3.0"
 ```
 
-to the require section of your `composer.json` file.
+to the `require` section of your `composer.json` file.
 
 Basic Usage
 -----------
 
-Each task which is sent to queue should be defined as a separate class.
-For example, if you need to download and save a file the class may look like the following:
+Each queue task consists of two parts:
+1. Data payload. It is a class implementing `PayloadInterface`.
+2. Payload handler. It is a callable called by a `WorkerInterface` which handles every queue message.
+
+For example, if you need to download and save a file, the payload may look like the following:
 
 ```php
 class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
 {
-    public $url;
-    public $file;
+    public const NAME = 'file-download';
+
+    public string $url;
+    public string $fileName;
     
-    public function __construct(string $url, string $file)
+    public function __construct(string $url, string $fileName)
     {
         $this->url = $url;
-        $this->file = $file;
+        $this->fileName = $fileName;
     }
     
     public function getName(): string
     {
-        return 'earlyDefinedQueueHandlerName';
+        return self::NAME;
     }
 
-    public function getData()
+    public function getData(): array
     {
-        file_put_contents($this->file, file_get_contents($this->url));
+        return [
+            'destinationFile' => $this->fileName,
+            'url' => $this->url
+        ];
     }
 
     public function getMeta(): array
@@ -70,13 +78,51 @@ class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
 }
 ```
 
+And its handler may look like the following:
+
+```php
+class FileDownloader
+{
+    private string $absolutePath;
+
+    public function __construct(string $absolutePath) 
+    {
+        $this->absolutePath = $absolutePath;
+    }
+
+    public function handle(\Yiisoft\Yii\Queue\Message\MessageInterface $downloadMessage): void
+    {
+        $fileName = $downloadMessage->getPayloadData()['destinationFile'];
+        $path = "$this->absolutePath/$fileName"; 
+        file_put_contents($path, file_get_contents($downloadMessage->getPayloadData()['url']));
+    }
+}
+```
+
+The last thing we should do is to create configuration for the `Yiisoft\Yii\Queue\Worker\Worker`:
+```php
+$handlers = [DownloadJob::NAME => [new FileDownloader('/path/to/save/files'), 'handle']];
+$worker = new \Yiisoft\Yii\Queue\Worker\Worker(
+    $handlers, // Here it is
+    $dispatcher,
+    $logger,
+    $injector,
+    $container
+);
+```
+
 Here's how to send a task into the queue:
 
 ```php
 $queue->push(
-    new DownloadJob('http://example.com/image.jpg', '/tmp/image.jpg')
+    new DownloadJob('http://example.com/image.jpg', 'new-image-name.jpg')
 );
 ```
+
+
+
+
+
 To push a job into the queue that should run after 5 minutes:
 
 ```php

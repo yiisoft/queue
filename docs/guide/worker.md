@@ -1,3 +1,40 @@
+Configuration
+================
+
+In order to use implemented worker, you should resolve its dependencies (e.g. through DI container) 
+and define handlers for each message which will be consumed by this worker;
+
+Handlers are callables indexed by payload names. When a message is consumed from the queue, a callable associated with its payload name is called.
+
+#### Handler format
+Handler can be any callable with a couple of additions:
+
+- If handler is given as an array of two strings, it will be treated a DI container service id and its method.
+E.g. `[ClassName::class, 'handle']` will be resolved to `$container->get(ClassName::class)->handle()`.
+
+- The second important thing to know is that an `Injector` is used to call the handlers.
+This means you can define handlers as closures with their own dependenies which will be resolved with DI container.
+In the example below you can see a closure in which `message` will be taken from the queue 
+and `ClientInterface` will be resolved via DI container.
+```php
+'payloadName' => fn (MessageInterface $message, ClientInterface $client) => $client->send($message->getPayloadData()),
+```
+
+```php
+$eventDisptacher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
+$handlers = [
+    'simple' => fn() => 'someWork',
+    'anotherHandler' => [QueueHandlerCollection::class, 'methodName']
+];
+$worker = new Worker(
+       $handlers,
+       $eventDisptacher,
+       new \Psr\Log\NullLogger(),
+       new \Yiisoft\Injector\Injector($DIContainer),
+       $DIContainer
+);
+```
+
 Starting Workers
 ================
 
@@ -32,18 +69,6 @@ In this case Supervisor should start 4 `queue/listen` workers. The worker output
 to the specified log file.
 
 For more info about Supervisor's configuration and usage see its [documentation](http://supervisord.org).
-
-Note that worker daemons started with `queue/listen` are only supported by the [File], [Db], [Redis],
-[RabbitMQ], [AMQP Interop], [Beanstalk], [Gearman] and [AWS SQS] drivers. For additional options see driver guide.
-
-[File]: driver-file.md
-[Db]: driver-db.md
-[Redis]: driver-redis.md
-[AMQP Interop]: driver-amqp-interop.md
-[RabbitMQ]: driver-amqp.md
-[Beanstalk]: driver-beanstalk.md
-[Gearman]: driver-gearman.md
-[AWS SQS]: driver-sqs.md
 
 Systemd
 -------
@@ -110,13 +135,3 @@ Config example:
 ```
 
 In this case cron will run the command every minute.
-
-The `queue/run` command is supported by the [File], [Db], [Redis], [Beanstalk], [Gearman], [AWS SQS] drivers.
-For additional options see driver guide.
-
-[File]: driver-file.md
-[Db]: driver-db.md
-[Redis]: driver-redis.md
-[Beanstalk]: driver-beanstalk.md
-[Gearman]: driver-gearman.md
-[AWS SQS]: driver-sqs.md
