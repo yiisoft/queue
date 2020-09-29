@@ -5,7 +5,7 @@ Usage basics
 Configuration
 -------------
 
-In order to use the extension you can configure it with a DI container in the following way:
+You can configure it with a DI container in the following way:
 
 ```php
 $eventDisptacher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);

@@ -1,10 +1,10 @@
 Configuration
 ================
 
-In order to use implemented worker, you should resolve it's dependencies (e.g. through DI container) 
+In order to use implemented worker, you should resolve its dependencies (e.g. through DI container) 
 and define handlers for each message which will be consumed by this worker;
 
-Handlers are callables indexed by payload names. When a message will be consumed from the queue, a callable associated with it's payload name will be called.
+Handlers are callables indexed by payload names. When a message is consumed from the queue, a callable associated with its payload name is called.
 
 #### Handler format
 Handler can be any callable with a couple of additions:

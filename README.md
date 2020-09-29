@@ -40,7 +40,7 @@ Basic Usage
 
 Each queue task consists of two parts:
 1. Data payload. It is a class implementing `PayloadInterface`.
-1. Payload handler. It is a callable called by a `WorkerInterface` which handles every queue message.
+2. Payload handler. It is a callable called by a `WorkerInterface` which handles every queue message.
 
 For example, if you need to download and save a file, the payload may look like the following:
 
@@ -78,7 +78,7 @@ class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
 }
 ```
 
-And it's handler may look like this:
+And its handler may look like the following:
 
 ```php
 class FileDownloader
