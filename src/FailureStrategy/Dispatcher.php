@@ -8,7 +8,7 @@ use Yiisoft\Yii\Queue\Event\JobFailure;
 
 class Dispatcher
 {
-    private $pipeline;
+    private PipelineInterface $pipeline;
 
     public function __construct(PipelineInterface $pipeline)
     {
