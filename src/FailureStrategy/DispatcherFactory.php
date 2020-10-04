@@ -8,7 +8,7 @@ use Psr\Container\ContainerInterface;
 use WeakReference;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 
-class DispatcherFactory
+final class DispatcherFactory
 {
     public const DEFAULT_PIPELINE = 'failure-pipeline-default';
 
