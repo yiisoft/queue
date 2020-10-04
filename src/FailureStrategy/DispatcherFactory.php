@@ -35,13 +35,13 @@ class DispatcherFactory
         return $result;
     }
 
-    private function create($name): Dispatcher
+    private function create($definition): Dispatcher
     {
-        if ($this->pipelines[$name] instanceof PipelineInterface) {
-            return new Dispatcher($this->pipelines[$name]);
+        if ($definition instanceof PipelineInterface) {
+            return new Dispatcher($definition);
         }
 
-        return new Dispatcher($this->createPipeline($this->pipelines[$name]));
+        return new Dispatcher($this->createPipeline($definition));
     }
 
     private function createPipeline(array $pipeline): PipelineInterface
