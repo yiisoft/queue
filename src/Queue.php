@@ -10,7 +10,6 @@ use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
-use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Payload\PayloadInterface;
@@ -47,25 +46,6 @@ class Queue
 
         if ($driver instanceof QueueDependentInterface) {
             $driver->setQueue($this);
-        }
-    }
-
-    public function jobRetry(JobFailure $event): void
-    {
-        if (
-            $event->getQueue() === $this
-            && !$event->getException() instanceof PayloadNotSupportedException
-            && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) > 0
-        ) {
-            $event->preventThrowing();
-            $attemptsLeft = $event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] - 1;
-            $payload = $this->payloadFactory->createPayload($event->getMessage(), [PayloadInterface::META_KEY_ATTEMPTS => $attemptsLeft]);
-            $this->logger->debug(
-                'Retrying payload "{payload}".',
-                ['payload' => $event->getMessage()->getPayloadName()]
-            );
-
-            $this->push($payload);
         }
     }
 

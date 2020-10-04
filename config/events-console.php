@@ -1,10 +1,10 @@
 <?php
 
 use Yiisoft\Yii\Queue\Event\JobFailure;
-use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\FailureStrategy\FailedJobsHandler;
 
 return [
     JobFailure::class => [
-        [Queue::class, 'jobRetry'],
+        [FailedJobsHandler::class, 'handle'],
     ],
 ];
