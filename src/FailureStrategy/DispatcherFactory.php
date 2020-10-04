@@ -13,6 +13,9 @@ final class DispatcherFactory
     public const DEFAULT_PIPELINE = 'failure-pipeline-default';
 
     private array $pipelines;
+    /**
+     * @var WeakReference[]
+     */
     private array $built = [];
     private ContainerInterface $container;
 
@@ -25,6 +28,7 @@ final class DispatcherFactory
     public function get(string $payloadName): Dispatcher
     {
         $name = isset($this->pipelines[$payloadName]) ? $payloadName : self::DEFAULT_PIPELINE;
+        /** @var Dispatcher $result */
         if (isset($this->built[$name]) && $result = $this->built[$name]->get()) {
             return $result;
         }
