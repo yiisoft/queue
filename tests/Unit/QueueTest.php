@@ -4,16 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
-use RuntimeException;
-use Yiisoft\Yii\Queue\Driver\SynchronousDriver;
 use Yiisoft\Yii\Queue\Event\AfterExecution;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\BeforePush;
-use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
 use Yiisoft\Yii\Queue\Tests\App\DelayablePayload;
-use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
@@ -120,66 +116,6 @@ final class QueueTest extends TestCase
             AfterExecution::class => 2,
         ];
         $this->assertEvents($events);
-    }
-
-    public function testJobRetry(): void
-    {
-        self::markTestSkipped('The logic will be refactored in https://github.com/yiisoft/yii-queue/issues/59');
-
-        $exception = null;
-
-        $queue = $this->getQueue();
-        $payload = new RetryablePayload();
-        $queue->push($payload);
-
-        try {
-            $queue->run();
-        } catch (RuntimeException $exception) {
-        } finally {
-            self::assertInstanceOf(RuntimeException::class, $exception);
-            self::assertEquals(
-                "Processing of message #0 is stopped because of an exception:\ntest.",
-                $exception->getMessage()
-            );
-            self::assertEquals(2, $this->executionTimes);
-
-            $events = [
-                BeforePush::class => 2,
-                AfterPush::class => 2,
-                BeforeExecution::class => 2,
-                JobFailure::class => 2,
-            ];
-            $this->assertEvents($events);
-        }
-    }
-
-    public function testJobRetryFail(): void
-    {
-        self::markTestSkipped('The logic will be refactored in https://github.com/yiisoft/yii-queue/issues/59');
-
-        $queue = $this->getQueue();
-        $payload = new RetryablePayload();
-        $payload->setName('not-supported');
-        $queue->push($payload);
-        $exception = null;
-
-        try {
-            $queue->run();
-        } catch (PayloadNotSupportedException $exception) {
-        } finally {
-            $message = SynchronousDriver::class . ' does not support payload "retryable".';
-            self::assertInstanceOf(PayloadNotSupportedException::class, $exception);
-            self::assertEquals($message, $exception->getMessage());
-            self::assertEquals(0, $this->executionTimes);
-
-            $events = [
-                BeforePush::class => 1,
-                AfterPush::class => 1,
-                BeforeExecution::class => 1,
-                JobFailure::class => 1,
-            ];
-            $this->assertEvents($events);
-        }
     }
 
     public function testStatus(): void
