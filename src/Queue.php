@@ -12,13 +12,8 @@ use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
-use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
-use Yiisoft\Yii\Queue\Payload\BasicPayload;
-use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PayloadInterface;
-use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 /**
