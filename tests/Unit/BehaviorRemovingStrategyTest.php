@@ -98,6 +98,4 @@ class BehaviorRemovingStrategyTest extends TestCase
         $result = $strategy->handle($message, $pipeline);
         self::assertFalse($result);
     }
-
-
 }

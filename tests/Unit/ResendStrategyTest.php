@@ -228,5 +228,5 @@ class ResendStrategyTest extends TestCase
             ->willReturnCallback($queueAssertion);
 
         return $queue;
-}
+    }
 }
