@@ -34,6 +34,7 @@
         "infection/infection": "^0.17.0",
         "phan/phan": "^3.0",
         "phpunit/phpunit": "^9.3",
+        "yiisoft/composer-config-plugin": "^1.0@dev",
         "yiisoft/test-support": "3.0.x-dev"
     },
     "suggest": {
