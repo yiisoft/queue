@@ -11,7 +11,7 @@ use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
-use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
+use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Tests\App\DelayablePayload;
 use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
@@ -55,9 +55,9 @@ final class QueueTest extends TestCase
         $job = new DelayablePayload();
         try {
             $queue->push($job);
-        } catch (PayloadNotSupportedException $exception) {
+        } catch (BehaviorNotSupportedException $exception) {
         } finally {
-            self::assertInstanceOf(PayloadNotSupportedException::class, $exception);
+            self::assertInstanceOf(BehaviorNotSupportedException::class, $exception);
             $this->assertEvents([BeforePush::class => 1]);
         }
     }
@@ -165,10 +165,10 @@ final class QueueTest extends TestCase
 
         try {
             $queue->run();
-        } catch (PayloadNotSupportedException $exception) {
+        } catch (BehaviorNotSupportedException $exception) {
         } finally {
             $message = SynchronousDriver::class . ' does not support payload "retryable".';
-            self::assertInstanceOf(PayloadNotSupportedException::class, $exception);
+            self::assertInstanceOf(BehaviorNotSupportedException::class, $exception);
             self::assertEquals($message, $exception->getMessage());
             self::assertEquals(0, $this->executionTimes);
 

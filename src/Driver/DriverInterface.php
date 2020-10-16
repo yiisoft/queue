@@ -6,6 +6,7 @@ namespace Yiisoft\Yii\Queue\Driver;
 
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
+use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
@@ -32,13 +33,13 @@ interface DriverInterface
     public function status(string $id): JobStatus;
 
     /**
-     * Pushing a job to the queue
+     * Pushing a message to the queue. Driver sets message id if available.
      *
      * @param MessageInterface $message
      *
-     * @return string Id of a pushed message
+     * @throws BehaviorNotSupportedException Driver must throw exception when it does not support all the attached behaviours
      */
-    public function push(MessageInterface $message): ?string;
+    public function push(MessageInterface $message): void;
 
     /**
      * Listen to the queue and pass messages to the given handler as they come
@@ -46,14 +47,4 @@ interface DriverInterface
      * @param callable $handler The handler which will execute jobs
      */
     public function subscribe(callable $handler): void;
-
-    /**
-     * Takes care about supporting {@see DelayablePayloadInterface}, {@see PrioritisedPayloadInterface}
-     * and {@see AttemptsRestrictedPayloadInterface} and any other conditions.
-     *
-     * @param MessageInterface $message
-     *
-     * @return bool
-     */
-    public function canPush(MessageInterface $message): bool;
 }

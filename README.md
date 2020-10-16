@@ -92,9 +92,9 @@ class FileDownloader
 
     public function handle(\Yiisoft\Yii\Queue\Message\MessageInterface $downloadMessage): void
     {
-        $fileName = $downloadMessage->getPayloadData()['destinationFile'];
+        $fileName = $downloadMessage->getData()['destinationFile'];
         $path = "$this->absolutePath/$fileName"; 
-        file_put_contents($path, file_get_contents($downloadMessage->getPayloadData()['url']));
+        file_put_contents($path, file_get_contents($downloadMessage->getData()['url']));
     }
 }
 ```

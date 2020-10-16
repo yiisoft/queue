@@ -7,14 +7,16 @@ namespace Yiisoft\Yii\Queue\Driver;
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
+use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
+use Yiisoft\Yii\Queue\Message\Behaviors\ExecutableBehaviorInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueDependentInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 final class SynchronousDriver implements DriverInterface, QueueDependentInterface
 {
+    private const BEHAVIORS_AVAILABLE = [];
     private array $messages = [];
     private Queue $queue;
     private LoopInterface $loop;
@@ -64,12 +66,20 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
         throw new InvalidArgumentException('There is no message with the given id.');
     }
 
-    public function push(MessageInterface $message): string
+    public function push(MessageInterface $message): void
     {
+        $this->checkBehaviors($message);
+
+        foreach ($message->getBehaviors() as $behavior) {
+            if ($behavior instanceof ExecutableBehaviorInterface) {
+                $behavior->execute();
+            }
+        }
+
         $key = count($this->messages) + $this->current;
         $this->messages[] = $message;
 
-        return (string) $key;
+        $message->setId((string) $key);
     }
 
     public function subscribe(callable $handler): void
@@ -77,11 +87,21 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
         $this->run($handler);
     }
 
-    public function canPush(MessageInterface $message): bool
+    private function checkBehaviors(MessageInterface $message): void
     {
-        $meta = $message->getPayloadMeta();
+        foreach ($message->getBehaviors() as $behavior) {
+            $ok = false;
+            foreach (self::BEHAVIORS_AVAILABLE as $available) {
+                if ($behavior instanceof $available) {
+                    $ok = true;
+                    break;
+                }
+            }
 
-        return !isset($meta[PayloadInterface::META_KEY_DELAY]) && !isset($meta[PayloadInterface::META_KEY_PRIORITY]);
+            if ($ok === false) {
+                throw new BehaviorNotSupportedException($this, $behavior);
+            }
+        }
     }
 
     public function setQueue(Queue $queue): void

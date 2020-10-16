@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Message;
 
+use Yiisoft\Yii\Queue\Message\Behaviors\BehaviorInterface;
+
 interface MessageInterface
 {
     public function setId(?string $id): void;
@@ -20,19 +22,35 @@ interface MessageInterface
      *
      * @return string
      */
-    public function getPayloadName(): string;
+    public function getName(): string;
 
     /**
-     * Returns data for job payload
+     * Returns payload data
      *
      * @return mixed
      */
-    public function getPayloadData();
+    public function getData();
 
     /**
-     * Returns metadata for job payload
+     * Attaches behavior to the message
      *
-     * @return array
+     * @param BehaviorInterface $behavior
      */
-    public function getPayloadMeta(): array;
+    public function attachBehavior(BehaviorInterface $behavior): self;
+
+    /**
+     * Returns attached behaviors
+     *
+     * @return BehaviorInterface[]
+     */
+    public function getBehaviors(): array;
+
+    /**
+     * Returns attached behavior by its name
+     *
+     * @param string $behaviorClassName
+     *
+     * @return BehaviorInterface|null
+     */
+    public function getBehavior(string $behaviorClassName): ?BehaviorInterface;
 }

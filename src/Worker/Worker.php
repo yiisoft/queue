@@ -50,7 +50,7 @@ final class Worker implements WorkerInterface
     {
         $this->logger->debug('Start working with message #{message}.', ['message' => $message->getId()]);
 
-        $name = $message->getPayloadName();
+        $name = $message->getName();
         $handler = $this->getHandler($name);
         if ($handler === null) {
             throw new RuntimeException("No handler for message $name");
