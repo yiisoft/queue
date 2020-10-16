@@ -23,6 +23,10 @@ final class DispatcherFactory
     {
         $this->pipelines = $pipelines;
         $this->container = $container;
+
+        if (!isset($this->pipelines[self::DEFAULT_PIPELINE])) {
+            $this->pipelines[self::DEFAULT_PIPELINE] = [$this->getEmptyStrategy()];
+        }
     }
 
     public function get(string $payloadName): Dispatcher
@@ -75,6 +79,15 @@ final class DispatcherFactory
             public function handle(MessageInterface $message): bool
             {
                 return $this->strategy->handle($message, $this->pipeline);
+            }
+        };
+    }
+
+    private function getEmptyStrategy(): FailureStrategyInterface
+    {
+        return new class implements FailureStrategyInterface {
+            public function handle(MessageInterface $message, ?PipelineInterface $pipeline): bool {
+                return false;
             }
         };
     }
