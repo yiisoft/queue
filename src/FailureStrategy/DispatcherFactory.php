@@ -85,8 +85,9 @@ final class DispatcherFactory
 
     private function getEmptyStrategy(): FailureStrategyInterface
     {
-        return new class implements FailureStrategyInterface {
-            public function handle(MessageInterface $message, ?PipelineInterface $pipeline): bool {
+        return new class() implements FailureStrategyInterface {
+            public function handle(MessageInterface $message, ?PipelineInterface $pipeline): bool
+            {
                 return false;
             }
         };
