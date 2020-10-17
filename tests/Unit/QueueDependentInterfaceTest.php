@@ -32,7 +32,7 @@ final class QueueDependentInterfaceTest extends TestCase
             {
             }
 
-            public function push(MessageInterface $message): ?string
+            public function push(MessageInterface $message): void
             {
             }
 
@@ -60,7 +60,7 @@ final class QueueDependentInterfaceTest extends TestCase
             {
             }
 
-            public function push(MessageInterface $message): ?string
+            public function push(MessageInterface $message): void
             {
             }
 

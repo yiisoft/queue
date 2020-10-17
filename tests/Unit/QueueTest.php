@@ -12,9 +12,9 @@ use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
-use Yiisoft\Yii\Queue\Tests\App\DelayablePayload;
+use Yiisoft\Yii\Queue\Message\Behaviors\DelayBehavior;
+use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
-use Yiisoft\Yii\Queue\Tests\App\SimplePayload;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 final class QueueTest extends TestCase
@@ -36,11 +36,10 @@ final class QueueTest extends TestCase
     public function testPushSuccessful(): void
     {
         $this->needsRealDriver = false;
-        $this->getDriver()->method('canPush')->willReturn(true);
 
         $queue = $this->getQueue();
-        $job = new SimplePayload();
-        $queue->push($job);
+        $message = new Message('simple', null);
+        $queue->push($message);
 
         $this->assertEvents([BeforePush::class => 1, AfterPush::class => 1]);
     }
@@ -48,16 +47,18 @@ final class QueueTest extends TestCase
     public function testPushNotSuccessful(): void
     {
         $this->needsRealDriver = false;
-        $this->getDriver()->method('canPush')->willReturn(false);
-        $exception = null;
+        $behavior = new DelayBehavior(2);
+        $exception = new BehaviorNotSupportedException($this->getDriver(), $behavior);
+        $this->getDriver()->method('push')->willThrowException($exception);
+        $expectedException = null;
 
         $queue = $this->getQueue();
-        $job = new DelayablePayload();
+        $message = new Message('simple', null);
         try {
-            $queue->push($job);
-        } catch (BehaviorNotSupportedException $exception) {
+            $queue->push($message);
+        } catch (BehaviorNotSupportedException $expectedException) {
         } finally {
-            self::assertInstanceOf(BehaviorNotSupportedException::class, $exception);
+            self::assertInstanceOf(BehaviorNotSupportedException::class, $expectedException);
             $this->assertEvents([BeforePush::class => 1]);
         }
     }
@@ -65,10 +66,10 @@ final class QueueTest extends TestCase
     public function testRun(): void
     {
         $queue = $this->getQueue();
-        $job = new SimplePayload();
-        $job2 = clone $job;
-        $queue->push($job);
-        $queue->push($job2);
+        $message = new Message('simple', null);
+        $message2 = clone $message;
+        $queue->push($message);
+        $queue->push($message2);
         $queue->run();
 
         self::assertEquals(2, $this->executionTimes);
@@ -85,10 +86,10 @@ final class QueueTest extends TestCase
     public function testRunPartly(): void
     {
         $queue = $this->getQueue();
-        $job = new SimplePayload();
-        $job2 = clone $job;
-        $queue->push($job);
-        $queue->push($job2);
+        $message = new Message('simple', null);
+        $message2 = clone $message;
+        $queue->push($message);
+        $queue->push($message2);
         $queue->run(1);
 
         self::assertEquals(1, $this->executionTimes);
@@ -105,10 +106,10 @@ final class QueueTest extends TestCase
     public function testListen(): void
     {
         $queue = $this->getQueue();
-        $job = new SimplePayload();
-        $job2 = clone $job;
-        $queue->push($job);
-        $queue->push($job2);
+        $message = new Message('simple', null);
+        $message2 = clone $message;
+        $queue->push($message);
+        $queue->push($message2);
         $queue->listen();
 
         self::assertEquals(2, $this->executionTimes);
@@ -185,8 +186,9 @@ final class QueueTest extends TestCase
     public function testStatus(): void
     {
         $queue = $this->getQueue();
-        $job = new SimplePayload();
-        $id = $queue->push($job);
+        $message = new Message('simple', null);
+        $queue->push($message);
+        $id = $message->getId();
 
         $status = $queue->status($id);
         self::assertTrue($status->isWaiting());
