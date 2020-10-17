@@ -10,10 +10,8 @@ use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
-use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 class Queue
@@ -53,6 +51,8 @@ class Queue
     {
         $this->logger->debug('Preparing to push message "{message}".', ['message' => $message->getName()]);
         $this->eventDispatcher->dispatch(new BeforePush($this, $message));
+
+        $this->driver->push($message);
 
         $this->logger->debug(
             'Successfully pushed message "{name}" to the queue.',
