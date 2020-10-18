@@ -35,6 +35,8 @@ interface MessageInterface
      * Attaches behavior to the message
      *
      * @param BehaviorInterface $behavior
+     *
+     * @return MessageInterface
      */
     public function attachBehavior(BehaviorInterface $behavior): self;
 
