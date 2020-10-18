@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Message;
 
-final class Message implements MessageInterface
+final class Message extends AbstractMessage
 {
-    use BehaviorTrait;
-
-    private ?string $id = null;
     private string $name;
     private $data;
 
@@ -16,16 +13,6 @@ final class Message implements MessageInterface
     {
         $this->name = $name;
         $this->data = $data;
-    }
-
-    public function setId(?string $id): void
-    {
-        $this->id = $id;
-    }
-
-    public function getId(): ?string
-    {
-        return $this->id;
     }
 
     public function getName(): string

@@ -6,13 +6,33 @@ namespace Yiisoft\Yii\Queue\Message;
 
 use Yiisoft\Yii\Queue\Message\Behaviors\BehaviorInterface;
 
-trait BehaviorTrait
+abstract class AbstractMessage implements MessageInterface
 {
+    protected ?string $id = null;
     /**
      * @var BehaviorInterface[]
      */
     private array $behaviors = [];
 
+    /**
+     * @inheritDoc
+     */
+    public function setId(?string $id): void
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function attachBehavior(BehaviorInterface $behavior): self
     {
         $this->behaviors[] = $behavior;
@@ -20,11 +40,17 @@ trait BehaviorTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getBehaviors(): array
     {
         return $this->behaviors;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getBehavior(string $behaviorClassName): ?BehaviorInterface
     {
         $behavior = $this->getExactBehavior($behaviorClassName);
