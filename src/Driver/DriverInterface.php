@@ -8,9 +8,6 @@ use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
-use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
-use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
 
 interface DriverInterface
 {

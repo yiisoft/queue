@@ -9,11 +9,6 @@ use UnexpectedValueException;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Message\Behaviors\BehaviorInterface;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
-use Yiisoft\Yii\Queue\Payload\PayloadInterface;
-use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
-use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
 
 class BehaviorNotSupportedException extends UnexpectedValueException implements FriendlyExceptionInterface
 {
