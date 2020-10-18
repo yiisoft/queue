@@ -44,6 +44,14 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
             throw new InvalidArgumentException('maxAttempts parameter must be a positive integer');
         }
 
+        if ($delayInitial < 0) {
+            throw new InvalidArgumentException('delayInitial parameter must not be less then zero');
+        }
+
+        if ($delayMaximum < $delayInitial) {
+            throw new InvalidArgumentException('delayMaximum parameter must not be less then delayInitial');
+        }
+
         $this->maxAttempts = $maxAttempts;
         $this->delayInitial = $delayInitial;
         $this->delayMaximum = $delayMaximum;
@@ -91,7 +99,15 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
 
     private function getDelay(array $meta): float
     {
-        $delayOriginal = $meta[self::META_KEY_DELAY] ?? $this->delayInitial;
+        if (isset($meta[self::META_KEY_DELAY])) {
+            $delayOriginal = (float) $meta[self::META_KEY_DELAY];
+            if ($delayOriginal === 0.0) {
+                $delayOriginal = 0.5;
+            }
+        } else {
+            $delayOriginal = $this->delayInitial;
+        }
+
         $result = $delayOriginal * $this->exponent;
 
         return min($result, $this->delayMaximum);

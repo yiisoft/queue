@@ -229,4 +229,73 @@ class ResendStrategyTest extends TestCase
 
         return $queue;
     }
+
+    public function delayZeroProvider(): array
+    {
+        return [
+            'empty meta' => [
+                [],
+                [
+                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
+                    ExponentialDelayStrategy::META_KEY_DELAY => 0,
+                    PayloadInterface::META_KEY_DELAY => 0,
+                ],
+            ],
+            'zero delay in meta' => [
+                [
+                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
+                    ExponentialDelayStrategy::META_KEY_DELAY => 0,
+                ],
+                [
+                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
+                    ExponentialDelayStrategy::META_KEY_DELAY => 1,
+                    PayloadInterface::META_KEY_DELAY => 1,
+                ],
+            ],
+            'positive delay in meta' => [
+                [
+                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
+                    ExponentialDelayStrategy::META_KEY_DELAY => 2,
+                ],
+                [
+                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
+                    ExponentialDelayStrategy::META_KEY_DELAY => 4,
+                    PayloadInterface::META_KEY_DELAY => 4,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider delayZeroProvider
+     *
+     * @param array $messageMeta
+     * @param array $resultMeta
+     */
+    public function testDelayZero(array $messageMeta, array $resultMeta): void
+    {
+        $payloadFactory = new PayloadFactory();
+        $queueAssertion = static function (PayloadInterface $payload) use ($resultMeta) {
+            Assert::assertEquals($resultMeta, $payload->getMeta());
+
+            return null;
+        };
+
+        $queue = $this->createMock(Queue::class);
+        $queue->expects(self::once())
+            ->method('push')
+            ->willReturnCallback($queueAssertion);
+
+        $strategy = new ExponentialDelayStrategy(
+            5,
+            0,
+            5,
+            2,
+            $payloadFactory,
+            $queue
+        );
+        $pipeline = $this->createMock(PipelineInterface::class);
+        $message = new Message('simple', null, $messageMeta);
+        self::assertTrue($strategy->handle($message, $pipeline));
+    }
 }
