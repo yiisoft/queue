@@ -13,7 +13,7 @@ interface MessageInterface
     /**
      * Returns unique message id
      *
-     * @return string
+     * @return string|null
      */
     public function getId(): ?string;
 
