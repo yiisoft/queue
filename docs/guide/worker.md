@@ -21,14 +21,14 @@ and `ClientInterface` will be resolved via DI container.
 ```
 
 ```php
-$eventDisptacher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
+$eventDispatcher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
 $handlers = [
     'simple' => fn() => 'someWork',
     'anotherHandler' => [QueueHandlerCollection::class, 'methodName']
 ];
 $worker = new Worker(
        $handlers,
-       $eventDisptacher,
+       $eventDispatcher,
        new \Psr\Log\NullLogger(),
        new \Yiisoft\Injector\Injector($DIContainer),
        $DIContainer

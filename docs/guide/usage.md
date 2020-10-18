@@ -8,7 +8,7 @@ Configuration
 You can configure it with a DI container in the following way:
 
 ```php
-$eventDisptacher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
+$eventDispatcher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
 $logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
 
 $worker = $DIContainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);
@@ -17,7 +17,7 @@ $driver = $DIContainer->get(\Yiisoft\Yii\Queue\Driver\DriverInterface::class);
 
 $queue = new Queue(
     $driver,
-    $eventDisptacher,
+    $eventDispatcher,
     $worker,
     $loop,
     $logger
@@ -35,57 +35,23 @@ Each task which is sent to the queue should be defined as a separate class.
 For example, if you need to download and save a file the class may look like the following:
 
 ```php
-class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
-{
-    public string $url;
-    public string $filePath;
-    
-    public function __construct(string $url, string $filePath)
-    {
-        $this->url = $url;
-        $this->filePath = $filePath;
-    }
-    
-    public function getName(): string
-    {
-        return 'earlyDefinedQueueHandlerName';
-    }
-
-    public function getData()
-    {
-        return [
-            'destinationFile' => $this->filePath,
-            'url' => $this->url
-        ];
-    }
-
-    public function getMeta(): array
-    {
-        return [];
-    }
-}
+$data = [
+    'url' => $url,
+    'destinationFile' => $filename,
+];
+$message = new \Yiisoft\Yii\Queue\Message\Message('file-download', $data);
 ```
 
 Here's how to send a task to the queue:
 
 ```php
-$queue->push(
-    new DownloadJob('http://example.com/image.jpg', '/tmp/image.jpg')
-);
+$queue->push($message);
 ```
 To push a job into the queue that should run after 5 minutes:
 
 ```php
-$queue->push(
-    new class('http://example.com/image.jpg', '/tmp/image.jpg') extends DownloadJob 
-    implements \Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface {
-
-        public function getDelay(): int
-        {
-            return 5 * 60;
-        }
-    }
-);
+$message->attachBehavior(new DelayBehavior(5 * 60));
+$queue->push($message);
 ```
 
 **Important:** Not every driver (such as synchronous driver) supports delayed execution.

@@ -39,43 +39,22 @@ Basic Usage
 -----------
 
 Each queue task consists of two parts:
-1. Data payload. It is a class implementing `PayloadInterface`.
-2. Payload handler. It is a callable called by a `WorkerInterface` which handles every queue message.
+1. A message. It is a class implementing `MessageInterface`. For simple cases you can use the default implementation: `Yiisoft\Yii\Queue\Message\Message`. For more complex cases you should implement hte interface by your own.
+2. Message handler. It is a callable called by a `Yiisoft\Yii\Queue\Worker\Worker` which handles every queue message.
 
-For example, if you need to download and save a file, the payload may look like the following:
+For example, if you need to download and save a file, your message may look like the following:
 
 ```php
-class DownloadJob implements Yiisoft\Yii\Queue\Payload\PayloadInterface
-{
-    public const NAME = 'file-download';
+$data = [
+    'url' => $url,
+    'destinationFile' => $filename,
+];
+$message = new \Yiisoft\Yii\Queue\Message\Message('file-download', $data);
+```
 
-    public string $url;
-    public string $fileName;
-    
-    public function __construct(string $url, string $fileName)
-    {
-        $this->url = $url;
-        $this->fileName = $fileName;
-    }
-    
-    public function getName(): string
-    {
-        return self::NAME;
-    }
-
-    public function getData(): array
-    {
-        return [
-            'destinationFile' => $this->fileName,
-            'url' => $this->url
-        ];
-    }
-
-    public function getMeta(): array
-    {
-        return [];
-    }
-}
+Then you should push it to the queue:
+```php
+$queue->push($message);
 ```
 
 And its handler may look like the following:
@@ -101,7 +80,7 @@ class FileDownloader
 
 The last thing we should do is to create configuration for the `Yiisoft\Yii\Queue\Worker\Worker`:
 ```php
-$handlers = [DownloadJob::NAME => [new FileDownloader('/path/to/save/files'), 'handle']];
+$handlers = ['file-download' => [new FileDownloader('/path/to/save/files'), 'handle']];
 $worker = new \Yiisoft\Yii\Queue\Worker\Worker(
     $handlers, // Here it is
     $dispatcher,
@@ -111,34 +90,52 @@ $worker = new \Yiisoft\Yii\Queue\Worker\Worker(
 );
 ```
 
-Here's how to send a task into the queue:
-
+There is the way to run all the messages that are already in the queue, and then exit:
 ```php
-$queue->push(
-    new DownloadJob('http://example.com/image.jpg', 'new-image-name.jpg')
-);
+$queue->run(); // this will execute all the existing messages
+$queue->run(10); // while this will execute only 10 messages as a maximum before exit
 ```
 
-
-
-
-
-To push a job into the queue that should run after 5 minutes:
-
+If you don't want your script to exit immediately, you can use the `listen` method:
 ```php
-$queue->push(
-    new class('http://example.com/image.jpg', '/tmp/image.jpg') extends DownloadJob 
-    implements \Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface {
-
-        public function getDelay(): int
-        {
-            return 5 * 60;
-        }
-    }
-);
+$queue->listen();
 ```
 
-**Important:** Not every driver (such as synchronous driver) supports delayed execution.
+You can also check the status of a pushed message (the queue driver you are using must support this feature):
+```php
+$queue->push($message);
+$id = $message->getId();
+
+// Get status of the job
+$status = $queue->status($id);
+
+// Check whether the job is waiting for execution.
+$status->isWaiting();
+
+// Check whether a worker got the job from the queue and executes it.
+$status->isReserved();
+
+// Check whether a worker has executed the job.
+$status->isDone();
+```
+
+Driver behaviors
+----------------
+
+Some of queue drivers support different behaviors like delayed execution and prioritirized queues.
+
+**Important:** Not every driver supports all the behaviors. See concrete driver documentation to find out if it supports the behavior you want to use. Driver will throw a `BehaviorNotSupportedException` if it does not support some behaviors attached to the message you are trying to push to the queue.
+
+### Delay behavior
+
+To be sure message will be read from queue not earlier then 5 seconds since it will be pushed to the queue, you can use `DelayBehavior`:
+```php
+$message->attachBehavior(new DelayBehavior(5));
+$queue->push($message);
+```
+
+Console execution
+-----------------
 
 The exact way a task is executed depends on the used driver. Most drivers can be run using
 console commands, which the component automatically registers in your application.
@@ -158,22 +155,5 @@ yii queue/listen
 See the documentation for more details about driver specific console commands and their options.
 
 The component also has the ability to track the status of a job which was pushed into queue.
-
-```php
-// Push a job into the queue and get a message ID.
-$id = $queue->push(new SomeJob());
-
-// Get status of the job
-$status = $queue->status($id);
-
-// Check whether the job is waiting for execution.
-$status->isWaiting();
-
-// Check whether a worker got the job from the queue and executes it.
-$status->isReserved($id);
-
-// Check whether a worker has executed the job.
-$status->isDone($id);
-```
 
 For more details see [the guide](docs/guide/README.md).
