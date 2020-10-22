@@ -91,7 +91,8 @@ class BehaviorRemovingStrategyTest extends TestCase
     /**
      * BehaviorRemovingStrategy must return false when there is no another pipeline to pass the message
      */
-    public function testBehaviorRemovingStrategyReturnFalse(): void {
+    public function testBehaviorRemovingStrategyReturnFalse(): void
+    {
         $message = new Message('test', null, ['testBehavior' => 'testValue']);
         $strategy = new BehaviorRemovingStrategy('testBehavior');
         $result = $strategy->handle($message, null);
