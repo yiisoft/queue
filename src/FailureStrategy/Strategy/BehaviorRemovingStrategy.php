@@ -30,7 +30,11 @@ final class BehaviorRemovingStrategy implements FailureStrategyInterface
             return false;
         }
 
-        $messageNew = $this->wrap($message);
+        if ($this->metaKeys === []) {
+            $messageNew = $message;
+        } else {
+            $messageNew = $this->wrap($message);
+        }
 
         return $pipeline->handle($messageNew);
     }

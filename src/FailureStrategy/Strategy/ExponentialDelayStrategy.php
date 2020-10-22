@@ -46,11 +46,19 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
         }
 
         if ($delayInitial < 0) {
-            throw new InvalidArgumentException('delayInitial parameter must not be less then zero');
+            throw new InvalidArgumentException('delayInitial parameter must not be zero or less');
+        }
+
+        if ($delayMaximum <= 0) {
+            throw new InvalidArgumentException('delayMaximum parameter must not be zero or less');
         }
 
         if ($delayMaximum < $delayInitial) {
             throw new InvalidArgumentException('delayMaximum parameter must not be less then delayInitial');
+        }
+
+        if ($exponent <= 0) {
+            throw new InvalidArgumentException('exponent parameter must not be zero or less');
         }
 
         $this->maxAttempts = $maxAttempts;

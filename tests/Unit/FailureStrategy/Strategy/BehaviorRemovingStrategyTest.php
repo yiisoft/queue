@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit;
+namespace Yiisoft\Yii\Queue\Tests\Unit\FailureStrategy\Strategy;
 
 use PHPUnit\Framework\Assert;
 use Yiisoft\Yii\Queue\FailureStrategy\Dispatcher\PipelineInterface;
@@ -42,6 +42,11 @@ class BehaviorRemovingStrategyTest extends TestCase
                 ['testKey' => 'testValue', 'testKey2' => 'testValue2'],
                 ['testKey2' => 'testValue2'],
             ],
+            [
+                new BehaviorRemovingStrategy('testKey', 'non-existing'),
+                ['testKey' => 'testValue', 'testKey2' => 'testValue2', 'testKey3' => 'testValue3'],
+                ['testKey2' => 'testValue2', 'testKey3' => 'testValue3'],
+            ],
         ];
     }
 
@@ -57,8 +62,18 @@ class BehaviorRemovingStrategyTest extends TestCase
         array $metaInitial,
         array $metaResult
     ): void {
-        $resultAssertion = static function (MessageInterface $message) use ($metaResult) {
+        $id = 'testId';
+        $name = 'test';
+        $data = 'data';
+
+        $resultAssertion = static function (MessageInterface $message) use ($id, $name, $data, $metaResult) {
+            Assert::assertEquals($id, $message->getId());
+            Assert::assertEquals($name, $message->getPayloadName());
+            Assert::assertEquals($data, $message->getPayloadData());
             Assert::assertEquals($metaResult, $message->getPayloadMeta());
+
+            $message->setId('testIdTwo');
+            Assert::assertEquals('testIdTwo', $message->getId());
 
             return true;
         };
@@ -67,9 +82,21 @@ class BehaviorRemovingStrategyTest extends TestCase
             ->method('handle')
             ->willReturnCallback($resultAssertion);
 
-        $message = new Message('test', null, $metaInitial);
+        $message = new Message($name, $data, $metaInitial);
+        $message->setId($id);
         $result = $strategy->handle($message, $pipeline);
         self::assertTrue($result);
+    }
+
+    /**
+     * BehaviorRemovingStrategy must return false when there is no another pipeline to pass the message
+     */
+    public function testBehaviorRemovingStrategyReturnFalse(): void {
+        $message = new Message('test', null, ['testBehavior' => 'testValue']);
+        $strategy = new BehaviorRemovingStrategy('testBehavior');
+        $result = $strategy->handle($message, null);
+
+        self::assertFalse($result);
     }
 
     /**
@@ -79,7 +106,7 @@ class BehaviorRemovingStrategyTest extends TestCase
      * @param array $metaInitial
      * @param array $metaResult
      */
-    public function testBehaviorRemovingStrategyReturnFalse(
+    public function testBehaviorRemovingStrategyReturnFalseFromPipeline(
         FailureStrategyInterface $strategy,
         array $metaInitial,
         array $metaResult

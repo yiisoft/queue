@@ -32,14 +32,16 @@ final class DispatcherFactory implements DispatcherFactoryInterface
 
     public function get(string $payloadName): DispatcherInterface
     {
-        $name = isset($this->pipelines[$payloadName]) ? $payloadName : self::DEFAULT_PIPELINE;
+        if (!isset($this->pipelines[$payloadName]) || isset($this->pipelines[$payloadName]) === []) {
+            $payloadName = self::DEFAULT_PIPELINE;
+        }
         /** @var DispatcherInterface $result */
-        if (isset($this->built[$name]) && $result = $this->built[$name]->get()) {
+        if (isset($this->built[$payloadName]) && $result = $this->built[$payloadName]->get()) {
             return $result;
         }
 
-        $result = $this->create($this->pipelines[$name]);
-        $this->built[$name] = WeakReference::create($result);
+        $result = $this->create($this->pipelines[$payloadName]);
+        $this->built[$payloadName] = WeakReference::create($result);
 
         return $result;
     }

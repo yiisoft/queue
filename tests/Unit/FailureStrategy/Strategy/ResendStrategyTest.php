@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit;
+namespace Yiisoft\Yii\Queue\Tests\Unit\FailureStrategy\Strategy;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
