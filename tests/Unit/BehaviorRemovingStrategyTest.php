@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
 use PHPUnit\Framework\Assert;
-use Yiisoft\Yii\Queue\FailureStrategy\BehaviorRemovingStrategy;
-use Yiisoft\Yii\Queue\FailureStrategy\FailureStrategyInterface;
-use Yiisoft\Yii\Queue\FailureStrategy\PipelineInterface;
+use Yiisoft\Yii\Queue\FailureStrategy\Dispatcher\PipelineInterface;
+use Yiisoft\Yii\Queue\FailureStrategy\Strategy\BehaviorRemovingStrategy;
+use Yiisoft\Yii\Queue\FailureStrategy\Strategy\FailureStrategyInterface;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;

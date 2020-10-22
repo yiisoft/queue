@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\FailureStrategy;
+namespace Yiisoft\Yii\Queue\FailureStrategy\Dispatcher;
 
 use Psr\Container\ContainerInterface;
 use WeakReference;
+use Yiisoft\Yii\Queue\FailureStrategy\Strategy\FailureStrategyInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 
-final class DispatcherFactory
+final class DispatcherFactory implements DispatcherFactoryInterface
 {
     public const DEFAULT_PIPELINE = 'failure-pipeline-default';
 
@@ -29,10 +30,10 @@ final class DispatcherFactory
         }
     }
 
-    public function get(string $payloadName): Dispatcher
+    public function get(string $payloadName): DispatcherInterface
     {
         $name = isset($this->pipelines[$payloadName]) ? $payloadName : self::DEFAULT_PIPELINE;
-        /** @var Dispatcher $result */
+        /** @var DispatcherInterface $result */
         if (isset($this->built[$name]) && $result = $this->built[$name]->get()) {
             return $result;
         }
@@ -43,7 +44,7 @@ final class DispatcherFactory
         return $result;
     }
 
-    private function create($definition): Dispatcher
+    private function create($definition): DispatcherInterface
     {
         if ($definition instanceof PipelineInterface) {
             return new Dispatcher($definition);

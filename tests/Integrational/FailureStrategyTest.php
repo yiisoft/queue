@@ -6,9 +6,9 @@ namespace Yiisoft\Yii\Queue\Tests\Integrational;
 
 use RuntimeException;
 use Yiisoft\Yii\Queue\Event\JobFailure;
-use Yiisoft\Yii\Queue\FailureStrategy\DispatcherFactory;
-use Yiisoft\Yii\Queue\FailureStrategy\ExponentialDelayStrategy;
-use Yiisoft\Yii\Queue\FailureStrategy\SendAgainStrategy;
+use Yiisoft\Yii\Queue\FailureStrategy\Dispatcher\DispatcherFactory;
+use Yiisoft\Yii\Queue\FailureStrategy\Strategy\ExponentialDelayStrategy;
+use Yiisoft\Yii\Queue\FailureStrategy\Strategy\SendAgainStrategy;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\PayloadFactory;

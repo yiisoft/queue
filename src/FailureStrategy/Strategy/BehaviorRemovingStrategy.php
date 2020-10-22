@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\FailureStrategy;
+namespace Yiisoft\Yii\Queue\FailureStrategy\Strategy;
 
+use Yiisoft\Yii\Queue\FailureStrategy\Dispatcher\PipelineInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 

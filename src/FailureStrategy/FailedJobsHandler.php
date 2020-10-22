@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\FailureStrategy;
 
 use Yiisoft\Yii\Queue\Event\JobFailure;
+use Yiisoft\Yii\Queue\FailureStrategy\Dispatcher\DispatcherFactoryInterface;
 
 final class FailedJobsHandler
 {
-    private DispatcherFactory $factory;
+    private DispatcherFactoryInterface $factory;
 
-    public function __construct(DispatcherFactory $factory)
+    public function __construct(DispatcherFactoryInterface $factory)
     {
         $this->factory = $factory;
     }

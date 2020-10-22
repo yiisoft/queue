@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\FailureStrategy;
+namespace Yiisoft\Yii\Queue\FailureStrategy\Dispatcher;
 
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 

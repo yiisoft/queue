@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\FailureStrategy;
+namespace Yiisoft\Yii\Queue\FailureStrategy\Dispatcher;
 
 use Yiisoft\Yii\Queue\Event\JobFailure;
 
-class Dispatcher
+class Dispatcher implements DispatcherInterface
 {
     private PipelineInterface $pipeline;
 
