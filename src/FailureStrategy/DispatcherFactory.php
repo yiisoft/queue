@@ -55,7 +55,7 @@ final class DispatcherFactory
     private function createPipeline(array $pipeline): PipelineInterface
     {
         $handler = null;
-        foreach ($pipeline as $strategy) {
+        foreach (array_reverse($pipeline) as $strategy) {
             $strategy = $strategy instanceof FailureStrategyInterface ? $strategy : $this->container->get($strategy);
 
             $handler = $this->wrap($strategy, $handler);
