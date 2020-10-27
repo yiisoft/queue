@@ -7,7 +7,6 @@ namespace Yiisoft\Yii\Queue\Driver;
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Message\Behaviors\ExecutableBehaviorInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
@@ -22,11 +21,13 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
     private LoopInterface $loop;
     private WorkerInterface $worker;
     private int $current = 0;
+    private ?BehaviorCheckerInterface $behaviorChecker;
 
-    public function __construct(LoopInterface $loop, WorkerInterface $worker)
+    public function __construct(LoopInterface $loop, WorkerInterface $worker, ?BehaviorCheckerInterface $behaviorChecker = null)
     {
         $this->loop = $loop;
         $this->worker = $worker;
+        $this->behaviorChecker = $behaviorChecker;
     }
 
     public function __destruct()
@@ -68,9 +69,12 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
 
     public function push(MessageInterface $message): void
     {
-        $this->checkBehaviors($message);
+        $behaviors = $message->getBehaviors();
+        if ($this->behaviorChecker !== null) {
+            $this->behaviorChecker->check(self::class, $behaviors, self::BEHAVIORS_AVAILABLE);
+        }
 
-        foreach ($message->getBehaviors() as $behavior) {
+        foreach ($behaviors as $behavior) {
             if ($behavior instanceof ExecutableBehaviorInterface) {
                 $behavior->execute();
             }
@@ -85,23 +89,6 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
     public function subscribe(callable $handler): void
     {
         $this->run($handler);
-    }
-
-    private function checkBehaviors(MessageInterface $message): void
-    {
-        foreach ($message->getBehaviors() as $behavior) {
-            $ok = false;
-            foreach (self::BEHAVIORS_AVAILABLE as $available) {
-                if ($behavior instanceof $available) {
-                    $ok = true;
-                    break;
-                }
-            }
-
-            if ($ok === false) {
-                throw new BehaviorNotSupportedException($this, $behavior);
-            }
-        }
     }
 
     public function setQueue(Queue $queue): void

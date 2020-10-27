@@ -12,20 +12,19 @@ use Yiisoft\Yii\Queue\Message\Behaviors\BehaviorInterface;
 
 class BehaviorNotSupportedException extends UnexpectedValueException implements FriendlyExceptionInterface
 {
-    private DriverInterface $driver;
+    private string $driver;
     private BehaviorInterface $behavior;
 
     public function __construct(
-        DriverInterface $driver,
+        string $driver,
         BehaviorInterface $behavior,
         string $message = '',
         int $code = 0,
         Throwable $previous = null
     ) {
         if ($message === '') {
-            $driverClass = get_class($driver);
             $behaviorName = get_class($behavior);
-            $message = "$driverClass does not support message \"$behaviorName\".";
+            $message = "$driver does not support message \"$behaviorName\".";
         }
 
         parent::__construct($message, $code, $previous);
@@ -41,13 +40,12 @@ class BehaviorNotSupportedException extends UnexpectedValueException implements 
 
     public function getSolution(): ?string
     {
-        $driverClass = get_class($this->driver);
         $behaviorName = get_class($this->behavior);
         $driverInterfaceClass = DriverInterface::class;
 
         return <<<SOLUTION
-            The given driver $driverClass does not support behavior $behaviorName, attached to the provided message.
-            You should either avoid attaching this behavior to messages while using the $driverClass driver,
+            The given driver $this->driver does not support behavior $behaviorName, attached to the provided message.
+            You should either avoid attaching this behavior to messages while using the $this->driver driver,
                 or use another driver, which supports this behavior.
             Officially supported drivers are:
                 - yiisoft/yii-queue-amqp

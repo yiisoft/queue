@@ -34,7 +34,7 @@ interface DriverInterface
      *
      * @param MessageInterface $message
      *
-     * @throws BehaviorNotSupportedException Driver must throw exception when it does not support all the attached behaviours
+     * @throws BehaviorNotSupportedException Driver may throw exception when it does not support all the attached behaviours
      */
     public function push(MessageInterface $message): void;
 
