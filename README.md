@@ -35,6 +35,10 @@ or add
 
 to the `require` section of your `composer.json` file.
 
+Differences to yii2-queue
+-------------------------
+If you have experience with `yiisoft/yii2-queue`, you will find out that this package is almost the same. But there some key differences which are described in the "[migrating from yii2-queue](docs/guide/migrating-from-yii2-queue.md)" article.
+
 Basic Usage
 -----------
 

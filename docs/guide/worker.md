@@ -13,7 +13,7 @@ Handler can be any callable with a couple of additions:
 E.g. `[ClassName::class, 'handle']` will be resolved to `$container->get(ClassName::class)->handle()`.
 
 - The second important thing to know is that an `Injector` is used to call the handlers.
-This means you can define handlers as closures with their own dependenies which will be resolved with DI container.
+This means you can define handlers as closures with their own dependencies which will be resolved with DI container.
 In the example below you can see a closure in which `message` will be taken from the queue 
 and `ClientInterface` will be resolved via DI container.
 ```php
