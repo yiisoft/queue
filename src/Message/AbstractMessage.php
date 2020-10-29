@@ -31,7 +31,9 @@ abstract class AbstractMessage implements MessageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @suppress PhanParamSignatureMismatch
      */
     public function attachBehavior(BehaviorInterface $behavior): self
     {
