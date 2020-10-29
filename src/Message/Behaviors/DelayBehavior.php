@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Message\Behaviors;
 
-class DelayBehavior implements BehaviorInterface
+final class DelayBehavior implements BehaviorInterface, DelayBehaviorInterface
 {
     private int $delay;
 
@@ -16,8 +16,13 @@ class DelayBehavior implements BehaviorInterface
     /**
      * @inheritDoc
      */
-    public function getState(): array
+    public function getConstructorParameters(): array
     {
-        return ['delay' => $this->delay];
+        return [$this->delay];
+    }
+
+    public function getDelay(): int
+    {
+        return $this->delay;
     }
 }

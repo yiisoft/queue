@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Message\Behaviors;
 
-class PriorityBehavior implements BehaviorInterface
+final class PriorityBehavior implements BehaviorInterface, PriorityBehaviorInterface
 {
     private int $priority;
 
@@ -16,8 +16,13 @@ class PriorityBehavior implements BehaviorInterface
     /**
      * @inheritDoc
      */
-    public function getState(): array
+    public function getConstructorParameters(): array
     {
-        return ['priority' => $this->priority];
+        return [$this->priority];
+    }
+
+    public function getPriority(): int
+    {
+        return $this->priority;
     }
 }
