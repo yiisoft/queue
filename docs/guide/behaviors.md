@@ -16,10 +16,10 @@ This behavior sets a relative order for message consuming. The higher the priori
 Example: `$message->attachBehavior(new PriorityBehavior(100))`
 
 ## Compatibility matrix
-|                     | DelayBehavior | PriorityBehavior |
-| -                   | -             | -                |
-| [SynchronousDriver] | ❌             | ❌               |
-| [Amqp]              | ✔️             | ❌                |
+|                     | DelayBehavior             | PriorityBehavior |
+| -                   | -                         | -                |
+| [SynchronousDriver] | ❌                         | ❌                |
+| [Amqp]              | yiisoft/yii-queue-amqp#11 | ❌                |
 
 [drivers]: (driver-list.md)
 [SynchronousDriver]: (driver-sync.md)
