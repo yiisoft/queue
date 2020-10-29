@@ -13,16 +13,15 @@ final class ExceptionTest extends TestCase
 {
     public function testJobNotSupported(): void
     {
-        $driver = $this->getDriver();
-        $driverClass = get_class($driver);
+        $driverClass = 'TestDriver';
         $behavior = new DelayBehavior(2);
 
-        $exception = new BehaviorNotSupportedException($driver, $behavior);
+        $exception = new BehaviorNotSupportedException($driverClass, $behavior);
 
         self::assertStringContainsString(
             DelayBehavior::class,
             $exception->getMessage(),
-            'Payload name must be included'
+            'Behavior name must be included'
         );
         self::assertStringContainsString(
             $driverClass,

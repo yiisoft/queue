@@ -44,7 +44,7 @@ final class QueueTest extends TestCase
     {
         $this->needsRealDriver = false;
         $behavior = new DelayBehavior(2);
-        $exception = new BehaviorNotSupportedException($this->getDriver(), $behavior);
+        $exception = new BehaviorNotSupportedException(get_class($this->getDriver()), $behavior);
         $this->getDriver()->method('push')->willThrowException($exception);
         $expectedException = null;
 
