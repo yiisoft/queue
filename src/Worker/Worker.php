@@ -19,7 +19,7 @@ use Yiisoft\Yii\Queue\Queue;
 
 final class Worker implements WorkerInterface
 {
-    private array $handlersCached;
+    private array $handlersCached = [];
     private EventDispatcherInterface $dispatcher;
     private LoggerInterface $logger;
     private array $handlers;
