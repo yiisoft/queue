@@ -19,7 +19,7 @@ use Yiisoft\Yii\Queue\Queue;
 
 final class Worker implements WorkerInterface
 {
-    private array $handlersCached;
+    private array $handlersCached = [];
     private EventDispatcherInterface $dispatcher;
     private LoggerInterface $logger;
     private array $handlers;
@@ -86,7 +86,7 @@ final class Worker implements WorkerInterface
 
     private function getHandler(string $name): ?callable
     {
-        if (isset($this->handlersCached[$name])) {
+        if (array_key_exists($name, $this->handlersCached)) {
             return $this->handlersCached[$name];
         }
 
@@ -96,9 +96,7 @@ final class Worker implements WorkerInterface
 
         if (is_callable($handler)) {
             $this->handlersCached[$name] = $handler;
-        }
-
-        if ($this->isAlias($handler)) {
+        } elseif ($this->isAlias($handler)) {
             $handler[0] = $this->container->get($handler[0]);
             $this->handlersCached[$name] = $handler;
         }
