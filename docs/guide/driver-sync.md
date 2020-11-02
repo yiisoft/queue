@@ -1,13 +1,12 @@
 Synchronous Driver
 ==================
 
-Run tasks synchronously in the same process.
-It could be used when developing and debugging an application.
+Run tasks synchronously in the same process. It could be used when developing and debugging an application.
 
 Configuration example:
 
 ```php
-$eventDispatcher = $DContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
+$eventDispatcher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
 $logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
 
 $worker = $DIContainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);

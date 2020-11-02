@@ -1,10 +1,8 @@
-Yii Queue extension
-====================
+# Yii Queue extension
 
 An extension for running tasks asynchronously via queues.
 
-Guides and concept explanations
-------------
+## Guides and concept explanations
 
 * [Usage basics](usage.md)
 * [Migrating from `yii2-queue`](migrating-from-yii2-queue.md)

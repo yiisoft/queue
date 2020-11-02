@@ -16,8 +16,7 @@ Documentation is at [docs/guide/README.md](docs/guide/README.md).
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yiisoft/yii-queue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/yii-queue/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/yiisoft/yii-queue/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/yii-queue/?branch=master)
 
-Installation
-------------
+## Installation
 
 The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
 
@@ -35,16 +34,18 @@ or add
 
 to the `require` section of your `composer.json` file.
 
-Differences to yii2-queue
--------------------------
-If you have experience with `yiisoft/yii2-queue`, you will find out that this package is almost the same. But there some key differences which are described in the "[migrating from yii2-queue](docs/guide/migrating-from-yii2-queue.md)" article.
+## Differences to yii2-queue
 
-Basic Usage
------------
+If you have experience with `yiisoft/yii2-queue`, you will find out that this package is similar.
+Though, there are some key differences which are described in the "[migrating from yii2-queue](docs/guide/migrating-from-yii2-queue.md)" article.
+
+## Basic Usage
 
 Each queue task consists of two parts:
-1. A message. It is a class implementing `MessageInterface`. For simple cases you can use the default implementation: `Yiisoft\Yii\Queue\Message\Message`. For more complex cases you should implement hte interface by your own.
-2. Message handler. It is a callable called by a `Yiisoft\Yii\Queue\Worker\Worker` which handles every queue message.
+
+1. A message is a class implementing `MessageInterface`. For simple cases you can use the default implementation,
+   `Yiisoft\Yii\Queue\Message\Message`. For more complex cases you should implement the interface by your own.
+2. A message handler is a callable called by a `Yiisoft\Yii\Queue\Worker\Worker`. The handler handles each queue message.
 
 For example, if you need to download and save a file, your message may look like the following:
 
@@ -57,11 +58,12 @@ $message = new \Yiisoft\Yii\Queue\Message\Message('file-download', $data);
 ```
 
 Then you should push it to the queue:
+
 ```php
 $queue->push($message);
 ```
 
-And its handler may look like the following:
+Its handler may look like the following:
 
 ```php
 class FileDownloader
@@ -82,7 +84,8 @@ class FileDownloader
 }
 ```
 
-The last thing we should do is to create configuration for the `Yiisoft\Yii\Queue\Worker\Worker`:
+The last thing we should do is to create a configuration for the `Yiisoft\Yii\Queue\Worker\Worker`:
+
 ```php
 $handlers = ['file-download' => [new FileDownloader('/path/to/save/files'), 'handle']];
 $worker = new \Yiisoft\Yii\Queue\Worker\Worker(
@@ -95,17 +98,20 @@ $worker = new \Yiisoft\Yii\Queue\Worker\Worker(
 ```
 
 There is the way to run all the messages that are already in the queue, and then exit:
+
 ```php
 $queue->run(); // this will execute all the existing messages
 $queue->run(10); // while this will execute only 10 messages as a maximum before exit
 ```
 
 If you don't want your script to exit immediately, you can use the `listen` method:
+
 ```php
 $queue->listen();
 ```
 
 You can also check the status of a pushed message (the queue driver you are using must support this feature):
+
 ```php
 $queue->push($message);
 $id = $message->getId();
@@ -123,34 +129,35 @@ $status->isReserved();
 $status->isDone();
 ```
 
-Driver behaviors
-----------------
+## Driver behaviors
 
-Some of queue drivers support different behaviors like delayed execution and prioritirized queues.
+Some of queue drivers support different behaviors like delayed execution and prioritized queues.
 
-**Important:** Not every driver supports all the behaviors. See concrete driver documentation to find out if it supports the behavior you want to use. Driver will throw a `BehaviorNotSupportedException` if it does not support some behaviors attached to the message you are trying to push to the queue.
+**Important:** Not every driver supports all the behaviors. See concrete driver documentation to find out if
+it supports the behavior you want to use. Driver will throw a `BehaviorNotSupportedException` if it does not support
+some behaviors attached to the message you are trying to push to the queue.
 
 ### Delay behavior
 
 To be sure message will be read from queue not earlier then 5 seconds since it will be pushed to the queue, you can use `DelayBehavior`:
+
 ```php
 $message->attachBehavior(new DelayBehavior(5));
 $queue->push($message);
 ```
 
-Console execution
------------------
+## Console execution
 
-The exact way a task is executed depends on the used driver. Most drivers can be run using
+The exact way of task execution depends on the driver used. Most drivers can be run using
 console commands, which the component automatically registers in your application.
 
-This command obtains and executes tasks in a loop until the queue is empty:
+The following command obtains and executes tasks in a loop until the queue is empty:
 
 ```sh
 yii queue/run
 ```
 
-This command launches a daemon which infinitely queries the queue:
+The following command launches a daemon which infinitely queries the queue:
 
 ```sh
 yii queue/listen
