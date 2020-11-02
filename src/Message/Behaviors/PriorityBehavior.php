@@ -13,9 +13,6 @@ final class PriorityBehavior implements BehaviorInterface, PriorityBehaviorInter
         $this->priority = $priority;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getConstructorParameters(): array
     {
         return [$this->priority];

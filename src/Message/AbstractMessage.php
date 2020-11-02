@@ -14,17 +14,11 @@ abstract class AbstractMessage implements MessageInterface
      */
     private array $behaviors = [];
 
-    /**
-     * @inheritDoc
-     */
     public function setId(?string $id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getId(): ?string
     {
         return $this->id;
@@ -42,17 +36,11 @@ abstract class AbstractMessage implements MessageInterface
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getBehaviors(): array
     {
         return $this->behaviors;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getBehavior(string $behaviorClassName): ?BehaviorInterface
     {
         $behavior = $this->getExactBehavior($behaviorClassName);

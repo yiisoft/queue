@@ -7,7 +7,7 @@ namespace Yiisoft\Yii\Queue\Tests\Unit;
 use Yiisoft\Yii\Queue\Message\Behaviors\DelayBehavior;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
-class DelayBehaviorTest extends TestCase
+final class DelayBehaviorTest extends TestCase
 {
     public function testConstructorParameters(): void
     {

@@ -12,7 +12,7 @@ use Yiisoft\Yii\Queue\Tests\App\DummyBehaviorChild;
 use Yiisoft\Yii\Queue\Tests\App\DummyBehavior;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
-class BehaviorCheckerTest extends TestCase
+final class BehaviorCheckerTest extends TestCase
 {
     public function checkPassProvider(): array
     {

@@ -7,7 +7,7 @@ namespace Yiisoft\Yii\Queue\Message\Behaviors;
 interface DelayBehaviorInterface
 {
     /**
-     * Delay in seconds before the message can be consumed
+     * Delay in seconds before the message can be consumed.
      *
      * @return int
      */

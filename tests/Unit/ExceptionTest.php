@@ -21,23 +21,23 @@ final class ExceptionTest extends TestCase
         self::assertStringContainsString(
             DelayBehavior::class,
             $exception->getMessage(),
-            'Behavior name must be included'
+            'Behavior name must be included.'
         );
         self::assertStringContainsString(
             $driverClass,
             $exception->getMessage(),
-            'Driver class must be included'
+            'Driver class must be included.'
         );
         self::assertStringContainsString(
             DelayBehavior::class,
             $exception->getSolution(),
-            'DelayablePayloadInterface must be included to the exception message as it is a default interface and the payload implements it'
+            'DelayablePayloadInterface must be included to the exception message as it is a default interface and the payload implements it.'
         );
         self::assertStringNotContainsString(
             PriorityBehavior::class,
             $exception->getSolution(),
-            'PriorityBehavior must not be included as it is not implemented in the payload'
+            'PriorityBehavior must not be included as it is not implemented in the payload.'
         );
-        self::assertEquals("Behavior is not supported by current queue driver", $exception->getName());
+        self::assertEquals("Behavior is not supported by current queue driver.", $exception->getName());
     }
 }

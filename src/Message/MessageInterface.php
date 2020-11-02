@@ -11,28 +11,28 @@ interface MessageInterface
     public function setId(?string $id): void;
 
     /**
-     * Returns unique message id
+     * Returns unique message ID.
      *
      * @return string|null
      */
     public function getId(): ?string;
 
     /**
-     * Returns payload name
+     * Returns payload name.
      *
      * @return string
      */
     public function getName(): string;
 
     /**
-     * Returns payload data
+     * Returns payload data.
      *
      * @return mixed
      */
     public function getData();
 
     /**
-     * Attaches behavior to the message
+     * Attaches behavior to the message.
      *
      * @param BehaviorInterface $behavior
      *
@@ -41,14 +41,14 @@ interface MessageInterface
     public function attachBehavior(BehaviorInterface $behavior): self;
 
     /**
-     * Returns attached behaviors
+     * Returns attached behaviors.
      *
      * @return BehaviorInterface[]
      */
     public function getBehaviors(): array;
 
     /**
-     * Returns attached behavior by its name
+     * Returns attached behavior by its name.
      *
      * @param string $behaviorClassName
      *

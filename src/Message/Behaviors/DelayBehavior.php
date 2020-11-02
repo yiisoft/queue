@@ -13,9 +13,6 @@ final class DelayBehavior implements BehaviorInterface, DelayBehaviorInterface
         $this->delay = $delay;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getConstructorParameters(): array
     {
         return [$this->delay];

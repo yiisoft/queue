@@ -53,7 +53,7 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
         $id = (int) $id;
 
         if ($id < 0) {
-            throw new InvalidArgumentException('This driver ids starts with 0');
+            throw new InvalidArgumentException('This driver IDs start with 0.');
         }
 
         if ($id < $this->current) {
@@ -64,7 +64,7 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
             return JobStatus::waiting();
         }
 
-        throw new InvalidArgumentException('There is no message with the given id.');
+        throw new InvalidArgumentException('There is no message with the given ID.');
     }
 
     public function push(MessageInterface $message): void

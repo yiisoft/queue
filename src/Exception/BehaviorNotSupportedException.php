@@ -35,7 +35,7 @@ class BehaviorNotSupportedException extends UnexpectedValueException implements 
 
     public function getName(): string
     {
-        return 'Behavior is not supported by current queue driver';
+        return 'Behavior is not supported by current queue driver.';
     }
 
     public function getSolution(): ?string
@@ -50,7 +50,7 @@ class BehaviorNotSupportedException extends UnexpectedValueException implements 
             Officially supported drivers are:
                 - yiisoft/yii-queue-amqp
 
-            You can also implement your own driver within $driverInterfaceClass.
+            You can implement your own driver with $driverInterfaceClass.
             SOLUTION;
     }
 }
