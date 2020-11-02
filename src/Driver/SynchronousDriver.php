@@ -7,24 +7,27 @@ namespace Yiisoft\Yii\Queue\Driver;
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
+use Yiisoft\Yii\Queue\Message\Behaviors\ExecutableBehaviorInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueDependentInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 final class SynchronousDriver implements DriverInterface, QueueDependentInterface
 {
+    private const BEHAVIORS_AVAILABLE = [];
     private array $messages = [];
     private Queue $queue;
     private LoopInterface $loop;
     private WorkerInterface $worker;
     private int $current = 0;
+    private ?BehaviorCheckerInterface $behaviorChecker;
 
-    public function __construct(LoopInterface $loop, WorkerInterface $worker)
+    public function __construct(LoopInterface $loop, WorkerInterface $worker, ?BehaviorCheckerInterface $behaviorChecker = null)
     {
         $this->loop = $loop;
         $this->worker = $worker;
+        $this->behaviorChecker = $behaviorChecker;
     }
 
     public function __destruct()
@@ -50,7 +53,7 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
         $id = (int) $id;
 
         if ($id < 0) {
-            throw new InvalidArgumentException('This driver ids starts with 0');
+            throw new InvalidArgumentException('This driver IDs start with 0.');
         }
 
         if ($id < $this->current) {
@@ -61,27 +64,31 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
             return JobStatus::waiting();
         }
 
-        throw new InvalidArgumentException('There is no message with the given id.');
+        throw new InvalidArgumentException('There is no message with the given ID.');
     }
 
-    public function push(MessageInterface $message): string
+    public function push(MessageInterface $message): void
     {
+        $behaviors = $message->getBehaviors();
+        if ($this->behaviorChecker !== null) {
+            $this->behaviorChecker->check(self::class, $behaviors, self::BEHAVIORS_AVAILABLE);
+        }
+
+        foreach ($behaviors as $behavior) {
+            if ($behavior instanceof ExecutableBehaviorInterface) {
+                $behavior->execute();
+            }
+        }
+
         $key = count($this->messages) + $this->current;
         $this->messages[] = $message;
 
-        return (string) $key;
+        $message->setId((string) $key);
     }
 
     public function subscribe(callable $handler): void
     {
         $this->run($handler);
-    }
-
-    public function canPush(MessageInterface $message): bool
-    {
-        $meta = $message->getPayloadMeta();
-
-        return !isset($meta[PayloadInterface::META_KEY_DELAY]) && !isset($meta[PayloadInterface::META_KEY_PRIORITY]);
     }
 
     public function setQueue(Queue $queue): void

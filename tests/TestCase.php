@@ -20,9 +20,7 @@ use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Event\JobFailure;
-use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
 use Yiisoft\Yii\Queue\Queue;
-use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Worker\Worker;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
@@ -185,9 +183,6 @@ abstract class TestCase extends BaseTestCase
                 $this->executionTimes++;
 
                 throw new RuntimeException('test');
-            },
-            'not-supported' => function () {
-                throw new PayloadNotSupportedException($this->driver, new RetryablePayload());
             },
         ];
     }

@@ -10,15 +10,8 @@ use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
-use Yiisoft\Yii\Queue\Event\JobFailure;
-use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
-use Yiisoft\Yii\Queue\Message\Message;
+use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Payload\AttemptsRestrictedPayloadInterface;
-use Yiisoft\Yii\Queue\Payload\BasicPayload;
-use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
-use Yiisoft\Yii\Queue\Payload\PayloadInterface;
-use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 class Queue
@@ -47,59 +40,26 @@ class Queue
         }
     }
 
-    public function jobRetry(JobFailure $event): void
-    {
-        if (
-            $event->getQueue() === $this
-            && !$event->getException() instanceof PayloadNotSupportedException
-            && ($event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] ?? 0) > 0
-        ) {
-            $event->preventThrowing();
-            $attemptsLeft = $event->getMessage()->getPayloadMeta()[PayloadInterface::META_KEY_ATTEMPTS] - 1;
-            $payload = $this->messageConvert($event->getMessage(), [PayloadInterface::META_KEY_ATTEMPTS => $attemptsLeft]);
-            $this->logger->debug(
-                'Retrying payload "{payload}".',
-                ['payload' => $event->getMessage()->getPayloadName()]
-            );
-
-            $this->push($payload);
-        }
-    }
-
     /**
-     * Pushes job into queue.
+     * Pushes a message into the queue.
      *
-     * @param PayloadInterface $payload
+     * @param MessageInterface $message
      *
-     * @return string|null id of the pushed message
+     * @throws BehaviorNotSupportedException
      */
-    public function push(PayloadInterface $payload): ?string
+    public function push(MessageInterface $message): void
     {
-        $this->logger->debug('Preparing to push payload "{payload}".', ['payload' => $payload->getName()]);
-        $message = $this->payloadConvert($payload);
+        $this->logger->debug('Preparing to push message "{message}".', ['message' => $message->getName()]);
         $this->eventDispatcher->dispatch(new BeforePush($this, $message));
 
-        if ($this->driver->canPush($message)) {
-            $message->setId($this->driver->push($message));
-            $this->logger->debug(
-                'Successfully pushed message "{name}" to the queue.',
-                ['name' => $message->getPayloadName()]
-            );
-        } else {
-            $this->logger->error(
-                'Payload "{payload}" is not supported by driver "{driver}."',
-                [
-                    'payload' => $payload->getName(),
-                    'driver' => get_class($this->driver),
-                ]
-            );
+        $this->driver->push($message);
 
-            throw new PayloadNotSupportedException($this->driver, $payload);
-        }
+        $this->logger->debug(
+            'Successfully pushed message "{name}" to the queue.',
+            ['name' => $message->getName()]
+        );
 
         $this->eventDispatcher->dispatch(new AfterPush($this, $message));
-
-        return $message->getId();
     }
 
     /**
@@ -152,31 +112,5 @@ class Queue
     protected function handle(MessageInterface $message): void
     {
         $this->worker->process($message, $this);
-    }
-
-    protected function payloadConvert(PayloadInterface $payload): MessageInterface
-    {
-        $meta = $payload->getMeta();
-
-        if ($payload instanceof DelayablePayloadInterface) {
-            $meta[PayloadInterface::META_KEY_DELAY] = $payload->getDelay();
-        }
-
-        if ($payload instanceof PrioritisedPayloadInterface) {
-            $meta[PayloadInterface::META_KEY_PRIORITY] = $payload->getPriority();
-        }
-
-        if ($payload instanceof AttemptsRestrictedPayloadInterface) {
-            $meta[PayloadInterface::META_KEY_ATTEMPTS] = $payload->getAttempts();
-        }
-
-        return new Message($payload->getName(), $payload->getData(), $meta);
-    }
-
-    protected function messageConvert(MessageInterface $message, array $metaOverwrite): PayloadInterface
-    {
-        $meta = array_merge($message->getPayloadMeta(), $metaOverwrite);
-
-        return new BasicPayload($message->getPayloadName(), $message->getPayloadData(), $meta);
     }
 }

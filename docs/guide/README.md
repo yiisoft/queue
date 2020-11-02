@@ -1,17 +1,12 @@
-Yii Queue extension
-====================
+# Yii Queue extension
 
 An extension for running tasks asynchronously via queues.
 
-Introduction
-------------
+## Guides and concept explanations
 
 * [Usage basics](usage.md)
+* [Migrating from `yii2-queue`](migrating-from-yii2-queue.md)
+* [Message behaviors](behaviors.md)
 * [Errors and retryable jobs](retryable.md)
 * [Workers](worker.md)
-
-Queue Drivers
--------------
-
-* [Synchronous](driver-sync.md)
-* [AMQP](https://github.com/yiisoft/yii-queue-amqp)
+* [Driver list](driver-list.md)

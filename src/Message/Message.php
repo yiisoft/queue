@@ -4,43 +4,24 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Message;
 
-class Message implements MessageInterface
+final class Message extends AbstractMessage
 {
-    private ?string $id;
-    private string $payloadName;
-    private $payloadData;
-    private array $payloadMeta;
+    private string $name;
+    private $data;
 
-    public function __construct(string $payloadName, $payloadData, array $payloadMeta, ?string $id = null)
+    public function __construct(string $name, $data)
     {
-        $this->id = $id;
-        $this->payloadName = $payloadName;
-        $this->payloadData = $payloadData;
-        $this->payloadMeta = $payloadMeta;
+        $this->name = $name;
+        $this->data = $data;
     }
 
-    public function setId(?string $id): void
+    public function getName(): string
     {
-        $this->id = $id;
+        return $this->name;
     }
 
-    public function getId(): ?string
+    public function getData()
     {
-        return $this->id;
-    }
-
-    public function getPayloadName(): string
-    {
-        return $this->payloadName;
-    }
-
-    public function getPayloadData()
-    {
-        return $this->payloadData;
-    }
-
-    public function getPayloadMeta(): array
-    {
-        return $this->payloadMeta;
+        return $this->data;
     }
 }
