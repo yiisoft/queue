@@ -6,9 +6,9 @@ namespace Yiisoft\Yii\Queue\Driver;
 
 use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 
-class BehaviorChecker implements BehaviorCheckerInterface
+final class BehaviorChecker
 {
-    public function check(string $driver, iterable $behaviorsCurrent, iterable $behaviorsAvailable)
+    public function check(string $driver, iterable $behaviorsCurrent, iterable $behaviorsAvailable): void
     {
         foreach ($behaviorsCurrent as $behavior) {
             $ok = false;
