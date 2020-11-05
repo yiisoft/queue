@@ -21,9 +21,9 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
     private LoopInterface $loop;
     private WorkerInterface $worker;
     private int $current = 0;
-    private ?BehaviorCheckerInterface $behaviorChecker;
+    private ?BehaviorChecker $behaviorChecker;
 
-    public function __construct(LoopInterface $loop, WorkerInterface $worker, ?BehaviorCheckerInterface $behaviorChecker = null)
+    public function __construct(LoopInterface $loop, WorkerInterface $worker, ?BehaviorChecker $behaviorChecker = null)
     {
         $this->loop = $loop;
         $this->worker = $worker;
