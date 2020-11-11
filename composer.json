@@ -58,8 +58,7 @@
             "params": [
                 "$params",
                 "config/params.php"
-            ],
-            "events-console": "config/events-console.php"
+            ]
         }
     },
     "config": {
