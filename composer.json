@@ -32,7 +32,7 @@
     },
     "require-dev": {
         "infection/infection": "^0.20.1",
-        "phan/phan": "^3.0",
+        "phan/phan": "^3.2",
         "phpunit/phpunit": "^9.4",
         "yiisoft/test-support": "3.0.x-dev",
         "roave/infection-static-analysis-plugin": "^1.3",
