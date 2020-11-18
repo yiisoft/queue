@@ -33,7 +33,7 @@
     "require-dev": {
         "infection/infection": "^0.18.0",
         "phan/phan": "^3.0",
-        "phpunit/phpunit": "^9.3",
+        "phpunit/phpunit": "^9.4",
         "yiisoft/test-support": "3.0.x-dev"
     },
     "suggest": {
