@@ -5,7 +5,7 @@
         ]
     },
     "logs": {
-        "text": "infection.log",
+        "text": "php:\/\/stderr",
         "badge": {
             "branch": "master"
         }
