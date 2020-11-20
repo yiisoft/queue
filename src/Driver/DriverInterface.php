@@ -23,9 +23,9 @@ interface DriverInterface
      *
      * @param string $id ID of a job message.
      *
-     * @return JobStatus
-     *
      * @throws InvalidArgumentException When there is no such id in the driver.
+     *
+     * @return JobStatus
      */
     public function status(string $id): JobStatus;
 

@@ -107,7 +107,7 @@ final class Worker implements WorkerInterface
     /**
      * Checks if the handler is a DI container alias
      *
-     * @param callable|array|null $handler
+     * @param array|callable|null $handler
      *
      * @return bool
      */
