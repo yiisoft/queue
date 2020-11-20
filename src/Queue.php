@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Yii\Queue;
 
 use InvalidArgumentException;
@@ -100,9 +102,9 @@ class Queue
     /**
      * @param string $id A message id
      *
-     * @return JobStatus
-     *
      * @throws InvalidArgumentException when there is no such id in the driver
+     *
+     * @return JobStatus
      */
     public function status(string $id): JobStatus
     {

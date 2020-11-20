@@ -38,6 +38,6 @@ final class ExceptionTest extends TestCase
             $exception->getSolution(),
             'PriorityBehavior must not be included as it is not implemented in the payload.'
         );
-        self::assertEquals("Behavior is not supported by current queue driver.", $exception->getName());
+        self::assertEquals('Behavior is not supported by current queue driver.', $exception->getName());
     }
 }

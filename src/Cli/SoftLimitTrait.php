@@ -10,6 +10,7 @@ use Yiisoft\Yii\Queue\Event\MemoryLimitReached;
 trait SoftLimitTrait
 {
     abstract protected function getMemoryLimit(): int;
+
     abstract protected function getEventDispatcher(): EventDispatcherInterface;
 
     protected function memoryLimitReached(): bool
