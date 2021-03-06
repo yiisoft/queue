@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
 use Psr\Log\NullLogger;
-use Yiisoft\Yii\Queue\Driver\DriverInterface;
+use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
@@ -14,9 +14,9 @@ use Yiisoft\Yii\Queue\Tests\TestCase;
 
 final class QueueDependentInterfaceTest extends TestCase
 {
-    public function driverProvider(): array
+    public function adapterProvider(): array
     {
-        $dependent = new class() implements QueueDependentInterface, DriverInterface {
+        $dependent = new class() implements QueueDependentInterface, AdapterInterface {
             public ?Queue $queue = null;
 
             public function setQueue(Queue $queue): void
@@ -44,7 +44,7 @@ final class QueueDependentInterfaceTest extends TestCase
             {
             }
         };
-        $independent = new class() implements DriverInterface {
+        $independent = new class() implements AdapterInterface {
             public ?Queue $queue = null;
 
             public function setQueue(Queue $queue): void
@@ -80,20 +80,20 @@ final class QueueDependentInterfaceTest extends TestCase
     }
 
     /**
-     * @dataProvider driverProvider
+     * @dataProvider adapterProvider
      *
-     * @param DriverInterface $driver
+     * @param AdapterInterface $adapter
      */
-    public function testDependencyResolved(DriverInterface $driver): void
+    public function testDependencyResolved(AdapterInterface $adapter): void
     {
         new Queue(
-            $driver,
+            $adapter,
             $this->getEventDispatcher(),
             $this->getWorker(),
             $this->getLoop(),
             new NullLogger()
         );
 
-        self::assertEquals($driver instanceof QueueDependentInterface, $driver->queue instanceof Queue);
+        self::assertEquals($adapter instanceof QueueDependentInterface, $adapter->queue instanceof Queue);
     }
 }

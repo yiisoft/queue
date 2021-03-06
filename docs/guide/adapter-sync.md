@@ -1,4 +1,4 @@
-Synchronous Driver
+Synchronous Adapter
 ==================
 
 Run tasks synchronously in the same process. It could be used when developing and debugging an application.
@@ -11,10 +11,10 @@ $logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
 
 $worker = $DIContainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);
 $loop = $DIContainer->get(\Yiisoft\Yii\Queue\Cli\LoopInterface::class);
-$driver = new Yiisoft\Yii\Queue\Driver\SynchronousDriver($loop, $worker);
+$adapter = new Yiisoft\Yii\Queue\Adapter\SynchronousAdapter($loop, $worker);
 
 $queue = new Yiisoft\Yii\Queue\Queue(
-    $driver,
+    $adapter,
     $eventDispatcher,
     $worker,
     $loop,

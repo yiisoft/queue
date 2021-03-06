@@ -15,23 +15,23 @@ use Yiisoft\Yii\Queue\Tests\TestCase;
 
 final class QueueTest extends TestCase
 {
-    private bool $needsRealDriver = true;
+    private bool $needsRealAdapter = true;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->needsRealDriver = true;
+        $this->needsRealAdapter = true;
     }
 
-    protected function needsRealDriver(): bool
+    protected function needsRealAdapter(): bool
     {
-        return $this->needsRealDriver;
+        return $this->needsRealAdapter;
     }
 
     public function testPushSuccessful(): void
     {
-        $this->needsRealDriver = false;
+        $this->needsRealAdapter = false;
 
         $queue = $this->getQueue();
         $message = new Message('simple', null);
@@ -42,10 +42,10 @@ final class QueueTest extends TestCase
 
     public function testPushNotSuccessful(): void
     {
-        $this->needsRealDriver = false;
+        $this->needsRealAdapter = false;
         $behavior = new DelayBehavior(2);
-        $exception = new BehaviorNotSupportedException(get_class($this->getDriver()), $behavior);
-        $this->getDriver()->method('push')->willThrowException($exception);
+        $exception = new BehaviorNotSupportedException(get_class($this->getAdapter()), $behavior);
+        $this->getAdapter()->method('push')->willThrowException($exception);
         $expectedException = null;
 
         $queue = $this->getQueue();

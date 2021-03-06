@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
-use Yiisoft\Yii\Queue\Driver\DriverInterface;
+use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
@@ -19,26 +19,26 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 class Queue
 {
     protected EventDispatcherInterface $eventDispatcher;
-    protected DriverInterface $driver;
+    protected AdapterInterface $adapter;
     protected WorkerInterface $worker;
     protected LoopInterface $loop;
     private LoggerInterface $logger;
 
     public function __construct(
-        DriverInterface $driver,
+        AdapterInterface $adapter,
         EventDispatcherInterface $dispatcher,
         WorkerInterface $worker,
         LoopInterface $loop,
         LoggerInterface $logger
     ) {
-        $this->driver = $driver;
+        $this->adapter = $adapter;
         $this->eventDispatcher = $dispatcher;
         $this->worker = $worker;
         $this->loop = $loop;
         $this->logger = $logger;
 
-        if ($driver instanceof QueueDependentInterface) {
-            $driver->setQueue($this);
+        if ($adapter instanceof QueueDependentInterface) {
+            $adapter->setQueue($this);
         }
     }
 
@@ -54,7 +54,7 @@ class Queue
         $this->logger->debug('Preparing to push message "{message}".', ['message' => $message->getName()]);
         $this->eventDispatcher->dispatch(new BeforePush($this, $message));
 
-        $this->driver->push($message);
+        $this->adapter->push($message);
 
         $this->logger->debug(
             'Successfully pushed message "{name}" to the queue.',
@@ -77,7 +77,7 @@ class Queue
         while (
             ($max <= 0 || $max > $count)
             && $this->loop->canContinue()
-            && $message = $this->driver->nextMessage()
+            && $message = $this->adapter->nextMessage()
         ) {
             $this->handle($message);
             $count++;
@@ -95,20 +95,20 @@ class Queue
     public function listen(): void
     {
         $this->logger->debug('Start listening to the queue.');
-        $this->driver->subscribe(fn (MessageInterface $message) => $this->handle($message));
+        $this->adapter->subscribe(fn (MessageInterface $message) => $this->handle($message));
         $this->logger->debug('Finish listening to the queue.');
     }
 
     /**
      * @param string $id A message id
      *
-     * @throws InvalidArgumentException when there is no such id in the driver
+     * @throws InvalidArgumentException when there is no such id in the adapter
      *
      * @return JobStatus
      */
     public function status(string $id): JobStatus
     {
-        return $this->driver->status($id);
+        return $this->adapter->status($id);
     }
 
     protected function handle(MessageInterface $message): void

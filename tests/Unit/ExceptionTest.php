@@ -13,10 +13,10 @@ final class ExceptionTest extends TestCase
 {
     public function testJobNotSupported(): void
     {
-        $driverClass = 'TestDriver';
+        $adapterClass = 'TestAdapter';
         $behavior = new DelayBehavior(2);
 
-        $exception = new BehaviorNotSupportedException($driverClass, $behavior);
+        $exception = new BehaviorNotSupportedException($adapterClass, $behavior);
 
         self::assertStringContainsString(
             DelayBehavior::class,
@@ -24,9 +24,9 @@ final class ExceptionTest extends TestCase
             'Behavior name must be included.'
         );
         self::assertStringContainsString(
-            $driverClass,
+            $adapterClass,
             $exception->getMessage(),
-            'Driver class must be included.'
+            'Adapter class must be included.'
         );
         self::assertStringContainsString(
             DelayBehavior::class,
@@ -38,6 +38,6 @@ final class ExceptionTest extends TestCase
             $exception->getSolution(),
             'PriorityBehavior must not be included as it is not implemented in the payload.'
         );
-        self::assertEquals('Behavior is not supported by current queue driver.', $exception->getName());
+        self::assertEquals('Behavior is not supported by current queue adapter.', $exception->getName());
     }
 }

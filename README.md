@@ -113,7 +113,7 @@ If you don't want your script to exit immediately, you can use the `listen` meth
 $queue->listen();
 ```
 
-You can also check the status of a pushed message (the queue driver you are using must support this feature):
+You can also check the status of a pushed message (the queue adapter you are using must support this feature):
 
 ```php
 $queue->push($message);
@@ -132,12 +132,12 @@ $status->isReserved();
 $status->isDone();
 ```
 
-## Driver behaviors
+## Adapter behaviors
 
-Some of queue drivers support different behaviors like delayed execution and prioritized queues.
+Some of queue adapters support different behaviors like delayed execution and prioritized queues.
 
-**Important:** Not every driver supports all the behaviors. See concrete driver documentation to find out if
-it supports the behavior you want to use. Driver will throw a `BehaviorNotSupportedException` if it does not support
+**Important:** Not every adapter supports all the behaviors. See concrete adapter documentation to find out if
+it supports the behavior you want to use. Adapter will throw a `BehaviorNotSupportedException` if it does not support
 some behaviors attached to the message you are trying to push to the queue.
 
 ### Delay behavior
@@ -151,7 +151,7 @@ $queue->push($message);
 
 ## Console execution
 
-The exact way of task execution depends on the driver used. Most drivers can be run using
+The exact way of task execution depends on the adapter used. Most adapters can be run using
 console commands, which the component automatically registers in your application.
 
 The following command obtains and executes tasks in a loop until the queue is empty:
@@ -166,7 +166,7 @@ The following command launches a daemon which infinitely queries the queue:
 yii queue/listen
 ```
 
-See the documentation for more details about driver specific console commands and their options.
+See the documentation for more details about adapter specific console commands and their options.
 
 The component also has the ability to track the status of a job which was pushed into queue.
 
