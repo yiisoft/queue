@@ -53,11 +53,14 @@
         "branch-alias": {
             "dev-master": "3.0.x-dev"
         },
+        "config-plugin-options": {
+            "source-directory": "config"
+        },
         "config-plugin": {
-            "common": "config/common.php",
+            "common": "common.php",
             "params": [
                 "$params",
-                "config/params.php"
+                "params.php"
             ]
         }
     },
