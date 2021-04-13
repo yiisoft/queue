@@ -13,7 +13,7 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 return [
     QueueWorker::class => [
-        '__class' => QueueWorker::class,
+        'class' => QueueWorker::class,
         '__construct()' => [$params['yiisoft/yii-queue']['handlers']],
     ],
     WorkerInterface::class => QueueWorker::class,
