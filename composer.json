@@ -58,10 +58,7 @@
         },
         "config-plugin": {
             "common": "common.php",
-            "params": [
-                "$params",
-                "params.php"
-            ]
+            "params": "params.php"
         }
     },
     "config": {
