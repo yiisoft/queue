@@ -44,4 +44,6 @@ interface DriverInterface
      * @param callable $handler The handler which will execute jobs.
      */
     public function subscribe(callable $handler): void;
+
+    public function withChannel(string $channel);
 }

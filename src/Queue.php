@@ -13,23 +13,24 @@ use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
+use Yiisoft\Yii\Queue\Exception\DriverConfiguration\DriverNotConfiguredException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 class Queue
 {
     protected EventDispatcherInterface $eventDispatcher;
-    protected DriverInterface $driver;
     protected WorkerInterface $worker;
     protected LoopInterface $loop;
     private LoggerInterface $logger;
+    protected ?DriverInterface $driver = null;
 
     public function __construct(
-        DriverInterface $driver,
         EventDispatcherInterface $dispatcher,
         WorkerInterface $worker,
         LoopInterface $loop,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ?DriverInterface $driver = null
     ) {
         $this->driver = $driver;
         $this->eventDispatcher = $dispatcher;
@@ -51,6 +52,8 @@ class Queue
      */
     public function push(MessageInterface $message): void
     {
+        $this->checkDriver();
+
         $this->logger->debug('Preparing to push message "{message}".', ['message' => $message->getName()]);
         $this->eventDispatcher->dispatch(new BeforePush($this, $message));
 
@@ -71,6 +74,8 @@ class Queue
      */
     public function run(int $max = 0): void
     {
+        $this->checkDriver();
+
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
@@ -94,6 +99,8 @@ class Queue
      */
     public function listen(): void
     {
+        $this->checkDriver();
+
         $this->logger->debug('Start listening to the queue.');
         $this->driver->subscribe(fn (MessageInterface $message) => $this->handle($message));
         $this->logger->debug('Finish listening to the queue.');
@@ -114,5 +121,20 @@ class Queue
     protected function handle(MessageInterface $message): void
     {
         $this->worker->process($message, $this);
+    }
+
+    public function withDriver(DriverInterface $driver): self
+    {
+        $instance = clone $this;
+        $instance->driver = $driver;
+
+        return $instance;
+    }
+
+    private function checkDriver(): void
+    {
+        if ($this->driver === null) {
+            throw new DriverNotConfiguredException();
+        }
     }
 }

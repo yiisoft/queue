@@ -96,6 +96,11 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
         $this->queue = $queue;
     }
 
+    public function withChannel(string $channel)
+    {
+        // TODO: Implement withChannel() method.
+    }
+
     private function run(callable $handler): void
     {
         while ($this->loop->canContinue() && $message = $this->nextMessage()) {
