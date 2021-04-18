@@ -36,11 +36,11 @@ final class QueueFactory implements QueueFactoryInterface
         if (!isset($this->channelConfiguration[$channel])) {
             if ($this->enableRuntimeChannelDefinition === false) {
                 throw new ChannelNotConfigureException($channel);
-            } elseif ($this->defaultDriver === null) {
-                throw new EmptyDefaultDriverException();
-            } else {
-                return $this->queue->withDriver($this->defaultDriver->withChannel($channel));
             }
+            if ($this->defaultDriver === null) {
+                throw new EmptyDefaultDriverException();
+            }
+            return $this->queue->withDriver($this->defaultDriver->withChannel($channel));
         }
 
         // TODO
