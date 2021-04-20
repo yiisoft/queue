@@ -1,11 +1,11 @@
 # Message behaviors
 
-`Behaviors` are classes designed to tell queue [drivers] about some specific message behavior: e.g. when you want
+`Behaviors` are classes designed to tell queue [adapters] about some specific message behavior: e.g. when you want
 to delay message consuming or set message priority. There are some predefined behaviors with which some
-default [drivers] can work.
+default [adapters] can work.
 
-***Important!* Not every driver can work with all the behaviors. Below you will find a matrix displaying compatibility
-of drivers and behaviors.**
+***Important!* Not every adapter can work with all the behaviors. Below you will find a matrix displaying compatibility
+of adapters and behaviors.**
 
 ## Default behaviors
 
@@ -33,10 +33,10 @@ $message->attachBehavior(new PriorityBehavior(100));
 
 |                     | DelayBehavior             | PriorityBehavior
 |---------------------|---------------------------|-----------------
-| [SynchronousDriver] | ❌                        | ❌                
+| [SynchronousAdapter] | ❌                        | ❌                
 | [Amqp]              | yiisoft/yii-queue-amqp#11 | ❌               
 
 
-[drivers]: (driver-list.md)
-[SynchronousDriver]: (driver-sync.md)
+[adapters]: (adapter-list.md)
+[SynchronousAdapter]: (adapter-sync.md)
 [Amqp]: (https://github.com/yiisoft/yii-queue-amqp)

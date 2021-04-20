@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Driver;
+namespace Yiisoft\Yii\Queue\Adapter;
 
 use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 
 final class BehaviorChecker
 {
-    public function check(string $driver, iterable $behaviorsCurrent, iterable $behaviorsAvailable): void
+    public function check(string $adapter, iterable $behaviorsCurrent, iterable $behaviorsAvailable): void
     {
         foreach ($behaviorsCurrent as $behavior) {
             $ok = false;
@@ -20,7 +20,7 @@ final class BehaviorChecker
             }
 
             if ($ok === false) {
-                throw new BehaviorNotSupportedException($driver, $behavior);
+                throw new BehaviorNotSupportedException($adapter, $behavior);
             }
         }
     }

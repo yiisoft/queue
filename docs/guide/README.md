@@ -9,4 +9,4 @@ An extension for running tasks asynchronously via queues.
 * [Message behaviors](behaviors.md)
 * [Errors and retryable jobs](retryable.md)
 * [Workers](worker.md)
-* [Driver list](driver-list.md)
+* [Adapter list](adapter-list.md)

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Message\Behaviors;
 
 /**
- * Interface for queue driver behaviors which can change their state on message pushing
+ * Interface for queue adapter behaviors which can change their state on message pushing
  */
 interface ExecutableBehaviorInterface extends BehaviorInterface
 {
