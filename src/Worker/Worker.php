@@ -7,6 +7,8 @@ namespace Yiisoft\Yii\Queue\Worker;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
+use ReflectionMethod;
 use RuntimeException;
 use Throwable;
 use Yiisoft\Injector\Injector;
@@ -86,19 +88,8 @@ final class Worker implements WorkerInterface
 
     private function getHandler(string $name): ?callable
     {
-        if (array_key_exists($name, $this->handlersCached)) {
-            return $this->handlersCached[$name];
-        }
-
-        $this->handlersCached[$name] = null;
-
-        $handler = $this->handlers[$name] ?? null;
-
-        if (is_callable($handler)) {
-            $this->handlersCached[$name] = $handler;
-        } elseif ($this->isAlias($handler)) {
-            $handler[0] = $this->container->get($handler[0]);
-            $this->handlersCached[$name] = $handler;
+        if (!array_key_exists($name, $this->handlersCached)) {
+            $this->handlersCached[$name] = $this->prepare($this->handlers[$name] ?? null);
         }
 
         return $this->handlersCached[$name];
@@ -107,14 +98,52 @@ final class Worker implements WorkerInterface
     /**
      * Checks if the handler is a DI container alias
      *
-     * @param array|callable|null $handler
+     * @param array|callable|object|null $definition
      *
-     * @return bool
+     * @return callable|null
      */
-    private function isAlias($handler): bool
+    private function prepare($definition)
     {
-        return is_array($handler)
-            && array_keys($handler) === [0, 1]
-            && is_string($handler[0]);
+        if (is_string($definition) && $this->container->has($definition)) {
+            return $this->container->get($definition);
+        }
+
+        if (is_array($definition)
+            && array_keys($definition) === [0, 1]
+            && is_string($definition[0])
+            && is_string($definition[1])
+        ) {
+            [$className, $methodName] = $definition;
+
+            if (!class_exists($className) && $this->container->has($className)) {
+                return [
+                    $this->container->get($className),
+                    $methodName,
+                ];
+            }
+
+            if (!class_exists($className)) {
+                return null;
+            }
+
+            try {
+                $reflection = new ReflectionMethod($className, $methodName);
+            } catch (ReflectionException $e) {
+                return null;
+            }
+            if ($reflection->isStatic()) {
+                return [$className, $methodName];
+            }
+            if ($this->container->has($className)) {
+                return [
+                    $this->container->get($className),
+                    $methodName,
+                ];
+            }
+
+            return null;
+        }
+
+        return $definition;
     }
 }
