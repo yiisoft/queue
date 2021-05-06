@@ -57,8 +57,9 @@ final class QueueFactory implements QueueFactoryInterface
     /**
      * @param string $channel
      *
-     * @return Queue
      * @throws InvalidConfigException
+     *
+     * @return Queue
      */
     private function create(string $channel): Queue
     {
@@ -73,10 +74,10 @@ final class QueueFactory implements QueueFactoryInterface
 
         if ($this->enableRuntimeChannelDefinition === false) {
             throw new ChannelNotConfiguredException($channel);
-        } elseif ($this->defaultAdapter === null) {
-            throw new EmptyDefaultAdapterException();
-        } else {
-            return $this->queue->withAdapter($this->defaultAdapter->withChannel($channel));
         }
+        if ($this->defaultAdapter === null) {
+            throw new EmptyDefaultAdapterException();
+        }
+        return $this->queue->withAdapter($this->defaultAdapter->withChannel($channel));
     }
 }

@@ -11,7 +11,6 @@ use Yiisoft\Yii\Queue\Queue;
 
 class ChannelIncorrectlyConfigured extends InvalidArgumentException implements FriendlyExceptionInterface
 {
-
     /**
      * ChannelIncorrectlyConfigured constructor.
      *
