@@ -17,16 +17,23 @@ final class SynchronousAdapter implements AdapterInterface, QueueDependentInterf
 {
     private const BEHAVIORS_AVAILABLE = [];
     private array $messages = [];
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private QueueInterface $queue;
     private LoopInterface $loop;
     private WorkerInterface $worker;
     private int $current = 0;
     private ?BehaviorChecker $behaviorChecker;
+    private string $channel;
 
-    public function __construct(LoopInterface $loop, WorkerInterface $worker, ?BehaviorChecker $behaviorChecker = null)
-    {
+    public function __construct(
+        LoopInterface $loop,
+        WorkerInterface $worker,
+        string $channel = 'default',
+        ?BehaviorChecker $behaviorChecker = null
+    ) {
         $this->loop = $loop;
         $this->worker = $worker;
+        $this->channel = $channel;
         $this->behaviorChecker = $behaviorChecker;
     }
 
@@ -96,9 +103,17 @@ final class SynchronousAdapter implements AdapterInterface, QueueDependentInterf
         $this->queue = $queue;
     }
 
-    public function withChannel(string $channel)
+    public function withChannel(string $channel): self
     {
-        // TODO: Implement withChannel() method.
+        if ($channel === $this->channel) {
+            return $this;
+        }
+
+        $instance = clone $this;
+        $instance->channel = $channel;
+        $instance->messages = [];
+
+        return $instance;
     }
 
     private function run(callable $handler): void

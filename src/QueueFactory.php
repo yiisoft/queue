@@ -12,7 +12,7 @@ use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigure
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\EmptyDefaultAdapterException;
 
-final class QueueFactory implements QueueFactoryInterface
+final class QueueFactory
 {
     private array $channelConfiguration;
     private QueueInterface $queue;
@@ -21,6 +21,20 @@ final class QueueFactory implements QueueFactoryInterface
     private Factory $yiiFactory;
     private array $queueCollection = [];
 
+    /**
+     * QueueFactory constructor.
+     *
+     * @param array<string, mixed> $channelConfiguration Configuration array in [channel_name => definition] format.
+     *        "Definition" here is a {@see Factory} definition
+     * @param QueueInterface $queue A default queue implementation. `$queue->withAdapter()` will be returned
+     *        with the `get` method
+     * @param Factory $yiiFactory
+     * @param bool $enableRuntimeChannelDefinition A flag whether to enable a such behavior when there is no
+     *        explicit channel adapter definition: `return $this->queue->withAdapter($this->adapter->withChannel($channel)`
+     *        When this flag is set to false, only explicit definitions from the $definition parameter are used.
+     * @param AdapterInterface|null $defaultAdapter A default adapter implementation.
+     *        It must be set when $enableRuntimeChannelDefinition is true.
+     */
     public function __construct(
         array $channelConfiguration,
         QueueInterface $queue,

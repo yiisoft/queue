@@ -45,7 +45,7 @@ final class QueueDependentInterfaceTest extends TestCase
             {
             }
 
-            public function withChannel(string $channel)
+            public function withChannel(string $channel): self
             {
                 // TODO: Implement withChannel() method.
             }
@@ -78,7 +78,7 @@ final class QueueDependentInterfaceTest extends TestCase
             {
             }
 
-            public function withChannel(string $channel)
+            public function withChannel(string $channel): self
             {
                 // TODO: Implement withChannel() method.
             }

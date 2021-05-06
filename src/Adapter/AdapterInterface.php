@@ -45,5 +45,5 @@ interface AdapterInterface
      */
     public function subscribe(callable $handler): void;
 
-    public function withChannel(string $channel);
+    public function withChannel(string $channel): self;
 }

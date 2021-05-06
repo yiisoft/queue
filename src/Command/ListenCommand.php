@@ -13,10 +13,7 @@ use Yiisoft\Yii\Queue\QueueInterface;
 class ListenCommand extends Command
 {
     protected static $defaultName = 'queue/listen';
-    /**
-     * @var QueueInterface
-     */
-    private Queue $queue;
+    private QueueInterface $queue;
 
     public function __construct(?string $name, QueueInterface $queue)
     {

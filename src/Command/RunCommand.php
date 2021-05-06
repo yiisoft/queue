@@ -13,7 +13,7 @@ use Yiisoft\Yii\Queue\QueueInterface;
 class RunCommand extends Command
 {
     protected static $defaultName = 'queue/run';
-    private Queue $queue;
+    private QueueInterface $queue;
 
     public function __construct(?string $name, QueueInterface $queue)
     {

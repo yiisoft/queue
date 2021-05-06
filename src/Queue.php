@@ -48,6 +48,7 @@ final class Queue implements QueueInterface
         $this->logger->debug('Preparing to push message "{message}".', ['message' => $message->getName()]);
         $this->eventDispatcher->dispatch(new BeforePush($this, $message));
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->adapter->push($message);
 
         $this->logger->debug(
@@ -65,6 +66,7 @@ final class Queue implements QueueInterface
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
+        /** @psalm-suppress PossiblyNullReference */
         while (
             ($max <= 0 || $max > $count)
             && $this->loop->canContinue()
@@ -85,12 +87,16 @@ final class Queue implements QueueInterface
         $this->checkAdapter();
 
         $this->logger->debug('Start listening to the queue.');
+        /** @psalm-suppress PossiblyNullReference */
         $this->adapter->subscribe(fn (MessageInterface $message) => $this->handle($message));
         $this->logger->debug('Finish listening to the queue.');
     }
 
     public function status(string $id): JobStatus
     {
+        $this->checkAdapter();
+
+        /** @psalm-suppress PossiblyNullReference */
         return $this->adapter->status($id);
     }
 

@@ -10,6 +10,10 @@ use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 
+/**
+ * @internal Please don't use this interface. It is only used here to make tests simpler and will be removed
+ * after tests refactoring. Use the {@see Queue} class directly instead.
+ */
 interface QueueInterface
 {
     /**
