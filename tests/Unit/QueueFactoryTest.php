@@ -11,7 +11,6 @@ use Yiisoft\Factory\Factory;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
-use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\EmptyDefaultAdapterException;
 use Yiisoft\Yii\Queue\QueueFactory;
 use Yiisoft\Yii\Queue\QueueInterface;
 
