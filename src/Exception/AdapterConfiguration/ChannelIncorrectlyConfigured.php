@@ -7,7 +7,9 @@ namespace Yiisoft\Yii\Queue\Exception\AdapterConfiguration;
 use InvalidArgumentException;
 use Throwable;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
+use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueInterface;
 
 class ChannelIncorrectlyConfigured extends InvalidArgumentException implements FriendlyExceptionInterface
 {
@@ -19,16 +21,16 @@ class ChannelIncorrectlyConfigured extends InvalidArgumentException implements F
      */
     public function __construct(string $channel, $object, int $code = 0, ?Throwable $previous = null)
     {
-        $queueClass = Queue::class;
+        $adapterClass = AdapterInterface::class;
         $realType = is_object($object) ? get_class($object) : gettype($object);
-        $message = "Channel $channel is not properly configured: definition must return $queueClass, $realType returned";
+        $message = "Channel '$channel' is not properly configured: definition must return $adapterClass, $realType returned";
 
         parent::__construct($message, $code, $previous);
     }
 
     public function getName(): string
     {
-        return 'Channel incorrectly configured';
+        return 'Incorrect queue channel configuration';
     }
 
     public function getSolution(): ?string

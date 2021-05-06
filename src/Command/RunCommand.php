@@ -8,13 +8,14 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueInterface;
 
 class RunCommand extends Command
 {
     protected static $defaultName = 'queue/run';
     private Queue $queue;
 
-    public function __construct(?string $name, Queue $queue)
+    public function __construct(?string $name, QueueInterface $queue)
     {
         parent::__construct($name);
         $this->queue = $queue;

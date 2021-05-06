@@ -6,13 +6,14 @@ namespace Yiisoft\Yii\Queue\Event;
 
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueInterface;
 
 final class AfterPush
 {
-    private Queue $queue;
+    private QueueInterface $queue;
     private MessageInterface $message;
 
-    public function __construct(Queue $queue, MessageInterface $message)
+    public function __construct(QueueInterface $queue, MessageInterface $message)
     {
         $this->queue = $queue;
         $this->message = $message;
@@ -23,7 +24,7 @@ final class AfterPush
         return $this->message;
     }
 
-    public function getQueue(): Queue
+    public function getQueue(): QueueInterface
     {
         return $this->queue;
     }

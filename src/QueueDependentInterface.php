@@ -6,5 +6,5 @@ namespace Yiisoft\Yii\Queue;
 
 interface QueueDependentInterface
 {
-    public function setQueue(Queue $queue): void;
+    public function setQueue(QueueInterface $queue): void;
 }

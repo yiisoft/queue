@@ -11,13 +11,14 @@ use Yiisoft\Yii\Queue\Message\Behaviors\ExecutableBehaviorInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueDependentInterface;
+use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 final class SynchronousAdapter implements AdapterInterface, QueueDependentInterface
 {
     private const BEHAVIORS_AVAILABLE = [];
     private array $messages = [];
-    private Queue $queue;
+    private QueueInterface $queue;
     private LoopInterface $loop;
     private WorkerInterface $worker;
     private int $current = 0;
@@ -91,7 +92,7 @@ final class SynchronousAdapter implements AdapterInterface, QueueDependentInterf
         $this->run($handler);
     }
 
-    public function setQueue(Queue $queue): void
+    public function setQueue(QueueInterface $queue): void
     {
         $this->queue = $queue;
     }

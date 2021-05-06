@@ -6,5 +6,5 @@ namespace Yiisoft\Yii\Queue;
 
 interface QueueFactoryInterface
 {
-    public function get(?string $channel = null): Queue;
+    public function get(?string $channel = null): QueueInterface;
 }

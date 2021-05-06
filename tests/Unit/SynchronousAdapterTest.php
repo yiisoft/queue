@@ -7,6 +7,7 @@ namespace Yiisoft\Yii\Queue\Tests\Unit;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 final class SynchronousAdapterTest extends TestCase
@@ -18,7 +19,7 @@ final class SynchronousAdapterTest extends TestCase
 
     public function testNonIntegerId(): void
     {
-        $queue = $this->getQueue();
+        $queue = $this->getQueue()->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
         $queue->push($message);
         $id = $message->getId();
@@ -30,7 +31,7 @@ final class SynchronousAdapterTest extends TestCase
     {
         $message = new Message('simple', []);
         $adapter = $this->getAdapter();
-        $adapter->setQueue($this->createMock(Queue::class));
+        $adapter->setQueue($this->createMock(QueueInterface::class));
 
         $ids = [];
         $adapter->push($message);

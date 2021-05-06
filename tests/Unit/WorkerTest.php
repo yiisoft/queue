@@ -9,6 +9,7 @@ use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 final class WorkerTest extends TestCase
@@ -20,7 +21,7 @@ final class WorkerTest extends TestCase
     {
         $this->executionTimes = 0;
         $message = new Message('simple', '', []);
-        $queue = $this->createMock(Queue::class);
+        $queue = $this->createMock(QueueInterface::class);
         $this->getWorker()->process($message, $queue);
 
         self::assertEquals(1, $this->executionTimes);
@@ -39,7 +40,7 @@ final class WorkerTest extends TestCase
         $this->setEventHandlers($handler);
 
         $message = new Message('simple', '', []);
-        $queue = $this->createMock(Queue::class);
+        $queue = $this->createMock(QueueInterface::class);
         $this->getWorker()->process($message, $queue);
 
         self::assertEquals(0, $this->executionTimes);
@@ -53,7 +54,7 @@ final class WorkerTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         $message = new Message('exceptional', '', []);
-        $queue = $this->createMock(Queue::class);
+        $queue = $this->createMock(QueueInterface::class);
         $this->getWorker()->process($message, $queue);
     }
 
@@ -70,7 +71,7 @@ final class WorkerTest extends TestCase
         $this->setEventHandlers($handler);
 
         $message = new Message('exceptional', '', []);
-        $queue = $this->createMock(Queue::class);
+        $queue = $this->createMock(QueueInterface::class);
         $this->getWorker()->process($message, $queue);
 
         self::assertEquals(1, $this->executionTimes);

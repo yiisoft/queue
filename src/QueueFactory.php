@@ -15,7 +15,7 @@ use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\EmptyDefaultAdapterExceptio
 final class QueueFactory implements QueueFactoryInterface
 {
     private array $channelConfiguration;
-    private Queue $queue;
+    private QueueInterface $queue;
     private bool $enableRuntimeChannelDefinition;
     private ?AdapterInterface $defaultAdapter;
     private Factory $yiiFactory;
@@ -23,7 +23,7 @@ final class QueueFactory implements QueueFactoryInterface
 
     public function __construct(
         array $channelConfiguration,
-        Queue $queue,
+        QueueInterface $queue,
         Factory $yiiFactory,
         bool $enableRuntimeChannelDefinition = false,
         ?AdapterInterface $defaultAdapter = null
@@ -38,7 +38,7 @@ final class QueueFactory implements QueueFactoryInterface
     /**
      * @throws InvalidConfigException
      */
-    public function get(?string $channel = null): Queue
+    public function get(?string $channel = null): QueueInterface
     {
         if ($channel === null) {
             return $this->queue;
@@ -57,19 +57,19 @@ final class QueueFactory implements QueueFactoryInterface
     /**
      * @param string $channel
      *
+     * @return QueueInterface
      * @throws InvalidConfigException
      *
-     * @return Queue
      */
-    private function create(string $channel): Queue
+    private function create(string $channel): QueueInterface
     {
         if (isset($this->channelConfiguration[$channel])) {
-            $queue = $this->yiiFactory->create($this->channelConfiguration[$channel]);
-            if (!$queue instanceof Queue) {
-                throw new ChannelIncorrectlyConfigured($channel, $queue);
+            $adapter = $this->yiiFactory->create($this->channelConfiguration[$channel]);
+            if (!$adapter instanceof AdapterInterface) {
+                throw new ChannelIncorrectlyConfigured($channel, $adapter);
             }
 
-            return $queue;
+            return $this->queue->withAdapter($adapter);
         }
 
         if ($this->enableRuntimeChannelDefinition === false) {

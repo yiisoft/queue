@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
-use InvalidArgumentException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
@@ -12,12 +11,11 @@ use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
-use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
-class Queue
+final class Queue implements QueueInterface
 {
     protected EventDispatcherInterface $eventDispatcher;
     protected WorkerInterface $worker;
@@ -43,13 +41,6 @@ class Queue
         }
     }
 
-    /**
-     * Pushes a message into the queue.
-     *
-     * @param MessageInterface $message
-     *
-     * @throws BehaviorNotSupportedException
-     */
     public function push(MessageInterface $message): void
     {
         $this->checkAdapter();
@@ -67,11 +58,6 @@ class Queue
         $this->eventDispatcher->dispatch(new AfterPush($this, $message));
     }
 
-    /**
-     * Execute all existing jobs and exit
-     *
-     * @param int $max
-     */
     public function run(int $max = 0): void
     {
         $this->checkAdapter();
@@ -94,9 +80,6 @@ class Queue
         );
     }
 
-    /**
-     * Listen to the queue and execute jobs as they come
-     */
     public function listen(): void
     {
         $this->checkAdapter();
@@ -106,13 +89,6 @@ class Queue
         $this->logger->debug('Finish listening to the queue.');
     }
 
-    /**
-     * @param string $id A message id
-     *
-     * @throws InvalidArgumentException when there is no such id in the adapter
-     *
-     * @return JobStatus
-     */
     public function status(string $id): JobStatus
     {
         return $this->adapter->status($id);

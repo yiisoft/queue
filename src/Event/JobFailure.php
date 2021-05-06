@@ -8,16 +8,17 @@ use Psr\EventDispatcher\StoppableEventInterface;
 use Throwable;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueInterface;
 
 final class JobFailure implements StoppableEventInterface
 {
     private bool $stop = false;
     private bool $throw = true;
-    private Queue $queue;
+    private QueueInterface $queue;
     private MessageInterface $message;
     private Throwable $exception;
 
-    public function __construct(Queue $queue, MessageInterface $message, Throwable $exception)
+    public function __construct(QueueInterface $queue, MessageInterface $message, Throwable $exception)
     {
         $this->queue = $queue;
         $this->message = $message;
@@ -29,7 +30,7 @@ final class JobFailure implements StoppableEventInterface
         return $this->message;
     }
 
-    public function getQueue(): Queue
+    public function getQueue(): QueueInterface
     {
         return $this->queue;
     }

@@ -10,6 +10,7 @@ use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueDependentInterface;
+use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 final class QueueDependentInterfaceTest extends TestCase
@@ -19,7 +20,7 @@ final class QueueDependentInterfaceTest extends TestCase
         $dependent = new class() implements QueueDependentInterface, AdapterInterface {
             public ?Queue $queue = null;
 
-            public function setQueue(Queue $queue): void
+            public function setQueue(QueueInterface $queue): void
             {
                 $this->queue = $queue;
             }
@@ -42,12 +43,17 @@ final class QueueDependentInterfaceTest extends TestCase
 
             public function canPush(MessageInterface $message): bool
             {
+            }
+
+            public function withChannel(string $channel)
+            {
+                // TODO: Implement withChannel() method.
             }
         };
         $independent = new class() implements AdapterInterface {
             public ?Queue $queue = null;
 
-            public function setQueue(Queue $queue): void
+            public function setQueue(QueueInterface $queue): void
             {
                 $this->queue = $queue;
             }
@@ -70,6 +76,11 @@ final class QueueDependentInterfaceTest extends TestCase
 
             public function canPush(MessageInterface $message): bool
             {
+            }
+
+            public function withChannel(string $channel)
+            {
+                // TODO: Implement withChannel() method.
             }
         };
 
@@ -87,11 +98,11 @@ final class QueueDependentInterfaceTest extends TestCase
     public function testDependencyResolved(AdapterInterface $adapter): void
     {
         new Queue(
-            $adapter,
             $this->getEventDispatcher(),
             $this->getWorker(),
             $this->getLoop(),
-            new NullLogger()
+            new NullLogger(),
+            $adapter
         );
 
         self::assertEquals($adapter instanceof QueueDependentInterface, $adapter->queue instanceof Queue);
