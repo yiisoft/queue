@@ -10,10 +10,10 @@ $logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
 
 $worker = $DIContainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);
 $loop = $DIContainer->get(\Yiisoft\Yii\Queue\Cli\LoopInterface::class);
-$driver = $DIContainer->get(\Yiisoft\Yii\Queue\Driver\DriverInterface::class);
+$adapter = $DIContainer->get(\Yiisoft\Yii\Queue\Adapter\AdapterInterface::class);
 
 $queue = new Queue(
-    $driver,
+    $adapter,
     $eventDispatcher,
     $worker,
     $loop,
@@ -21,8 +21,8 @@ $queue = new Queue(
 );
 ```
 
-See also the documentation for concrete drivers ([synchronous driver](driver-sync.md), 
-[AMQP driver](https://github.com/yiisoft/yii-queue-amqp)) and [workers](worker.md)
+See also the documentation for concrete adapters ([synchronous adapter](adapter-sync.md), 
+[AMQP adapter](https://github.com/yiisoft/yii-queue-amqp)) and [workers](worker.md)
 
 
 ## Usage
@@ -51,14 +51,14 @@ $message->attachBehavior(new DelayBehavior(5 * 60));
 $queue->push($message);
 ```
 
-**Important:** Not every driver (such as synchronous driver) supports delayed execution.
+**Important:** Not every adapter (such as synchronous adapter) supports delayed execution.
 
 
 ## Queue handling
 
-The exact way how a job is executed depends on the driver used. Most drivers can be run using
+The exact way how a job is executed depends on the adapter used. Most adapters can be run using
 console commands, which the component registers in your application. For more details check the respective
-driver documentation.
+adapter documentation.
 
 
 ## Job status

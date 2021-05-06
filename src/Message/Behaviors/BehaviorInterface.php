@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Message\Behaviors;
 
 /**
- * Interface for behaviors to be used by queue drivers.
+ * Interface for behaviors to be used by queue adapters.
  */
 interface BehaviorInterface
 {

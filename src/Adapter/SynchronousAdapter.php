@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Driver;
+namespace Yiisoft\Yii\Queue\Adapter;
 
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
@@ -13,7 +13,7 @@ use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueDependentInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
-final class SynchronousDriver implements DriverInterface, QueueDependentInterface
+final class SynchronousAdapter implements AdapterInterface, QueueDependentInterface
 {
     private const BEHAVIORS_AVAILABLE = [];
     private array $messages = [];
@@ -53,7 +53,7 @@ final class SynchronousDriver implements DriverInterface, QueueDependentInterfac
         $id = (int) $id;
 
         if ($id < 0) {
-            throw new InvalidArgumentException('This driver IDs start with 0.');
+            throw new InvalidArgumentException('This adapter IDs start with 0.');
         }
 
         if ($id < $this->current) {

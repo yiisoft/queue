@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Driver;
+namespace Yiisoft\Yii\Queue\Adapter;
 
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 
-interface DriverInterface
+interface AdapterInterface
 {
     /**
      * Returns the first message from the queue if it exists (null otherwise).
@@ -23,18 +23,18 @@ interface DriverInterface
      *
      * @param string $id ID of a job message.
      *
-     * @throws InvalidArgumentException When there is no such id in the driver.
+     * @throws InvalidArgumentException When there is no such id in the adapter.
      *
      * @return JobStatus
      */
     public function status(string $id): JobStatus;
 
     /**
-     * Pushing a message to the queue. Driver sets message ID if available.
+     * Pushing a message to the queue. Adapter sets message ID if available.
      *
      * @param MessageInterface $message
      *
-     * @throws BehaviorNotSupportedException Driver may throw exception when it does not support all the attached behaviors.
+     * @throws BehaviorNotSupportedException Adapter may throw exception when it does not support all the attached behaviors.
      */
     public function push(MessageInterface $message): void;
 

@@ -15,8 +15,8 @@ use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\EventDispatcher\SimpleEventDispatcher;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Cli\SimpleLoop;
-use Yiisoft\Yii\Queue\Driver\DriverInterface;
-use Yiisoft\Yii\Queue\Driver\SynchronousDriver;
+use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
+use Yiisoft\Yii\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Yii\Queue\Event\AfterExecution;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforeExecution;
@@ -33,7 +33,7 @@ abstract class TestCase extends BaseTestCase
 {
     protected ?ContainerInterface $container = null;
     protected ?Queue $queue = null;
-    protected ?DriverInterface $driver = null;
+    protected ?AdapterInterface $adapter = null;
     protected ?LoopInterface $loop = null;
     protected ?WorkerInterface $worker = null;
     protected ?EventDispatcherInterface $dispatcher = null;
@@ -46,7 +46,7 @@ abstract class TestCase extends BaseTestCase
 
         $this->container = null;
         $this->queue = null;
-        $this->driver = null;
+        $this->adapter = null;
         $this->loop = null;
         $this->worker = null;
         $this->dispatcher = null;
@@ -64,15 +64,15 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * @return DriverInterface|MockObject
+     * @return AdapterInterface|MockObject
      */
-    protected function getDriver(): DriverInterface
+    protected function getAdapter(): AdapterInterface
     {
-        if ($this->driver === null) {
-            $this->driver = $this->createDriver($this->needsRealDriver());
+        if ($this->adapter === null) {
+            $this->adapter = $this->createAdapter($this->needsRealAdapter());
         }
 
-        return $this->driver;
+        return $this->adapter;
     }
 
     protected function getLoop(): LoopInterface
@@ -114,7 +114,7 @@ abstract class TestCase extends BaseTestCase
     protected function createQueue(): Queue
     {
         return new Queue(
-            $this->getDriver(),
+            $this->getAdapter(),
             $this->getEventDispatcher(),
             $this->getWorker(),
             $this->getLoop(),
@@ -122,13 +122,13 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
-    protected function createDriver(bool $realDriver = false): DriverInterface
+    protected function createAdapter(bool $realAdapter = false): AdapterInterface
     {
-        if ($realDriver) {
-            return new SynchronousDriver($this->getLoop(), $this->getWorker());
+        if ($realAdapter) {
+            return new SynchronousAdapter($this->getLoop(), $this->getWorker());
         }
 
-        return $this->createMock(DriverInterface::class);
+        return $this->createMock(AdapterInterface::class);
     }
 
     protected function createLoop(): LoopInterface
@@ -189,7 +189,7 @@ abstract class TestCase extends BaseTestCase
         ];
     }
 
-    protected function needsRealDriver(): bool
+    protected function needsRealAdapter(): bool
     {
         return false;
     }

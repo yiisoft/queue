@@ -3,13 +3,13 @@
 This package is similar to [yiisoft/yii2-queue] but with improved design and code style. The new package less coupled
 and more structured than the old one allowing better maintenance.
 
-## Drivers
+## Adapters
 
-- Individual drivers are now separate packages. This means each driver must be `require`d with composer in order to
+- Individual adapters are now separate packages. This means each adapter must be `require`d with composer in order to
   be available in your application.
-- Driver may be any class which implements `DriverInterface`. This means you can replace one driver with another without
-  changing any code in your app. For example, you can use `db` driver in development while using `amqp` in production,
-  then you may seamlessly switch to `redis` if needed. This also means you can write your own driver implementation
+- Adapter may be any class which implements `AdapterInterface`. This means you can replace one adapter with another without
+  changing any code in your app. For example, you can use `db` adapter in development while using `amqp` in production,
+  then you may seamlessly switch to `redis` if needed. This also means you can write your own adapter implementation
   if necessary.
 
 ## Jobs (Messages and Handlers)
@@ -20,7 +20,7 @@ being consumed. In the new package it is divided into two different concepts: a 
 - A `Message` is a class implementing `MessageInterface`. It contains 3 types of data:
     - Name. Worker uses it to find the right handler for a message.
     - Data. Any serializable data which should be used by the message handler.
-    - Behaviors. Message behaviors used by drivers. For example, priority setting, message delaying, etc. [See more](behaviors.md).
+    - Behaviors. Message behaviors used by adapters. For example, priority setting, message delaying, etc. [See more](behaviors.md).
     
     All the message data is fully serializable (that means message `data` must be serializable too). It allows you to
     freely choose where and how to send and process jobs. Both can be implemented in a single application, or

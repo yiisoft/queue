@@ -9,9 +9,9 @@ use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
-final class SynchronousDriverTest extends TestCase
+final class SynchronousAdapterTest extends TestCase
 {
-    protected function needsRealDriver(): bool
+    protected function needsRealAdapter(): bool
     {
         return true;
     }
@@ -29,15 +29,15 @@ final class SynchronousDriverTest extends TestCase
     public function testIdSetting(): void
     {
         $message = new Message('simple', []);
-        $driver = $this->getDriver();
-        $driver->setQueue($this->createMock(Queue::class));
+        $adapter = $this->getAdapter();
+        $adapter->setQueue($this->createMock(Queue::class));
 
         $ids = [];
-        $driver->push($message);
+        $adapter->push($message);
         $ids[] = $message->getId();
-        $driver->push($message);
+        $adapter->push($message);
         $ids[] = $message->getId();
-        $driver->push($message);
+        $adapter->push($message);
         $ids[] = $message->getId();
 
         self::assertCount(3, array_unique($ids));
