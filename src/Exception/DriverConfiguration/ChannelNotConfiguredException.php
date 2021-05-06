@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use Throwable;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
-class ChannelNotConfigureException extends InvalidArgumentException implements FriendlyExceptionInterface
+class ChannelNotConfiguredException extends InvalidArgumentException implements FriendlyExceptionInterface
 {
     public function __construct(string $channelName, int $code = 0, Throwable $previous = null)
     {
