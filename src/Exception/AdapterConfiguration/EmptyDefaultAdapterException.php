@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Exception\DriverConfiguration;
+namespace Yiisoft\Yii\Queue\Exception\AdapterConfiguration;
 
 use InvalidArgumentException;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
-class EmptyDefaultDriverException extends InvalidArgumentException implements FriendlyExceptionInterface
+class EmptyDefaultAdapterException extends InvalidArgumentException implements FriendlyExceptionInterface
 {
-    protected $message = 'Default queue driver is not set';
+    protected $message = 'Default queue adapter is not set';
 
     public function getName(): string
     {
-        return 'Empty default driver';
+        return 'Empty default adapter';
     }
 
     public function getSolution(): ?string

@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Exception\DriverConfiguration;
+namespace Yiisoft\Yii\Queue\Exception\AdapterConfiguration;
 
 use RuntimeException;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
-class DriverNotConfiguredException extends RuntimeException implements FriendlyExceptionInterface
+class AdapterNotConfiguredException extends RuntimeException implements FriendlyExceptionInterface
 {
-    protected $message = 'Queue driver in not set';
+    protected $message = 'Queue adapter is not configured';
 
     public function getName(): string
     {
-        return 'Driver not configured';
+        return 'Adapter is not configured';
     }
 
     public function getSolution(): ?string

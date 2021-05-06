@@ -7,17 +7,17 @@ namespace Yiisoft\Yii\Queue;
 use WeakReference;
 use Yiisoft\Factory\Exception\InvalidConfigException;
 use Yiisoft\Factory\Factory;
-use Yiisoft\Yii\Queue\Driver\DriverInterface;
-use Yiisoft\Yii\Queue\Exception\DriverConfiguration\ChannelIncorrectlyConfigured;
-use Yiisoft\Yii\Queue\Exception\DriverConfiguration\ChannelNotConfiguredException;
-use Yiisoft\Yii\Queue\Exception\DriverConfiguration\EmptyDefaultDriverException;
+use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
+use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
+use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
+use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\EmptyDefaultAdapterException;
 
 final class QueueFactory implements QueueFactoryInterface
 {
     private array $channelConfiguration;
     private Queue $queue;
     private bool $enableRuntimeChannelDefinition;
-    private ?DriverInterface $defaultDriver;
+    private ?AdapterInterface $defaultAdapter;
     private Factory $yiiFactory;
     private array $queueCollection = [];
 
@@ -26,13 +26,13 @@ final class QueueFactory implements QueueFactoryInterface
         Queue $queue,
         Factory $yiiFactory,
         bool $enableRuntimeChannelDefinition = false,
-        ?DriverInterface $defaultDriver = null
+        ?AdapterInterface $defaultAdapter = null
     ) {
         $this->channelConfiguration = $channelConfiguration;
         $this->queue = $queue;
         $this->yiiFactory = $yiiFactory;
         $this->enableRuntimeChannelDefinition = $enableRuntimeChannelDefinition;
-        $this->defaultDriver = $defaultDriver;
+        $this->defaultAdapter = $defaultAdapter;
     }
 
     /**
@@ -73,10 +73,10 @@ final class QueueFactory implements QueueFactoryInterface
 
         if ($this->enableRuntimeChannelDefinition === false) {
             throw new ChannelNotConfiguredException($channel);
-        } elseif ($this->defaultDriver === null) {
-            throw new EmptyDefaultDriverException();
+        } elseif ($this->defaultAdapter === null) {
+            throw new EmptyDefaultAdapterException();
         } else {
-            return $this->queue->withDriver($this->defaultDriver->withChannel($channel));
+            return $this->queue->withAdapter($this->defaultAdapter->withChannel($channel));
         }
     }
 }

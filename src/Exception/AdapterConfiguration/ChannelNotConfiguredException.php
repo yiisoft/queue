@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Exception\DriverConfiguration;
+namespace Yiisoft\Yii\Queue\Exception\AdapterConfiguration;
 
 use InvalidArgumentException;
 use Throwable;

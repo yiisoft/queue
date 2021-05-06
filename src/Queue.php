@@ -23,14 +23,14 @@ class Queue
     protected WorkerInterface $worker;
     protected LoopInterface $loop;
     private LoggerInterface $logger;
-    protected ?AdapterInterface $adapter = null;
+    protected ?AdapterInterface $adapter;
 
     public function __construct(
         EventDispatcherInterface $dispatcher,
         WorkerInterface $worker,
         LoopInterface $loop,
         LoggerInterface $logger,
-        AdapterInterface $adapter
+        ?AdapterInterface $adapter = null
     ) {
         $this->adapter = $adapter;
         $this->eventDispatcher = $dispatcher;
@@ -127,6 +127,10 @@ class Queue
     {
         $instance = clone $this;
         $instance->adapter = $adapter;
+
+        if ($adapter instanceof QueueDependentInterface) {
+            $adapter->setQueue($instance);
+        }
 
         return $instance;
     }
