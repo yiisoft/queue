@@ -6,7 +6,6 @@ namespace Yiisoft\Yii\Queue\Tests\Unit;
 
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 

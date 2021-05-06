@@ -36,11 +36,11 @@ interface QueueInterface
     /**
      * @param string $id A message id
      *
-     * @return JobStatus
      * @throws InvalidArgumentException when there is no such id in the adapter
      *
+     * @return JobStatus
      */
     public function status(string $id): JobStatus;
 
-    public function withAdapter(AdapterInterface $adapter): QueueInterface;
+    public function withAdapter(AdapterInterface $adapter): self;
 }

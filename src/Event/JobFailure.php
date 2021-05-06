@@ -7,7 +7,6 @@ namespace Yiisoft\Yii\Queue\Event;
 use Psr\EventDispatcher\StoppableEventInterface;
 use Throwable;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueInterface;
 
 final class JobFailure implements StoppableEventInterface
