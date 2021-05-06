@@ -165,7 +165,9 @@ For more information about a definition formats available see the [factory](http
 Another queue factory usage strategy is implicit adapter creation via `withChannel()` method call. To use this approach you should pass some specific constructor parameters:
 - `true` to the `$enableRuntimeChannelDefinition`
 - a default `AdapterInterface` implementation to the `$defaultAdapter`.
-In this case `$factory->get('channel-name')` call will be converted to `$this->queue->withAdapter($this->defaultAdapter->withChannel($channel))`, when there is no explicit adapter definition in the `$definitions`.
+
+In this case `$factory->get('channel-name')` call will be converted to `$this->queue->withAdapter($this->defaultAdapter->withChannel($channel))`, when there is no explicit adapter definition in the `$definitions`.  
+*This way is not recommended as it does not give you any protection against typos and mistakes in channel names.*
 
 ## Adapter behaviors
 
