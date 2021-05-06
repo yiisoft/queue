@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Yiisoft\Factory\Factory;
@@ -37,17 +38,15 @@ class QueueFactoryTest extends TestCase
 
     public function testThrowExceptionOnEmptyAdapter(): void
     {
-        $this->expectException(EmptyDefaultAdapterException::class);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Either $enableRuntimeChannelDefinition must be false, or $defaultAdapter should be provided.');
 
-        $queue = $this->createMock(QueueInterface::class);
-        $factory = new QueueFactory(
+        new QueueFactory(
             [],
-            $queue,
+            $this->createMock(QueueInterface::class),
             new Factory(),
             true
         );
-
-        $factory->get('test');
     }
 
     public function testThrowExceptionOnEmptyDefinition(): void

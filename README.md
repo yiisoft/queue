@@ -37,6 +37,13 @@ or add
 
 to the `require` section of your `composer.json` file.
 
+## Ready for yiisoft\config
+If you are using [yiisoft/config](https://github.com/yiisoft/config), you'll find out this package has some defaults in the [`common`](config/common.php) and [`params`](config/params.php) configurations saving your time. Things you should change to start working with the queue:
+- Optionally: define default `\Yiisoft\Yii\Queue\Adapter\AdapterInterface` implementation.
+- And/or define channel-specific `AdapterInterface` implementations in the `channel-definitions` params key to be used with the [queue factory](#different-queue-channels).
+- Define [message handlers](docs/guide/worker.md#handler-format) in the `handlers` params key to be used with the `QueueWorker`.
+- Resolve other `\Yiisoft\Yii\Queue\Queue` dependencies (psr-compliant event dispatcher).
+
 ## Differences to yii2-queue
 
 If you have experience with `yiisoft/yii2-queue`, you will find out that this package is similar.
@@ -131,6 +138,34 @@ $status->isReserved();
 // Check whether a worker has executed the job.
 $status->isDone();
 ```
+
+## Different queue channels
+
+Often we need to push to different queue channels with an only application. There is the `QueueFactory` class to make different `Queue` objects creation for different channels. With this factory channel-specific `Queue` creation is as simple as
+```php
+$queue = $factory->get('channel-name');
+```
+
+The main usage strategy is with explicit channel-specific adapter creation definition. Definitions are passed through the `$definitions` factory constructor parameter, where keys are channel names and values are definitions for the [`Yiisoft\Factory\Factory`](https://github.com/yiisoft/factory). Here are some examples:
+```php
+use Yiisoft\Yii\Queue\Adapter\SynchronousAdapter;
+
+[
+    'channel1' => new SynchronousAdapter(),
+    'channel2' => static fn(SynchronousAdapter $adapter) => $adapter->withChannel('channel2'),
+    'channel3' => [
+        'class' => SynchronousAdapter::class,
+        '__constructor' => ['channel' => 'channel3'],
+    ],
+]
+```
+
+For more information about a definition formats available see the [factory](https://github.com/yiisoft/factory) documentation.
+
+Another queue factory usage strategy is implicit adapter creation via `withChannel()` method call. To use this approach you should pass some specific constructor parameters:
+- `true` to the `$enableRuntimeChannelDefinition`
+- a default `AdapterInterface` implementation to the `$defaultAdapter`.
+In this case `$factory->get('channel-name')` call will be converted to `$this->queue->withAdapter($this->defaultAdapter->withChannel($channel))`, when there is no explicit adapter definition in the `$definitions`.
 
 ## Adapter behaviors
 

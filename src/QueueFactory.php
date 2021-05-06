@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
+use InvalidArgumentException;
 use WeakReference;
 use Yiisoft\Factory\Exception\InvalidConfigException;
 use Yiisoft\Factory\Factory;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
-use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\EmptyDefaultAdapterException;
 
 final class QueueFactory
 {
@@ -42,6 +42,12 @@ final class QueueFactory
         bool $enableRuntimeChannelDefinition = false,
         ?AdapterInterface $defaultAdapter = null
     ) {
+        if ($enableRuntimeChannelDefinition === true && $defaultAdapter === null) {
+            $message = 'Either $enableRuntimeChannelDefinition must be false, or $defaultAdapter should be provided.';
+
+            throw new InvalidArgumentException($message);
+        }
+
         $this->channelConfiguration = $channelConfiguration;
         $this->queue = $queue;
         $this->yiiFactory = $yiiFactory;
@@ -89,9 +95,8 @@ final class QueueFactory
         if ($this->enableRuntimeChannelDefinition === false) {
             throw new ChannelNotConfiguredException($channel);
         }
-        if ($this->defaultAdapter === null) {
-            throw new EmptyDefaultAdapterException();
-        }
+
+        /** @psalm-suppress PossiblyNullReference */
         return $this->queue->withAdapter($this->defaultAdapter->withChannel($channel));
     }
 }
