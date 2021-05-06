@@ -7,14 +7,14 @@ namespace Yiisoft\Yii\Queue\Message;
 final class Message extends AbstractMessage
 {
     private string $name;
-    /** @var mixed $data Json-encodable message data */
+    /** @var mixed $data Message data, encodable by a used driver */
     private $data;
 
     /**
      * Message constructor.
      *
      * @param string $name
-     * @param mixed $data Json-encodable message data
+     * @param mixed $data Message data, encodable by a used driver
      */
     public function __construct(string $name, $data)
     {

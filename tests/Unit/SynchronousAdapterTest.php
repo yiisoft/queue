@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
+use Yiisoft\Yii\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\QueueInterface;
@@ -41,5 +42,22 @@ final class SynchronousAdapterTest extends TestCase
         $ids[] = $message->getId();
 
         self::assertCount(3, array_unique($ids));
+    }
+
+    public function testWithSameChannel(): void
+    {
+        $adapter = $this->getAdapter();
+        self::assertEquals($adapter, $adapter->withChannel(SynchronousAdapter::CHANNEL_DEFAULT));
+    }
+
+    public function testWithAnotherChannel(): void
+    {
+        $adapter = $this->getAdapter();
+        $adapter->push(new Message('test', null));
+        $adapterNew = $adapter->withChannel('test');
+
+        self::assertNotEquals($adapter, $adapterNew);
+        self::assertNull($adapterNew->nextMessage());
+        self::assertInstanceOf(Message::class, $adapter->nextMessage());
     }
 }

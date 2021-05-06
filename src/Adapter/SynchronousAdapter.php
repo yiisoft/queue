@@ -15,7 +15,9 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 final class SynchronousAdapter implements AdapterInterface, QueueDependentInterface
 {
+    public const CHANNEL_DEFAULT = 'default';
     private const BEHAVIORS_AVAILABLE = [];
+
     private array $messages = [];
     /** @psalm-suppress PropertyNotSetInConstructor */
     private QueueInterface $queue;
@@ -28,7 +30,7 @@ final class SynchronousAdapter implements AdapterInterface, QueueDependentInterf
     public function __construct(
         LoopInterface $loop,
         WorkerInterface $worker,
-        string $channel = 'default',
+        string $channel = self::CHANNEL_DEFAULT,
         ?BehaviorChecker $behaviorChecker = null
     ) {
         $this->loop = $loop;
