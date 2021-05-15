@@ -24,7 +24,7 @@ return [
             : $container->get(SimpleLoop::class);
     },
     QueueFactory::class => [
-        '__construct' => ['definitions' => $params['yiisoft/yii-queue']['channel-definitions']],
+        '__construct' => ['channelConfiguration' => $params['yiisoft/yii-queue']['channel-definitions']],
     ],
     \Yiisoft\Yii\Queue\QueueInterface::class => \Yiisoft\Yii\Queue\Queue::class,
 ];
