@@ -21,12 +21,12 @@ class RunCommand extends Command
         $this->queueFactory = $queueFactory;
         $this->setDescription('Runs all the existing messages in the queue. Exits once messages are over.');
 
-        $this->addArgument('channel', InputArgument::OPTIONAL, 'Queue channel name to listen', QueueFactory::DEFAULT_CHANNEL_NAME);
+        $this->addArgument('channel', InputArgument::OPTIONAL, 'Queue channel name to connect to', QueueFactory::DEFAULT_CHANNEL_NAME);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->queueFactory->get($input->getArgument('channel'))->listen();
+        $this->queueFactory->get($input->getArgument('channel'))->run();
 
         return 0;
     }

@@ -21,7 +21,7 @@ class ListenCommand extends Command
         $this->queueFactory = $queueFactory;
         $this->setDescription('Listens the queue and executes messages as they come. Needs to be stopped manually.');
 
-        $this->addArgument('channel', InputArgument::OPTIONAL, 'Queue channel name to listen', QueueFactory::DEFAULT_CHANNEL_NAME);
+        $this->addArgument('channel', InputArgument::OPTIONAL, 'Queue channel name to connect to', QueueFactory::DEFAULT_CHANNEL_NAME);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
