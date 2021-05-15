@@ -26,4 +26,5 @@ return [
     QueueFactory::class => [
         '__construct' => ['definitions' => $params['yiisoft/yii-queue']['channel-definitions']],
     ],
+    \Yiisoft\Yii\Queue\QueueInterface::class => \Yiisoft\Yii\Queue\Queue::class,
 ];
