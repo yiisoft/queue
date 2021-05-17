@@ -8,11 +8,11 @@ use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\Behaviors\ExecutableBehaviorInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\QueueFactory;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 final class SynchronousAdapter implements AdapterInterface
 {
-    public const CHANNEL_DEFAULT = 'default';
     private const BEHAVIORS_AVAILABLE = [];
 
     private array $messages = [];
@@ -23,7 +23,7 @@ final class SynchronousAdapter implements AdapterInterface
 
     public function __construct(
         WorkerInterface $worker,
-        string $channel = self::CHANNEL_DEFAULT,
+        string $channel = QueueFactory::DEFAULT_CHANNEL_NAME,
         ?BehaviorChecker $behaviorChecker = null
     ) {
         $this->worker = $worker;
