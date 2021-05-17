@@ -70,7 +70,7 @@ class Queue
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
-        $callback = function(MessageInterface $message) use(&$max, &$count): bool {
+        $callback = function (MessageInterface $message) use (&$max, &$count): bool {
             if (($max > 0 && $max <= $count) || !$this->loop->canContinue()) {
                 return false;
             }
