@@ -36,10 +36,6 @@ class Queue
         $this->worker = $worker;
         $this->loop = $loop;
         $this->logger = $logger;
-
-        if ($adapter instanceof QueueDependentInterface) {
-            $adapter->setQueue($this);
-        }
     }
 
     /**
@@ -74,14 +70,17 @@ class Queue
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
-        while (
-            ($max <= 0 || $max > $count)
-            && $this->loop->canContinue()
-            && $message = $this->adapter->nextMessage()
-        ) {
+        $callback = function(MessageInterface $message) use(&$max, &$count): bool {
+            if (($max > 0 && $max <= $count) || !$this->loop->canContinue()) {
+                return false;
+            }
+
             $this->handle($message);
             $count++;
-        }
+
+            return true;
+        };
+        $this->adapter->runExisting($callback);
 
         $this->logger->debug(
             'Finish processing queue messages. There were {count} messages to work with.',

@@ -5,47 +5,37 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Adapter;
 
 use InvalidArgumentException;
-use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\Behaviors\ExecutableBehaviorInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Queue;
-use Yiisoft\Yii\Queue\QueueDependentInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
-final class SynchronousAdapter implements AdapterInterface, QueueDependentInterface
+final class SynchronousAdapter implements AdapterInterface
 {
     private const BEHAVIORS_AVAILABLE = [];
     private array $messages = [];
-    private Queue $queue;
-    private LoopInterface $loop;
     private WorkerInterface $worker;
     private int $current = 0;
     private ?BehaviorChecker $behaviorChecker;
 
-    public function __construct(LoopInterface $loop, WorkerInterface $worker, ?BehaviorChecker $behaviorChecker = null)
+    public function __construct(WorkerInterface $worker, ?BehaviorChecker $behaviorChecker = null)
     {
-        $this->loop = $loop;
         $this->worker = $worker;
         $this->behaviorChecker = $behaviorChecker;
     }
 
     public function __destruct()
     {
-        $this->run([$this->worker, 'process']);
+        $this->runExisting([$this->worker, 'process']);
     }
 
-    public function nextMessage(): ?MessageInterface
+    public function runExisting(callable $callback): void
     {
-        $message = null;
-
-        if (isset($this->messages[$this->current])) {
-            $message = $this->messages[$this->current];
+        while (isset($this->messages[$this->current])) {
+            $callback($this->messages[$this->current]);
             unset($this->messages[$this->current]);
             $this->current++;
         }
-
-        return $message;
     }
 
     public function status(string $id): JobStatus
@@ -88,18 +78,6 @@ final class SynchronousAdapter implements AdapterInterface, QueueDependentInterf
 
     public function subscribe(callable $handler): void
     {
-        $this->run($handler);
-    }
-
-    public function setQueue(Queue $queue): void
-    {
-        $this->queue = $queue;
-    }
-
-    private function run(callable $handler): void
-    {
-        while ($this->loop->canContinue() && $message = $this->nextMessage()) {
-            $handler($message, $this->queue);
-        }
+        $this->runExisting($handler);
     }
 }
