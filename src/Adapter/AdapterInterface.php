@@ -13,10 +13,8 @@ interface AdapterInterface
 {
     /**
      * Returns the first message from the queue if it exists (null otherwise).
-     *
-     * @return MessageInterface|null
      */
-    public function nextMessage(): ?MessageInterface;
+    public function runExisting(callable $callback): void;
 
     /**
      * Returns status code of a message with the given id.

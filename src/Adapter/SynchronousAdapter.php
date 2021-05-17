@@ -5,35 +5,27 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Adapter;
 
 use InvalidArgumentException;
-use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\Behaviors\ExecutableBehaviorInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\QueueDependentInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
-final class SynchronousAdapter implements AdapterInterface, QueueDependentInterface
+final class SynchronousAdapter implements AdapterInterface
 {
     public const CHANNEL_DEFAULT = 'default';
     private const BEHAVIORS_AVAILABLE = [];
 
     private array $messages = [];
-    /** @psalm-suppress PropertyNotSetInConstructor */
-    private QueueInterface $queue;
-    private LoopInterface $loop;
     private WorkerInterface $worker;
     private int $current = 0;
     private ?BehaviorChecker $behaviorChecker;
     private string $channel;
 
     public function __construct(
-        LoopInterface $loop,
         WorkerInterface $worker,
         string $channel = self::CHANNEL_DEFAULT,
         ?BehaviorChecker $behaviorChecker = null
     ) {
-        $this->loop = $loop;
         $this->worker = $worker;
         $this->channel = $channel;
         $this->behaviorChecker = $behaviorChecker;
@@ -41,20 +33,16 @@ final class SynchronousAdapter implements AdapterInterface, QueueDependentInterf
 
     public function __destruct()
     {
-        $this->run([$this->worker, 'process']);
+        $this->runExisting([$this->worker, 'process']);
     }
 
-    public function nextMessage(): ?MessageInterface
+    public function runExisting(callable $callback): void
     {
-        $message = null;
-
-        if (isset($this->messages[$this->current])) {
-            $message = $this->messages[$this->current];
+        while (isset($this->messages[$this->current])) {
+            $callback($this->messages[$this->current]);
             unset($this->messages[$this->current]);
             $this->current++;
         }
-
-        return $message;
     }
 
     public function status(string $id): JobStatus
@@ -97,12 +85,7 @@ final class SynchronousAdapter implements AdapterInterface, QueueDependentInterf
 
     public function subscribe(callable $handler): void
     {
-        $this->run($handler);
-    }
-
-    public function setQueue(QueueInterface $queue): void
-    {
-        $this->queue = $queue;
+        $this->runExisting($handler);
     }
 
     public function withChannel(string $channel): self
@@ -116,12 +99,5 @@ final class SynchronousAdapter implements AdapterInterface, QueueDependentInterf
         $instance->messages = [];
 
         return $instance;
-    }
-
-    private function run(callable $handler): void
-    {
-        while ($this->loop->canContinue() && $message = $this->nextMessage()) {
-            $handler($message, $this->queue);
-        }
     }
 }

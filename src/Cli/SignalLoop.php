@@ -56,9 +56,6 @@ class SignalLoop implements LoopInterface
 
     protected function dispatchSignals(): bool
     {
-        $this->pause = false;
-        $this->exit = false;
-
         pcntl_signal_dispatch();
 
         // Wait for resume signal until loop is suspended

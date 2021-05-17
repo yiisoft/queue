@@ -35,10 +35,6 @@ final class Queue implements QueueInterface
         $this->worker = $worker;
         $this->loop = $loop;
         $this->logger = $logger;
-
-        if ($adapter instanceof QueueDependentInterface) {
-            $adapter->setQueue($this);
-        }
     }
 
     public function push(MessageInterface $message): void
@@ -66,15 +62,19 @@ final class Queue implements QueueInterface
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
-        /** @psalm-suppress PossiblyNullReference */
-        while (
-            ($max <= 0 || $max > $count)
-            && $this->loop->canContinue()
-            && $message = $this->adapter->nextMessage()
-        ) {
+        $callback = function (MessageInterface $message) use (&$max, &$count): bool {
+            if (($max > 0 && $max <= $count) || !$this->loop->canContinue()) {
+                return false;
+            }
+
             $this->handle($message);
             $count++;
-        }
+
+            return true;
+        };
+
+        /** @psalm-suppress PossiblyNullReference */
+        $this->adapter->runExisting($callback);
 
         $this->logger->debug(
             'Finish processing queue messages. There were {count} messages to work with.',
