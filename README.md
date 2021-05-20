@@ -37,7 +37,7 @@ or add
 
 to the `require` section of your `composer.json` file.
 
-## Ready for yiisoft\config
+## Ready for yiisoft/config
 If you are using [yiisoft/config](https://github.com/yiisoft/config), you'll find out this package has some defaults in the [`common`](config/common.php) and [`params`](config/params.php) configurations saving your time. Things you should change to start working with the queue:
 - Optionally: define default `\Yiisoft\Yii\Queue\Adapter\AdapterInterface` implementation.
 - And/or define channel-specific `AdapterInterface` implementations in the `channel-definitions` params key to be used with the [queue factory](#different-queue-channels).
