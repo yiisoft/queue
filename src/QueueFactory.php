@@ -12,10 +12,8 @@ use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
 
-final class QueueFactory
+final class QueueFactory implements QueueFactoryInterface
 {
-    public const DEFAULT_CHANNEL_NAME = 'yii-queue';
-
     private array $channelConfiguration;
     private QueueInterface $queue;
     private bool $enableRuntimeChannelDefinition;
@@ -57,9 +55,6 @@ final class QueueFactory
         $this->defaultAdapter = $defaultAdapter;
     }
 
-    /**
-     * @throws InvalidConfigException
-     */
     public function get(string $channel = self::DEFAULT_CHANNEL_NAME): QueueInterface
     {
         if ($channel === null) {
