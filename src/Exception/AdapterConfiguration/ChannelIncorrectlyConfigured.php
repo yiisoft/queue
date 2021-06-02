@@ -24,7 +24,7 @@ class ChannelIncorrectlyConfigured extends InvalidArgumentException implements F
     {
         $adapterClass = AdapterInterface::class;
         $realType = is_object($object) ? get_class($object) : gettype($object);
-        $message = "Channel '$channel' is not properly configured: definition must return $adapterClass, $realType returned";
+        $message = "Channel \"$channel\" is not properly configured: definition must return $adapterClass, $realType returned";
 
         $this->channel = $channel;
         parent::__construct($message, $code, $previous);
@@ -40,8 +40,8 @@ class ChannelIncorrectlyConfigured extends InvalidArgumentException implements F
         $factoryClass = QueueFactory::class;
 
         return <<<SOLUTION
-            You tried to get a Queue object for channel '$this->channel' which is incorrectly configured.
-            Please take a look to the documentation for the $factoryClass '\$definitions' constructor parameter.
+            You tried to get a Queue object for channel "$this->channel" which is incorrectly configured.
+            Please take a look to the documentation for the $factoryClass "\$definitions" constructor parameter.
             SOLUTION;
     }
 }

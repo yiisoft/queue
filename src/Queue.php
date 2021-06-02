@@ -107,14 +107,14 @@ final class Queue implements QueueInterface
 
     public function withAdapter(AdapterInterface $adapter): self
     {
-        $instance = clone $this;
-        $instance->adapter = $adapter;
+        $new = clone $this;
+        $new->adapter = $adapter;
 
         if ($adapter instanceof QueueDependentInterface) {
-            $adapter->setQueue($instance);
+            $adapter->setQueue($new);
         }
 
-        return $instance;
+        return $new;
     }
 
     private function checkAdapter(): void

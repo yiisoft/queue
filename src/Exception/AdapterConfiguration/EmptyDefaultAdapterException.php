@@ -24,7 +24,7 @@ class EmptyDefaultAdapterException extends InvalidArgumentException implements F
         return <<<SOLUTION
             $factoryClass::defaultAdapter property must be set to allow runtime adapter generation without
             explicit channel definition. Please refer to the $factoryClass::__constructor() documentation,
-            parameters '\$enableRuntimeChannelDefinition' and '\$defaultAdapter'.
+            parameters "\$enableRuntimeChannelDefinition" and "\$defaultAdapter".
             SOLUTION;
     }
 }

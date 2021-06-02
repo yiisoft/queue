@@ -94,10 +94,10 @@ final class SynchronousAdapter implements AdapterInterface
             return $this;
         }
 
-        $instance = clone $this;
-        $instance->channel = $channel;
-        $instance->messages = [];
+        $new = clone $this;
+        $new->channel = $channel;
+        $new->messages = [];
 
-        return $instance;
+        return $new;
     }
 }

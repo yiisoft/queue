@@ -15,7 +15,7 @@ class ChannelNotConfiguredException extends InvalidArgumentException implements 
 
     public function __construct(string $channel, int $code = 0, Throwable $previous = null)
     {
-        $message = "Queue channel '$channel' is not properly configured.";
+        $message = "Queue channel \"$channel\" is not properly configured.";
         $this->channel = $channel;
         parent::__construct($message, $code, $previous);
     }
@@ -30,9 +30,9 @@ class ChannelNotConfiguredException extends InvalidArgumentException implements 
         $factoryClass = QueueFactory::class;
 
         return <<<SOLUTION
-            Channel '$this->channel' creation is not configured in the $factoryClass.
+            Channel "$this->channel" creation is not configured in the $factoryClass.
             Please take a look to the documentation for the $factoryClass constructor.
-            The most important parameters are '\$definitions' and '\$enableRuntimeChannelDefinition'.
+            The most important parameters are "\$definitions" and "\$enableRuntimeChannelDefinition".
 
             SOLUTION;
     }
