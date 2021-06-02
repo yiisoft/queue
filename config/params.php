@@ -13,7 +13,7 @@ return [
         ],
     ],
     'yiisoft/yii-queue' => [
-        'handlers' => [
-        ],
+        'handlers' => [],
+        'channel-definitions' => [],
     ],
 ];

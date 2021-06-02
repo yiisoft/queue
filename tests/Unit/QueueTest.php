@@ -33,7 +33,7 @@ final class QueueTest extends TestCase
     {
         $this->needsRealAdapter = false;
 
-        $queue = $this->getQueue();
+        $queue = $this->getQueue()->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
         $queue->push($message);
 
@@ -48,7 +48,7 @@ final class QueueTest extends TestCase
         $this->getAdapter()->method('push')->willThrowException($exception);
         $expectedException = null;
 
-        $queue = $this->getQueue();
+        $queue = $this->getQueue()->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
         try {
             $queue->push($message);
@@ -61,7 +61,7 @@ final class QueueTest extends TestCase
 
     public function testRun(): void
     {
-        $queue = $this->getQueue();
+        $queue = $this->getQueue()->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
         $message2 = clone $message;
         $queue->push($message);
@@ -81,8 +81,8 @@ final class QueueTest extends TestCase
 
     public function testRunPartly(): void
     {
-        $queue = $this->getQueue();
         $message = new Message('simple', null);
+        $queue = $this->getQueue()->withAdapter($this->getAdapter());
         $message2 = clone $message;
         $queue->push($message);
         $queue->push($message2);
@@ -101,7 +101,7 @@ final class QueueTest extends TestCase
 
     public function testListen(): void
     {
-        $queue = $this->getQueue();
+        $queue = $this->getQueue()->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
         $message2 = clone $message;
         $queue->push($message);
@@ -121,7 +121,7 @@ final class QueueTest extends TestCase
 
     public function testStatus(): void
     {
-        $queue = $this->getQueue();
+        $queue = $this->getQueue()->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
         $queue->push($message);
         $id = $message->getId();

@@ -8,19 +8,26 @@ use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\Behaviors\ExecutableBehaviorInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\QueueFactory;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 final class SynchronousAdapter implements AdapterInterface
 {
     private const BEHAVIORS_AVAILABLE = [];
+
     private array $messages = [];
     private WorkerInterface $worker;
     private int $current = 0;
     private ?BehaviorChecker $behaviorChecker;
+    private string $channel;
 
-    public function __construct(WorkerInterface $worker, ?BehaviorChecker $behaviorChecker = null)
-    {
+    public function __construct(
+        WorkerInterface $worker,
+        string $channel = QueueFactory::DEFAULT_CHANNEL_NAME,
+        ?BehaviorChecker $behaviorChecker = null
+    ) {
         $this->worker = $worker;
+        $this->channel = $channel;
         $this->behaviorChecker = $behaviorChecker;
     }
 
@@ -79,5 +86,18 @@ final class SynchronousAdapter implements AdapterInterface
     public function subscribe(callable $handler): void
     {
         $this->runExisting($handler);
+    }
+
+    public function withChannel(string $channel): self
+    {
+        if ($channel === $this->channel) {
+            return $this;
+        }
+
+        $new = clone $this;
+        $new->channel = $channel;
+        $new->messages = [];
+
+        return $new;
     }
 }

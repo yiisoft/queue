@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
+use Yiisoft\Yii\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 final class SynchronousAdapterTest extends TestCase
@@ -18,7 +19,7 @@ final class SynchronousAdapterTest extends TestCase
 
     public function testNonIntegerId(): void
     {
-        $queue = $this->getQueue();
+        $queue = $this->getQueue()->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
         $queue->push($message);
         $id = $message->getId();
@@ -30,7 +31,7 @@ final class SynchronousAdapterTest extends TestCase
     {
         $message = new Message('simple', []);
         $adapter = $this->getAdapter();
-        $adapter->setQueue($this->createMock(Queue::class));
+        $adapter->setQueue($this->createMock(QueueInterface::class));
 
         $ids = [];
         $adapter->push($message);
@@ -41,5 +42,22 @@ final class SynchronousAdapterTest extends TestCase
         $ids[] = $message->getId();
 
         self::assertCount(3, array_unique($ids));
+    }
+
+    public function testWithSameChannel(): void
+    {
+        $adapter = $this->getAdapter();
+        self::assertEquals($adapter, $adapter->withChannel(SynchronousAdapter::CHANNEL_DEFAULT));
+    }
+
+    public function testWithAnotherChannel(): void
+    {
+        $adapter = $this->getAdapter();
+        $adapter->push(new Message('test', null));
+        $adapterNew = $adapter->withChannel('test');
+
+        self::assertNotEquals($adapter, $adapterNew);
+        self::assertNull($adapterNew->nextMessage());
+        self::assertInstanceOf(Message::class, $adapter->nextMessage());
     }
 }

@@ -16,8 +16,8 @@ class SignalLoop implements LoopInterface
 
     protected int $memorySoftLimit;
     protected EventDispatcherInterface $dispatcher;
-    protected bool $pause;
-    protected bool $exit;
+    protected bool $pause = false;
+    protected bool $exit = false;
 
     /**
      * @param EventDispatcherInterface $dispatcher

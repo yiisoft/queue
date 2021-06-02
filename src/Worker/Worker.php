@@ -17,7 +17,7 @@ use Yiisoft\Yii\Queue\Event\BeforeExecution;
 use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\JobFailureException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueInterface;
 
 final class Worker implements WorkerInterface
 {
@@ -44,11 +44,11 @@ final class Worker implements WorkerInterface
 
     /**
      * @param MessageInterface $message
-     * @param Queue $queue
+     * @param QueueInterface $queue
      *
      * @throws Throwable
      */
-    public function process(MessageInterface $message, Queue $queue): void
+    public function process(MessageInterface $message, QueueInterface $queue): void
     {
         $this->logger->debug('Start working with message #{message}.', ['message' => $message->getId()]);
 

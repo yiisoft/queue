@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
-use InvalidArgumentException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
@@ -12,24 +11,24 @@ use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Event\AfterPush;
 use Yiisoft\Yii\Queue\Event\BeforePush;
-use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
+use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
-class Queue
+final class Queue implements QueueInterface
 {
     protected EventDispatcherInterface $eventDispatcher;
-    protected AdapterInterface $adapter;
     protected WorkerInterface $worker;
     protected LoopInterface $loop;
     private LoggerInterface $logger;
+    protected ?AdapterInterface $adapter;
 
     public function __construct(
-        AdapterInterface $adapter,
         EventDispatcherInterface $dispatcher,
         WorkerInterface $worker,
         LoopInterface $loop,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ?AdapterInterface $adapter = null
     ) {
         $this->adapter = $adapter;
         $this->eventDispatcher = $dispatcher;
@@ -38,18 +37,14 @@ class Queue
         $this->logger = $logger;
     }
 
-    /**
-     * Pushes a message into the queue.
-     *
-     * @param MessageInterface $message
-     *
-     * @throws BehaviorNotSupportedException
-     */
     public function push(MessageInterface $message): void
     {
+        $this->checkAdapter();
+
         $this->logger->debug('Preparing to push message "{message}".', ['message' => $message->getName()]);
         $this->eventDispatcher->dispatch(new BeforePush($this, $message));
 
+        /** @psalm-suppress PossiblyNullReference */
         $this->adapter->push($message);
 
         $this->logger->debug(
@@ -60,13 +55,10 @@ class Queue
         $this->eventDispatcher->dispatch(new AfterPush($this, $message));
     }
 
-    /**
-     * Execute all existing jobs and exit
-     *
-     * @param int $max
-     */
     public function run(int $max = 0): void
     {
+        $this->checkAdapter();
+
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
@@ -80,6 +72,8 @@ class Queue
 
             return true;
         };
+
+        /** @psalm-suppress PossiblyNullReference */
         $this->adapter->runExisting($callback);
 
         $this->logger->debug(
@@ -88,30 +82,45 @@ class Queue
         );
     }
 
-    /**
-     * Listen to the queue and execute jobs as they come
-     */
     public function listen(): void
     {
+        $this->checkAdapter();
+
         $this->logger->debug('Start listening to the queue.');
+        /** @psalm-suppress PossiblyNullReference */
         $this->adapter->subscribe(fn (MessageInterface $message) => $this->handle($message));
         $this->logger->debug('Finish listening to the queue.');
     }
 
-    /**
-     * @param string $id A message id
-     *
-     * @throws InvalidArgumentException when there is no such id in the adapter
-     *
-     * @return JobStatus
-     */
     public function status(string $id): JobStatus
     {
+        $this->checkAdapter();
+
+        /** @psalm-suppress PossiblyNullReference */
         return $this->adapter->status($id);
     }
 
     protected function handle(MessageInterface $message): void
     {
         $this->worker->process($message, $this);
+    }
+
+    public function withAdapter(AdapterInterface $adapter): self
+    {
+        $new = clone $this;
+        $new->adapter = $adapter;
+
+        if ($adapter instanceof QueueDependentInterface) {
+            $adapter->setQueue($new);
+        }
+
+        return $new;
+    }
+
+    private function checkAdapter(): void
+    {
+        if ($this->adapter === null) {
+            throw new AdapterNotConfiguredException();
+        }
     }
 }
