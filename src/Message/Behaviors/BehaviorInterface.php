@@ -16,7 +16,7 @@ interface BehaviorInterface
      *
      * @return BehaviorInterface
      */
-    public static function fromData($data): BehaviorInterface;
+    public static function fromData($data): self;
 
     /**
      * Returns current state data as a json-serializable dataset.

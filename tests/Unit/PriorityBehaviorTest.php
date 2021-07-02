@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
-use Yiisoft\Yii\Queue\Message\Behaviors\DelayBehavior;
 use Yiisoft\Yii\Queue\Message\Behaviors\PriorityBehavior;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
