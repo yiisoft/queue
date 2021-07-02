@@ -9,19 +9,20 @@ use Yiisoft\Yii\Queue\Tests\TestCase;
 
 final class DelayBehaviorTest extends TestCase
 {
-    public function testConstructorParameters(): void
+    public function testRestorationFromData(): void
     {
         $delay = 5;
         $behavior = new DelayBehavior($delay);
+        $behavior2 = DelayBehavior::fromData($behavior->getSerializableData());
 
-        self::assertEquals([$delay], $behavior->getConstructorParameters());
+        self::assertEquals($behavior->getDelay(), $behavior2->getDelay());
     }
 
-    public function testConstructorParametersUsage(): void
+    public function testRestorationFromSerializedData(): void
     {
         $delay = 5;
         $behavior = new DelayBehavior($delay);
-        $behavior2 = new DelayBehavior(...$behavior->getConstructorParameters());
+        $behavior2 = DelayBehavior::fromData(json_decode(json_encode($behavior->getSerializableData()), true));
 
         self::assertEquals($behavior->getDelay(), $behavior2->getDelay());
     }

@@ -96,6 +96,7 @@ abstract class TestCase extends BaseTestCase
     protected function createQueue(): Queue
     {
         return new Queue(
+            $this->getEventDispatcher(),
             $this->getWorker(),
             $this->getLoop(),
             new NullLogger()

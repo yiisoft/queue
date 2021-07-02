@@ -7,6 +7,7 @@ namespace Yiisoft\Yii\Queue\Adapter;
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
+use Yiisoft\Yii\Queue\Message\Behaviors\BehaviorInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 
 interface AdapterInterface
@@ -31,8 +32,6 @@ interface AdapterInterface
      * Pushing a message to the queue. Adapter sets message ID if available.
      *
      * @param MessageInterface $message
-     *
-     * @throws BehaviorNotSupportedException Adapter may throw exception when it does not support all the attached behaviors.
      */
     public function push(MessageInterface $message): void;
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
+use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Message\Behaviors\DelayBehavior;
 use Yiisoft\Yii\Queue\Message\Behaviors\PriorityBehavior;
@@ -13,10 +14,11 @@ final class ExceptionTest extends TestCase
 {
     public function testJobNotSupported(): void
     {
-        $adapterClass = 'TestAdapter';
+        $adapter = $this->createMock(AdapterInterface::class);
+        $adapterClass = get_class($adapter);
         $behavior = new DelayBehavior(2);
 
-        $exception = new BehaviorNotSupportedException($adapterClass, $behavior);
+        $exception = new BehaviorNotSupportedException($adapter, $behavior);
 
         self::assertStringContainsString(
             DelayBehavior::class,

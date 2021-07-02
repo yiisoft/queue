@@ -10,10 +10,19 @@ namespace Yiisoft\Yii\Queue\Message\Behaviors;
 interface BehaviorInterface
 {
     /**
-     * Returns current state data as an array of constructor parameters.
-     * Behavior will be restored with this data after serializing and deserializing.
+     * Factory method for the current behavior
      *
-     * @return array
+     * @param mixed $data Dataset returned by {@see getSerializableData}
+     *
+     * @return BehaviorInterface
      */
-    public function getConstructorParameters(): array;
+    public static function fromData($data): BehaviorInterface;
+
+    /**
+     * Returns current state data as a json-serializable dataset.
+     * Behavior will be restored with this data through {@see fromData}
+     *
+     * @return mixed
+     */
+    public function getSerializableData();
 }

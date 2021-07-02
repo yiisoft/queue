@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Psr\Container\ContainerInterface;
+use Yiisoft\Yii\Queue\BehaviorApplier;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Cli\SignalLoop;
 use Yiisoft\Yii\Queue\Cli\SimpleLoop;
@@ -31,4 +32,7 @@ return [
         '__construct()' => ['channelConfiguration' => $params['yiisoft/yii-queue']['channel-definitions']],
     ],
     QueueInterface::class => Queue::class,
+    BehaviorApplier::class => [
+        '__construct' => ['behaviorMap' => $params['yiisoft/yii-queue']['behavior-appliers']],
+    ],
 ];

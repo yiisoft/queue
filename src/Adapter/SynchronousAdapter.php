@@ -6,7 +6,6 @@ namespace Yiisoft\Yii\Queue\Adapter;
 
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Message\Behaviors\ExecutableBehaviorInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\QueueFactory;
 use Yiisoft\Yii\Queue\QueueInterface;
@@ -20,19 +19,16 @@ final class SynchronousAdapter implements AdapterInterface
     private WorkerInterface $worker;
     private QueueInterface $queue;
     private int $current = 0;
-    private ?BehaviorChecker $behaviorChecker;
     private string $channel;
 
     public function __construct(
         WorkerInterface $worker,
         QueueInterface $queue,
         string $channel = QueueFactory::DEFAULT_CHANNEL_NAME,
-        ?BehaviorChecker $behaviorChecker = null
     ) {
         $this->worker = $worker;
         $this->queue = $queue;
         $this->channel = $channel;
-        $this->behaviorChecker = $behaviorChecker;
     }
 
     public function __destruct()
@@ -72,17 +68,6 @@ final class SynchronousAdapter implements AdapterInterface
 
     public function push(MessageInterface $message): void
     {
-        $behaviors = $message->getBehaviors();
-        if ($this->behaviorChecker !== null) {
-            $this->behaviorChecker->check(self::class, $behaviors, self::BEHAVIORS_AVAILABLE);
-        }
-
-        foreach ($behaviors as $behavior) {
-            if ($behavior instanceof ExecutableBehaviorInterface) {
-                $behavior->execute();
-            }
-        }
-
         $key = count($this->messages) + $this->current;
         $this->messages[] = $message;
 

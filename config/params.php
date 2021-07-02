@@ -15,5 +15,6 @@ return [
     'yiisoft/yii-queue' => [
         'handlers' => [],
         'channel-definitions' => [],
+        'behavior-appliers' => [],
     ],
 ];

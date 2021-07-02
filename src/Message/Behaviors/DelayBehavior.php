@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Message\Behaviors;
 
-final class DelayBehavior implements BehaviorInterface, DelayBehaviorInterface
+use InvalidArgumentException;
+
+final class DelayBehavior implements BehaviorInterface
 {
     private int $delay;
 
@@ -13,9 +15,19 @@ final class DelayBehavior implements BehaviorInterface, DelayBehaviorInterface
         $this->delay = $delay;
     }
 
-    public function getConstructorParameters(): array
+    public static function fromData($data): self
     {
-        return [$this->delay];
+        if (!is_array($data) || !isset($data['delay'])) {
+            var_dump($data);
+            throw new InvalidArgumentException('Behavior restoration data is invalid');
+        }
+
+        return new self((int) $data['delay']);
+    }
+
+    public function getSerializableData(): array
+    {
+        return ['delay' => $this->delay];
     }
 
     public function getDelay(): int

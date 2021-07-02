@@ -8,7 +8,12 @@ use Yiisoft\Yii\Queue\Message\Behaviors\BehaviorInterface;
 
 class DummyBehavior implements BehaviorInterface
 {
-    public function getConstructorParameters(): array
+    public static function fromData($data): BehaviorInterface
+    {
+        return new self();
+    }
+
+    public function getSerializableData(): array
     {
         return [];
     }

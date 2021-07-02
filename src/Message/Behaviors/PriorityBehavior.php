@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Message\Behaviors;
 
-final class PriorityBehavior implements BehaviorInterface, PriorityBehaviorInterface
+use InvalidArgumentException;
+
+final class PriorityBehavior implements BehaviorInterface
 {
     private int $priority;
 
@@ -13,9 +15,18 @@ final class PriorityBehavior implements BehaviorInterface, PriorityBehaviorInter
         $this->priority = $priority;
     }
 
-    public function getConstructorParameters(): array
+    public static function fromData($data): self
     {
-        return [$this->priority];
+        if (!is_array($data) || !isset($data['priority'])) {
+            throw new InvalidArgumentException('Behavior restoration data is invalid');
+        }
+
+        return new self((int) $data['priority']);
+    }
+
+    public function getSerializableData(): array
+    {
+        return ['priority' => $this->priority];
     }
 
     public function getPriority(): int
