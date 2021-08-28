@@ -26,6 +26,7 @@
         "php": "^7.4|^8.0",
         "psr/event-dispatcher": "^1.0",
         "psr/log": "^1.1",
+        "yiisoft/definitions": "3.0.x-dev",
         "yiisoft/factory": "3.0.x-dev",
         "yiisoft/friendly-exception": "^1.0",
         "yiisoft/injector": "^1.0"
