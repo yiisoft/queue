@@ -15,6 +15,8 @@ use Yiisoft\Yii\Queue\QueueFactoryInterface;
 final class RunCommand extends Command
 {
     protected static $defaultName = 'queue/run';
+    protected static $defaultDescription = 'Runs all the existing messages in the queue. Exits once messages are over.';
+
     private QueueFactoryInterface $queueFactory;
 
     public function __construct(QueueFactoryInterface $queueFactory)
@@ -25,7 +27,7 @@ final class RunCommand extends Command
 
     public function configure(): void
     {
-        $this->setDescription('Runs all the existing messages in the queue. Exits once messages are over.');
+        $this->setDescription(self::$defaultDescription);
         $this->addArgument(
             'channel',
             InputArgument::OPTIONAL,
