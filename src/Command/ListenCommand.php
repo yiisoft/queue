@@ -27,7 +27,6 @@ final class ListenCommand extends Command
 
     public function configure(): void
     {
-        $this->setDescription(self::$defaultDescription);
         $this->addArgument(
             'channel',
             InputArgument::OPTIONAL,
