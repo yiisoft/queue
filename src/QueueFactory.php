@@ -6,7 +6,7 @@ namespace Yiisoft\Yii\Queue;
 
 use InvalidArgumentException;
 use WeakReference;
-use Yiisoft\Factory\Exception\InvalidConfigException;
+use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Factory\Factory;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
