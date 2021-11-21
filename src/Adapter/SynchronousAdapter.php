@@ -9,6 +9,7 @@ use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\Behaviors\ExecutableBehaviorInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\QueueFactory;
+use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 final class SynchronousAdapter implements AdapterInterface
@@ -17,23 +18,28 @@ final class SynchronousAdapter implements AdapterInterface
 
     private array $messages = [];
     private WorkerInterface $worker;
+    private QueueInterface $queue;
     private int $current = 0;
     private ?BehaviorChecker $behaviorChecker;
     private string $channel;
 
     public function __construct(
         WorkerInterface $worker,
+        QueueInterface $queue,
         string $channel = QueueFactory::DEFAULT_CHANNEL_NAME,
         ?BehaviorChecker $behaviorChecker = null
     ) {
         $this->worker = $worker;
+        $this->queue = $queue;
         $this->channel = $channel;
         $this->behaviorChecker = $behaviorChecker;
     }
 
     public function __destruct()
     {
-        $this->runExisting([$this->worker, 'process']);
+        $this->runExisting(function (MessageInterface $message) {
+            $this->worker->process($message, $this->queue);
+        });
     }
 
     public function runExisting(callable $callback): void
@@ -47,7 +53,7 @@ final class SynchronousAdapter implements AdapterInterface
 
     public function status(string $id): JobStatus
     {
-        $id = (int) $id;
+        $id = (int)$id;
 
         if ($id < 0) {
             throw new InvalidArgumentException('This adapter IDs start with 0.');
@@ -80,7 +86,7 @@ final class SynchronousAdapter implements AdapterInterface
         $key = count($this->messages) + $this->current;
         $this->messages[] = $message;
 
-        $message->setId((string) $key);
+        $message->setId((string)$key);
     }
 
     public function subscribe(callable $handler): void
