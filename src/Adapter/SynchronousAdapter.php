@@ -53,7 +53,7 @@ final class SynchronousAdapter implements AdapterInterface
 
     public function status(string $id): JobStatus
     {
-        $id = (int)$id;
+        $id = (int) $id;
 
         if ($id < 0) {
             throw new InvalidArgumentException('This adapter IDs start with 0.');
@@ -86,7 +86,7 @@ final class SynchronousAdapter implements AdapterInterface
         $key = count($this->messages) + $this->current;
         $this->messages[] = $message;
 
-        $message->setId((string)$key);
+        $message->setId((string) $key);
     }
 
     public function subscribe(callable $handler): void
