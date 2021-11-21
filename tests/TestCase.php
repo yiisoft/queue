@@ -124,7 +124,7 @@ abstract class TestCase extends BaseTestCase
     protected function createAdapter(bool $realAdapter = false): AdapterInterface
     {
         if ($realAdapter) {
-            return new SynchronousAdapter($this->getLoop(), $this->getWorker());
+            return new SynchronousAdapter($this->getWorker(), $this->createQueue());
         }
 
         return $this->createMock(AdapterInterface::class);
