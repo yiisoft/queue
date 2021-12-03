@@ -47,4 +47,6 @@ interface QueueInterface
     public function status(string $id): JobStatus;
 
     public function withAdapter(AdapterInterface $adapter): self;
+
+    public function getChannelName(): string;
 }

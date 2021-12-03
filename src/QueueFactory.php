@@ -57,7 +57,7 @@ final class QueueFactory implements QueueFactoryInterface
 
     public function get(string $channel = self::DEFAULT_CHANNEL_NAME): QueueInterface
     {
-        if ($channel === null) {
+        if ($channel === $this->queue->getChannelName()) {
             return $this->queue;
         }
 

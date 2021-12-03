@@ -22,19 +22,27 @@ final class Queue implements QueueInterface
     protected LoopInterface $loop;
     private LoggerInterface $logger;
     protected ?AdapterInterface $adapter;
+    private string $channelName;
 
     public function __construct(
         EventDispatcherInterface $dispatcher,
         WorkerInterface $worker,
         LoopInterface $loop,
         LoggerInterface $logger,
-        ?AdapterInterface $adapter = null
+        ?AdapterInterface $adapter = null,
+        string $channelName = QueueFactoryInterface::DEFAULT_CHANNEL_NAME
     ) {
         $this->adapter = $adapter;
         $this->eventDispatcher = $dispatcher;
         $this->worker = $worker;
         $this->loop = $loop;
         $this->logger = $logger;
+        $this->channelName = $channelName;
+    }
+
+    public function getChannelName(): string
+    {
+        return $this->channelName;
     }
 
     public function push(MessageInterface $message): void
