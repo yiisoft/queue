@@ -28,7 +28,7 @@
         "psr/log": "^1.1",
         "yiisoft/yii-console": "^1.0",
         "yiisoft/definitions": "^1.0",
-        "yiisoft/factory": "3.0.x-dev",
+        "yiisoft/factory": "^1.0",
         "yiisoft/friendly-exception": "^1.0",
         "yiisoft/injector": "^1.0"
     },
