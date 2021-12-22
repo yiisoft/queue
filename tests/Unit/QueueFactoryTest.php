@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Yiisoft\Factory\Factory;
+use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
@@ -27,7 +28,7 @@ class QueueFactoryTest extends TestCase
         $factory = new QueueFactory(
             [],
             $queue,
-            new Factory(),
+            $this->createYiiFactory(),
             true,
             $adapter
         );
@@ -38,12 +39,14 @@ class QueueFactoryTest extends TestCase
     public function testThrowExceptionOnEmptyAdapter(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Either $enableRuntimeChannelDefinition must be false, or $defaultAdapter should be provided.');
+        $this->expectExceptionMessage(
+            'Either $enableRuntimeChannelDefinition must be false, or $defaultAdapter should be provided.'
+        );
 
         new QueueFactory(
             [],
             $this->createMock(QueueInterface::class),
-            new Factory(),
+            $this->createYiiFactory(),
             true
         );
     }
@@ -56,7 +59,7 @@ class QueueFactoryTest extends TestCase
         $factory = new QueueFactory(
             [],
             $queue,
-            new Factory(),
+            $this->createYiiFactory(),
             false
         );
 
@@ -71,7 +74,7 @@ class QueueFactoryTest extends TestCase
         $factory = new QueueFactory(
             ['test' => new stdClass()],
             $queue,
-            new Factory(),
+            $this->createYiiFactory(),
             false
         );
 
@@ -89,7 +92,7 @@ class QueueFactoryTest extends TestCase
         $factory = new QueueFactory(
             ['test' => $adapterNew],
             $queue,
-            new Factory(),
+            $this->createYiiFactory(),
             false,
             $adapterDefault
         );
@@ -107,10 +110,15 @@ class QueueFactoryTest extends TestCase
         $factory = new QueueFactory(
             ['test' => $adapterNew],
             $queue,
-            new Factory(),
+            $this->createYiiFactory(),
             false
         );
 
         $factory->get('test');
+    }
+
+    private function createYiiFactory(): Factory
+    {
+        return new Factory(new SimpleContainer());
     }
 }
