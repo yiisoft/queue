@@ -118,10 +118,6 @@ final class Queue implements QueueInterface
         $new = clone $this;
         $new->adapter = $adapter;
 
-        if ($adapter instanceof QueueDependentInterface) {
-            $adapter->setQueue($new);
-        }
-
         return $new;
     }
 
