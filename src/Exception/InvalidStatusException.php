@@ -12,7 +12,7 @@ class InvalidStatusException extends InvalidArgumentException implements Friendl
 {
     private int $status;
 
-    public function __construct(int $status, string $message = '', $code = 0, Throwable $previous = null)
+    public function __construct(int $status, string $message = '', int $code = 0, Throwable $previous = null)
     {
         if ($message === '') {
             $message = "Invalid status provided: $status";

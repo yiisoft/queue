@@ -75,7 +75,7 @@ final class Worker implements WorkerInterface
             }
         } catch (Throwable $exception) {
             $exception = new JobFailureException($message, $exception);
-            $this->logger->error($exception);
+            $this->logger->error($exception->getMessage());
 
             $event = new JobFailure($queue, $message, $exception);
             $this->dispatcher->dispatch($event);
