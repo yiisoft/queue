@@ -64,11 +64,7 @@
         }
     },
     "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "composer/package-versions-deprecated": true,
-            "infection/extension-installer": true
-        }
+        "sort-packages": true
     },
     "scripts": {
         "test": "phpunit --testdox --no-interaction",
