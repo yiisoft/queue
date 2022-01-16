@@ -4,20 +4,16 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue;
 
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Event\AfterPush;
-use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 final class Queue implements QueueInterface
 {
-    protected EventDispatcherInterface $eventDispatcher;
     protected WorkerInterface $worker;
     protected LoopInterface $loop;
     private LoggerInterface $logger;
@@ -25,7 +21,6 @@ final class Queue implements QueueInterface
     private string $channelName;
 
     public function __construct(
-        EventDispatcherInterface $dispatcher,
         WorkerInterface $worker,
         LoopInterface $loop,
         LoggerInterface $logger,
@@ -33,7 +28,6 @@ final class Queue implements QueueInterface
         string $channelName = QueueFactoryInterface::DEFAULT_CHANNEL_NAME
     ) {
         $this->adapter = $adapter;
-        $this->eventDispatcher = $dispatcher;
         $this->worker = $worker;
         $this->loop = $loop;
         $this->logger = $logger;
@@ -50,7 +44,6 @@ final class Queue implements QueueInterface
         $this->checkAdapter();
 
         $this->logger->debug('Preparing to push message "{message}".', ['message' => $message->getName()]);
-        $this->eventDispatcher->dispatch(new BeforePush($this, $message));
 
         /** @psalm-suppress PossiblyNullReference */
         $this->adapter->push($message);
@@ -59,8 +52,6 @@ final class Queue implements QueueInterface
             'Successfully pushed message "{name}" to the queue.',
             ['name' => $message->getName()]
         );
-
-        $this->eventDispatcher->dispatch(new AfterPush($this, $message));
     }
 
     public function run(int $max = 0): void

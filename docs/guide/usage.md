@@ -5,7 +5,6 @@
 You can configure it with a DI container in the following way:
 
 ```php
-$eventDispatcher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
 $logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
 
 $worker = $DIContainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);
@@ -14,7 +13,6 @@ $adapter = $DIContainer->get(\Yiisoft\Yii\Queue\Adapter\AdapterInterface::class)
 
 $queue = new Queue(
     $adapter,
-    $eventDispatcher,
     $worker,
     $loop,
     $logger
