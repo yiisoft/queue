@@ -104,7 +104,6 @@ The last thing we should do is to create a configuration for the `Yiisoft\Yii\Qu
 $handlers = ['file-download' => [new FileDownloader('/path/to/save/files'), 'handle']];
 $worker = new \Yiisoft\Yii\Queue\Worker\Worker(
     $handlers, // Here it is
-    $dispatcher,
     $logger,
     $injector,
     $container

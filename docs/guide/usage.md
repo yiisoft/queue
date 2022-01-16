@@ -78,24 +78,6 @@ $status->isReserved($id);
 $status->isDone($id);
 ```
 
-
-## Handling events
-
-The queue triggers the following events:
-
-| Event class        | Triggered                                                 |
-|--------------------|-----------------------------------------------------------|
-| BeforePush         | Before adding a job to queue using `Queue::push()` method.|
-| AfterPush          | After adding a job to queue using `Queue::push()` method. |
-| BeforeExecution    | Before executing a job.                                   |
-| AfterExecution     | After successful job execution.                           |
-| JobFailure         | On uncaught exception during the job execution.           |
-
-## Logging events
-
-In order to log events, please refer to `EventDispatcherInterface` implementation documentation
-(i.e. [Yii Event Dispatcher](https://github.com/yiisoft/event-dispatcher#events-hierarchy)).
-
 ## Limitations
 
 When using queues it is important to remember that tasks are put into and obtained from the queue in separate
