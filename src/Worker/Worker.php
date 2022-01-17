@@ -5,16 +5,12 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Worker;
 
 use Psr\Container\ContainerInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
 use ReflectionMethod;
 use RuntimeException;
 use Throwable;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Yii\Queue\Event\AfterExecution;
-use Yiisoft\Yii\Queue\Event\BeforeExecution;
-use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\JobFailureException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
@@ -22,7 +18,6 @@ use Yiisoft\Yii\Queue\QueueInterface;
 final class Worker implements WorkerInterface
 {
     private array $handlersCached = [];
-    private EventDispatcherInterface $dispatcher;
     private LoggerInterface $logger;
     private array $handlers;
     private Injector $injector;
@@ -30,12 +25,10 @@ final class Worker implements WorkerInterface
 
     public function __construct(
         array $handlers,
-        EventDispatcherInterface $dispatcher,
         LoggerInterface $logger,
         Injector $injector,
         ContainerInterface $container
     ) {
-        $this->dispatcher = $dispatcher;
         $this->logger = $logger;
         $this->handlers = $handlers;
         $this->injector = $injector;
@@ -59,30 +52,11 @@ final class Worker implements WorkerInterface
         }
 
         try {
-            $event = new BeforeExecution($queue, $message);
-            $this->dispatcher->dispatch($event);
-
-            if ($event->isExecutionStopped() === false) {
-                $this->injector->invoke($handler, [$message]);
-
-                $event = new AfterExecution($queue, $message);
-                $this->dispatcher->dispatch($event);
-            } else {
-                $this->logger->notice(
-                    'Execution of message #{message} is stopped by an event handler.',
-                    ['message' => $message->getId()]
-                );
-            }
+            $this->injector->invoke($handler, [$message]);
         } catch (Throwable $exception) {
             $exception = new JobFailureException($message, $exception);
             $this->logger->error($exception->getMessage());
-
-            $event = new JobFailure($queue, $message, $exception);
-            $this->dispatcher->dispatch($event);
-
-            if ($event->shouldThrowException() === true) {
-                throw $exception;
-            }
+            throw $exception;
         }
     }
 

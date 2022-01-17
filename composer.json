@@ -24,7 +24,6 @@
     "prefer-stable": true,
     "require": {
         "php": "^7.4|^8.0",
-        "psr/event-dispatcher": "^1.0",
         "psr/log": "^1.1",
         "yiisoft/yii-console": "^1.0",
         "yiisoft/definitions": "^1.0",

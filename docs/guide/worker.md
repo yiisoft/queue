@@ -21,14 +21,12 @@ Handler can be any callable with a couple of additions:
   ```
 
   ```php
-  $eventDispatcher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
   $handlers = [
       'simple' => fn() => 'someWork',
       'anotherHandler' => [QueueHandlerCollection::class, 'methodName']
   ];
   $worker = new Worker(
       $handlers,
-      $eventDispatcher,
       new \Psr\Log\NullLogger(),
       new \Yiisoft\Injector\Injector($DIContainer),
       $DIContainer

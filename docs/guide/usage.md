@@ -5,7 +5,6 @@
 You can configure it with a DI container in the following way:
 
 ```php
-$eventDispatcher = $DIContainer->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
 $logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
 
 $worker = $DIContainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);
@@ -14,7 +13,6 @@ $adapter = $DIContainer->get(\Yiisoft\Yii\Queue\Adapter\AdapterInterface::class)
 
 $queue = new Queue(
     $adapter,
-    $eventDispatcher,
     $worker,
     $loop,
     $logger
@@ -79,24 +77,6 @@ $status->isReserved($id);
 // Check whether a worker has executed the job.
 $status->isDone($id);
 ```
-
-
-## Handling events
-
-The queue triggers the following events:
-
-| Event class        | Triggered                                                 |
-|--------------------|-----------------------------------------------------------|
-| BeforePush         | Before adding a job to queue using `Queue::push()` method.|
-| AfterPush          | After adding a job to queue using `Queue::push()` method. |
-| BeforeExecution    | Before executing a job.                                   |
-| AfterExecution     | After successful job execution.                           |
-| JobFailure         | On uncaught exception during the job execution.           |
-
-## Logging events
-
-In order to log events, please refer to `EventDispatcherInterface` implementation documentation
-(i.e. [Yii Event Dispatcher](https://github.com/yiisoft/event-dispatcher#events-hierarchy)).
 
 ## Limitations
 

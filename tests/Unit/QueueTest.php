@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
-use Yiisoft\Yii\Queue\Event\AfterExecution;
-use Yiisoft\Yii\Queue\Event\AfterPush;
-use Yiisoft\Yii\Queue\Event\BeforeExecution;
-use Yiisoft\Yii\Queue\Event\BeforePush;
 use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Message\Behaviors\DelayBehavior;
 use Yiisoft\Yii\Queue\Message\Message;
+use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 final class QueueTest extends TestCase
@@ -31,13 +28,12 @@ final class QueueTest extends TestCase
 
     public function testPushSuccessful(): void
     {
-        $this->needsRealAdapter = false;
-
-        $queue = $this->getQueue()->withAdapter($this->getAdapter());
+        $adapter = new FakeAdapter();
+        $queue = $this->getQueue()->withAdapter($adapter);
         $message = new Message('simple', null);
         $queue->push($message);
 
-        $this->assertEvents([BeforePush::class => 1, AfterPush::class => 1]);
+        self::assertSame([$message], $adapter->pushMessages);
     }
 
     public function testPushNotSuccessful(): void
@@ -55,7 +51,6 @@ final class QueueTest extends TestCase
         } catch (BehaviorNotSupportedException $expectedException) {
         } finally {
             self::assertInstanceOf(BehaviorNotSupportedException::class, $expectedException);
-            $this->assertEvents([BeforePush::class => 1]);
         }
     }
 
@@ -69,14 +64,6 @@ final class QueueTest extends TestCase
         $queue->run();
 
         self::assertEquals(2, $this->executionTimes);
-
-        $events = [
-            BeforePush::class => 2,
-            AfterPush::class => 2,
-            BeforeExecution::class => 2,
-            AfterExecution::class => 2,
-        ];
-        $this->assertEvents($events);
     }
 
     public function testRunPartly(): void
@@ -89,14 +76,6 @@ final class QueueTest extends TestCase
         $queue->run(1);
 
         self::assertEquals(1, $this->executionTimes);
-
-        $events = [
-            BeforePush::class => 2,
-            AfterPush::class => 2,
-            BeforeExecution::class => 1,
-            AfterExecution::class => 1,
-        ];
-        $this->assertEvents($events);
     }
 
     public function testListen(): void
@@ -109,14 +88,6 @@ final class QueueTest extends TestCase
         $queue->listen();
 
         self::assertEquals(2, $this->executionTimes);
-
-        $events = [
-            BeforePush::class => 2,
-            AfterPush::class => 2,
-            BeforeExecution::class => 2,
-            AfterExecution::class => 2,
-        ];
-        $this->assertEvents($events);
     }
 
     public function testStatus(): void
