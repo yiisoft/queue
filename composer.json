@@ -16,9 +16,12 @@
     ],
     "license": "BSD-3-Clause",
     "support": {
-        "issues": "https://github.com/yiisoft/yii-queue/issues",
-        "source": "https://github.com/yiisoft/yii-queue",
-        "docs": "https://github.com/yiisoft/yii-queue/blob/master/docs/guide"
+        "issues": "https://github.com/yiisoft/yii-queue/issues?state=open",
+        "forum": "https://www.yiiframework.com/forum/",
+        "wiki": "https://www.yiiframework.com/wiki/",
+        "irc": "irc://irc.freenode.net/yii",
+        "chat": "https://t.me/yii3en",
+        "source": "https://github.com/yiisoft/yii-queue"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -32,10 +35,10 @@
         "yiisoft/injector": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.4",
-        "roave/infection-static-analysis-plugin": "^1.14",
+        "phpunit/phpunit": "^9.5",
+        "roave/infection-static-analysis-plugin": "^1.16",
         "spatie/phpunit-watcher": "^1.23",
-        "vimeo/psalm": "^4.2",
+        "vimeo/psalm": "^4.18",
         "yiisoft/test-support": "^1.0"
     },
     "suggest": {
