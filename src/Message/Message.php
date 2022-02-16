@@ -6,25 +6,25 @@ namespace Yiisoft\Yii\Queue\Message;
 
 final class Message extends AbstractMessage
 {
-    private string $name;
+    private string $handlerName;
     /** @var mixed $data Message data, encodable by a used driver */
     private $data;
 
     /**
      * Message constructor.
      *
-     * @param string $name
+     * @param string $handlerName
      * @param mixed $data Message data, encodable by a used driver
      */
-    public function __construct(string $name, $data)
+    public function __construct(string $handlerName, $data)
     {
-        $this->name = $name;
+        $this->handlerName = $handlerName;
         $this->data = $data;
     }
 
-    public function getName(): string
+    public function getHandlerName(): string
     {
-        return $this->name;
+        return $this->handlerName;
     }
 
     /**

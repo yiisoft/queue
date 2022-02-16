@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue;
 
 use Psr\Log\LoggerInterface;
-use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
+use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
@@ -16,8 +16,8 @@ final class Queue implements QueueInterface
 {
     protected WorkerInterface $worker;
     protected LoopInterface $loop;
-    private LoggerInterface $logger;
     protected ?AdapterInterface $adapter;
+    private LoggerInterface $logger;
     private string $channelName;
 
     public function __construct(
@@ -43,14 +43,17 @@ final class Queue implements QueueInterface
     {
         $this->checkAdapter();
 
-        $this->logger->debug('Preparing to push message "{message}".', ['message' => $message->getName()]);
+        $this->logger->debug(
+            'Preparing to push message with handler name "{handlerName}".',
+            ['handlerName' => $message->getHandlerName()]
+        );
 
         /** @psalm-suppress PossiblyNullReference */
         $this->adapter->push($message);
 
         $this->logger->debug(
-            'Successfully pushed message "{name}" to the queue.',
-            ['name' => $message->getName()]
+            'Successfully pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
+            ['name' => $message->getHandlerName(), 'id' => $message->getId()]
         );
     }
 
@@ -99,17 +102,17 @@ final class Queue implements QueueInterface
         return $this->adapter->status($id);
     }
 
-    protected function handle(MessageInterface $message): void
-    {
-        $this->worker->process($message, $this);
-    }
-
     public function withAdapter(AdapterInterface $adapter): self
     {
         $new = clone $this;
         $new->adapter = $adapter;
 
         return $new;
+    }
+
+    protected function handle(MessageInterface $message): void
+    {
+        $this->worker->process($message, $this);
     }
 
     private function checkAdapter(): void
