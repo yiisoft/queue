@@ -45,10 +45,10 @@ final class Worker implements WorkerInterface
     {
         $this->logger->debug('Start working with message #{message}.', ['message' => $message->getId()]);
 
-        $name = $message->getName();
+        $name = $message->getHandlerName();
         $handler = $this->getHandler($name);
         if ($handler === null) {
-            throw new RuntimeException("No handler for message $name");
+            throw new RuntimeException("Queue handler with name $name doesn't exist");
         }
 
         try {

@@ -18,11 +18,11 @@ interface MessageInterface
     public function getId(): ?string;
 
     /**
-     * Returns payload name.
+     * Returns handler name.
      *
      * @return string
      */
-    public function getName(): string;
+    public function getHandlerName(): string;
 
     /**
      * Returns payload data.
