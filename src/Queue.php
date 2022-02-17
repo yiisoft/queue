@@ -52,7 +52,7 @@ final class Queue implements QueueInterface
         $this->adapter->push($message);
 
         $this->logger->info(
-            'Successfully pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
+            'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
             ['name' => $message->getHandlerName(), 'id' => $message->getId() ?? 'null']
         );
     }
@@ -79,7 +79,7 @@ final class Queue implements QueueInterface
         $this->adapter->runExisting($callback);
 
         $this->logger->info(
-            'Finish processing queue messages. There were {count} messages to work with.',
+            'Processed {count} queue messages.',
             ['count' => $count]
         );
     }
