@@ -97,7 +97,7 @@ final class Worker implements WorkerInterface
             }
 
             if (!class_exists($className)) {
-                $this->logger->error("$className doesn't exist");
+                $this->logger->error("$className doesn't exist.");
                 return null;
             }
 
