@@ -43,7 +43,7 @@ final class Queue implements QueueInterface
     {
         $this->checkAdapter();
 
-        $this->logger->debug(
+        $this->logger->info(
             'Preparing to push message with handler name "{handlerName}".',
             ['handlerName' => $message->getHandlerName()]
         );
@@ -51,7 +51,7 @@ final class Queue implements QueueInterface
         /** @psalm-suppress PossiblyNullReference */
         $this->adapter->push($message);
 
-        $this->logger->debug(
+        $this->logger->info(
             'Successfully pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
             ['name' => $message->getHandlerName(), 'id' => $message->getId() ?? 'null']
         );
@@ -61,7 +61,7 @@ final class Queue implements QueueInterface
     {
         $this->checkAdapter();
 
-        $this->logger->debug('Start processing queue messages.');
+        $this->logger->info('Start processing queue messages.');
         $count = 0;
 
         $callback = function (MessageInterface $message) use (&$max, &$count): bool {
@@ -78,7 +78,7 @@ final class Queue implements QueueInterface
         /** @psalm-suppress PossiblyNullReference */
         $this->adapter->runExisting($callback);
 
-        $this->logger->debug(
+        $this->logger->info(
             'Finish processing queue messages. There were {count} messages to work with.',
             ['count' => $count]
         );
@@ -88,10 +88,10 @@ final class Queue implements QueueInterface
     {
         $this->checkAdapter();
 
-        $this->logger->debug('Start listening to the queue.');
+        $this->logger->info('Start listening to the queue.');
         /** @psalm-suppress PossiblyNullReference */
         $this->adapter->subscribe(fn (MessageInterface $message) => $this->handle($message));
-        $this->logger->debug('Finish listening to the queue.');
+        $this->logger->info('Finish listening to the queue.');
     }
 
     public function status(string $id): JobStatus
