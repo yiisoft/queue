@@ -43,7 +43,7 @@ final class Worker implements WorkerInterface
      */
     public function process(MessageInterface $message, QueueInterface $queue): void
     {
-        $this->logger->info('Start working with message #{message}.', ['message' => $message->getId()]);
+        $this->logger->info('Processing message #{message}.', ['message' => $message->getId()]);
 
         $name = $message->getHandlerName();
         $handler = $this->getHandler($name);
