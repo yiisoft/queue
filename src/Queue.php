@@ -43,7 +43,7 @@ final class Queue implements QueueInterface
     {
         $this->checkAdapter();
 
-        $this->logger->info(
+        $this->logger->debug(
             'Preparing to push message with handler name "{handlerName}".',
             ['handlerName' => $message->getHandlerName()]
         );
@@ -61,7 +61,7 @@ final class Queue implements QueueInterface
     {
         $this->checkAdapter();
 
-        $this->logger->info('Start processing queue messages.');
+        $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
         $callback = function (MessageInterface $message) use (&$max, &$count): bool {
