@@ -97,12 +97,14 @@ final class Worker implements WorkerInterface
             }
 
             if (!class_exists($className)) {
+                $this->logger->error("$className doesn't exist");
                 return null;
             }
 
             try {
                 $reflection = new ReflectionMethod($className, $methodName);
             } catch (ReflectionException $e) {
+                $this->logger->error($e->getMessage());
                 return null;
             }
             if ($reflection->isStatic()) {
