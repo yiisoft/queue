@@ -43,7 +43,7 @@ final class Worker implements WorkerInterface
      */
     public function process(MessageInterface $message, QueueInterface $queue): void
     {
-        $this->logger->debug('Start working with message #{message}.', ['message' => $message->getId()]);
+        $this->logger->info('Processing message #{message}.', ['message' => $message->getId()]);
 
         $name = $message->getHandlerName();
         $handler = $this->getHandler($name);
@@ -97,12 +97,14 @@ final class Worker implements WorkerInterface
             }
 
             if (!class_exists($className)) {
+                $this->logger->error("$className doesn't exist.");
                 return null;
             }
 
             try {
                 $reflection = new ReflectionMethod($className, $methodName);
             } catch (ReflectionException $e) {
+                $this->logger->error($e->getMessage());
                 return null;
             }
             if ($reflection->isStatic()) {
