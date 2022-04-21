@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\Push;
+namespace Yiisoft\Yii\Queue\Middleware\Consume;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -16,7 +16,7 @@ use function is_string;
 /**
  * Creates a middleware based on the definition provided.
  */
-final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
+final class MiddlewareFactoryConsume implements MiddlewareFactoryConsumeInterface
 {
     /**
      * @param ContainerInterface $container Container to use for resolving definitions.
@@ -28,7 +28,7 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
     }
 
     /**
-     * @param array|callable|MiddlewarePushInterface|string $middlewareDefinition Middleware definition in one of the
+     * @param MiddlewareConsumeInterface|callable|array|string $middlewareDefinition Middleware definition in one of the
      *     following formats:
      *
      * - A middleware object.
@@ -44,20 +44,18 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
      * Current request and handler could be obtained by type-hinting for {@see ServerRequestInterface}
      * and {@see RequestHandlerInterface}.
      *
+     * @return MiddlewareConsumeInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     *
-     * @return MiddlewarePushInterface
      */
-    public function createPushMiddleware(
-        MiddlewarePushInterface|callable|array|string $middlewareDefinition
-    ): MiddlewarePushInterface {
-        if ($middlewareDefinition instanceof MiddlewarePushInterface) {
+    public function createConsumeMiddleware(MiddlewareConsumeInterface|callable|array|string $middlewareDefinition
+    ): MiddlewareConsumeInterface {
+        if ($middlewareDefinition instanceof MiddlewareConsumeInterface) {
             return $middlewareDefinition;
         }
 
-        if (is_string($middlewareDefinition) && is_subclass_of($middlewareDefinition, MiddlewarePushInterface::class)) {
-            /** @var MiddlewarePushInterface */
+        if (is_string($middlewareDefinition) && is_subclass_of($middlewareDefinition, MiddlewareConsumeInterface::class)) {
+            /** @var MiddlewareConsumeInterface */
             return $this->container->get($middlewareDefinition);
         }
 
@@ -66,9 +64,9 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
         return $this->wrapCallable($callable);
     }
 
-    private function wrapCallable(callable $callback): MiddlewarePushInterface
+    private function wrapCallable(callable $callback): MiddlewareConsumeInterface
     {
-        return new class ($callback, $this->container) implements MiddlewarePushInterface {
+        return new class ($callback, $this->container) implements MiddlewareConsumeInterface {
             private ContainerInterface $container;
             private $callback;
 
@@ -78,15 +76,15 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
                 $this->container = $container;
             }
 
-            public function processPush(PushRequest $request, MessageHandlerPushInterface $handler): PushRequest
+            public function processConsume(ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest
             {
                 $response = (new Injector($this->container))->invoke($this->callback, [$request, $handler]);
-                if ($response instanceof PushRequest) {
+                if ($response instanceof ConsumeRequest) {
                     return $response;
                 }
 
-                if ($response instanceof MiddlewarePushInterface) {
-                    return $response->processPush($request, $handler);
+                if ($response instanceof MiddlewareConsumeInterface) {
+                    return $response->processConsume($request, $handler);
                 }
 
                 throw new InvalidMiddlewareDefinitionException($this->callback);

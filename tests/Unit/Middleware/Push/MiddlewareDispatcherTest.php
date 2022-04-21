@@ -13,8 +13,8 @@ use Yiisoft\Test\Support\EventDispatcher\SimpleEventDispatcher;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\Push\Event\AfterMiddleware;
-use Yiisoft\Yii\Queue\Middleware\Push\Event\BeforeMiddleware;
+use Yiisoft\Yii\Queue\Middleware\Push\Event\AfterPushMiddleware;
+use Yiisoft\Yii\Queue\Middleware\Push\Event\BeforePushMiddleware;
 use Yiisoft\Yii\Queue\Middleware\Push\MessageHandlerPushInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
@@ -126,10 +126,10 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $this->assertEquals(
             [
-                BeforeMiddleware::class,
-                BeforeMiddleware::class,
-                AfterMiddleware::class,
-                AfterMiddleware::class,
+                BeforePushMiddleware::class,
+                BeforePushMiddleware::class,
+                AfterPushMiddleware::class,
+                AfterPushMiddleware::class,
             ],
             $eventDispatcher->getEventClasses()
         );
@@ -150,8 +150,8 @@ final class MiddlewareDispatcherTest extends TestCase
         } finally {
             $this->assertEquals(
                 [
-                    BeforeMiddleware::class,
-                    AfterMiddleware::class,
+                    BeforePushMiddleware::class,
+                    AfterPushMiddleware::class,
                 ],
                 $eventDispatcher->getEventClasses()
             );

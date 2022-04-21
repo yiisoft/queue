@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\Push;
+namespace Yiisoft\Yii\Queue\Middleware\Consume;
 
 /**
  * Creates a middleware based on the definition provided.
  * You may implement this interface if you want to introduce custom definitions or pass additional data to
  * the middleware created.
  */
-interface MiddlewareFactoryPushInterface
+interface MiddlewareFactoryConsumeInterface
 {
     /**
      * Create a middleware based on definition provided.
      *
-     * @param array|callable|string $middlewareDefinition Middleware definition to use.
+     * @param callable|array|string $middlewareDefinition Middleware definition to use.
      */
-    public function createPushMiddleware(callable|array|string $middlewareDefinition): MiddlewarePushInterface;
+    public function createConsumeMiddleware(callable|array|string $middlewareDefinition): MiddlewareConsumeInterface;
 }

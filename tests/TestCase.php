@@ -17,6 +17,8 @@ use Yiisoft\Yii\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Cli\SimpleLoop;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
+use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
 use Yiisoft\Yii\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
@@ -129,7 +131,8 @@ abstract class TestCase extends BaseTestCase
             $this->getMessageHandlers(),
             new NullLogger(),
             new Injector($this->getContainer()),
-            $this->getContainer()
+            $this->getContainer(),
+            $this->getConsumeMiddlewareDispatcher(),
         );
     }
 
@@ -179,6 +182,17 @@ abstract class TestCase extends BaseTestCase
     {
         return new PushMiddlewareDispatcher(
             new MiddlewareFactoryPush(
+                $this->getContainer(),
+                new CallableFactory($this->getContainer()),
+            ),
+            new SimpleEventDispatcher(),
+        );
+    }
+
+    protected function getConsumeMiddlewareDispatcher()
+    {
+        return new ConsumeMiddlewareDispatcher(
+            new MiddlewareFactoryConsume(
                 $this->getContainer(),
                 new CallableFactory($this->getContainer()),
             ),

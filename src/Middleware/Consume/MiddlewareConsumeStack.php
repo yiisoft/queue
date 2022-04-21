@@ -2,44 +2,45 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\Push;
+namespace Yiisoft\Yii\Queue\Middleware\Consume;
 
 use Closure;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use RuntimeException;
 use Yiisoft\Yii\Queue\Middleware\Push\Event\AfterPushMiddleware;
 use Yiisoft\Yii\Queue\Middleware\Push\Event\BeforePushMiddleware;
 
-final class MiddlewarePushStack implements MessageHandlerPushInterface
+final class MiddlewareConsumeStack implements MessageHandlerConsumeInterface
 {
     /**
      * Contains a stack of middleware wrapped in handlers.
      * Each handler points to the handler of middleware that will be processed next.
      *
-     * @var MessageHandlerPushInterface|null stack of middleware
+     * @var MessageHandlerConsumeInterface|null stack of middleware
      */
-    private ?MessageHandlerPushInterface $stack = null;
+    private ?MessageHandlerConsumeInterface $stack = null;
 
     /**
      * @param Closure[] $middlewares Middlewares.
-     * @param MessageHandlerPushInterface $finishHandler Fallback handler
+     * @param MessageHandlerConsumeInterface $finishHandler Fallback handler
      * @param EventDispatcherInterface|null $dispatcher Event dispatcher to use for triggering before/after middleware
      * events.
      */
     public function __construct(
         private array $middlewares,
-        private MessageHandlerPushInterface $finishHandler,
+        private MessageHandlerConsumeInterface $finishHandler,
         private ?EventDispatcherInterface $dispatcher = null,
     ) {
     }
 
-    public function handlePush(PushRequest $request): PushRequest
+    public function handleConsume(ConsumeRequest $request): ConsumeRequest
     {
         if ($this->stack === null) {
             $this->build();
         }
 
         /** @psalm-suppress PossiblyNullReference */
-        return $this->stack->handlePush($request);
+        return $this->stack->handleConsume($request);
     }
 
     private function build(): void
@@ -56,19 +57,19 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
     /**
      * Wrap handler by middlewares.
      */
-    private function wrap(Closure $middlewareFactory, MessageHandlerPushInterface $handler): MessageHandlerPushInterface
+    private function wrap(Closure $middlewareFactory, MessageHandlerConsumeInterface $handler): MessageHandlerConsumeInterface
     {
-        return new class ($middlewareFactory, $handler, $this->dispatcher) implements MessageHandlerPushInterface {
-            private ?MiddlewarePushInterface $middleware = null;
+        return new class ($middlewareFactory, $handler, $this->dispatcher) implements MessageHandlerConsumeInterface {
+            private ?MiddlewareConsumeInterface $middleware = null;
 
             public function __construct(
                 private Closure $middlewareFactory,
-                private MessageHandlerPushInterface $handler,
+                private MessageHandlerConsumeInterface $handler,
                 private ?EventDispatcherInterface $dispatcher
             ) {
             }
 
-            public function handlePush(PushRequest $request): PushRequest
+            public function handleConsume(ConsumeRequest $request): ConsumeRequest
             {
                 if ($this->middleware === null) {
                     $this->middleware = ($this->middlewareFactory)();
@@ -77,7 +78,7 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
                 $this->dispatcher?->dispatch(new BeforePushMiddleware($this->middleware, $request));
 
                 try {
-                    return $request = $this->middleware->processPush($request, $this->handler);
+                    return $request = $this->middleware->processConsume($request, $this->handler);
                 } finally {
                     $this->dispatcher?->dispatch(new AfterPushMiddleware($this->middleware, $request));
                 }
