@@ -12,6 +12,7 @@ use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredExcepti
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Yii\Queue\Middleware\Push\MessageHandlerPushInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Push\PushRequest;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
@@ -34,8 +35,10 @@ final class Queue implements QueueInterface
         return $this->channelName;
     }
 
-    public function push(MessageInterface $message, ...$middlewareDefinitions): void
-    {
+    public function push(
+        MessageInterface $message,
+        MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
+    ): void {
         $this->logger->debug(
             'Preparing to push message with handler name "{handlerName}".',
             ['handlerName' => $message->getHandlerName()]
