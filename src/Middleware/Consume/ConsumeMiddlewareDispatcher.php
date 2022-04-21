@@ -93,7 +93,7 @@ final class ConsumeMiddlewareDispatcher
         $factory = $this->middlewareFactory;
 
         foreach ($this->middlewareDefinitions as $middlewareDefinition) {
-            $middlewares[] = static fn(): MiddlewareConsumeInterface => $factory->createPushMiddleware(
+            $middlewares[] = static fn (): MiddlewareConsumeInterface => $factory->createPushMiddleware(
                 $middlewareDefinition
             );
         }

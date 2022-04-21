@@ -52,7 +52,7 @@ final class Worker implements WorkerInterface
         }
 
         $request = new ConsumeRequest($message, $queue);
-        $closure = fn(): mixed => $this->injector->invoke($handler, [$message]);
+        $closure = fn (): mixed => $this->injector->invoke($handler, [$message]);
         try {
             $this->middlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure));
         } catch (Throwable $exception) {
@@ -74,11 +74,12 @@ final class Worker implements WorkerInterface
     /**
      * Checks if the handler is a DI container alias
      *
-     * @param callable|object|array|null $definition
+     * @param array|callable|object|null $definition
      *
-     * @return callable|null
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     *
+     * @return callable|null
      */
     private function prepare(callable|object|array|null $definition): callable|null
     {

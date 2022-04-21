@@ -28,7 +28,7 @@ final class MiddlewareFactoryConsume implements MiddlewareFactoryConsumeInterfac
     }
 
     /**
-     * @param MiddlewareConsumeInterface|callable|array|string $middlewareDefinition Middleware definition in one of the
+     * @param array|callable|MiddlewareConsumeInterface|string $middlewareDefinition Middleware definition in one of the
      *     following formats:
      *
      * - A middleware object.
@@ -44,11 +44,13 @@ final class MiddlewareFactoryConsume implements MiddlewareFactoryConsumeInterfac
      * Current request and handler could be obtained by type-hinting for {@see ServerRequestInterface}
      * and {@see RequestHandlerInterface}.
      *
-     * @return MiddlewareConsumeInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     *
+     * @return MiddlewareConsumeInterface
      */
-    public function createConsumeMiddleware(MiddlewareConsumeInterface|callable|array|string $middlewareDefinition
+    public function createConsumeMiddleware(
+        MiddlewareConsumeInterface|callable|array|string $middlewareDefinition
     ): MiddlewareConsumeInterface {
         if ($middlewareDefinition instanceof MiddlewareConsumeInterface) {
             return $middlewareDefinition;
