@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Middleware\Consume\Event;
 
-use Yiisoft\Yii\Queue\Middleware\Push\MiddlewarePushInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\PushRequest;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareConsumeInterface;
 
 /**
  * BeforeMiddleware event is raised before executing a middleware.
@@ -13,27 +13,27 @@ use Yiisoft\Yii\Queue\Middleware\Push\PushRequest;
 final class BeforeConsumeMiddleware
 {
     /**
-     * @param MiddlewarePushInterface $middleware Middleware to be executed.
-     * @param PushRequest $request Request to be passed to the middleware.
+     * @param MiddlewareConsumeInterface $middleware Middleware to be executed.
+     * @param ConsumeRequest $request Request to be passed to the middleware.
      */
     public function __construct(
-        private MiddlewarePushInterface $middleware,
-        private PushRequest $request
+        private MiddlewareConsumeInterface $middleware,
+        private ConsumeRequest $request
     ) {
     }
 
     /**
-     * @return MiddlewarePushInterface Middleware to be executed.
+     * @return MiddlewareConsumeInterface Middleware to be executed.
      */
-    public function getMiddleware(): MiddlewarePushInterface
+    public function getMiddleware(): MiddlewareConsumeInterface
     {
         return $this->middleware;
     }
 
     /**
-     * @return PushRequest Request to be passed to the middleware.
+     * @return ConsumeRequest Request to be passed to the middleware.
      */
-    public function getRequest(): PushRequest
+    public function getRequest(): ConsumeRequest
     {
         return $this->request;
     }

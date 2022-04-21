@@ -6,8 +6,8 @@ namespace Yiisoft\Yii\Queue\Middleware\Consume;
 
 use Closure;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\Event\AfterPushMiddleware;
-use Yiisoft\Yii\Queue\Middleware\Push\Event\BeforePushMiddleware;
+use Yiisoft\Yii\Queue\Middleware\Consume\Event\AfterConsumeMiddleware;
+use Yiisoft\Yii\Queue\Middleware\Consume\Event\BeforeConsumeMiddleware;
 
 final class MiddlewareConsumeStack implements MessageHandlerConsumeInterface
 {
@@ -74,12 +74,12 @@ final class MiddlewareConsumeStack implements MessageHandlerConsumeInterface
                     $this->middleware = ($this->middlewareFactory)();
                 }
 
-                $this->dispatcher?->dispatch(new BeforePushMiddleware($this->middleware, $request));
+                $this->dispatcher?->dispatch(new BeforeConsumeMiddleware($this->middleware, $request));
 
                 try {
                     return $request = $this->middleware->processConsume($request, $this->handler);
                 } finally {
-                    $this->dispatcher?->dispatch(new AfterPushMiddleware($this->middleware, $request));
+                    $this->dispatcher?->dispatch(new AfterConsumeMiddleware($this->middleware, $request));
                 }
             }
         };
