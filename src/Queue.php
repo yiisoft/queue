@@ -10,28 +10,23 @@ use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\AdapterPushHandler;
+use Yiisoft\Yii\Queue\Middleware\Push\MessageHandlerPushInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Yii\Queue\Middleware\Push\PushRequest;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 final class Queue implements QueueInterface
 {
-    protected WorkerInterface $worker;
-    protected LoopInterface $loop;
-    protected ?AdapterInterface $adapter;
-    private LoggerInterface $logger;
-    private string $channelName;
-
     public function __construct(
-        WorkerInterface $worker,
-        LoopInterface $loop,
-        LoggerInterface $logger,
-        ?AdapterInterface $adapter = null,
-        string $channelName = QueueFactoryInterface::DEFAULT_CHANNEL_NAME
+        private WorkerInterface $worker,
+        private LoopInterface $loop,
+        private LoggerInterface $logger,
+        private PushMiddlewareDispatcher $pushMiddlewareDispatcher,
+        private AdapterPushHandler $adapterPushHandler,
+        private ?AdapterInterface $adapter = null,
+        private string $channelName = QueueFactoryInterface::DEFAULT_CHANNEL_NAME
     ) {
-        $this->adapter = $adapter;
-        $this->worker = $worker;
-        $this->loop = $loop;
-        $this->logger = $logger;
-        $this->channelName = $channelName;
     }
 
     public function getChannelName(): string
@@ -39,17 +34,17 @@ final class Queue implements QueueInterface
         return $this->channelName;
     }
 
-    public function push(MessageInterface $message): void
+    public function push(MessageInterface $message, ...$middlewareDefinitions): void
     {
-        $this->checkAdapter();
-
         $this->logger->debug(
             'Preparing to push message with handler name "{handlerName}".',
             ['handlerName' => $message->getHandlerName()]
         );
 
-        /** @psalm-suppress PossiblyNullReference */
-        $this->adapter->push($message);
+        $request = new PushRequest($message, $this->adapter);
+        $message = $this->pushMiddlewareDispatcher
+            ->dispatch($request, $this->createPushHandler($middlewareDefinitions))
+            ->getMessage();
 
         $this->logger->info(
             'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
@@ -120,5 +115,28 @@ final class Queue implements QueueInterface
         if ($this->adapter === null) {
             throw new AdapterNotConfiguredException();
         }
+    }
+
+    private function createPushHandler(array $middlewares): MessageHandlerPushInterface
+    {
+        return new class (
+            $this->adapterPushHandler,
+            $this->pushMiddlewareDispatcher,
+            $middlewares
+        ) implements MessageHandlerPushInterface {
+            public function __construct(
+                private AdapterPushHandler $adapterPushHandler,
+                private PushMiddlewareDispatcher $dispatcher,
+                private array $middlewares,
+            ) {
+            }
+
+            public function handlePush(PushRequest $request): PushRequest
+            {
+                return $this->dispatcher
+                    ->withMiddlewares($this->middlewares)
+                    ->dispatch($request, $this->adapterPushHandler);
+            }
+        };
     }
 }
