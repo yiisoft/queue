@@ -97,14 +97,10 @@ final class MiddlewareDispatcherTest extends TestCase
         $request = $this->getPushRequest();
 
         $middleware1 = static function (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest {
-            $request = $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'first'));
-
-            return $request;
+            return $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'first'));
         };
         $middleware2 = static function (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest {
-            $request = $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'second'));
-
-            return $request;
+            return $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'second'));
         };
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
@@ -146,7 +142,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $request = $this->getPushRequest();
         $eventDispatcher = new SimpleEventDispatcher();
-        $middleware = static fn() => new FailMiddleware();
+        $middleware = static fn () => new FailMiddleware();
         $dispatcher = $this->createDispatcher(null, $eventDispatcher)->withMiddlewares([$middleware]);
 
         try {

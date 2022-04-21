@@ -6,7 +6,6 @@ namespace Yiisoft\Yii\Queue\Middleware\Push;
 
 use Closure;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use RuntimeException;
 use Yiisoft\Yii\Queue\Middleware\Push\Event\AfterMiddleware;
 use Yiisoft\Yii\Queue\Middleware\Push\Event\BeforeMiddleware;
 

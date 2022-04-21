@@ -29,7 +29,7 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
     }
 
     /**
-     * @param MiddlewarePushInterface|callable|array|string $middlewareDefinition Middleware definition in one of the
+     * @param array|callable|MiddlewarePushInterface|string $middlewareDefinition Middleware definition in one of the
      *     following formats:
      *
      * - A middleware object.
@@ -45,11 +45,13 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
      * Current request and handler could be obtained by type-hinting for {@see ServerRequestInterface}
      * and {@see RequestHandlerInterface}.
      *
-     * @return MiddlewarePushInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     *
+     * @return MiddlewarePushInterface
      */
-    public function createPushMiddleware(MiddlewarePushInterface|callable|array|string $middlewareDefinition
+    public function createPushMiddleware(
+        MiddlewarePushInterface|callable|array|string $middlewareDefinition
     ): MiddlewarePushInterface {
         if ($middlewareDefinition instanceof MiddlewarePushInterface) {
             return $middlewareDefinition;

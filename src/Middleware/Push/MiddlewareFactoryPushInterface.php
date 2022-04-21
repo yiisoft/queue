@@ -16,14 +16,14 @@ interface MiddlewareFactoryPushInterface
     /**
      * Create a middleware based on definition provided.
      *
-     * @param callable|array|string $middlewareDefinition Middleware definition to use.
+     * @param array|callable|string $middlewareDefinition Middleware definition to use.
      */
     public function createPushMiddleware(callable|array|string $middlewareDefinition): MiddlewarePushInterface;
 
     /**
      * Create a middleware based on definition provided.
      *
-     * @param callable|array|string $middlewareDefinition Middleware definition to use.
+     * @param array|callable|string $middlewareDefinition Middleware definition to use.
      */
     public function createConsumeMiddleware(callable|array|string $middlewareDefinition): MiddlewareConsumeInterface;
 }

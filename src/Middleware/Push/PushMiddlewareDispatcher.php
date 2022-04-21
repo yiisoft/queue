@@ -93,7 +93,7 @@ final class PushMiddlewareDispatcher
         $factory = $this->middlewareFactory;
 
         foreach ($this->middlewareDefinitions as $middlewareDefinition) {
-            $middlewares[] = static fn(): MiddlewarePushInterface => $factory->createPushMiddleware(
+            $middlewares[] = static fn (): MiddlewarePushInterface => $factory->createPushMiddleware(
                 $middlewareDefinition
             );
         }
