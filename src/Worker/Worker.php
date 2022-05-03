@@ -81,7 +81,7 @@ final class Worker implements WorkerInterface
      *
      * @return callable|null
      */
-    private function prepare(callable|object|array|null $definition): callable|null
+    private function prepare(callable|object|array|string|null $definition): callable|null
     {
         if (is_string($definition) && $this->container->has($definition)) {
             return $this->container->get($definition);

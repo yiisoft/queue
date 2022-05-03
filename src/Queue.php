@@ -19,6 +19,11 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 final class Queue implements QueueInterface
 {
+    /**
+     * @var array|array[]|callable[]|string[]|MiddlewarePushInterface[]
+     */
+    private array $middlewareDefinitions;
+
     public function __construct(
         private WorkerInterface $worker,
         private LoopInterface $loop,
@@ -26,8 +31,10 @@ final class Queue implements QueueInterface
         private PushMiddlewareDispatcher $pushMiddlewareDispatcher,
         private AdapterPushHandler $adapterPushHandler,
         private ?AdapterInterface $adapter = null,
-        private string $channelName = QueueFactoryInterface::DEFAULT_CHANNEL_NAME
+        private string $channelName = QueueFactoryInterface::DEFAULT_CHANNEL_NAME,
+        MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
     ) {
+        $this->middlewareDefinitions = $middlewareDefinitions;
     }
 
     public function getChannelName(): string
@@ -38,7 +45,7 @@ final class Queue implements QueueInterface
     public function push(
         MessageInterface $message,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
-    ): void {
+    ): MessageInterface {
         $this->logger->debug(
             'Preparing to push message with handler name "{handlerName}".',
             ['handlerName' => $message->getHandlerName()]
@@ -53,6 +60,8 @@ final class Queue implements QueueInterface
             'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
             ['name' => $message->getHandlerName(), 'id' => $message->getId() ?? 'null']
         );
+
+        return $message;
     }
 
     public function run(int $max = 0): void
@@ -106,6 +115,22 @@ final class Queue implements QueueInterface
         $new->adapter = $adapter;
 
         return $new;
+    }
+
+    public function withMiddlewares(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
+    {
+        $instance = clone $this;
+        $instance->middlewareDefinitions = $middlewareDefinitions;
+
+        return $instance;
+    }
+
+    public function withMiddlewaresAdded(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
+    {
+        $instance = clone $this;
+        $instance->middlewareDefinitions = [...$instance->middlewareDefinitions, ...$middlewareDefinitions];
+
+        return $instance;
     }
 
     protected function handle(MessageInterface $message): void

@@ -15,16 +15,17 @@ final class PushMiddlewareDispatcher
      * @var MiddlewarePushStack|null The middleware stack.
      */
     private ?MiddlewarePushStack $stack = null;
-
     /**
      * @var array[]|callable[]|string[]
      */
-    private array $middlewareDefinitions = [];
+    private array $middlewareDefinitions;
 
     public function __construct(
         private MiddlewareFactoryPushInterface $middlewareFactory,
         private ?EventDispatcherInterface $eventDispatcher,
+        array|callable|string|MiddlewarePushInterface ...$middlewareDefinitions,
     ) {
+        $this->middlewareDefinitions = array_reverse($middlewareDefinitions);
     }
 
     /**
@@ -48,7 +49,7 @@ final class PushMiddlewareDispatcher
      * Returns new instance with middleware handlers replaced with the ones provided.
      * Last specified handler will be executed first.
      *
-     * @param array[]|callable[]|string[] $middlewareDefinitions Each array element is:
+     * @param array[]|callable[]|string[]|MiddlewarePushInterface[] $middlewareDefinitions Each array element is:
      *
      * - A name of PSR-15 middleware class. The middleware instance will be obtained from container executed.
      * - A callable with `function(ServerRequestInterface $request, RequestHandlerInterface $handler):
