@@ -21,10 +21,11 @@ interface QueueInterface
      * Pushes a message into the queue.
      *
      * @param MessageInterface $message
-     * @param MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
+     * @param array|callable|MiddlewarePushInterface|string ...$middlewareDefinitions
+     *
+     * @throws BehaviorNotSupportedException
      *
      * @return MessageInterface
-     * @throws BehaviorNotSupportedException
      */
     public function push(MessageInterface $message, MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): MessageInterface;
 

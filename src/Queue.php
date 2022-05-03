@@ -20,7 +20,7 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 final class Queue implements QueueInterface
 {
     /**
-     * @var array|array[]|callable[]|string[]|MiddlewarePushInterface[]
+     * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
      */
     private array $middlewareDefinitions;
 

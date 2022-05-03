@@ -49,7 +49,7 @@ final class PushMiddlewareDispatcher
      * Returns new instance with middleware handlers replaced with the ones provided.
      * Last specified handler will be executed first.
      *
-     * @param array[]|callable[]|string[]|MiddlewarePushInterface[] $middlewareDefinitions Each array element is:
+     * @param array[]|callable[]|MiddlewarePushInterface[]|string[] $middlewareDefinitions Each array element is:
      *
      * - A name of PSR-15 middleware class. The middleware instance will be obtained from container executed.
      * - A callable with `function(ServerRequestInterface $request, RequestHandlerInterface $handler):
