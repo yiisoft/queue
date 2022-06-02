@@ -19,7 +19,9 @@ final class WorkerTest extends TestCase
         $this->executionTimes = 0;
         $message = new Message('simple', '', []);
         $queue = $this->createMock(QueueInterface::class);
-        $this->getWorker()->process($message, $queue);
+        $this
+            ->getWorker()
+            ->process($message, $queue);
 
         self::assertEquals(1, $this->executionTimes);
     }
@@ -33,6 +35,8 @@ final class WorkerTest extends TestCase
 
         $message = new Message('exceptional', '', []);
         $queue = $this->createMock(QueueInterface::class);
-        $this->getWorker()->process($message, $queue);
+        $this
+            ->getWorker()
+            ->process($message, $queue);
     }
 }
