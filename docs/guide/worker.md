@@ -11,7 +11,12 @@ its payload name is called.
 Handler can be any callable with a couple of additions:
 
 - If handler is provided as an array of two strings, it will be treated as a DI container service id and its method.
-  E.g. `[ClassName::class, 'handle']` will be resolved to `$container->get(ClassName::class)->handle()`.
+  E.g. `[ClassName::class, 'handle']` will be resolved to:
+  ```php 
+  $container
+      ->get(ClassName::class)
+      ->handle();
+  ```
 - An `Injector` is used to call the handlers. This means you can define handlers as closures with their own dependencies
   which will be resolved with DI container. In the example below you can see a closure in which `message` will be taken
   from the queue and `ClientInterface` will be resolved via DI container.

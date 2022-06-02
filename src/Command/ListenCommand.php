@@ -37,7 +37,9 @@ final class ListenCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->queueFactory->get($input->getArgument('channel'))->listen();
+        $this->queueFactory
+            ->get($input->getArgument('channel'))
+            ->listen();
 
         return ExitCode::OK;
     }

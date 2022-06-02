@@ -18,7 +18,9 @@ final class SynchronousAdapterTest extends TestCase
 
     public function testNonIntegerId(): void
     {
-        $queue = $this->getQueue()->withAdapter($this->getAdapter());
+        $queue = $this
+            ->getQueue()
+            ->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
         $queue->push($message);
         $id = $message->getId();
