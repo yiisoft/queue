@@ -10,7 +10,7 @@ use RuntimeException;
 final class FakeHandler
 {
     public static array $processedMessages = [];
-    
+
     public function __construct()
     {
         self::$processedMessages = [];

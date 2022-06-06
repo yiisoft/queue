@@ -38,7 +38,7 @@ final class WorkerTest extends TestCase
         $this->assertSame($message, $handleMessage);
 
         $this->assertTrue(
-            $logger->hasInfoThatContains("Processing message #{message}.")
+            $logger->hasInfoThatContains('Processing message #{message}.')
         );
     }
 
