@@ -72,7 +72,7 @@ final class WorkerTest extends TestCase
         $this->assertSame([$message], $handler::$processedMessages);
     }
 
-    public function testJobFailWithDefinitionNotFoundClassBuExistInContainerHandler(): void
+    public function testJobFailWithDefinitionNotFoundClassButExistInContainerHandler(): void
     {
         $message = new Message('simple', ['test-data']);
         $logger = new TestLogger();
