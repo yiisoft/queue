@@ -39,7 +39,7 @@
         "roave/infection-static-analysis-plugin": "^1.16",
         "spatie/phpunit-watcher": "^1.23",
         "vimeo/psalm": "^4.18",
-        "yiisoft/test-support": "^1.0"
+        "yiisoft/test-support": "^2.0"
     },
     "suggest": {
         "ext-pcntl": "Need for process signals"
