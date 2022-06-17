@@ -6,9 +6,9 @@ namespace Yiisoft\Yii\Queue\Tests\Unit;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\Test\TestLogger;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
+use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Yii\Queue\Exception\JobFailureException;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
@@ -23,7 +23,7 @@ final class WorkerTest extends TestCase
     {
         $handleMessage = null;
         $message = new Message('simple', ['test-data']);
-        $logger = new TestLogger();
+        $logger = new SimpleLogger();
         $container = new SimpleContainer();
         $handlers = [
             'simple' => function (MessageInterface $message) use (&$handleMessage) {
@@ -37,15 +37,15 @@ final class WorkerTest extends TestCase
         $worker->process($message, $queue);
         $this->assertSame($message, $handleMessage);
 
-        $this->assertTrue(
-            $logger->hasInfoThatContains('Processing message #{message}.')
-        );
+        $messages = $logger->getMessages();
+        $this->assertNotEmpty($messages);
+        $this->assertStringContainsString('Processing message #{message}.', $messages[0]['message']);
     }
 
     public function testJobExecutedWithDefinitionHandler(): void
     {
         $message = new Message('simple', ['test-data']);
-        $logger = new TestLogger();
+        $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => FakeHandler::class];
@@ -60,7 +60,7 @@ final class WorkerTest extends TestCase
     public function testJobExecutedWithDefinitionClassHandler(): void
     {
         $message = new Message('simple', ['test-data']);
-        $logger = new TestLogger();
+        $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => [FakeHandler::class, 'execute']];
@@ -75,7 +75,7 @@ final class WorkerTest extends TestCase
     public function testJobFailWithDefinitionNotFoundClassButExistInContainerHandler(): void
     {
         $message = new Message('simple', ['test-data']);
-        $logger = new TestLogger();
+        $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer(['not-found-class-name' => $handler]);
         $handlers = ['simple' => ['not-found-class-name', 'execute']];
@@ -90,7 +90,7 @@ final class WorkerTest extends TestCase
     public function testJobExecutedWithStaticDefinitionHandler(): void
     {
         $message = new Message('simple', ['test-data']);
-        $logger = new TestLogger();
+        $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => [FakeHandler::class, 'staticExecute']];
@@ -107,7 +107,7 @@ final class WorkerTest extends TestCase
         $this->expectExceptionMessage("Queue handler with name simple doesn't exist");
 
         $message = new Message('simple', ['test-data']);
-        $logger = new TestLogger();
+        $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => [FakeHandler::class, 'undefinedMethod']];
@@ -123,7 +123,7 @@ final class WorkerTest extends TestCase
         $this->expectExceptionMessage("Queue handler with name simple doesn't exist");
 
         $message = new Message('simple', ['test-data']);
-        $logger = new TestLogger();
+        $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => ['UndefinedClass', 'handle']];
@@ -134,9 +134,9 @@ final class WorkerTest extends TestCase
         try {
             $worker->process($message, $queue);
         } finally {
-            $this->assertTrue(
-                $logger->hasErrorThatContains("UndefinedClass doesn't exist.")
-            );
+            $messages = $logger->getMessages();
+            $this->assertNotEmpty($messages);
+            $this->assertStringContainsString('UndefinedClass doesn\'t exist.', $messages[1]['message']);
         }
     }
 
@@ -144,7 +144,7 @@ final class WorkerTest extends TestCase
     {
         $this->expectExceptionMessage("Queue handler with name simple doesn't exist");
         $message = new Message('simple', ['test-data']);
-        $logger = new TestLogger();
+        $logger = new SimpleLogger();
         $container = new SimpleContainer();
         $handlers = ['simple' => [FakeHandler::class, 'execute']];
 
@@ -162,7 +162,7 @@ final class WorkerTest extends TestCase
         );
 
         $message = new Message('simple', ['test-data']);
-        $logger = new TestLogger();
+        $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => [FakeHandler::class, 'executeWithException']];
@@ -173,10 +173,11 @@ final class WorkerTest extends TestCase
         try {
             $worker->process($message, $queue);
         } finally {
-            $this->assertTrue(
-                $logger->hasErrorThatContains(
-                    "Processing of message #null is stopped because of an exception:\nTest exception."
-                )
+            $messages = $logger->getMessages();
+            $this->assertNotEmpty($messages);
+            $this->assertStringContainsString(
+                "Processing of message #null is stopped because of an exception:\nTest exception.",
+                $messages[1]['message']
             );
         }
     }
