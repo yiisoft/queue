@@ -9,5 +9,5 @@ use Yiisoft\Yii\Queue\QueueInterface;
 
 interface WorkerInterface
 {
-    public function process(MessageInterface $message, QueueInterface $queue): void;
+    public function process(MessageInterface $message, QueueInterface $queue): MessageInterface;
 }

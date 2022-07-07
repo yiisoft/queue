@@ -19,12 +19,14 @@ final class ConsumeMiddlewareDispatcher
     /**
      * @var array[]|callable[]|string[]
      */
-    private array $middlewareDefinitions = [];
+    private array $middlewareDefinitions;
 
     public function __construct(
         private MiddlewareFactoryConsumeInterface $middlewareFactory,
         private ?EventDispatcherInterface $eventDispatcher,
+        array|callable|string|MiddlewareConsumeInterface ...$middlewareDefinitions,
     ) {
+        $this->middlewareDefinitions = array_reverse($middlewareDefinitions);
     }
 
     /**
@@ -48,7 +50,7 @@ final class ConsumeMiddlewareDispatcher
      * Returns new instance with middleware handlers replaced with the ones provided.
      * Last specified handler will be executed first.
      *
-     * @param array[]|callable[]|string[] $middlewareDefinitions Each array element is:
+     * @param array[]|callable[]|MiddlewareConsumeInterface[]|string[] $middlewareDefinitions Each array element is:
      *
      * - A name of PSR-15 middleware class. The middleware instance will be obtained from container executed.
      * - A callable with `function(ServerRequestInterface $request, RequestHandlerInterface $handler):

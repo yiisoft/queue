@@ -41,7 +41,7 @@ final class Worker implements WorkerInterface
      *
      * @throws Throwable
      */
-    public function process(MessageInterface $message, QueueInterface $queue): void
+    public function process(MessageInterface $message, QueueInterface $queue): MessageInterface
     {
         $this->logger->info('Processing message #{message}.', ['message' => $message->getId()]);
 
@@ -54,7 +54,7 @@ final class Worker implements WorkerInterface
         $request = new ConsumeRequest($message, $queue);
         $closure = fn (): mixed => $this->injector->invoke($handler, [$message]);
         try {
-            $this->middlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure));
+            return $this->middlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure))->getMessage();
         } catch (Throwable $exception) {
             $exception = new JobFailureException($message, $exception);
             $this->logger->error($exception->getMessage());
