@@ -17,7 +17,7 @@ final class ConsumeMiddlewareDispatcher
     private ?MiddlewareConsumeStack $stack = null;
 
     /**
-     * @var array[]|callable[]|string[]
+     * @var array[]|callable[]|string[]|MiddlewareConsumeInterface[]
      */
     private array $middlewareDefinitions;
 

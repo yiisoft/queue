@@ -129,7 +129,7 @@ final class Queue implements QueueInterface
     public function withMiddlewaresAdded(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
     {
         $instance = clone $this;
-        $instance->middlewareDefinitions = [...$instance->middlewareDefinitions, ...$middlewareDefinitions];
+        $instance->middlewareDefinitions = [...array_values($instance->middlewareDefinitions), ...array_values($middlewareDefinitions)];
 
         return $instance;
     }

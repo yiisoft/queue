@@ -14,7 +14,9 @@ interface MiddlewareFactoryConsumeInterface
     /**
      * Create a middleware based on definition provided.
      *
-     * @param array|callable|string $middlewareDefinition Middleware definition to use.
+     * @param callable|array|string|MiddlewareConsumeInterface $middlewareDefinition Middleware definition to use.
+     *
+     * @return MiddlewareConsumeInterface
      */
-    public function createConsumeMiddleware(callable|array|string $middlewareDefinition): MiddlewareConsumeInterface;
+    public function createConsumeMiddleware(callable|array|string|MiddlewareConsumeInterface $middlewareDefinition): MiddlewareConsumeInterface;
 }
