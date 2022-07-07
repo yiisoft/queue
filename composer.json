@@ -27,9 +27,9 @@
     "prefer-stable": true,
     "require": {
         "php": "^8.0",
-        "psr/log": "^1.1",
+        "psr/log": "^2.0|^3.0",
         "yiisoft/yii-console": "^1.0",
-        "yiisoft/definitions": "^1.0",
+        "yiisoft/definitions": "^1.0|^2.0",
         "yiisoft/factory": "^1.0",
         "yiisoft/friendly-exception": "^1.0",
         "yiisoft/injector": "^1.0"
@@ -39,7 +39,7 @@
         "roave/infection-static-analysis-plugin": "^1.16",
         "spatie/phpunit-watcher": "^1.23",
         "vimeo/psalm": "^4.18",
-        "yiisoft/test-support": "^1.0"
+        "yiisoft/test-support": "^2.0"
     },
     "suggest": {
         "ext-pcntl": "Need for process signals"

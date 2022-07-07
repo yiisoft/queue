@@ -29,7 +29,9 @@ final class QueueTest extends TestCase
     public function testPushSuccessful(): void
     {
         $adapter = new FakeAdapter();
-        $queue = $this->getQueue()->withAdapter($adapter);
+        $queue = $this
+            ->getQueue()
+            ->withAdapter($adapter);
         $message = new Message('simple', null);
         $queue->push($message);
 
@@ -41,10 +43,15 @@ final class QueueTest extends TestCase
         $this->needsRealAdapter = false;
         $behavior = new DelayBehavior(2);
         $exception = new BehaviorNotSupportedException(get_class($this->getAdapter()), $behavior);
-        $this->getAdapter()->method('push')->willThrowException($exception);
+        $this
+            ->getAdapter()
+            ->method('push')
+            ->willThrowException($exception);
         $expectedException = null;
 
-        $queue = $this->getQueue()->withAdapter($this->getAdapter());
+        $queue = $this
+            ->getQueue()
+            ->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
         try {
             $queue->push($message);
@@ -56,7 +63,9 @@ final class QueueTest extends TestCase
 
     public function testRun(): void
     {
-        $queue = $this->getQueue()->withAdapter($this->getAdapter());
+        $queue = $this
+            ->getQueue()
+            ->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
         $message2 = clone $message;
         $queue->push($message);
@@ -69,7 +78,9 @@ final class QueueTest extends TestCase
     public function testRunPartly(): void
     {
         $message = new Message('simple', null);
-        $queue = $this->getQueue()->withAdapter($this->getAdapter());
+        $queue = $this
+            ->getQueue()
+            ->withAdapter($this->getAdapter());
         $message2 = clone $message;
         $queue->push($message);
         $queue->push($message2);
@@ -80,7 +91,9 @@ final class QueueTest extends TestCase
 
     public function testListen(): void
     {
-        $queue = $this->getQueue()->withAdapter($this->getAdapter());
+        $queue = $this
+            ->getQueue()
+            ->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
         $message2 = clone $message;
         $queue->push($message);
@@ -92,7 +105,9 @@ final class QueueTest extends TestCase
 
     public function testStatus(): void
     {
-        $queue = $this->getQueue()->withAdapter($this->getAdapter());
+        $queue = $this
+            ->getQueue()
+            ->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
         $queue->push($message);
         $id = $message->getId();

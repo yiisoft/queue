@@ -20,10 +20,15 @@ class QueueFactoryTest extends TestCase
     public function testRuntimeDefinitionSuccessful(): void
     {
         $queue = $this->createMock(QueueInterface::class);
-        $queue->expects(self::once())->method('withAdapter');
+        $queue
+            ->expects(self::once())
+            ->method('withAdapter');
 
         $adapter = $this->createMock(AdapterInterface::class);
-        $adapter->expects(self::once())->method('withChannel')->willReturn($adapter);
+        $adapter
+            ->expects(self::once())
+            ->method('withChannel')
+            ->willReturn($adapter);
 
         $factory = new QueueFactory(
             [],
@@ -87,7 +92,11 @@ class QueueFactoryTest extends TestCase
         $adapterNew = $this->createMock(AdapterInterface::class);
 
         $queue = $this->createMock(QueueInterface::class);
-        $queue->expects(self::once())->method('withAdapter')->with($adapterNew)->willReturn($queue);
+        $queue
+            ->expects(self::once())
+            ->method('withAdapter')
+            ->with($adapterNew)
+            ->willReturn($queue);
 
         $factory = new QueueFactory(
             ['test' => $adapterNew],
@@ -105,7 +114,11 @@ class QueueFactoryTest extends TestCase
         $adapterNew = $this->createMock(AdapterInterface::class);
 
         $queue = $this->createMock(QueueInterface::class);
-        $queue->expects(self::once())->method('withAdapter')->with($adapterNew)->willReturn($queue);
+        $queue
+            ->expects(self::once())
+            ->method('withAdapter')
+            ->with($adapterNew)
+            ->willReturn($queue);
 
         $factory = new QueueFactory(
             ['test' => $adapterNew],
