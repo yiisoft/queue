@@ -17,7 +17,6 @@ use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
-use Yiisoft\Yii\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Queue;

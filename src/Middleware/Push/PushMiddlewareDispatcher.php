@@ -16,7 +16,7 @@ final class PushMiddlewareDispatcher
      */
     private ?MiddlewarePushStack $stack = null;
     /**
-     * @var array[]|callable[]|string[]|MiddlewarePushInterface[]
+     * @var array[]|callable[]|MiddlewarePushInterface[]|string[]
      */
     private array $middlewareDefinitions;
 

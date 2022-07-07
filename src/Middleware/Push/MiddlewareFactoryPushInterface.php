@@ -14,7 +14,7 @@ interface MiddlewareFactoryPushInterface
     /**
      * Create a middleware based on definition provided.
      *
-     * @param callable|array|string|MiddlewarePushInterface $middlewareDefinition Middleware definition to use.
+     * @param array|callable|MiddlewarePushInterface|string $middlewareDefinition Middleware definition to use.
      *
      * @return MiddlewarePushInterface
      */
