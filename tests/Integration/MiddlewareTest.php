@@ -54,7 +54,6 @@ final class MiddlewareTest extends TestCase
             $this->createMock(LoopInterface::class),
             $this->createMock(LoggerInterface::class),
             $pushMiddlewareDispatcher,
-            new AdapterPushHandler(),
             new SynchronousAdapter(
                 $this->createMock(WorkerInterface::class),
                 $this->createMock(QueueInterface::class),

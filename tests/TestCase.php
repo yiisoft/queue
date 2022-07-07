@@ -107,7 +107,6 @@ abstract class TestCase extends BaseTestCase
             $this->getLoop(),
             new NullLogger(),
             $this->getPushMiddlewareDispatcher(),
-            new AdapterPushHandler(),
         );
     }
 

@@ -23,18 +23,19 @@ final class Queue implements QueueInterface
      * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
      */
     private array $middlewareDefinitions;
+    private AdapterPushHandler $adapterPushHandler;
 
     public function __construct(
         private WorkerInterface $worker,
         private LoopInterface $loop,
         private LoggerInterface $logger,
         private PushMiddlewareDispatcher $pushMiddlewareDispatcher,
-        private AdapterPushHandler $adapterPushHandler,
         private ?AdapterInterface $adapter = null,
         private string $channelName = QueueFactoryInterface::DEFAULT_CHANNEL_NAME,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
     ) {
         $this->middlewareDefinitions = $middlewareDefinitions;
+        $this->adapterPushHandler = new AdapterPushHandler();
     }
 
     public function getChannelName(): string
