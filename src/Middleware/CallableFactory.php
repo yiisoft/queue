@@ -66,10 +66,10 @@ final class CallableFactory
      * @param string $className
      * @param string $methodName
      *
-     * @return mixed
-     *
      * @throws ContainerExceptionInterface Error while retrieving the entry from container.
      * @throws NotFoundExceptionInterface
+     *
+     * @return mixed
      */
     private function fromDefinition(string $className, string $methodName): mixed
     {
