@@ -22,7 +22,7 @@ class InvalidCallableConfigurationException extends InvalidArgumentException imp
             - [object, method] array.
             - [class name, method] array.
             - [DI container service ID, method] array.
-            - DI container service ID string which references a class with the __invoke() method
+            - DI container service ID string which references a class with the `__invoke()` method
 
             If you are using a classname or an alias string to be passed to a DI container please check if it is properly configured in the DI container.
         SOLUTION;

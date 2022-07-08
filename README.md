@@ -210,7 +210,7 @@ For more details see [the guide](docs/guide/README.md).
 ## Middleware pipelines
 
 Any message pushed to a queue or consumed from it passes through two different middleware pipelines: one pipeline
-on message push and another - on message consume. The process is the same as for the http request, but it is executed
+on message push and another - on message consume. The process is the same as for the HTTP request, but it is executed
 twice for a queue message. That means you can add extra functionality on message pushing and consuming with configuration
 of the two classes: `PushMiddlewareDispatcher` and `ConsumeMiddlewareDispatcher` respectively.
 
@@ -222,7 +222,7 @@ You can use any of these formats to define a middleware:
 - A `callable`: `fn() => // do stuff`, `$object->foo(...)`, etc. It will be executed through the [yiisoft/injector](yiisoft/injector), so all the dependencies of your callable will be resolved
 - A string for your DI container to resolve the middleware, e.g. `FooMiddleware::class`
 
-The forward middleware execution will always be in the same order they are defined. I.e., if you define it like this:
+Middleware will be executed forwards in the same order they are defined. If you define it like the following:
 `[$middleware1, $midleware2]`, the execution will look like this:
 1. `$middleware1`
 1. `$middleware2`
@@ -232,8 +232,8 @@ The forward middleware execution will always be in the same order they are defin
 
 ### Push pipeline
 When you push a message, you can use middlewares to modify both message and queue adapter. 
-With message modifying you can add extra data, obfuscate data, collect metrics, etc.  
-With queue adapter modifying you can redirect message to another queue, delay message consuming, and so on.
+With message modification you can add extra data, obfuscate data, collect metrics, etc.  
+With queue adapter modification you can redirect message to another queue, delay message consuming, and so on.
 
 To use this feature you have to create a middleware class, which implements `MiddlewarePushInterface`, and
 return a modified `PushRequest` object from the `processPush` method:
