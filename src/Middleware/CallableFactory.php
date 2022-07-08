@@ -38,7 +38,8 @@ final class CallableFactory
     {
         $callable = null;
 
-        if (is_string($definition)) {
+        if (is_string($definition) && $this->container->has($definition)) {
+            // Object with an __invoke() method
             $callable = $this->container->get($definition);
         }
 
