@@ -6,6 +6,7 @@ namespace Yiisoft\Yii\Queue\Middleware;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use ReflectionMethod;
 
@@ -35,8 +36,24 @@ final class CallableFactory
      */
     public function create(mixed $definition): callable
     {
-        /** @var mixed */
-        $callable = $this->prepare($definition);
+        $callable = null;
+
+        if (is_string($definition)) {
+            $callable = $this->container->get($definition);
+        }
+
+        if (is_array($definition)
+            && array_keys($definition) === [0, 1]
+            && is_string($definition[0])
+            && is_string($definition[1])
+        ) {
+            [$className, $methodName] = $definition;
+            $callable = $this->fromDefinition($className, $methodName);
+        }
+
+        if ($callable === null) {
+            $callable = $definition;
+        }
 
         if (is_callable($callable)) {
             return $callable;
@@ -46,54 +63,44 @@ final class CallableFactory
     }
 
     /**
-     * @param mixed $definition
-     *
-     * @throws ContainerExceptionInterface Error while retrieving the entry from container.
+     * @param string $className
+     * @param string $methodName
      *
      * @return mixed
+     *
+     * @throws ContainerExceptionInterface Error while retrieving the entry from container.
+     * @throws NotFoundExceptionInterface
      */
-    private function prepare(mixed $definition): mixed
+    private function fromDefinition(string $className, string $methodName): mixed
     {
-        if (is_string($definition) && $this->container->has($definition)) {
-            return $this->container->get($definition);
+        if (!class_exists($className) && $this->container->has($className)) {
+            return [
+                $this->container->get($className),
+                $methodName,
+            ];
         }
 
-        if (is_array($definition)
-            && array_keys($definition) === [0, 1]
-            && is_string($definition[0])
-            && is_string($definition[1])
-        ) {
-            [$className, $methodName] = $definition;
-
-            if (!class_exists($className) && $this->container->has($className)) {
-                /** @var mixed */
-                return [
-                    $this->container->get($className),
-                    $methodName,
-                ];
-            }
-
-            if (!class_exists($className)) {
-                return null;
-            }
-
-            try {
-                $reflection = new ReflectionMethod($className, $methodName);
-            } catch (ReflectionException) {
-                return null;
-            }
-            if ($reflection->isStatic()) {
-                return [$className, $methodName];
-            }
-            if ($this->container->has($className)) {
-                return [
-                    $this->container->get($className),
-                    $methodName,
-                ];
-            }
+        if (!class_exists($className)) {
             return null;
         }
 
-        return $definition;
+        try {
+            $reflection = new ReflectionMethod($className, $methodName);
+        } catch (ReflectionException) {
+            return null;
+        }
+
+        if ($reflection->isStatic()) {
+            return [$className, $methodName];
+        }
+
+        if ($this->container->has($className)) {
+            return [
+                $this->container->get($className),
+                $methodName,
+            ];
+        }
+
+        return null;
     }
 }
