@@ -67,41 +67,33 @@ final class CallableFactory
      * @param string $className
      * @param string $methodName
      *
+     * @return callable|null
+     *
      * @throws ContainerExceptionInterface Error while retrieving the entry from container.
      * @throws NotFoundExceptionInterface
-     *
-     * @return mixed
      */
-    private function fromDefinition(string $className, string $methodName): mixed
+    private function fromDefinition(string $className, string $methodName): ?callable
     {
-        if (!class_exists($className) && $this->container->has($className)) {
-            return [
+        $result = null;
+
+        if (class_exists($className)) {
+            try {
+                $reflection = new ReflectionMethod($className, $methodName);
+                if ($reflection->isStatic()) {
+                    $result = [$className, $methodName];
+                }
+            } catch (ReflectionException) {
+            }
+
+        }
+
+        if ($result === null && $this->container->has($className)) {
+            $result = [
                 $this->container->get($className),
                 $methodName,
             ];
         }
 
-        if (!class_exists($className)) {
-            return null;
-        }
-
-        try {
-            $reflection = new ReflectionMethod($className, $methodName);
-        } catch (ReflectionException) {
-            return null;
-        }
-
-        if ($reflection->isStatic()) {
-            return [$className, $methodName];
-        }
-
-        if ($this->container->has($className)) {
-            return [
-                $this->container->get($className),
-                $methodName,
-            ];
-        }
-
-        return null;
+        return is_callable($result) ? $result : null;
     }
 }
