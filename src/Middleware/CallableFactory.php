@@ -67,10 +67,10 @@ final class CallableFactory
      * @param string $className
      * @param string $methodName
      *
-     * @return callable|null
-     *
      * @throws ContainerExceptionInterface Error while retrieving the entry from container.
      * @throws NotFoundExceptionInterface
+     *
+     * @return callable|null
      */
     private function fromDefinition(string $className, string $methodName): ?callable
     {
@@ -84,7 +84,6 @@ final class CallableFactory
                 }
             } catch (ReflectionException) {
             }
-
         }
 
         if ($result === null && $this->container->has($className)) {
