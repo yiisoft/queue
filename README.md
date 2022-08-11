@@ -244,7 +244,7 @@ To use this feature you have to create a middleware class, which implements `Mid
 return a modified `PushRequest` object from the `processPush` method:
 
 ```php
-return $pushRequest->withMessage($newMessage)->withAdapter($newADapter);
+return $pushRequest->withMessage($newMessage)->withAdapter($newAdapter);
 ```
 
 With push middlewares you can define an adapter object at the runtime, not in the `Queue` constructor.
