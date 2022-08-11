@@ -9,11 +9,11 @@ class SignalLoop implements LoopInterface
     use SoftLimitTrait;
 
     /** @psalm-suppress UndefinedConstant */
-    protected const SIGNALS_EXIT = [\SIGHUP, \SIGINT, \SIGTERM];
+    protected const SIGNALS_EXIT = [SIGHUP, SIGINT, SIGTERM];
     /** @psalm-suppress UndefinedConstant */
-    protected const SIGNALS_SUSPEND = [\SIGTSTP];
+    protected const SIGNALS_SUSPEND = [SIGTSTP];
     /** @psalm-suppress UndefinedConstant */
-    protected const SIGNALS_RESUME = [\SIGCONT];
+    protected const SIGNALS_RESUME = [SIGCONT];
 
     protected int $memorySoftLimit;
     protected bool $pause = false;

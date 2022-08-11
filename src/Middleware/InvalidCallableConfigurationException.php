@@ -7,7 +7,7 @@ namespace Yiisoft\Yii\Queue\Middleware;
 use InvalidArgumentException;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 
-class InvalidCallableConfigurationException extends InvalidArgumentException implements FriendlyExceptionInterface
+final class InvalidCallableConfigurationException extends InvalidArgumentException implements FriendlyExceptionInterface
 {
     public function getName(): string
     {
