@@ -16,19 +16,6 @@ return [
     ],
     'yiisoft/yii-queue' => [
         'handlers' => [],
-        'channel-definitions' => [
-            'some-channel' => static fn (AdapterInterface $a): AdapterInterface => $a
-                ->withChannel('some-channel')
-                ->withPushMiddleware(SomeMiddleware::class)
-                ->withConsumeMiddleware(AnotherMiddleware::class),
-            'another-channel' => [
-                'class' => SynchronousAdapter::class,
-                '__construct()' => [
-                    'channel' => 'another-channel',
-                ],
-                'withPushMiddleware()' => [SomeMiddleware::class],
-                'withConsumeMiddlewares()' => [AnotherMiddleware::class],
-            ],
-        ],
+        'channel-definitions' => [],
     ],
 ];
