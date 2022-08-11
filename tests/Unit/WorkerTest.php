@@ -194,7 +194,7 @@ final class WorkerTest extends TestCase
             $logger,
             new Injector($container),
             $container,
-            new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class), null)
+            new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class))
         );
     }
 }

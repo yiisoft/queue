@@ -183,7 +183,6 @@ abstract class TestCase extends BaseTestCase
                 $this->getContainer(),
                 new CallableFactory($this->getContainer()),
             ),
-            new SimpleEventDispatcher(),
         );
     }
 
@@ -194,7 +193,6 @@ abstract class TestCase extends BaseTestCase
                 $this->getContainer(),
                 new CallableFactory($this->getContainer()),
             ),
-            new SimpleEventDispatcher(),
         );
     }
 }
