@@ -6,22 +6,16 @@ namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
-use RuntimeException;
 use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Test\Support\EventDispatcher\SimpleEventDispatcher;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\Consume\Event\AfterConsumeMiddleware;
-use Yiisoft\Yii\Queue\Middleware\Consume\Event\BeforeConsumeMiddleware;
-use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
-use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
+use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
 use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\FailMiddleware;
 use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware;
 use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\TestMiddleware;
 
@@ -95,55 +89,6 @@ final class MiddlewareDispatcherTest extends TestCase
         $this->assertSame('first', $request->getMessage()->getData());
     }
 
-    public function testEventsAreDispatched(): void
-    {
-        $eventDispatcher = new SimpleEventDispatcher();
-        $request = $this->getConsumeRequest();
-
-        $middleware1 = static function (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest {
-            return $handler->handleConsume($request);
-        };
-        $middleware2 = static function (ConsumeRequest $request): ConsumeRequest {
-            return $request;
-        };
-
-        $dispatcher = $this->createDispatcher(null, $eventDispatcher)->withMiddlewares([$middleware1, $middleware2]);
-        $dispatcher->dispatch($request, $this->getRequestHandler());
-
-        $this->assertEquals(
-            [
-                BeforeConsumeMiddleware::class,
-                BeforeConsumeMiddleware::class,
-                AfterConsumeMiddleware::class,
-                AfterConsumeMiddleware::class,
-            ],
-            $eventDispatcher->getEventClasses()
-        );
-    }
-
-    public function testEventsAreDispatchedWhenMiddlewareFailedWithException(): void
-    {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Middleware failed.');
-
-        $request = $this->getConsumeRequest();
-        $eventDispatcher = new SimpleEventDispatcher();
-        $middleware = static fn () => new FailMiddleware();
-        $dispatcher = $this->createDispatcher(null, $eventDispatcher)->withMiddlewares([$middleware]);
-
-        try {
-            $dispatcher->dispatch($request, $this->getRequestHandler());
-        } finally {
-            $this->assertEquals(
-                [
-                    BeforeConsumeMiddleware::class,
-                    AfterConsumeMiddleware::class,
-                ],
-                $eventDispatcher->getEventClasses()
-            );
-        }
-    }
-
     public function dataHasMiddlewares(): array
     {
         return [
@@ -202,14 +147,12 @@ final class MiddlewareDispatcherTest extends TestCase
 
     private function createDispatcher(
         ContainerInterface $container = null,
-        ?EventDispatcherInterface $eventDispatcher = null
     ): ConsumeMiddlewareDispatcher {
         $container = $container ?? $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
         $callableFactory = new CallableFactory($container);
 
         return new ConsumeMiddlewareDispatcher(
             new MiddlewareFactoryConsume($container, $callableFactory),
-            $eventDispatcher
         );
     }
 

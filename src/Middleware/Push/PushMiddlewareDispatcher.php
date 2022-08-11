@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Middleware\Push;
 
 use Closure;
-use Psr\EventDispatcher\EventDispatcherInterface;
 
 final class PushMiddlewareDispatcher
 {
@@ -22,7 +21,6 @@ final class PushMiddlewareDispatcher
 
     public function __construct(
         private MiddlewareFactoryPushInterface $middlewareFactory,
-        private ?EventDispatcherInterface $eventDispatcher,
         array|callable|string|MiddlewarePushInterface ...$middlewareDefinitions,
     ) {
         $this->middlewareDefinitions = array_reverse($middlewareDefinitions);
@@ -39,7 +37,7 @@ final class PushMiddlewareDispatcher
         MessageHandlerPushInterface $finishHandler
     ): PushRequest {
         if ($this->stack === null) {
-            $this->stack = new MiddlewarePushStack($this->buildMiddlewares(), $finishHandler, $this->eventDispatcher);
+            $this->stack = new MiddlewarePushStack($this->buildMiddlewares(), $finishHandler);
         }
 
         return $this->stack->handlePush($request);

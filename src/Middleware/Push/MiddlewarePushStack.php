@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Middleware\Push;
 
 use Closure;
-use Psr\EventDispatcher\EventDispatcherInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\Event\AfterPushMiddleware;
-use Yiisoft\Yii\Queue\Middleware\Push\Event\BeforePushMiddleware;
 
 final class MiddlewarePushStack implements MessageHandlerPushInterface
 {
@@ -22,13 +19,11 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
     /**
      * @param Closure[] $middlewares Middlewares.
      * @param MessageHandlerPushInterface $finishHandler Fallback handler
-     * @param EventDispatcherInterface|null $dispatcher Event dispatcher to use for triggering before/after middleware
      * events.
      */
     public function __construct(
         private array $middlewares,
         private MessageHandlerPushInterface $finishHandler,
-        private ?EventDispatcherInterface $dispatcher = null,
     ) {
     }
 
@@ -58,13 +53,12 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
      */
     private function wrap(Closure $middlewareFactory, MessageHandlerPushInterface $handler): MessageHandlerPushInterface
     {
-        return new class ($middlewareFactory, $handler, $this->dispatcher) implements MessageHandlerPushInterface {
+        return new class ($middlewareFactory, $handler) implements MessageHandlerPushInterface {
             private ?MiddlewarePushInterface $middleware = null;
 
             public function __construct(
                 private Closure $middlewareFactory,
                 private MessageHandlerPushInterface $handler,
-                private ?EventDispatcherInterface $dispatcher
             ) {
             }
 
@@ -74,13 +68,7 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
                     $this->middleware = ($this->middlewareFactory)();
                 }
 
-                $this->dispatcher?->dispatch(new BeforePushMiddleware($this->middleware, $request));
-
-                try {
-                    return $request = $this->middleware->processPush($request, $this->handler);
-                } finally {
-                    $this->dispatcher?->dispatch(new AfterPushMiddleware($this->middleware, $request));
-                }
+                return $this->middleware->processPush($request, $this->handler);
             }
         };
     }

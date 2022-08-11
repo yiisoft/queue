@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Middleware\Consume;
 
 use Closure;
-use Psr\EventDispatcher\EventDispatcherInterface;
-use Yiisoft\Yii\Queue\Middleware\Consume\Event\AfterConsumeMiddleware;
-use Yiisoft\Yii\Queue\Middleware\Consume\Event\BeforeConsumeMiddleware;
 
 final class MiddlewareConsumeStack implements MessageHandlerConsumeInterface
 {
@@ -22,13 +19,11 @@ final class MiddlewareConsumeStack implements MessageHandlerConsumeInterface
     /**
      * @param Closure[] $middlewares Middlewares.
      * @param MessageHandlerConsumeInterface $finishHandler Fallback handler
-     * @param EventDispatcherInterface|null $dispatcher Event dispatcher to use for triggering before/after middleware
      * events.
      */
     public function __construct(
         private array $middlewares,
         private MessageHandlerConsumeInterface $finishHandler,
-        private ?EventDispatcherInterface $dispatcher = null,
     ) {
     }
 
@@ -58,13 +53,12 @@ final class MiddlewareConsumeStack implements MessageHandlerConsumeInterface
      */
     private function wrap(Closure $middlewareFactory, MessageHandlerConsumeInterface $handler): MessageHandlerConsumeInterface
     {
-        return new class ($middlewareFactory, $handler, $this->dispatcher) implements MessageHandlerConsumeInterface {
+        return new class ($middlewareFactory, $handler) implements MessageHandlerConsumeInterface {
             private ?MiddlewareConsumeInterface $middleware = null;
 
             public function __construct(
                 private Closure $middlewareFactory,
                 private MessageHandlerConsumeInterface $handler,
-                private ?EventDispatcherInterface $dispatcher
             ) {
             }
 
@@ -74,13 +68,7 @@ final class MiddlewareConsumeStack implements MessageHandlerConsumeInterface
                     $this->middleware = ($this->middlewareFactory)();
                 }
 
-                $this->dispatcher?->dispatch(new BeforeConsumeMiddleware($this->middleware, $request));
-
-                try {
-                    return $request = $this->middleware->processConsume($request, $this->handler);
-                } finally {
-                    $this->dispatcher?->dispatch(new AfterConsumeMiddleware($this->middleware, $request));
-                }
+                return $this->middleware->processConsume($request, $this->handler);
             }
         };
     }

@@ -6,21 +6,15 @@ namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Push;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
-use RuntimeException;
 use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Test\Support\EventDispatcher\SimpleEventDispatcher;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\Push\Event\AfterPushMiddleware;
-use Yiisoft\Yii\Queue\Middleware\Push\Event\BeforePushMiddleware;
 use Yiisoft\Yii\Queue\Middleware\Push\MessageHandlerPushInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Push\PushRequest;
 use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Push\Support\FailMiddleware;
 use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Push\Support\TestCallableMiddleware;
 use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Push\Support\TestMiddleware;
 
@@ -109,55 +103,6 @@ final class MiddlewareDispatcherTest extends TestCase
         $this->assertSame('first', $request->getMessage()->getData());
     }
 
-    public function testEventsAreDispatched(): void
-    {
-        $eventDispatcher = new SimpleEventDispatcher();
-        $request = $this->getPushRequest();
-
-        $middleware1 = static function (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest {
-            return $handler->handlePush($request);
-        };
-        $middleware2 = static function (PushRequest $request): PushRequest {
-            return $request;
-        };
-
-        $dispatcher = $this->createDispatcher(null, $eventDispatcher)->withMiddlewares([$middleware1, $middleware2]);
-        $dispatcher->dispatch($request, $this->getRequestHandler());
-
-        $this->assertEquals(
-            [
-                BeforePushMiddleware::class,
-                BeforePushMiddleware::class,
-                AfterPushMiddleware::class,
-                AfterPushMiddleware::class,
-            ],
-            $eventDispatcher->getEventClasses()
-        );
-    }
-
-    public function testEventsAreDispatchedWhenMiddlewareFailedWithException(): void
-    {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Middleware failed.');
-
-        $request = $this->getPushRequest();
-        $eventDispatcher = new SimpleEventDispatcher();
-        $middleware = static fn () => new FailMiddleware();
-        $dispatcher = $this->createDispatcher(null, $eventDispatcher)->withMiddlewares([$middleware]);
-
-        try {
-            $dispatcher->dispatch($request, $this->getRequestHandler());
-        } finally {
-            $this->assertEquals(
-                [
-                    BeforePushMiddleware::class,
-                    AfterPushMiddleware::class,
-                ],
-                $eventDispatcher->getEventClasses()
-            );
-        }
-    }
-
     public function dataHasMiddlewares(): array
     {
         return [
@@ -216,14 +161,12 @@ final class MiddlewareDispatcherTest extends TestCase
 
     private function createDispatcher(
         ContainerInterface $container = null,
-        ?EventDispatcherInterface $eventDispatcher = null
     ): PushMiddlewareDispatcher {
         $container = $container ?? $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
         $callableFactory = new CallableFactory($container);
 
         return new PushMiddlewareDispatcher(
             new MiddlewareFactoryPush($container, $callableFactory),
-            $eventDispatcher
         );
     }
 

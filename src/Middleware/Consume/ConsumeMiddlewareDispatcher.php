@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Middleware\Consume;
 
 use Closure;
-use Psr\EventDispatcher\EventDispatcherInterface;
 
 final class ConsumeMiddlewareDispatcher
 {
@@ -23,7 +22,6 @@ final class ConsumeMiddlewareDispatcher
 
     public function __construct(
         private MiddlewareFactoryConsumeInterface $middlewareFactory,
-        private ?EventDispatcherInterface $eventDispatcher,
         array|callable|string|MiddlewareConsumeInterface ...$middlewareDefinitions,
     ) {
         $this->middlewareDefinitions = array_reverse($middlewareDefinitions);
@@ -40,7 +38,7 @@ final class ConsumeMiddlewareDispatcher
         MessageHandlerConsumeInterface $finishHandler
     ): ConsumeRequest {
         if ($this->stack === null) {
-            $this->stack = new MiddlewareConsumeStack($this->buildMiddlewares(), $finishHandler, $this->eventDispatcher);
+            $this->stack = new MiddlewareConsumeStack($this->buildMiddlewares(), $finishHandler);
         }
 
         return $this->stack->handleConsume($request);

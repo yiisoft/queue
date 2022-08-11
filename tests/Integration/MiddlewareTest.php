@@ -6,7 +6,6 @@ namespace Yiisoft\Yii\Queue\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
@@ -44,7 +43,6 @@ final class MiddlewareTest extends TestCase
                     $this->createMock(ContainerInterface::class)
                 ),
             ),
-            $this->createMock(EventDispatcherInterface::class),
             new TestMiddleware('common 1'),
             new TestMiddleware('common 2'),
         );
@@ -84,7 +82,6 @@ final class MiddlewareTest extends TestCase
                     $this->createMock(ContainerInterface::class)
                 ),
             ),
-            $this->createMock(EventDispatcherInterface::class),
             new TestMiddleware('common 1'),
             new TestMiddleware('common 2'),
         );
