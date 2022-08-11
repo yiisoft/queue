@@ -224,11 +224,16 @@ You can use any of these formats to define a middleware:
 
 Middleware will be executed forwards in the same order they are defined. If you define it like the following:
 `[$middleware1, $midleware2]`, the execution will look like this:
-1. `$middleware1`
-1. `$middleware2`
-1. push to a queue server *OR* handle on consume
-1. `$middleware2`
-1. `$middleware1`
+```mermaid
+graph LR
+    StartPush((Start)) --> PushMiddleware1[$middleware1] --> PushMiddleware2[$middleware2] --> Push(Push to a queue)
+    -.-> PushMiddleware2[$middleware2] -.-> PushMiddleware1[$middleware1]
+    PushMiddleware1[$middleware1] -.-> EndPush((End))
+    
+
+    StartConsume((Start)) --> ConsumeMiddleware1[$middleware1] --> ConsumeMiddleware2[$middleware2] --> Consume(Consume / handle)
+    -.-> ConsumeMiddleware2[$middleware2] -.-> ConsumeMiddleware1[$middleware1]
+    ConsumeMiddleware1[$middleware1] -.-> EndConsume((End))
 
 ### Push pipeline
 When you push a message, you can use middlewares to modify both message and queue adapter. 
