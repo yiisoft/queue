@@ -234,6 +234,7 @@ graph LR
     StartConsume((Start)) --> ConsumeMiddleware1[$middleware1] --> ConsumeMiddleware2[$middleware2] --> Consume(Consume / handle)
     -.-> ConsumeMiddleware2[$middleware2] -.-> ConsumeMiddleware1[$middleware1]
     ConsumeMiddleware1[$middleware1] -.-> EndConsume((End))
+```
 
 ### Push pipeline
 When you push a message, you can use middlewares to modify both message and queue adapter. 
