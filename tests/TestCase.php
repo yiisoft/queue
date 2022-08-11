@@ -11,7 +11,6 @@ use Psr\Log\NullLogger;
 use RuntimeException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Test\Support\EventDispatcher\SimpleEventDispatcher;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
