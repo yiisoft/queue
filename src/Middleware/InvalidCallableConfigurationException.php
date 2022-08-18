@@ -11,7 +11,7 @@ final class InvalidCallableConfigurationException extends InvalidArgumentExcepti
 {
     public function getName(): string
     {
-        return 'Invalid event listener configuration.';
+        return 'Invalid callable configuration.';
     }
 
     public function getSolution(): ?string
