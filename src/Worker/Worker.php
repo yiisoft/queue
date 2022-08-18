@@ -39,9 +39,9 @@ final class Worker implements WorkerInterface
      * @param MessageInterface $message
      * @param QueueInterface $queue
      *
-     * @return MessageInterface
-     *
      * @throws Throwable
+     *
+     * @return MessageInterface
      */
     public function process(MessageInterface $message, QueueInterface $queue): MessageInterface
     {
