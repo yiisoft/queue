@@ -11,6 +11,7 @@ use Yiisoft\Yii\Queue\Message\MessageInterface;
 final class FakeAdapter implements AdapterInterface
 {
     public array $pushMessages = [];
+    public string $channel = 'default';
 
     public function push(MessageInterface $message): void
     {
@@ -34,6 +35,10 @@ final class FakeAdapter implements AdapterInterface
 
     public function withChannel(string $channel): AdapterInterface
     {
-        //skip
+        $instance = clone $this;
+        $instance->pushMessages = [];
+        $instance->channel = $channel;
+
+        return $instance;
     }
 }

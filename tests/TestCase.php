@@ -11,10 +11,15 @@ use Psr\Log\NullLogger;
 use RuntimeException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Yii\Queue\Cli\LoopInterface;
-use Yiisoft\Yii\Queue\Cli\SimpleLoop;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Adapter\SynchronousAdapter;
+use Yiisoft\Yii\Queue\Cli\LoopInterface;
+use Yiisoft\Yii\Queue\Cli\SimpleLoop;
+use Yiisoft\Yii\Queue\Middleware\CallableFactory;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
+use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
+use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\Worker\Worker;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
@@ -98,7 +103,8 @@ abstract class TestCase extends BaseTestCase
         return new Queue(
             $this->getWorker(),
             $this->getLoop(),
-            new NullLogger()
+            new NullLogger(),
+            $this->getPushMiddlewareDispatcher(),
         );
     }
 
@@ -122,7 +128,8 @@ abstract class TestCase extends BaseTestCase
             $this->getMessageHandlers(),
             new NullLogger(),
             new Injector($this->getContainer()),
-            $this->getContainer()
+            $this->getContainer(),
+            $this->getConsumeMiddlewareDispatcher(),
         );
     }
 
@@ -166,5 +173,25 @@ abstract class TestCase extends BaseTestCase
     protected function needsRealAdapter(): bool
     {
         return false;
+    }
+
+    protected function getPushMiddlewareDispatcher()
+    {
+        return new PushMiddlewareDispatcher(
+            new MiddlewareFactoryPush(
+                $this->getContainer(),
+                new CallableFactory($this->getContainer()),
+            ),
+        );
+    }
+
+    protected function getConsumeMiddlewareDispatcher()
+    {
+        return new ConsumeMiddlewareDispatcher(
+            new MiddlewareFactoryConsume(
+                $this->getContainer(),
+                new CallableFactory($this->getContainer()),
+            ),
+        );
     }
 }

@@ -184,23 +184,6 @@ in the `$definitions`.
 > Warning: This strategy is not recommended as it does not give you any protection against typos and mistakes
 > in channel names.
 
-## Adapter behaviors
-
-Some of queue adapters support different behaviors like delayed execution and prioritized queues.
-
-**Important:** Not every adapter supports all the behaviors. See concrete adapter documentation to find out if
-it supports the behavior you want to use. Adapter will throw a `BehaviorNotSupportedException` if it does not support
-some behaviors attached to the message you are trying to push to the queue.
-
-### Delay behavior
-
-To be sure message will be read from queue not earlier then 5 seconds since it will be pushed to the queue, you can use `DelayBehavior`:
-
-```php
-$message->attachBehavior(new DelayBehavior(5));
-$queue->push($message);
-```
-
 ## Console execution
 
 The exact way of task execution depends on the adapter used. Most adapters can be run using
@@ -223,6 +206,62 @@ See the documentation for more details about adapter specific console commands a
 The component also has the ability to track the status of a job which was pushed into queue.
 
 For more details see [the guide](docs/guide/README.md).
+
+## Middleware pipelines
+
+Any message pushed to a queue or consumed from it passes through two different middleware pipelines: one pipeline
+on message push and another - on message consume. The process is the same as for the HTTP request, but it is executed
+twice for a queue message. That means you can add extra functionality on message pushing and consuming with configuration
+of the two classes: `PushMiddlewareDispatcher` and `ConsumeMiddlewareDispatcher` respectively.
+
+You can use any of these formats to define a middleware:
+- A ready-to-use middleware object: `new FooMiddleware()`. It must implement either `MiddlewarePushInterface`,
+    or `MiddlewareConsumeInterface` depending on the place you use it.
+- An array in the format of [yiisoft/definitions](https://github.com/yiisoft/definitions).
+    **Only if you use yiisoft/definitions and yiisoft/di**.
+- A `callable`: `fn() => // do stuff`, `$object->foo(...)`, etc. It will be executed through the [yiisoft/injector](yiisoft/injector), so all the dependencies of your callable will be resolved
+- A string for your DI container to resolve the middleware, e.g. `FooMiddleware::class`
+
+Middleware will be executed forwards in the same order they are defined. If you define it like the following:
+`[$middleware1, $midleware2]`, the execution will look like this:
+```mermaid
+graph LR
+    StartPush((Start)) --> PushMiddleware1[$middleware1] --> PushMiddleware2[$middleware2] --> Push(Push to a queue)
+    -.-> PushMiddleware2[$middleware2] -.-> PushMiddleware1[$middleware1]
+    PushMiddleware1[$middleware1] -.-> EndPush((End))
+    
+
+    StartConsume((Start)) --> ConsumeMiddleware1[$middleware1] --> ConsumeMiddleware2[$middleware2] --> Consume(Consume / handle)
+    -.-> ConsumeMiddleware2[$middleware2] -.-> ConsumeMiddleware1[$middleware1]
+    ConsumeMiddleware1[$middleware1] -.-> EndConsume((End))
+```
+
+### Push pipeline
+When you push a message, you can use middlewares to modify both message and queue adapter. 
+With message modification you can add extra data, obfuscate data, collect metrics, etc.  
+With queue adapter modification you can redirect message to another queue, delay message consuming, and so on.
+
+To use this feature you have to create a middleware class, which implements `MiddlewarePushInterface`, and
+return a modified `PushRequest` object from the `processPush` method:
+
+```php
+return $pushRequest->withMessage($newMessage)->withAdapter($newAdapter);
+```
+
+With push middlewares you can define an adapter object at the runtime, not in the `Queue` constructor.
+There is a restriction: by the time all middlewares are executed in the forward order, the adapter must be specified
+in the `PushRequest` object. You will get a `AdapterNotConfiguredException`, if it isn't.
+
+You have two places to define push middlewares:
+1. `PushMiddlewareDispatcher`. You can pass it either to the constructor, or to the `withMiddlewares()` method, which  
+    creates a completely new dispatcher object with only those middlewares, which are passed as arguments.
+2. Put middlewares into the `Queue::push()` method like this: `$queue->push($message, ...$middlewares)`. These middlewares will always be executed after those which are in the `PushMiddlewareDispatcher`.
+
+### Consume pipeline
+
+You can set a middleware pipeline for a message when it will be consumed from a queue server. This is useful to collect metrics, modify message data, etc. In pair with a Push middleware you can deduplicate messages in the queue, calculate time from push to consume, handle errors (push to a queue again, redirect failed message to another queue, send a notification, etc.). Unless Push pipeline, you have only one place to define the middleware stack: in the `ConsumeMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method.
+
+## Extra
 
 ### Unit testing
 

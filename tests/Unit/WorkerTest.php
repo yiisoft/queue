@@ -12,6 +12,8 @@ use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Yii\Queue\Exception\JobFailureException;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
+use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\App\FakeHandler;
 use Yiisoft\Yii\Queue\Tests\TestCase;
@@ -191,7 +193,8 @@ final class WorkerTest extends TestCase
             $handlers,
             $logger,
             new Injector($container),
-            $container
+            $container,
+            new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class))
         );
     }
 }

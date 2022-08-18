@@ -9,6 +9,7 @@ use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\MiddlewarePushInterface;
 
 /**
  * @internal Please don't use this interface. It is only used here to make tests simpler and will be removed
@@ -20,10 +21,13 @@ interface QueueInterface
      * Pushes a message into the queue.
      *
      * @param MessageInterface $message
+     * @param array|callable|MiddlewarePushInterface|string ...$middlewareDefinitions
      *
      * @throws BehaviorNotSupportedException
+     *
+     * @return MessageInterface
      */
-    public function push(MessageInterface $message): void;
+    public function push(MessageInterface $message, MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): MessageInterface;
 
     /**
      * Execute all existing jobs and exit

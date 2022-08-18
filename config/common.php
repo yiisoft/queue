@@ -6,6 +6,10 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Cli\SignalLoop;
 use Yiisoft\Yii\Queue\Cli\SimpleLoop;
+use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
+use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueFactory;
 use Yiisoft\Yii\Queue\QueueFactoryInterface;
@@ -31,4 +35,6 @@ return [
         '__construct()' => ['channelConfiguration' => $params['yiisoft/yii-queue']['channel-definitions']],
     ],
     QueueInterface::class => Queue::class,
+    MiddlewareFactoryPushInterface::class => MiddlewareFactoryPush::class,
+    MiddlewareFactoryConsumeInterface::class => MiddlewareFactoryConsume::class,
 ];
