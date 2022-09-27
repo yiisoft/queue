@@ -22,15 +22,12 @@ interface AdapterInterface
      * @param string $id ID of a job message.
      *
      * @throws InvalidArgumentException When there is no such id in the adapter.
-     *
-     * @return JobStatus
      */
     public function status(string $id): JobStatus;
 
     /**
      * Pushing a message to the queue. Adapter sets message ID if available.
      *
-     * @param MessageInterface $message
      *
      * @throws BehaviorNotSupportedException Adapter may throw exception when it does not support all the attached behaviors.
      */

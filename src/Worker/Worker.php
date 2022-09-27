@@ -36,12 +36,8 @@ final class Worker implements WorkerInterface
     }
 
     /**
-     * @param MessageInterface $message
-     * @param QueueInterface $queue
-     *
      * @throws Throwable
      *
-     * @return MessageInterface
      */
     public function process(MessageInterface $message, QueueInterface $queue): MessageInterface
     {
@@ -80,8 +76,6 @@ final class Worker implements WorkerInterface
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     *
-     * @return callable|null
      */
     private function prepare(callable|object|array|string|null $definition): callable|null
     {

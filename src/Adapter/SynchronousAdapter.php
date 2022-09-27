@@ -17,22 +17,10 @@ final class SynchronousAdapter implements AdapterInterface
     private const BEHAVIORS_AVAILABLE = [];
 
     private array $messages = [];
-    private WorkerInterface $worker;
-    private QueueInterface $queue;
     private int $current = 0;
-    private ?BehaviorChecker $behaviorChecker;
-    private string $channel;
 
-    public function __construct(
-        WorkerInterface $worker,
-        QueueInterface $queue,
-        string $channel = QueueFactory::DEFAULT_CHANNEL_NAME,
-        ?BehaviorChecker $behaviorChecker = null
-    ) {
-        $this->worker = $worker;
-        $this->queue = $queue;
-        $this->channel = $channel;
-        $this->behaviorChecker = $behaviorChecker;
+    public function __construct(private WorkerInterface $worker, private QueueInterface $queue, private string $channel = QueueFactory::DEFAULT_CHANNEL_NAME, private ?\Yiisoft\Yii\Queue\Adapter\BehaviorChecker $behaviorChecker = null)
+    {
     }
 
     public function __destruct()

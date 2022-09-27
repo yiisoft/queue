@@ -42,9 +42,6 @@ final class BehaviorCheckerTest extends TestCase
 
     /**
      * @dataProvider checkPassProvider
-     *
-     * @param array $current
-     * @param array $available
      */
     public function testCheckPass(array $current, array $available): void
     {
@@ -73,9 +70,6 @@ final class BehaviorCheckerTest extends TestCase
 
     /**
      * @dataProvider checkFailProvider
-     *
-     * @param array $current
-     * @param array $available
      */
     public function testCheckFail(array $current, array $available): void
     {

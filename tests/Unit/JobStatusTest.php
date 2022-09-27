@@ -41,10 +41,6 @@ final class JobStatusTest extends TestCase
 
     /**
      * @dataProvider getStatusPairs
-     *
-     * @param string $statusName
-     * @param string $positiveMethod
-     * @param array $negatives
      */
     public function testInstanceValue(string $statusName, string $positiveMethod, array $negatives): void
     {

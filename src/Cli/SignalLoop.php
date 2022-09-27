@@ -14,8 +14,6 @@ class SignalLoop implements LoopInterface
     protected const SIGNALS_SUSPEND = [SIGTSTP];
     /** @psalm-suppress UndefinedConstant */
     protected const SIGNALS_RESUME = [SIGCONT];
-
-    protected int $memorySoftLimit;
     protected bool $pause = false;
     protected bool $exit = false;
 
@@ -23,10 +21,8 @@ class SignalLoop implements LoopInterface
      * @param int $memorySoftLimit Soft RAM limit in bytes. The loop won't let you continue to execute the program if
      *     soft limit is reached. Zero means no limit.
      */
-    public function __construct(int $memorySoftLimit = 0)
+    public function __construct(protected int $memorySoftLimit = 0)
     {
-        $this->memorySoftLimit = $memorySoftLimit;
-
         foreach (self::SIGNALS_EXIT as $signal) {
             pcntl_signal($signal, fn () => $this->exit = true);
         }

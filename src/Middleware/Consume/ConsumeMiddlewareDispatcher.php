@@ -61,8 +61,6 @@ final class ConsumeMiddlewareDispatcher
      * typed parameters are automatically injected using dependency injection container.
      * Current request and handler could be obtained by type-hinting for {@see ServerRequestInterface}
      * and {@see RequestHandlerInterface}.
-     *
-     * @return self
      */
     public function withMiddlewares(array $middlewareDefinitions): self
     {
