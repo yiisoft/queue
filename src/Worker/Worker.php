@@ -37,7 +37,6 @@ final class Worker implements WorkerInterface
 
     /**
      * @throws Throwable
-     *
      */
     public function process(MessageInterface $message, QueueInterface $queue): MessageInterface
     {

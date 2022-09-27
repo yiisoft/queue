@@ -26,7 +26,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static fn(PushRequest $request, AdapterInterface $adapter): PushRequest => $request
+                static fn (PushRequest $request, AdapterInterface $adapter): PushRequest => $request
                     ->withMessage(new Message('test', 'New closure test data'))
                     ->withAdapter($adapter->withChannel('closure-channel')),
             ]
@@ -88,8 +88,8 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $request = $this->getPushRequest();
 
-        $middleware1 = static fn(PushRequest $request, MessageHandlerPushInterface $handler): PushRequest => $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'first'));
-        $middleware2 = static fn(PushRequest $request, MessageHandlerPushInterface $handler): PushRequest => $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'second'));
+        $middleware1 = static fn (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest => $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'first'));
+        $middleware2 = static fn (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest => $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'second'));
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 

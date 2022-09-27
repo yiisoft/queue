@@ -28,7 +28,6 @@ interface AdapterInterface
     /**
      * Pushing a message to the queue. Adapter sets message ID if available.
      *
-     *
      * @throws BehaviorNotSupportedException Adapter may throw exception when it does not support all the attached behaviors.
      */
     public function push(MessageInterface $message): void;

@@ -51,7 +51,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
-            fn(): ConsumeRequest => new ConsumeRequest(
+            fn (): ConsumeRequest => new ConsumeRequest(
                 new Message('test', 'test data'),
                 $this->createMock(QueueInterface::class),
             )
@@ -69,7 +69,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
-            static fn(): MiddlewareConsumeInterface => new TestMiddleware()
+            static fn (): MiddlewareConsumeInterface => new TestMiddleware()
         );
         self::assertSame(
             'New middleware test data',
@@ -115,7 +115,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
-            static fn() => 42
+            static fn () => 42
         );
 
         $this->expectException(InvalidMiddlewareDefinitionException::class);

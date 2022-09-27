@@ -61,10 +61,8 @@ final class CallableFactory
     }
 
     /**
-     *
      * @throws ContainerExceptionInterface Error while retrieving the entry from container.
      * @throws NotFoundExceptionInterface
-     *
      */
     private function fromDefinition(string $className, string $methodName): ?callable
     {

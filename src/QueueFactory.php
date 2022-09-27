@@ -64,9 +64,7 @@ final class QueueFactory implements QueueFactoryInterface
     }
 
     /**
-     *
      * @throws InvalidConfigException
-     *
      */
     private function create(string $channel): QueueInterface
     {

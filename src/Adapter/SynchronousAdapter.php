@@ -19,7 +19,7 @@ final class SynchronousAdapter implements AdapterInterface
     private array $messages = [];
     private int $current = 0;
 
-    public function __construct(private WorkerInterface $worker, private QueueInterface $queue, private string $channel = QueueFactory::DEFAULT_CHANNEL_NAME, private ?\Yiisoft\Yii\Queue\Adapter\BehaviorChecker $behaviorChecker = null)
+    public function __construct(private WorkerInterface $worker, private QueueInterface $queue, private string $channel = QueueFactory::DEFAULT_CHANNEL_NAME, private ?BehaviorChecker $behaviorChecker = null)
     {
     }
 

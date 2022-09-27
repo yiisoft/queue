@@ -6,7 +6,6 @@ namespace Yiisoft\Yii\Queue\Middleware;
 
 use InvalidArgumentException;
 
-use function get_class;
 use function is_array;
 use function is_object;
 use function is_string;

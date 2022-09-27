@@ -48,7 +48,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
-            static fn(): PushRequest => new PushRequest(new Message('test', 'test data'), new FakeAdapter())
+            static fn (): PushRequest => new PushRequest(new Message('test', 'test data'), new FakeAdapter())
         );
         self::assertSame(
             'test data',
@@ -63,7 +63,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
-            static fn(): MiddlewarePushInterface => new TestMiddleware()
+            static fn (): MiddlewarePushInterface => new TestMiddleware()
         );
         self::assertSame(
             'New middleware test data',
@@ -107,7 +107,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
-            static fn() => 42
+            static fn () => 42
         );
 
         $this->expectException(InvalidMiddlewareDefinitionException::class);
