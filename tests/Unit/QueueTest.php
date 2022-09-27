@@ -42,7 +42,7 @@ final class QueueTest extends TestCase
     {
         $this->needsRealAdapter = false;
         $behavior = new DelayBehavior(2);
-        $exception = new BehaviorNotSupportedException(get_class($this->getAdapter()), $behavior);
+        $exception = new BehaviorNotSupportedException($this->getAdapter()::class, $behavior);
         $this
             ->getAdapter()
             ->method('push')

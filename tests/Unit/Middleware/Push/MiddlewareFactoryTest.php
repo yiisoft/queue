@@ -48,9 +48,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
-            static function (): PushRequest {
-                return new PushRequest(new Message('test', 'test data'), new FakeAdapter());
-            }
+            static fn (): PushRequest => new PushRequest(new Message('test', 'test data'), new FakeAdapter())
         );
         self::assertSame(
             'test data',
@@ -65,9 +63,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
-            static function (): MiddlewarePushInterface {
-                return new TestMiddleware();
-            }
+            static fn (): MiddlewarePushInterface => new TestMiddleware()
         );
         self::assertSame(
             'New middleware test data',
@@ -111,9 +107,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
-            static function () {
-                return 42;
-            }
+            static fn () => 42
         );
 
         $this->expectException(InvalidMiddlewareDefinitionException::class);
@@ -173,7 +167,7 @@ final class MiddlewareFactoryTest extends TestCase
 
     private function getMiddlewareFactory(ContainerInterface $container = null): MiddlewareFactoryPushInterface
     {
-        $container = $container ?? $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
 
         return new MiddlewareFactoryPush($container, new CallableFactory($container));
     }

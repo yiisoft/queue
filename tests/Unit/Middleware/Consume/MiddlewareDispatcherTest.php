@@ -27,9 +27,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static function (ConsumeRequest $request): ConsumeRequest {
-                    return $request->withMessage(new Message('test', 'New closure test data'));
-                },
+                static fn (ConsumeRequest $request): ConsumeRequest => $request->withMessage(new Message('test', 'New closure test data')),
             ]
         );
 
@@ -76,12 +74,8 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $request = $this->getConsumeRequest();
 
-        $middleware1 = static function (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest {
-            return $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'first'));
-        };
-        $middleware2 = static function (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest {
-            return $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'second'));
-        };
+        $middleware1 = static fn (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest => $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'first'));
+        $middleware2 = static fn (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest => $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'second'));
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
@@ -148,7 +142,7 @@ final class MiddlewareDispatcherTest extends TestCase
     private function createDispatcher(
         ContainerInterface $container = null,
     ): ConsumeMiddlewareDispatcher {
-        $container = $container ?? $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
         $callableFactory = new CallableFactory($container);
 
         return new ConsumeMiddlewareDispatcher(

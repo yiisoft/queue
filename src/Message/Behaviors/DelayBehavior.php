@@ -6,11 +6,8 @@ namespace Yiisoft\Yii\Queue\Message\Behaviors;
 
 final class DelayBehavior implements BehaviorInterface, DelayBehaviorInterface
 {
-    private int $delay;
-
-    public function __construct(int $delay)
+    public function __construct(private int $delay)
     {
-        $this->delay = $delay;
     }
 
     public function getConstructorParameters(): array

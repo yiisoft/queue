@@ -51,12 +51,10 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
-            function (): ConsumeRequest {
-                return new ConsumeRequest(
-                    new Message('test', 'test data'),
-                    $this->createMock(QueueInterface::class),
-                );
-            }
+            fn (): ConsumeRequest => new ConsumeRequest(
+                new Message('test', 'test data'),
+                $this->createMock(QueueInterface::class),
+            )
         );
         self::assertSame(
             'test data',
@@ -71,9 +69,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
-            static function (): MiddlewareConsumeInterface {
-                return new TestMiddleware();
-            }
+            static fn (): MiddlewareConsumeInterface => new TestMiddleware()
         );
         self::assertSame(
             'New middleware test data',
@@ -119,9 +115,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
-            static function () {
-                return 42;
-            }
+            static fn () => 42
         );
 
         $this->expectException(InvalidMiddlewareDefinitionException::class);
@@ -183,7 +177,7 @@ final class MiddlewareFactoryTest extends TestCase
 
     private function getMiddlewareFactory(ContainerInterface $container = null): MiddlewareFactoryConsumeInterface
     {
-        $container = $container ?? $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
 
         return new MiddlewareFactoryConsume($container, new CallableFactory($container));
     }

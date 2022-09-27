@@ -55,7 +55,7 @@ abstract class AbstractMessage implements MessageInterface
     {
         $behaviorClassName = ltrim($behaviorClassName, '\\');
         foreach ($this->behaviors as $behavior) {
-            if (get_class($behavior) === $behaviorClassName) {
+            if ($behavior::class === $behaviorClassName) {
                 return $behavior;
             }
         }

@@ -23,7 +23,7 @@ class BehaviorNotSupportedException extends UnexpectedValueException implements 
         Throwable $previous = null
     ) {
         if ($message === '') {
-            $behaviorName = get_class($behavior);
+            $behaviorName = $behavior::class;
             $message = "$adapter does not support message \"$behaviorName\".";
         }
 
@@ -40,7 +40,7 @@ class BehaviorNotSupportedException extends UnexpectedValueException implements 
 
     public function getSolution(): ?string
     {
-        $behaviorName = get_class($this->behavior);
+        $behaviorName = $this->behavior::class;
         $adapterInterfaceClass = AdapterInterface::class;
 
         return <<<SOLUTION

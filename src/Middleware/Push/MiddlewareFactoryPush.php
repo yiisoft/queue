@@ -46,8 +46,6 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     *
-     * @return MiddlewarePushInterface
      */
     public function createPushMiddleware(
         MiddlewarePushInterface|callable|array|string $middlewareDefinition
@@ -69,13 +67,8 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
     private function wrapCallable(callable $callback): MiddlewarePushInterface
     {
         return new class ($callback, $this->container) implements MiddlewarePushInterface {
-            private ContainerInterface $container;
-            private $callback;
-
-            public function __construct(callable $callback, ContainerInterface $container)
+            public function __construct(private callable $callback, private ContainerInterface $container)
             {
-                $this->callback = $callback;
-                $this->container = $container;
             }
 
             public function processPush(PushRequest $request, MessageHandlerPushInterface $handler): PushRequest

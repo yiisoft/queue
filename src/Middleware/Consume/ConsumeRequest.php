@@ -13,9 +13,6 @@ final class ConsumeRequest
     {
     }
 
-    /**
-     * @return MessageInterface
-     */
     public function getMessage(): MessageInterface
     {
         return $this->message;
