@@ -41,7 +41,7 @@ final class BehaviorRemovingStrategy implements FailureStrategyInterface
 
     private function wrap(MessageInterface $message)
     {
-        return new class($message, ...$this->metaKeys) implements MessageInterface {
+        return new class ($message, ...$this->metaKeys) implements MessageInterface {
             private ?string $id = null;
             private MessageInterface $message;
             private array $metaKeys;

@@ -142,7 +142,6 @@ class ResendStrategyTest extends TestCase
         ];
     }
 
-
     /**
      * @dataProvider queueSendingStrategyProvider
      *

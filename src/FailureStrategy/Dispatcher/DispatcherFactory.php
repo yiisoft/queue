@@ -69,7 +69,7 @@ final class DispatcherFactory implements DispatcherFactoryInterface
 
     private function wrap(FailureStrategyInterface $strategy, ?PipelineInterface $pipeline): PipelineInterface
     {
-        return new class($strategy, $pipeline) implements PipelineInterface {
+        return new class ($strategy, $pipeline) implements PipelineInterface {
             private FailureStrategyInterface $strategy;
             private ?PipelineInterface $pipeline;
 
@@ -88,7 +88,7 @@ final class DispatcherFactory implements DispatcherFactoryInterface
 
     private function getEmptyStrategy(): FailureStrategyInterface
     {
-        return new class() implements FailureStrategyInterface {
+        return new class () implements FailureStrategyInterface {
             public function handle(MessageInterface $message, ?PipelineInterface $pipeline): bool
             {
                 return false;

@@ -41,7 +41,7 @@ final class BehaviorAddingStrategy implements FailureStrategyInterface
 
     private function wrap(MessageInterface $message)
     {
-        return new class($message, $this->meta) implements MessageInterface {
+        return new class ($message, $this->meta) implements MessageInterface {
             private ?string $id = null;
             private MessageInterface $message;
             private array $meta;
