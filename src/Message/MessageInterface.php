@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Message;
 
-use Yiisoft\Yii\Queue\Message\Behaviors\BehaviorInterface;
-
 interface MessageInterface
 {
     public function setId(?string $id): void;

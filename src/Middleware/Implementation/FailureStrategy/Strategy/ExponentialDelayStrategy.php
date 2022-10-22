@@ -10,7 +10,6 @@ use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\PayloadFactory;
 use Yiisoft\Yii\Queue\Queue;
 
