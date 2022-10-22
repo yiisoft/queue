@@ -1,139 +1,171 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Yii\Queue;
 
-use InvalidArgumentException;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
-use Yiisoft\Yii\Queue\Driver\DriverInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Event\AfterPush;
-use Yiisoft\Yii\Queue\Event\BeforePush;
-use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
+use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Payload\PayloadInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\AdapterPushHandler;
+use Yiisoft\Yii\Queue\Middleware\Push\MessageHandlerPushInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\MiddlewarePushInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Yii\Queue\Middleware\Push\PushRequest;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
-/**
- * Base Queue.
- *
- * @property null|int $workerPid
- */
-class Queue
+final class Queue implements QueueInterface
 {
-    protected EventDispatcherInterface $eventDispatcher;
-    protected DriverInterface $driver;
-    protected WorkerInterface $worker;
-    protected LoopInterface $loop;
-    private LoggerInterface $logger;
-    private PayloadFactory $payloadFactory;
+    /**
+     * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
+     */
+    private array $middlewareDefinitions;
+    private AdapterPushHandler $adapterPushHandler;
 
     public function __construct(
-        DriverInterface $driver,
-        EventDispatcherInterface $dispatcher,
-        WorkerInterface $worker,
-        LoopInterface $loop,
-        LoggerInterface $logger,
-        PayloadFactory $factory
+        private WorkerInterface $worker,
+        private LoopInterface $loop,
+        private LoggerInterface $logger,
+        private PushMiddlewareDispatcher $pushMiddlewareDispatcher,
+        private ?AdapterInterface $adapter = null,
+        private string $channelName = QueueFactoryInterface::DEFAULT_CHANNEL_NAME,
+        MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
     ) {
-        $this->driver = $driver;
-        $this->eventDispatcher = $dispatcher;
-        $this->worker = $worker;
-        $this->loop = $loop;
-        $this->logger = $logger;
-        $this->payloadFactory = $factory;
-
-        if ($driver instanceof QueueDependentInterface) {
-            $driver->setQueue($this);
-        }
+        $this->middlewareDefinitions = $middlewareDefinitions;
+        $this->adapterPushHandler = new AdapterPushHandler();
     }
 
-    /**
-     * Pushes job into queue.
-     *
-     * @param PayloadInterface $payload
-     *
-     * @return string|null id of the pushed message
-     */
-    public function push(PayloadInterface $payload): ?string
+    public function getChannelName(): string
     {
-        $this->logger->debug('Preparing to push payload "{payload}".', ['payload' => $payload->getName()]);
-        $message = $this->payloadFactory->createMessage($payload);
-        $this->eventDispatcher->dispatch(new BeforePush($this, $message));
-
-        if ($this->driver->canPush($message)) {
-            $message->setId($this->driver->push($message));
-            $this->logger->debug(
-                'Successfully pushed message "{name}" to the queue.',
-                ['name' => $message->getPayloadName()]
-            );
-        } else {
-            $this->logger->error(
-                'Payload "{payload}" is not supported by driver "{driver}."',
-                [
-                    'payload' => $payload->getName(),
-                    'driver' => get_class($this->driver),
-                ]
-            );
-
-            throw new PayloadNotSupportedException($this->driver, $payload);
-        }
-
-        $this->eventDispatcher->dispatch(new AfterPush($this, $message));
-
-        return $message->getId();
+        return $this->channelName;
     }
 
-    /**
-     * Execute all existing jobs and exit
-     *
-     * @param int $max
-     */
+    public function push(
+        MessageInterface $message,
+        MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
+    ): MessageInterface {
+        $this->logger->debug(
+            'Preparing to push message with handler name "{handlerName}".',
+            ['handlerName' => $message->getHandlerName()]
+        );
+
+        $request = new PushRequest($message, $this->adapter);
+        $message = $this->pushMiddlewareDispatcher
+            ->dispatch($request, $this->createPushHandler($middlewareDefinitions))
+            ->getMessage();
+
+        $this->logger->info(
+            'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
+            ['name' => $message->getHandlerName(), 'id' => $message->getId() ?? 'null']
+        );
+
+        return $message;
+    }
+
     public function run(int $max = 0): void
     {
+        $this->checkAdapter();
+
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
-        while (
-            ($max <= 0 || $max > $count)
-            && $this->loop->canContinue()
-            && $message = $this->driver->nextMessage()
-        ) {
+        $callback = function (MessageInterface $message) use (&$max, &$count): bool {
+            if (($max > 0 && $max <= $count) || !$this->loop->canContinue()) {
+                return false;
+            }
+
             $this->handle($message);
             $count++;
-        }
 
-        $this->logger->debug(
-            'Finish processing queue messages. There were {count} messages to work with.',
+            return true;
+        };
+
+        /** @psalm-suppress PossiblyNullReference */
+        $this->adapter->runExisting($callback);
+
+        $this->logger->info(
+            'Processed {count} queue messages.',
             ['count' => $count]
         );
     }
 
-    /**
-     * Listen to the queue and execute jobs as they come
-     */
     public function listen(): void
     {
-        $this->logger->debug('Start listening to the queue.');
-        $this->driver->subscribe(fn (MessageInterface $message) => $this->handle($message));
-        $this->logger->debug('Finish listening to the queue.');
+        $this->checkAdapter();
+
+        $this->logger->info('Start listening to the queue.');
+        /** @psalm-suppress PossiblyNullReference */
+        $this->adapter->subscribe(fn (MessageInterface $message) => $this->handle($message));
+        $this->logger->info('Finish listening to the queue.');
     }
 
-    /**
-     * @param string $id A message id
-     *
-     * @return JobStatus
-     *
-     * @throws InvalidArgumentException when there is no such id in the driver
-     */
     public function status(string $id): JobStatus
     {
-        return $this->driver->status($id);
+        $this->checkAdapter();
+
+        /** @psalm-suppress PossiblyNullReference */
+        return $this->adapter->status($id);
+    }
+
+    public function withAdapter(AdapterInterface $adapter): self
+    {
+        $new = clone $this;
+        $new->adapter = $adapter;
+
+        return $new;
+    }
+
+    public function withMiddlewares(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
+    {
+        $instance = clone $this;
+        $instance->middlewareDefinitions = $middlewareDefinitions;
+
+        return $instance;
+    }
+
+    public function withMiddlewaresAdded(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
+    {
+        $instance = clone $this;
+        $instance->middlewareDefinitions = [...array_values($instance->middlewareDefinitions), ...array_values($middlewareDefinitions)];
+
+        return $instance;
     }
 
     protected function handle(MessageInterface $message): void
     {
         $this->worker->process($message, $this);
+    }
+
+    private function checkAdapter(): void
+    {
+        if ($this->adapter === null) {
+            throw new AdapterNotConfiguredException();
+        }
+    }
+
+    private function createPushHandler(array $middlewares): MessageHandlerPushInterface
+    {
+        return new class (
+            $this->adapterPushHandler,
+            $this->pushMiddlewareDispatcher,
+            $middlewares
+        ) implements MessageHandlerPushInterface {
+            public function __construct(
+                private AdapterPushHandler $adapterPushHandler,
+                private PushMiddlewareDispatcher $dispatcher,
+                private array $middlewares,
+            ) {
+            }
+
+            public function handlePush(PushRequest $request): PushRequest
+            {
+                return $this->dispatcher
+                    ->withMiddlewares($this->middlewares)
+                    ->dispatch($request, $this->adapterPushHandler);
+            }
+        };
     }
 }

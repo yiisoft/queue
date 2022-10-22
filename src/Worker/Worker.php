@@ -4,103 +4,70 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Worker;
 
+use Closure;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
+use ReflectionMethod;
 use RuntimeException;
 use Throwable;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Yii\Queue\Event\AfterExecution;
-use Yiisoft\Yii\Queue\Event\BeforeExecution;
-use Yiisoft\Yii\Queue\Event\JobFailure;
 use Yiisoft\Yii\Queue\Exception\JobFailureException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeHandler;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
+use Yiisoft\Yii\Queue\QueueInterface;
 
 final class Worker implements WorkerInterface
 {
-    private array $handlersCached;
-    private EventDispatcherInterface $dispatcher;
-    private LoggerInterface $logger;
-    private array $handlers;
-    private Injector $injector;
-    private ContainerInterface $container;
+    private array $handlersCached = [];
 
     public function __construct(
-        array $handlers,
-        EventDispatcherInterface $dispatcher,
-        LoggerInterface $logger,
-        Injector $injector,
-        ContainerInterface $container
+        private array $handlers,
+        private LoggerInterface $logger,
+        private Injector $injector,
+        private ContainerInterface $container,
+        private ConsumeMiddlewareDispatcher $middlewareDispatcher,
     ) {
-        $this->dispatcher = $dispatcher;
-        $this->logger = $logger;
-        $this->handlers = $handlers;
-        $this->injector = $injector;
-        $this->container = $container;
     }
 
     /**
      * @param MessageInterface $message
-     * @param Queue $queue
+     * @param QueueInterface $queue
      *
      * @throws Throwable
+     *
+     * @return MessageInterface
      */
-    public function process(MessageInterface $message, Queue $queue): void
+    public function process(MessageInterface $message, QueueInterface $queue): MessageInterface
     {
-        $this->logger->debug('Start working with message #{message}.', ['message' => $message->getId()]);
+        $this->logger->info('Processing message #{message}.', ['message' => $message->getId()]);
 
-        $name = $message->getPayloadName();
+        $name = $message->getHandlerName();
         $handler = $this->getHandler($name);
         if ($handler === null) {
-            throw new RuntimeException("No handler for message $name");
+            throw new RuntimeException("Queue handler with name $name doesn't exist");
         }
 
+        $request = new ConsumeRequest($message, $queue);
+        $closure = fn (): mixed => $this->injector->invoke($handler, [$message]);
         try {
-            $event = new BeforeExecution($queue, $message);
-            $this->dispatcher->dispatch($event);
-
-            if ($event->isExecutionStopped() === false) {
-                $this->injector->invoke($handler, [$message]);
-
-                $event = new AfterExecution($queue, $message);
-                $this->dispatcher->dispatch($event);
-            } else {
-                $this->logger->notice(
-                    'Execution of message #{message} is stopped by an event handler.',
-                    ['message' => $message->getId()]
-                );
-            }
+            return $this->middlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure))->getMessage();
         } catch (Throwable $exception) {
             $exception = new JobFailureException($message, $exception);
-            $this->logger->error($exception);
-
-            $event = new JobFailure($queue, $message, $exception);
-            $this->dispatcher->dispatch($event);
-
-            if ($event->shouldThrowException() === true) {
-                throw $exception;
-            }
+            $this->logger->error($exception->getMessage());
+            throw $exception;
         }
     }
 
     private function getHandler(string $name): ?callable
     {
-        if (isset($this->handlersCached[$name])) {
-            return $this->handlersCached[$name];
-        }
-
-        $this->handlersCached[$name] = null;
-
-        $handler = $this->handlers[$name] ?? null;
-
-        if (is_callable($handler)) {
-            $this->handlersCached[$name] = $handler;
-        }
-
-        if ($this->isAlias($handler)) {
-            $handler[0] = $this->container->get($handler[0]);
-            $this->handlersCached[$name] = $handler;
+        if (!array_key_exists($name, $this->handlersCached)) {
+            $this->handlersCached[$name] = $this->prepare($this->handlers[$name] ?? null);
         }
 
         return $this->handlersCached[$name];
@@ -109,14 +76,65 @@ final class Worker implements WorkerInterface
     /**
      * Checks if the handler is a DI container alias
      *
-     * @param callable|array|null $handler
+     * @param array|callable|object|null $definition
      *
-     * @return bool
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     *
+     * @return callable|null
      */
-    private function isAlias($handler): bool
+    private function prepare(callable|object|array|string|null $definition): callable|null
     {
-        return is_array($handler)
-            && array_keys($handler) === [0, 1]
-            && is_string($handler[0]);
+        if (is_string($definition) && $this->container->has($definition)) {
+            return $this->container->get($definition);
+        }
+
+        if (
+            is_array($definition)
+            && array_keys($definition) === [0, 1]
+            && is_string($definition[0])
+            && is_string($definition[1])
+        ) {
+            [$className, $methodName] = $definition;
+
+            if (!class_exists($className) && $this->container->has($className)) {
+                return [
+                    $this->container->get($className),
+                    $methodName,
+                ];
+            }
+
+            if (!class_exists($className)) {
+                $this->logger->error("$className doesn't exist.");
+
+                return null;
+            }
+
+            try {
+                $reflection = new ReflectionMethod($className, $methodName);
+            } catch (ReflectionException $e) {
+                $this->logger->error($e->getMessage());
+
+                return null;
+            }
+            if ($reflection->isStatic()) {
+                return [$className, $methodName];
+            }
+            if ($this->container->has($className)) {
+                return [
+                    $this->container->get($className),
+                    $methodName,
+                ];
+            }
+
+            return null;
+        }
+
+        return $definition;
+    }
+
+    private function createConsumeHandler(Closure $handler): MessageHandlerConsumeInterface
+    {
+        return new ConsumeHandler($handler);
     }
 }

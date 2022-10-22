@@ -1,51 +1,39 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+
+declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Container\ContainerInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Test\Support\EventDispatcher\SimpleEventDispatcher;
+use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
+use Yiisoft\Yii\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
-use Yiisoft\Yii\Queue\Cli\SignalLoop;
-use Yiisoft\Yii\Queue\Driver\DriverInterface;
-use Yiisoft\Yii\Queue\Driver\SynchronousDriver;
-use Yiisoft\Yii\Queue\Event\AfterExecution;
-use Yiisoft\Yii\Queue\Event\AfterPush;
-use Yiisoft\Yii\Queue\Event\BeforeExecution;
-use Yiisoft\Yii\Queue\Event\BeforePush;
-use Yiisoft\Yii\Queue\Event\JobFailure;
-use Yiisoft\Yii\Queue\Exception\PayloadNotSupportedException;
-use Yiisoft\Yii\Queue\PayloadFactory;
+use Yiisoft\Yii\Queue\Cli\SimpleLoop;
+use Yiisoft\Yii\Queue\Middleware\CallableFactory;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
+use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
+use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Queue;
-use Yiisoft\Yii\Queue\Tests\App\RetryablePayload;
 use Yiisoft\Yii\Queue\Worker\Worker;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 /**
  * Base Test Case.
- *
- * @author Roman Zhuravlev <zhuravljov@gmail.com>
  */
 abstract class TestCase extends BaseTestCase
 {
     protected ?ContainerInterface $container = null;
     protected ?Queue $queue = null;
-    protected ?DriverInterface $driver = null;
+    protected ?AdapterInterface $adapter = null;
     protected ?LoopInterface $loop = null;
     protected ?WorkerInterface $worker = null;
-    protected ?EventDispatcherInterface $dispatcher = null;
     protected array $eventHandlers = [];
     protected int $executionTimes;
 
@@ -55,10 +43,9 @@ abstract class TestCase extends BaseTestCase
 
         $this->container = null;
         $this->queue = null;
-        $this->driver = null;
+        $this->adapter = null;
         $this->loop = null;
         $this->worker = null;
-        $this->dispatcher = null;
         $this->eventHandlers = [];
         $this->executionTimes = 0;
     }
@@ -73,15 +60,15 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * @return DriverInterface|MockObject
+     * @return AdapterInterface|MockObject
      */
-    protected function getDriver(): DriverInterface
+    protected function getAdapter(): AdapterInterface
     {
-        if ($this->driver === null) {
-            $this->driver = $this->createDriver($this->needsRealDriver());
+        if ($this->adapter === null) {
+            $this->adapter = $this->createAdapter($this->needsRealAdapter());
         }
 
-        return $this->driver;
+        return $this->adapter;
     }
 
     protected function getLoop(): LoopInterface
@@ -102,15 +89,6 @@ abstract class TestCase extends BaseTestCase
         return $this->worker;
     }
 
-    protected function getEventDispatcher(): SimpleEventDispatcher
-    {
-        if ($this->dispatcher === null) {
-            $this->dispatcher = $this->createEventDispatcher();
-        }
-
-        return $this->dispatcher;
-    }
-
     protected function getContainer(): ContainerInterface
     {
         if ($this->container === null) {
@@ -123,43 +101,36 @@ abstract class TestCase extends BaseTestCase
     protected function createQueue(): Queue
     {
         return new Queue(
-            $this->getDriver(),
-            $this->getEventDispatcher(),
             $this->getWorker(),
             $this->getLoop(),
             new NullLogger(),
-            new PayloadFactory()
+            $this->getPushMiddlewareDispatcher(),
         );
     }
 
-    protected function createDriver(bool $realDriver = false): DriverInterface
+    protected function createAdapter(bool $realAdapter = false): AdapterInterface
     {
-        if ($realDriver) {
-            return new SynchronousDriver($this->getLoop(), $this->getWorker());
+        if ($realAdapter) {
+            return new SynchronousAdapter($this->getWorker(), $this->createQueue());
         }
 
-        return $this->createMock(DriverInterface::class);
+        return $this->createMock(AdapterInterface::class);
     }
 
     protected function createLoop(): LoopInterface
     {
-        return new SignalLoop();
+        return new SimpleLoop();
     }
 
     protected function createWorker(): WorkerInterface
     {
         return new Worker(
             $this->getMessageHandlers(),
-            $this->getEventDispatcher(),
             new NullLogger(),
             new Injector($this->getContainer()),
-            $this->getContainer()
+            $this->getContainer(),
+            $this->getConsumeMiddlewareDispatcher(),
         );
-    }
-
-    protected function createEventDispatcher(): SimpleEventDispatcher
-    {
-        return new SimpleEventDispatcher(...$this->getEventHandlers());
     }
 
     protected function createContainer(): ContainerInterface
@@ -196,40 +167,31 @@ abstract class TestCase extends BaseTestCase
 
                 throw new RuntimeException('test');
             },
-            'not-supported' => function () {
-                throw new PayloadNotSupportedException($this->driver, new RetryablePayload());
-            },
         ];
     }
 
-    protected function needsRealDriver(): bool
+    protected function needsRealAdapter(): bool
     {
         return false;
     }
 
-    protected function assertEvents(array $events = []): void
+    protected function getPushMiddlewareDispatcher()
     {
-        $default = [
-            BeforePush::class => 0,
-            AfterPush::class => 0,
-            BeforeExecution::class => 0,
-            AfterExecution::class => 0,
-            JobFailure::class => 0,
-        ];
-        foreach (array_merge($default, $events) as $event => $timesExecuted) {
-            self::assertEquals($timesExecuted, $this->getEventsCount($event));
-        }
+        return new PushMiddlewareDispatcher(
+            new MiddlewareFactoryPush(
+                $this->getContainer(),
+                new CallableFactory($this->getContainer()),
+            ),
+        );
     }
 
-    protected function getEventsCount(string $className): int
+    protected function getConsumeMiddlewareDispatcher()
     {
-        $result = 0;
-        foreach ($this->getEventDispatcher()->getEvents() as $event) {
-            if ($event instanceof $className) {
-                $result++;
-            }
-        }
-
-        return $result;
+        return new ConsumeMiddlewareDispatcher(
+            new MiddlewareFactoryConsume(
+                $this->getContainer(),
+                new CallableFactory($this->getContainer()),
+            ),
+        );
     }
 }

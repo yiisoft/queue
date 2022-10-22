@@ -1,11 +1,49 @@
-Starting Workers
-================
+# Configuration
 
-Supervisor
-----------
+To use a worker, you should resolve its dependencies (e.g. through DI container) and define handlers for each message
+which will be consumed by this worker;
 
-[Supervisor](http://supervisord.org) is a process monitor for Linux. It automatically starts
-console processes.  On Ubuntu it can be installed with this command:
+Handlers are callables indexed by payload names. When a message is consumed from the queue, a callable associated with
+its payload name is called.
+
+## Handler format
+
+Handler can be any callable with a couple of additions:
+
+- If handler is provided as an array of two strings, it will be treated as a DI container service id and its method.
+  E.g. `[ClassName::class, 'handle']` will be resolved to:
+  ```php 
+  $container
+      ->get(ClassName::class)
+      ->handle();
+  ```
+- An `Injector` is used to call the handlers. This means you can define handlers as closures with their own dependencies
+  which will be resolved with DI container. In the example below you can see a closure in which `message` will be taken
+  from the queue and `ClientInterface` will be resolved via DI container.
+  
+  ```php
+  'payloadName' => fn (MessageInterface $message, ClientInterface $client) => $client->send($message->getPayloadData()),
+  ```
+
+  ```php
+  $handlers = [
+      'simple' => fn() => 'someWork',
+      'anotherHandler' => [QueueHandlerCollection::class, 'methodName']
+  ];
+  $worker = new Worker(
+      $handlers,
+      new \Psr\Log\NullLogger(),
+      new \Yiisoft\Injector\Injector($DIContainer),
+      $DIContainer
+  );
+  ```
+
+## Starting Workers
+
+### Supervisor
+
+[Supervisor](http://supervisord.org) is a process monitor for Linux. It automatically starts console processes.
+On Ubuntu or Debian it can be installed with the following command:
 
 ```sh
 sudo apt-get install supervisor
@@ -33,26 +71,13 @@ to the specified log file.
 
 For more info about Supervisor's configuration and usage see its [documentation](http://supervisord.org).
 
-Note that worker daemons started with `queue/listen` are only supported by the [File], [Db], [Redis],
-[RabbitMQ], [AMQP Interop], [Beanstalk], [Gearman] and [AWS SQS] drivers. For additional options see driver guide.
-
-[File]: driver-file.md
-[Db]: driver-db.md
-[Redis]: driver-redis.md
-[AMQP Interop]: driver-amqp-interop.md
-[RabbitMQ]: driver-amqp.md
-[Beanstalk]: driver-beanstalk.md
-[Gearman]: driver-gearman.md
-[AWS SQS]: driver-sqs.md
-
-Systemd
--------
+### Systemd
 
 Systemd is another init system used on Linux to bootstrap the user space. To configure workers startup
 using systemd, create a config file named `yii-queue@.service` in `/etc/systemd/system` with
 the following content:
 
-```conf
+```ini
 [Unit]
 Description=Yii Queue Worker %I
 After=network.target
@@ -73,13 +98,13 @@ WantedBy=multi-user.target
 
 You need to reload systemd in order to re-read its configuration:
 
-```sh
+```shell
 systemctl daemon-reload
 ```
 
 Set of commands to control workers:
 
-```sh
+```shell
 # To start two workers
 systemctl start yii-queue@1 yii-queue@2
 
@@ -98,25 +123,14 @@ systemctl enable yii-queue@1 yii-queue@2
 
 To learn all features of systemd, check its [documentation](https://freedesktop.org/wiki/Software/systemd/#manualsanddocumentationforusersandadministrators).
 
-Cron
-----
+### Cron
 
-You can also start workers using cron. Here you have to use the `queue/run` command.
+You can also start workers using cron that executes `queue/run` command.
 
 Config example:
 
-```sh
+```shell
 * * * * * /usr/bin/php /var/www/my_project/yii queue/run
 ```
 
 In this case cron will run the command every minute.
-
-The `queue/run` command is supported by the [File], [Db], [Redis], [Beanstalk], [Gearman], [AWS SQS] drivers.
-For additional options see driver guide.
-
-[File]: driver-file.md
-[Db]: driver-db.md
-[Redis]: driver-redis.md
-[Beanstalk]: driver-beanstalk.md
-[Gearman]: driver-gearman.md
-[AWS SQS]: driver-sqs.md
