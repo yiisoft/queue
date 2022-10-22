@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\FailureStrategy\Dispatcher;
+namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher;
 
 use Psr\Container\ContainerInterface;
+use Throwable;
 use WeakReference;
-use Yiisoft\Yii\Queue\FailureStrategy\Strategy\FailureStrategyInterface;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\FailureStrategyInterface;
 
 final class DispatcherFactory implements DispatcherFactoryInterface
 {
@@ -32,11 +33,11 @@ final class DispatcherFactory implements DispatcherFactoryInterface
 
     public function get(string $payloadName): DispatcherInterface
     {
-        if (!isset($this->pipelines[$payloadName]) || isset($this->pipelines[$payloadName]) === []) {
+        if (!isset($this->pipelines[$payloadName]) || $this->pipelines[$payloadName] === []) {
             $payloadName = self::DEFAULT_PIPELINE;
         }
-        /** @var DispatcherInterface $result */
         if (isset($this->built[$payloadName]) && $result = $this->built[$payloadName]->get()) {
+            /** @var DispatcherInterface $result */
             return $result;
         }
 
@@ -46,7 +47,7 @@ final class DispatcherFactory implements DispatcherFactoryInterface
         return $result;
     }
 
-    private function create($definition): DispatcherInterface
+    private function create(PipelineInterface|array $definition): DispatcherInterface
     {
         if ($definition instanceof PipelineInterface) {
             return new Dispatcher($definition);
@@ -64,6 +65,7 @@ final class DispatcherFactory implements DispatcherFactoryInterface
             $handler = $this->wrap($strategy, $handler);
         }
 
+        /** @var PipelineInterface $handler It can't be null here, because $pipeline can't be empty */
         return $handler;
     }
 
@@ -79,9 +81,9 @@ final class DispatcherFactory implements DispatcherFactoryInterface
                 $this->pipeline = $pipeline;
             }
 
-            public function handle(MessageInterface $message): bool
+            public function handle(ConsumeRequest $request, Throwable $exception): ConsumeRequest
             {
-                return $this->strategy->handle($message, $this->pipeline);
+                return $this->strategy->handle($request, $exception, $this->pipeline);
             }
         };
     }
@@ -89,9 +91,9 @@ final class DispatcherFactory implements DispatcherFactoryInterface
     private function getEmptyStrategy(): FailureStrategyInterface
     {
         return new class () implements FailureStrategyInterface {
-            public function handle(MessageInterface $message, ?PipelineInterface $pipeline): bool
+            public function handle(ConsumeRequest $request, Throwable $exception, ?PipelineInterface $pipeline): ConsumeRequest
             {
-                return false;
+                return $request;
             }
         };
     }

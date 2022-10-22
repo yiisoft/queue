@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\FailureStrategy\Dispatcher;
+namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher;
 
 interface DispatcherFactoryInterface
 {

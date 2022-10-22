@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\FailureStrategy\Strategy;
+namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy;
 
 use InvalidArgumentException;
-use Yiisoft\Yii\Queue\FailureStrategy\Dispatcher\PipelineInterface;
+use Throwable;
+use Yiisoft\Yii\Queue\Message\Message;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\PayloadFactory;
@@ -71,34 +74,37 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
 
     private function suites(MessageInterface $message): bool
     {
-        return $this->maxAttempts > $this->getAttempts($message->getPayloadMeta());
+        return $this->maxAttempts > $this->getAttempts($message->getMetadata());
     }
 
-    public function handle(MessageInterface $message, ?PipelineInterface $pipeline): bool
+    public function handle(ConsumeRequest $request, Throwable $exception, ?PipelineInterface $pipeline): ConsumeRequest
     {
+        $message = $request->getMessage();
         if ($this->suites($message)) {
-            $meta = $message->getPayloadMeta();
-            $metaNew = $this->formNewMeta($meta);
-            $payload = $this->factory->createPayload($message, $metaNew);
-            $this->queue->push($payload);
+            $message = new Message(
+                handlerName: $message->getHandlerName(),
+                data: $message->getData(),
+                metadata: $this->formNewMeta($message->getMetadata()),
+                id: $message->getId(),
+            );
+            $this->queue->push($message, /** TODO place delaying middleware here */);
 
-            return true;
+            return $request;
         }
 
         if ($pipeline === null) {
-            return false;
+            return $request;
         }
 
-        return $pipeline->handle($message);
+        return $pipeline->handle($request, $exception);
     }
 
     private function formNewMeta(array $meta): array
     {
-        return [
-            PayloadInterface::META_KEY_DELAY => $this->getDelay($meta),
-            self::META_KEY_DELAY => $this->getDelay($meta),
-            self::META_KEY_ATTEMPTS => $this->getAttempts($meta) + 1,
-        ];
+        $meta[self::META_KEY_DELAY] = $this->getDelay($meta);
+        $meta[self::META_KEY_ATTEMPTS] = $this->getAttempts($meta) + 1;
+
+        return $meta;
     }
 
     private function getAttempts(array $meta): int

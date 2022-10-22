@@ -6,10 +6,14 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Cli\SignalLoop;
 use Yiisoft\Yii\Queue\Cli\SimpleLoop;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\DispatcherFactory;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\DispatcherFactoryInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueFactory;
 use Yiisoft\Yii\Queue\QueueFactoryInterface;
@@ -37,4 +41,11 @@ return [
     QueueInterface::class => Queue::class,
     MiddlewareFactoryPushInterface::class => MiddlewareFactoryPush::class,
     MiddlewareFactoryConsumeInterface::class => MiddlewareFactoryConsume::class,
+    DispatcherFactoryInterface::class => DispatcherFactory::class,
+    PushMiddlewareDispatcher::class => [
+        'middlewareDefinitions' => $params['yiisoft/yii-queue']['middlewares-push'],
+    ],
+    ConsumeMiddlewareDispatcher::class => [
+        'middlewareDefinitions' => $params['yiisoft/yii-queue']['middlewares-consume'],
+    ],
 ];

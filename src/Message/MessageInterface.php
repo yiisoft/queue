@@ -29,30 +29,12 @@ interface MessageInterface
      *
      * @return mixed
      */
-    public function getData();
+    public function getData(): mixed;
 
     /**
-     * Attaches behavior to the message.
+     * Returns some message metadata
      *
-     * @param BehaviorInterface $behavior
-     *
-     * @return MessageInterface
+     * @return array
      */
-    public function attachBehavior(BehaviorInterface $behavior): self;
-
-    /**
-     * Returns attached behaviors.
-     *
-     * @return BehaviorInterface[]
-     */
-    public function getBehaviors(): array;
-
-    /**
-     * Returns attached behavior by its name.
-     *
-     * @param string $behaviorClassName
-     *
-     * @return BehaviorInterface|null
-     */
-    public function getBehavior(string $behaviorClassName): ?BehaviorInterface;
+    public function getMetadata(): array;
 }

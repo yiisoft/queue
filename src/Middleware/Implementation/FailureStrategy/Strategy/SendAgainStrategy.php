@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\FailureStrategy\Strategy;
+namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy;
 
 use InvalidArgumentException;
-use Yiisoft\Yii\Queue\FailureStrategy\Dispatcher\PipelineInterface;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\PayloadFactory;
 use Yiisoft\Yii\Queue\Queue;

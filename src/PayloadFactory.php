@@ -12,6 +12,7 @@ use Yiisoft\Yii\Queue\Payload\DelayablePayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PayloadInterface;
 use Yiisoft\Yii\Queue\Payload\PrioritisedPayloadInterface;
 
+// TODO remove it
 class PayloadFactory
 {
     public function createMessage(PayloadInterface $payload): MessageInterface
