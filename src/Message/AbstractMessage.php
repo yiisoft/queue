@@ -7,6 +7,4 @@ namespace Yiisoft\Yii\Queue\Message;
 abstract class AbstractMessage implements MessageInterface
 {
     protected ?string $id = null;
-
-
 }
