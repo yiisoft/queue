@@ -7,10 +7,10 @@ namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy;
 use InvalidArgumentException;
 use Throwable;
 use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\PayloadFactory;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Yii\Queue\Middleware\Implementation\DelayMiddlewareInterface;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
 use Yiisoft\Yii\Queue\Queue;
 
 final class ExponentialDelayStrategy implements FailureStrategyInterface
@@ -18,30 +18,21 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
     public const META_KEY_ATTEMPTS = 'failure-strategy-exponential-delay-attempts';
     public const META_KEY_DELAY = 'failure-strategy-exponential-delay-delay';
 
-    private int $maxAttempts;
-    private float $delayInitial;
-    private float $delayMaximum;
-    private float $exponent;
-    private Queue $queue;
-    private PayloadFactory $factory;
-
     /**
-     * ExponentialDelayStrategy constructor.
-     *
      * @param int $maxAttempts Maximum attempts count before this strategy will give up
-     * @param float $delayInitial
-     * @param float $delayMaximum
-     * @param float $exponent
-     * @param PayloadFactory $factory
+     * @param float $delayInitial The first delay period
+     * @param float $delayMaximum The maximum delay period
+     * @param float $exponent The multiplication of delay increasing
      * @param Queue $queue
+     * @param DelayMiddlewareInterface $delayMiddleware
      */
     public function __construct(
-        int $maxAttempts,
-        float $delayInitial,
-        float $delayMaximum,
-        float $exponent,
-        PayloadFactory $factory,
-        Queue $queue
+        private int $maxAttempts,
+        private float $delayInitial,
+        private float $delayMaximum,
+        private float $exponent,
+        private Queue $queue,
+        private DelayMiddlewareInterface $delayMiddleware,
     ) {
         if ($maxAttempts <= 0) {
             throw new InvalidArgumentException('maxAttempts parameter must be a positive integer');
@@ -62,31 +53,24 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
         if ($exponent <= 0) {
             throw new InvalidArgumentException('exponent parameter must not be zero or less');
         }
-
-        $this->maxAttempts = $maxAttempts;
-        $this->delayInitial = $delayInitial;
-        $this->delayMaximum = $delayMaximum;
-        $this->exponent = $exponent;
-        $this->factory = $factory;
-        $this->queue = $queue;
     }
 
     private function suites(MessageInterface $message): bool
     {
-        return $this->maxAttempts > $this->getAttempts($message->getMetadata());
+        return $this->maxAttempts > $this->getAttempts($message);
     }
 
     public function handle(ConsumeRequest $request, Throwable $exception, ?PipelineInterface $pipeline): ConsumeRequest
     {
         $message = $request->getMessage();
         if ($this->suites($message)) {
-            $message = new Message(
+            $messageNew = new Message(
                 handlerName: $message->getHandlerName(),
                 data: $message->getData(),
-                metadata: $this->formNewMeta($message->getMetadata()),
+                metadata: $this->formNewMeta($message),
                 id: $message->getId(),
             );
-            $this->queue->push($message, /** TODO place delaying middleware here */);
+            $this->queue->push($messageNew, $this->delayMiddleware->withDelay($this->getDelay($message)));
 
             return $request;
         }
@@ -98,21 +82,23 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
         return $pipeline->handle($request, $exception);
     }
 
-    private function formNewMeta(array $meta): array
+    private function formNewMeta(MessageInterface $message): array
     {
-        $meta[self::META_KEY_DELAY] = $this->getDelay($meta);
-        $meta[self::META_KEY_ATTEMPTS] = $this->getAttempts($meta) + 1;
+        $meta = $message->getMetadata();
+        $meta[self::META_KEY_DELAY] = $this->getDelay($message);
+        $meta[self::META_KEY_ATTEMPTS] = $this->getAttempts($message) + 1;
 
         return $meta;
     }
 
-    private function getAttempts(array $meta): int
+    private function getAttempts(MessageInterface $message): int
     {
-        return $meta[self::META_KEY_ATTEMPTS] ?? 0;
+        return $message->getMetadata()[self::META_KEY_ATTEMPTS] ?? 0;
     }
 
-    private function getDelay(array $meta): float
+    private function getDelay(MessageInterface $message): float
     {
+        $meta = $message->getMetadata();
         if (isset($meta[self::META_KEY_DELAY])) {
             $delayOriginal = (float) $meta[self::META_KEY_DELAY];
             if ($delayOriginal === 0.0) {
