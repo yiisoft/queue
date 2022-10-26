@@ -4,20 +4,14 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Message;
 
-final class Message extends AbstractMessage
+final class Message implements MessageInterface
 {
-    private string $handlerName;
-    /** @var mixed $data Message data, encodable by a used driver */
-    private $data;
+    private ?string $id = null;
 
-    /**
-     * Message constructor.
-     *
-     * @param string $handlerName
-     * @param mixed $data Message data, encodable by a used driver
-     */
-    public function __construct(string $handlerName, $data)
-    {
+    public function __construct(
+        private string $handlerName,
+        private mixed $data,
+    ) {
         $this->handlerName = $handlerName;
         $this->data = $data;
     }
@@ -30,8 +24,18 @@ final class Message extends AbstractMessage
     /**
      * @return mixed
      */
-    public function getData()
+    public function getData(): mixed
     {
         return $this->data;
+    }
+
+    public function setId(?string $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function getId(): ?string
+    {
+        return $this->id;
     }
 }
