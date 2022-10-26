@@ -16,9 +16,10 @@ return [
     'yiisoft/yii-queue' => [
         'handlers' => [],
         'channel-definitions' => [],
-    ],
-    'middlewares-push' => [],
-    'middlewares-consume' => [
-        FailureStrategyMiddleware::class,
+        'middlewares-push' => [],
+        'middlewares-consume' => [
+            FailureStrategyMiddleware::class,
+        ],
+        'fail-strategy-pipelines' => [],
     ],
 ];

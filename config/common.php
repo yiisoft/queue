@@ -42,10 +42,13 @@ return [
     MiddlewareFactoryPushInterface::class => MiddlewareFactoryPush::class,
     MiddlewareFactoryConsumeInterface::class => MiddlewareFactoryConsume::class,
     DispatcherFactoryInterface::class => DispatcherFactory::class,
+    DispatcherFactory::class => [
+        '__construct()' => ['pipelines' => $params['yiisoft/yii-queue']['fail-strategy-pipelines']],
+    ],
     PushMiddlewareDispatcher::class => [
-        'middlewareDefinitions' => $params['yiisoft/yii-queue']['middlewares-push'],
+        '__construct()' => ['middlewareDefinitions' => $params['yiisoft/yii-queue']['middlewares-push']],
     ],
     ConsumeMiddlewareDispatcher::class => [
-        'middlewareDefinitions' => $params['yiisoft/yii-queue']['middlewares-consume'],
+        '__construct()' => ['middlewareDefinitions' => $params['yiisoft/yii-queue']['middlewares-consume']],
     ],
 ];
