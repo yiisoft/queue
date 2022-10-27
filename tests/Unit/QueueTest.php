@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
-use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
-use Yiisoft\Yii\Queue\Message\Behaviors\DelayBehavior;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Yii\Queue\Tests\TestCase;
@@ -36,29 +34,6 @@ final class QueueTest extends TestCase
         $queue->push($message);
 
         self::assertSame([$message], $adapter->pushMessages);
-    }
-
-    public function testPushNotSuccessful(): void
-    {
-        $this->needsRealAdapter = false;
-        $behavior = new DelayBehavior(2);
-        $exception = new BehaviorNotSupportedException(get_class($this->getAdapter()), $behavior);
-        $this
-            ->getAdapter()
-            ->method('push')
-            ->willThrowException($exception);
-        $expectedException = null;
-
-        $queue = $this
-            ->getQueue()
-            ->withAdapter($this->getAdapter());
-        $message = new Message('simple', null);
-        try {
-            $queue->push($message);
-        } catch (BehaviorNotSupportedException $expectedException) {
-        } finally {
-            self::assertInstanceOf(BehaviorNotSupportedException::class, $expectedException);
-        }
     }
 
     public function testRun(): void
