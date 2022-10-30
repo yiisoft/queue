@@ -219,7 +219,7 @@ You can use any of these formats to define a middleware:
     or `MiddlewareConsumeInterface` depending on the place you use it.
 - An array in the format of [yiisoft/definitions](https://github.com/yiisoft/definitions).
     **Only if you use yiisoft/definitions and yiisoft/di**.
-- A `callable`: `fn() => // do stuff`, `$object->foo(...)`, etc. It will be executed through the [yiisoft/injector](yiisoft/injector), so all the dependencies of your callable will be resolved
+- A `callable`: `fn() => // do stuff`, `$object->foo(...)`, etc. It will be executed through the [yiisoft/injector](https://github.com/yiisoft/injector), so all the dependencies of your callable will be resolved
 - A string for your DI container to resolve the middleware, e.g. `FooMiddleware::class`
 
 Middleware will be executed forwards in the same order they are defined. If you define it like the following:
@@ -252,10 +252,11 @@ With push middlewares you can define an adapter object at the runtime, not in th
 There is a restriction: by the time all middlewares are executed in the forward order, the adapter must be specified
 in the `PushRequest` object. You will get a `AdapterNotConfiguredException`, if it isn't.
 
-You have two places to define push middlewares:
+You have three places to define push middlewares:
 1. `PushMiddlewareDispatcher`. You can pass it either to the constructor, or to the `withMiddlewares()` method, which  
     creates a completely new dispatcher object with only those middlewares, which are passed as arguments.
-2. Put middlewares into the `Queue::push()` method like this: `$queue->push($message, ...$middlewares)`. These middlewares will always be executed after those which are in the `PushMiddlewareDispatcher`.
+2. Pass middlewares to the `Queue::withMiddlewares()` or `Queue::withMiddlewaresAdded()` method. The difference is that the first method will completely replace an existing middleware stack, while the second one will add passed middlewares to the end of the existing stack. These middlewares will be executed after the common ones, passed directly to the `PushMiddlewareDispatcher`. It's useful when defining a queue channel. Both methods return a new instance of the `Queue` class.
+3. Put middlewares into the `Queue::push()` method like this: `$queue->push($message, ...$middlewares)`. These middlewares will be executed after those which are in the `PushMiddlewareDispatcher` and which are passed to the `Queue::withMiddlewares()` and `Queue::withMiddlewaresAdded()`, and only for the message with which they are passed.
 
 ### Consume pipeline
 
