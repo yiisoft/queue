@@ -151,7 +151,7 @@ final class Queue implements QueueInterface
         return new class (
             $this->adapterPushHandler,
             $this->pushMiddlewareDispatcher,
-            $middlewares
+            [...array_values($this->middlewareDefinitions), ...array_values($middlewares)]
         ) implements MessageHandlerPushInterface {
             public function __construct(
                 private AdapterPushHandler $adapterPushHandler,

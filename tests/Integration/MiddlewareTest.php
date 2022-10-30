@@ -32,6 +32,9 @@ final class MiddlewareTest extends TestCase
             'initial',
             'common 1',
             'common 2',
+            'channel 1',
+            'channel 2',
+            'channel 3',
             'message 1',
             'message 2',
         ];
@@ -56,6 +59,9 @@ final class MiddlewareTest extends TestCase
                 $this->createMock(QueueInterface::class),
             ),
         );
+        $queue = $queue
+            ->withMiddlewares(new TestMiddleware('channel 1'), new TestMiddleware('channel 2'))
+            ->withMiddlewaresAdded(new TestMiddleware('channel 3'));
 
         $message = new Message('test', ['initial']);
         $messagePushed = $queue->push(
