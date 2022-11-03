@@ -60,6 +60,7 @@ final class MiddlewareTest extends TestCase
             ),
         );
         $queue = $queue
+            ->withMiddlewares(new TestMiddleware('Won\'t be executed'))
             ->withMiddlewares(new TestMiddleware('channel 1'), new TestMiddleware('channel 2'))
             ->withMiddlewaresAdded(new TestMiddleware('channel 3'));
 
