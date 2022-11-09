@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit\FailureStrategy\Strategy;
 
+use Exception;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use RuntimeException;
-use Yiisoft\Yii\Queue\FailureStrategy\Dispatcher\PipelineInterface;
-use Yiisoft\Yii\Queue\FailureStrategy\Strategy\ExponentialDelayStrategy;
-use Yiisoft\Yii\Queue\FailureStrategy\Strategy\FailureStrategyInterface;
-use Yiisoft\Yii\Queue\FailureStrategy\Strategy\SendAgainStrategy;
+use Throwable;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Payload\PayloadInterface;
-use Yiisoft\Yii\Queue\PayloadFactory;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Yii\Queue\Middleware\Implementation\DelayMiddlewareInterface;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\ExponentialDelayStrategy;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\FailureStrategyInterface;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\SendAgainStrategy;
 use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 class ResendStrategyTest extends TestCase
@@ -71,7 +74,6 @@ class ResendStrategyTest extends TestCase
                 [
                     ExponentialDelayStrategy::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_INITIAL * self::EXPONENTIAL_STRATEGY_EXPONENT,
                     ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
-                    PayloadInterface::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_INITIAL * self::EXPONENTIAL_STRATEGY_EXPONENT,
                 ],
             ],
             [
@@ -84,7 +86,6 @@ class ResendStrategyTest extends TestCase
                 [
                     ExponentialDelayStrategy::META_KEY_DELAY => 1 * self::EXPONENTIAL_STRATEGY_EXPONENT,
                     ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
-                    PayloadInterface::META_KEY_DELAY => 1 * self::EXPONENTIAL_STRATEGY_EXPONENT,
                 ],
             ],
             [
@@ -97,7 +98,6 @@ class ResendStrategyTest extends TestCase
                 [
                     ExponentialDelayStrategy::META_KEY_DELAY => 2 * self::EXPONENTIAL_STRATEGY_EXPONENT,
                     ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
-                    PayloadInterface::META_KEY_DELAY => 2 * self::EXPONENTIAL_STRATEGY_EXPONENT,
                 ],
             ],
             [
@@ -110,7 +110,6 @@ class ResendStrategyTest extends TestCase
                 [
                     ExponentialDelayStrategy::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
                     ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
-                    PayloadInterface::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
                 ],
             ],
             [
@@ -123,7 +122,6 @@ class ResendStrategyTest extends TestCase
                 [
                     ExponentialDelayStrategy::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
                     ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
-                    PayloadInterface::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
                 ],
             ],
             [
@@ -136,7 +134,6 @@ class ResendStrategyTest extends TestCase
                 [
                     ExponentialDelayStrategy::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
                     ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
-                    PayloadInterface::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
                 ],
             ],
         ];
@@ -156,34 +153,34 @@ class ResendStrategyTest extends TestCase
         array $metaInitial,
         array $metaResult
     ): void {
+        if (!$suites) {
+            $this->expectExceptionMessage('testException');
+        }
+
         $pipeline = $this->getPipeline($metaResult, $suites);
         $queue = $this->getPreparedQueue($metaResult, $suites);
 
         $strategy = $this->getStrategy($strategyName, $queue);
+        $request = new ConsumeRequest(new Message('test', null, $metaInitial), $queue);
+        $result = $strategy->handle($request, new Exception('testException'), $pipeline);
 
-        $message = new Message('test', null, $metaInitial);
-        $result = $strategy->handle($message, $pipeline);
-
-        self::assertEquals($suites, $result);
+        self::assertInstanceOf(ConsumeRequest::class, $result);
     }
 
-    private function getStrategy(string $strategyName, Queue $queue): FailureStrategyInterface
+    private function getStrategy(string $strategyName, QueueInterface $queue): FailureStrategyInterface
     {
-        switch ($strategyName) {
-            case SendAgainStrategy::class:
-                return new SendAgainStrategy('', 2, $queue, new PayloadFactory());
-            case ExponentialDelayStrategy::class:
-                return new ExponentialDelayStrategy(
-                    2,
-                    self::EXPONENTIAL_STRATEGY_DELAY_INITIAL,
-                    self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
-                    self::EXPONENTIAL_STRATEGY_EXPONENT,
-                    new PayloadFactory(),
-                    $queue
-                );
-            default:
-                throw new RuntimeException('Unknown strategy');
-        }
+        return match ($strategyName) {
+            SendAgainStrategy::class => new SendAgainStrategy('', 2, $queue),
+            ExponentialDelayStrategy::class => new ExponentialDelayStrategy(
+                2,
+                self::EXPONENTIAL_STRATEGY_DELAY_INITIAL,
+                self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
+                self::EXPONENTIAL_STRATEGY_EXPONENT,
+                $queue,
+                $this->createMock(DelayMiddlewareInterface::class),
+            ),
+            default => throw new RuntimeException('Unknown strategy'),
+        };
     }
 
     /**
@@ -194,10 +191,10 @@ class ResendStrategyTest extends TestCase
      */
     private function getPipeline(array $metaResult, bool $suites): PipelineInterface
     {
-        $pipelineAssertion = static function (MessageInterface $message) use ($metaResult) {
-            Assert::assertEquals($metaResult, $message->getPayloadMeta());
+        $pipelineAssertion = static function (ConsumeRequest $request, Throwable $exception) use ($metaResult) {
+            Assert::assertEquals($metaResult, $request->getMessage()->getMetadata());
 
-            return false;
+            throw $exception;
         };
         $pipeline = $this->createMock(PipelineInterface::class);
         $pipeline->expects($suites ? self::never() : self::once())
@@ -213,15 +210,15 @@ class ResendStrategyTest extends TestCase
      *
      * @return MockObject|Queue
      */
-    private function getPreparedQueue(array $metaResult, bool $suites): Queue
+    private function getPreparedQueue(array $metaResult, bool $suites): QueueInterface
     {
-        $queueAssertion = static function (PayloadInterface $payload) use ($metaResult) {
-            Assert::assertEquals($metaResult, $payload->getMeta());
+        $queueAssertion = static function (MessageInterface $message) use ($metaResult) {
+            Assert::assertEquals($metaResult, $message->getMetadata());
 
-            return null;
+            return $message;
         };
 
-        $queue = $this->createMock(Queue::class);
+        $queue = $this->createMock(QueueInterface::class);
         $queue->expects($suites ? self::once() : self::never())
             ->method('push')
             ->willReturnCallback($queueAssertion);
@@ -237,7 +234,6 @@ class ResendStrategyTest extends TestCase
                 [
                     ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
                     ExponentialDelayStrategy::META_KEY_DELAY => 0,
-                    PayloadInterface::META_KEY_DELAY => 0,
                 ],
             ],
             'zero delay in meta' => [
@@ -248,7 +244,6 @@ class ResendStrategyTest extends TestCase
                 [
                     ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
                     ExponentialDelayStrategy::META_KEY_DELAY => 1,
-                    PayloadInterface::META_KEY_DELAY => 1,
                 ],
             ],
             'positive delay in meta' => [
@@ -259,7 +254,6 @@ class ResendStrategyTest extends TestCase
                 [
                     ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
                     ExponentialDelayStrategy::META_KEY_DELAY => 4,
-                    PayloadInterface::META_KEY_DELAY => 4,
                 ],
             ],
         ];
@@ -273,14 +267,13 @@ class ResendStrategyTest extends TestCase
      */
     public function testDelayZero(array $messageMeta, array $resultMeta): void
     {
-        $payloadFactory = new PayloadFactory();
-        $queueAssertion = static function (PayloadInterface $payload) use ($resultMeta) {
-            Assert::assertEquals($resultMeta, $payload->getMeta());
+        $queueAssertion = static function (MessageInterface $message) use ($resultMeta) {
+            Assert::assertEquals($resultMeta, $message->getMetadata());
 
-            return null;
+            return $message;
         };
 
-        $queue = $this->createMock(Queue::class);
+        $queue = $this->createMock(QueueInterface::class);
         $queue->expects(self::once())
             ->method('push')
             ->willReturnCallback($queueAssertion);
@@ -290,11 +283,11 @@ class ResendStrategyTest extends TestCase
             0,
             5,
             2,
-            $payloadFactory,
-            $queue
+            $queue,
+            $this->createMock(DelayMiddlewareInterface::class)
         );
         $pipeline = $this->createMock(PipelineInterface::class);
-        $message = new Message('simple', null, $messageMeta);
-        self::assertTrue($strategy->handle($message, $pipeline));
+        $request = new ConsumeRequest(new Message('simple', null, $messageMeta), $queue);
+        self::assertInstanceOf(ConsumeRequest::class, $strategy->handle($request, new Exception('testException'), $pipeline));
     }
 }

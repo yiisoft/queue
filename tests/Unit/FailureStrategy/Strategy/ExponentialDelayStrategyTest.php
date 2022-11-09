@@ -4,20 +4,24 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit\FailureStrategy\Strategy;
 
+use Exception;
 use InvalidArgumentException;
-use Yiisoft\Yii\Queue\FailureStrategy\Dispatcher\PipelineInterface;
-use Yiisoft\Yii\Queue\FailureStrategy\Strategy\ExponentialDelayStrategy;
 use Yiisoft\Yii\Queue\Message\Message;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Yii\Queue\Middleware\Implementation\DelayMiddlewareInterface;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\ExponentialDelayStrategy;
 use Yiisoft\Yii\Queue\PayloadFactory;
 use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 class ExponentialDelayStrategyTest extends TestCase
 {
     public function constructorRequirementsProvider(): array
     {
-        $queue = $this->createMock(Queue::class);
-        $factory = $this->createMock(PayloadFactory::class);
+        $queue = $this->createMock(QueueInterface::class);
+        $middleware = $this->createMock(DelayMiddlewareInterface::class);
 
         return [
             [
@@ -27,8 +31,8 @@ class ExponentialDelayStrategyTest extends TestCase
                     0,
                     1,
                     0.01,
-                    $factory,
                     $queue,
+                    $middleware,
                 ],
             ],
             [
@@ -38,8 +42,8 @@ class ExponentialDelayStrategyTest extends TestCase
                     PHP_INT_MAX,
                     PHP_INT_MAX,
                     PHP_INT_MAX,
-                    $factory,
                     $queue,
+                    $middleware,
                 ],
             ],
             [
@@ -49,8 +53,8 @@ class ExponentialDelayStrategyTest extends TestCase
                     0,
                     1,
                     0.01,
-                    $factory,
                     $queue,
+                    $middleware,
                 ],
             ],
             [
@@ -60,8 +64,8 @@ class ExponentialDelayStrategyTest extends TestCase
                     0,
                     0,
                     0.01,
-                    $factory,
                     $queue,
+                    $middleware,
                 ],
             ],
             [
@@ -71,8 +75,8 @@ class ExponentialDelayStrategyTest extends TestCase
                     0,
                     0.01,
                     0,
-                    $factory,
                     $queue,
+                    $middleware,
                 ],
             ],
             [
@@ -82,8 +86,8 @@ class ExponentialDelayStrategyTest extends TestCase
                     PHP_INT_MAX,
                     PHP_INT_MAX,
                     PHP_INT_MAX,
-                    $factory,
                     $queue,
+                    $middleware,
                 ],
             ],
             [
@@ -93,8 +97,8 @@ class ExponentialDelayStrategyTest extends TestCase
                     PHP_INT_MAX,
                     0,
                     PHP_INT_MAX,
-                    $factory,
                     $queue,
+                    $middleware,
                 ],
             ],
             [
@@ -104,8 +108,8 @@ class ExponentialDelayStrategyTest extends TestCase
                     PHP_INT_MAX,
                     PHP_INT_MAX,
                     0,
-                    $factory,
                     $queue,
+                    $middleware,
                 ],
             ],
         ];
@@ -127,34 +131,47 @@ class ExponentialDelayStrategyTest extends TestCase
         self::assertInstanceOf(ExponentialDelayStrategy::class, $strategy);
     }
 
-    public function testReturnTrueFromPipeline(): void
+    public function testPipelineSuccess(): void
     {
-        $message = new Message('test', null, [ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2]);
-        $strategy = new ExponentialDelayStrategy(1, 1, 1, 1, $this->createMock(PayloadFactory::class), $this->createMock(Queue::class));
+        $message = new Message('test', null);
+        $queue = $this->createMock(QueueInterface::class);
+        $strategy = new ExponentialDelayStrategy(
+            1,
+            1,
+            1,
+            1,
+            $queue,
+            $this->createMock(DelayMiddlewareInterface::class)
+        );
         $pipeline = $this->createMock(PipelineInterface::class);
-        $pipeline->expects(self::once())->method('handle')->willReturn(true);
-        $result = $strategy->handle($message, $pipeline);
+        $pipeline->expects(self::never())->method('handle');
+        $request = new ConsumeRequest($message, $queue);
+        $result = $strategy->handle($request, new Exception('test'), $pipeline);
 
-        self::assertTrue($result);
+        self::assertNotEquals($request, $result);
+        self::assertArrayHasKey(ExponentialDelayStrategy::META_KEY_ATTEMPTS, $result->getMessage()->getMetadata());
+        self::assertArrayHasKey(ExponentialDelayStrategy::META_KEY_DELAY, $result->getMessage()->getMetadata());
     }
 
-    public function testReturnFalseFromPipeline(): void
+    public function testPipelineFailure(): void
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('test');
+
         $message = new Message('test', null, [ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2]);
-        $strategy = new ExponentialDelayStrategy(1, 1, 1, 1, $this->createMock(PayloadFactory::class), $this->createMock(Queue::class));
+        $queue = $this->createMock(QueueInterface::class);
+        $strategy = new ExponentialDelayStrategy(
+            1,
+            1,
+            1,
+            1,
+            $queue,
+            $this->createMock(DelayMiddlewareInterface::class)
+        );
         $pipeline = $this->createMock(PipelineInterface::class);
-        $pipeline->expects(self::once())->method('handle')->willReturn(false);
-        $result = $strategy->handle($message, $pipeline);
-
-        self::assertFalse($result);
-    }
-
-    public function testReturnFalseWithoutPipeline(): void
-    {
-        $message = new Message('test', null, [ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2]);
-        $strategy = new ExponentialDelayStrategy(1, 1, 1, 1, $this->createMock(PayloadFactory::class), $this->createMock(Queue::class));
-        $result = $strategy->handle($message, null);
-
-        self::assertFalse($result);
+        $exception = new Exception('test');
+        $pipeline->expects(self::once())->method('handle')->willThrowException($exception);
+        $request = new ConsumeRequest($message, $queue);
+        $strategy->handle($request, $exception, $pipeline);
     }
 }
