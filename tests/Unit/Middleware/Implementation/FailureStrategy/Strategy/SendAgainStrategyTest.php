@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\FailureStrategy\Strategy;
+namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Implementation\FailureStrategy\Strategy;
 
 use Exception;
 use Yiisoft\Yii\Queue\Message\Message;
