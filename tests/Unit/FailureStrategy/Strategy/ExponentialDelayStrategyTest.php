@@ -115,9 +115,6 @@ class ExponentialDelayStrategyTest extends TestCase
 
     /**
      * @dataProvider constructorRequirementsProvider
-     *
-     * @param bool $success
-     * @param array $arguments
      */
     public function testConstructorRequirements(bool $success, array $arguments): void
     {

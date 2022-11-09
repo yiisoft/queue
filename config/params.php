@@ -17,9 +17,7 @@ return [
         'handlers' => [],
         'channel-definitions' => [],
         'middlewares-push' => [],
-        'middlewares-consume' => [
-            FailureStrategyMiddleware::class,
-        ],
+        'middlewares-consume' => [FailureStrategyMiddleware::class],
         'fail-strategy-pipelines' => [],
     ],
 ];

@@ -13,7 +13,7 @@ final class DispatcherFactory implements DispatcherFactoryInterface
 {
     public const DEFAULT_PIPELINE = 'failure-pipeline-default';
     /**
-     * @var WeakReference[]
+     * @var WeakReference<DispatcherInterface>[]
      */
     private array $built = [];
 
@@ -31,7 +31,6 @@ final class DispatcherFactory implements DispatcherFactoryInterface
         }
 
         if (isset($this->built[$payloadName]) && $result = $this->built[$payloadName]->get()) {
-            /** @var DispatcherInterface $result */
             return $result;
         }
 

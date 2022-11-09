@@ -139,11 +139,6 @@ class ResendStrategyTest extends TestCase
 
     /**
      * @dataProvider queueSendingStrategyProvider
-     *
-     * @param string $strategyName
-     * @param bool $suites
-     * @param array $metaInitial
-     * @param array $metaResult
      */
     public function testQueueSendingStrategies(
         string $strategyName,
@@ -247,9 +242,6 @@ class ResendStrategyTest extends TestCase
 
     /**
      * @dataProvider delayZeroProvider
-     *
-     * @param array $messageMeta
-     * @param array $resultMeta
      */
     public function testDelayZero(array $messageMeta, array $resultMeta): void
     {
