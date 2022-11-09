@@ -9,7 +9,6 @@ use Throwable;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\FailureStrategyInterface;
 use Yiisoft\Yii\Queue\Middleware\InvalidMiddlewareDefinitionException;
 
