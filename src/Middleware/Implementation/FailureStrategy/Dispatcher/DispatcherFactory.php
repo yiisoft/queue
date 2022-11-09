@@ -52,7 +52,7 @@ final class DispatcherFactory implements DispatcherFactoryInterface
 
     private function createPipeline(array $pipeline): PipelineInterface
     {
-        $handler = $this->getEmptyPipeline();
+        $handler = $this->getLastPipeline();
         foreach (array_reverse($pipeline) as $strategy) {
             $strategy = $strategy instanceof FailureStrategyInterface ? $strategy : $this->factory->create($strategy);
 
@@ -81,12 +81,12 @@ final class DispatcherFactory implements DispatcherFactoryInterface
         };
     }
 
-    private function getEmptyPipeline(): PipelineInterface
+    private function getLastPipeline(): PipelineInterface
     {
         return new class () implements PipelineInterface {
             public function handle(ConsumeRequest $request, Throwable $exception): ConsumeRequest
             {
-                return $request;
+                throw $exception;
             }
         };
     }
