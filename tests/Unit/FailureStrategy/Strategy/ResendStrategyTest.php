@@ -6,7 +6,6 @@ namespace Yiisoft\Yii\Queue\Tests\Unit\FailureStrategy\Strategy;
 
 use Exception;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\MockObject;
 use RuntimeException;
 use Throwable;
 use Yiisoft\Yii\Queue\Message\Message;
@@ -17,7 +16,6 @@ use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\Pipel
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\ExponentialDelayStrategy;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\FailureStrategyInterface;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\SendAgainStrategy;
-use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
@@ -183,15 +181,9 @@ class ResendStrategyTest extends TestCase
         };
     }
 
-    /**
-     * @param array $metaResult
-     * @param bool $suites
-     *
-     * @return MockObject|PipelineInterface
-     */
     private function getPipeline(array $metaResult, bool $suites): PipelineInterface
     {
-        $pipelineAssertion = static function (ConsumeRequest $request, Throwable $exception) use ($metaResult) {
+        $pipelineAssertion = static function (ConsumeRequest $request, Throwable $exception) use ($metaResult): ConsumeRequest {
             Assert::assertEquals($metaResult, $request->getMessage()->getMetadata());
 
             throw $exception;
@@ -204,15 +196,9 @@ class ResendStrategyTest extends TestCase
         return $pipeline;
     }
 
-    /**
-     * @param array $metaResult
-     * @param bool $suites
-     *
-     * @return MockObject|Queue
-     */
     private function getPreparedQueue(array $metaResult, bool $suites): QueueInterface
     {
-        $queueAssertion = static function (MessageInterface $message) use ($metaResult) {
+        $queueAssertion = static function (MessageInterface $message) use ($metaResult): MessageInterface {
             Assert::assertEquals($metaResult, $message->getMetadata());
 
             return $message;
@@ -267,7 +253,7 @@ class ResendStrategyTest extends TestCase
      */
     public function testDelayZero(array $messageMeta, array $resultMeta): void
     {
-        $queueAssertion = static function (MessageInterface $message) use ($resultMeta) {
+        $queueAssertion = static function (MessageInterface $message) use ($resultMeta): MessageInterface {
             Assert::assertEquals($resultMeta, $message->getMetadata());
 
             return $message;
@@ -288,6 +274,6 @@ class ResendStrategyTest extends TestCase
         );
         $pipeline = $this->createMock(PipelineInterface::class);
         $request = new ConsumeRequest(new Message('simple', null, $messageMeta), $queue);
-        self::assertInstanceOf(ConsumeRequest::class, $strategy->handle($request, new Exception('testException'), $pipeline));
+        $strategy->handle($request, new Exception('testException'), $pipeline);
     }
 }
