@@ -10,7 +10,7 @@ use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
-use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueInterface;
 
 final class SendAgainStrategy implements FailureStrategyInterface
 {
@@ -19,7 +19,7 @@ final class SendAgainStrategy implements FailureStrategyInterface
     public function __construct(
         private string $id,
         private int $maxAttempts,
-        private Queue $queue,
+        private QueueInterface $queue,
     ) {
         if ($maxAttempts < 1) {
             throw new InvalidArgumentException('maxAttempts parameter must be a positive integer');
@@ -38,7 +38,7 @@ final class SendAgainStrategy implements FailureStrategyInterface
             );
             $this->queue->push($message);
 
-            return $request;
+            return $request->withMessage($message);
         }
 
         return $pipeline->handle($request, $exception);

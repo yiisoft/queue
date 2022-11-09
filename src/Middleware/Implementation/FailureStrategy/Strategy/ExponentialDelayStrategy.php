@@ -12,6 +12,7 @@ use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Implementation\DelayMiddlewareInterface;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
 use Yiisoft\Yii\Queue\Queue;
+use Yiisoft\Yii\Queue\QueueInterface;
 
 final class ExponentialDelayStrategy implements FailureStrategyInterface
 {
@@ -31,7 +32,7 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
         private float $delayInitial,
         private float $delayMaximum,
         private float $exponent,
-        private Queue $queue,
+        private QueueInterface $queue,
         private DelayMiddlewareInterface $delayMiddleware,
     ) {
         if ($maxAttempts <= 0) {
@@ -72,7 +73,7 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
             );
             $this->queue->push($messageNew, $this->delayMiddleware->withDelay($this->getDelay($message)));
 
-            return $request;
+            return $request->withMessage($messageNew);
         }
 
         return $pipeline->handle($request, $exception);
