@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Tests\Integration;
 
 use InvalidArgumentException;
+use Yiisoft\Factory\Factory;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
@@ -19,6 +20,12 @@ use Yiisoft\Yii\Queue\Tests\TestCase;
 
 class FailureStrategyTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->queue = $this->createMock(QueueInterface::class);
+    }
+
     /**
      * The first strategy must handle the message once, after that the second strategy must handle the message
      * two more times. And after all of them an exception should be thrown.
@@ -28,20 +35,27 @@ class FailureStrategyTest extends TestCase
         $message = new Message('simple', null, []);
         $queueCallback = static fn (MessageInterface $message): MessageInterface => $message;
 
-        $queue = $this->createMock(QueueInterface::class);
-        $queue2 = $this->createMock(QueueInterface::class);
-        $queue->expects(self::once())->method('push')->willReturnCallback($queueCallback);
-        $queue2->expects(self::exactly(2))->method('push')->willReturnCallback($queueCallback);
+        $this->queue->expects(self::exactly(7))->method('push')->willReturnCallback($queueCallback);
 
         $pipelines = [
             'simple' => [
-                new SendAgainStrategy('test', 1, $queue),
+                new SendAgainStrategy('test', 1, $this->queue),
+                [
+                    'class' => SendAgainStrategy::class,
+                    '__construct()' => ['test-factory', 1, $this->queue],
+                ],
+                [
+                    new SendAgainStrategy('test-callable', 1, $this->queue),
+                    'handle',
+                ],
+                fn () => new SendAgainStrategy('test-callable-2', 1, $this->queue),
+                SendAgainStrategy::class,
                 new ExponentialDelayStrategy(
                     2,
                     0,
                     5,
                     2,
-                    $queue2,
+                    $this->queue,
                     $this->createMock(DelayMiddlewareInterface::class)
                 ),
             ],
@@ -59,7 +73,7 @@ class FailureStrategyTest extends TestCase
             } while (true);
         } catch (InvalidArgumentException $thrown) {
             self::assertEquals($exception, $thrown);
-            self::assertEquals(3, $iteration);
+            self::assertEquals(7, $iteration);
         }
     }
 
@@ -68,6 +82,12 @@ class FailureStrategyTest extends TestCase
         return new FailureStrategyFactory(
             $this->getContainer(),
             new CallableFactory($this->getContainer()),
+            new Factory($this->getContainer()),
         );
+    }
+
+    protected function getContainerDefinitions(): array
+    {
+        return [SendAgainStrategy::class => new SendAgainStrategy('test-container', 1, $this->queue)];
     }
 }

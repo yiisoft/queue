@@ -8,6 +8,9 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Throwable;
+use Yiisoft\Definitions\Exception\NotInstantiableClassException;
+use Yiisoft\Factory\Factory;
+use Yiisoft\Factory\NotFoundException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
@@ -19,6 +22,7 @@ final class FailureStrategyFactory
     public function __construct(
         private ContainerInterface $container,
         private CallableFactory $callableFactory,
+        private Factory $factory,
     ) {
     }
 
@@ -37,9 +41,13 @@ final class FailureStrategyFactory
             return $this->container->get($definition);
         }
 
-        $callable = $this->callableFactory->create($definition);
+        try {
+            return $this->factory->create($definition);
+        } catch (NotFoundException|NotInstantiableClassException) {
+            $callable = $this->callableFactory->create($definition);
 
-        return $this->wrapCallable($callable);
+            return $this->wrapCallable($callable);
+        }
     }
 
     private function wrapCallable(callable $callback): FailureStrategyInterface

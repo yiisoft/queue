@@ -56,7 +56,10 @@ final class SendAgainStrategy implements FailureStrategyInterface
 
     private function createMeta(MessageInterface $message): array
     {
-        return [$this->getMetaKey() => $this->getAttempts($message) + 1];
+        $metadata = $message->getMetadata();
+        $metadata[$this->getMetaKey()] = $this->getAttempts($message) + 1;
+
+        return $metadata;
     }
 
     private function getAttempts(MessageInterface $message): int

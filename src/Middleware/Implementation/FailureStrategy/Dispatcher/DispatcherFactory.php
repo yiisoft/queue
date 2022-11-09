@@ -53,9 +53,7 @@ final class DispatcherFactory implements DispatcherFactoryInterface
     {
         $handler = $this->getLastPipeline();
         foreach (array_reverse($pipeline) as $strategy) {
-            $strategy = $strategy instanceof FailureStrategyInterface ? $strategy : $this->factory->create($strategy);
-
-            $handler = $this->wrap($strategy, $handler);
+            $handler = $this->wrap($this->factory->create($strategy), $handler);
         }
 
         return $handler;
