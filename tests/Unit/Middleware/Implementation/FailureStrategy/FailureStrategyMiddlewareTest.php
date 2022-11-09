@@ -35,6 +35,7 @@ class FailureStrategyMiddlewareTest extends TestCase
             $handler,
         );
     }
+
     public function testNotUsed(): void
     {
         $dispatcher = $this->createMock(DispatcherInterface::class);
