@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher;
 
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Throwable;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
@@ -20,7 +22,11 @@ final class FailureStrategyFactory
     ) {
     }
 
-    public function create(callable|array|string|FailureStrategyInterface $definition)
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function create(callable|array|string|FailureStrategyInterface $definition): FailureStrategyInterface
     {
         if ($definition instanceof FailureStrategyInterface) {
             return $definition;
