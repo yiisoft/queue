@@ -26,7 +26,7 @@ class FailureStrategyTest extends TestCase
     public function testComplexStrategy(): void
     {
         $message = new Message('simple', null, []);
-        $queueCallback = static fn(MessageInterface $message): MessageInterface => $message;
+        $queueCallback = static fn (MessageInterface $message): MessageInterface => $message;
 
         $queue = $this->createMock(QueueInterface::class);
         $queue2 = $this->createMock(QueueInterface::class);
