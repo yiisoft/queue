@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher;
 
-use Psr\Container\ContainerInterface;
 use Throwable;
 use WeakReference;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
@@ -13,21 +12,15 @@ use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\Failure
 final class DispatcherFactory implements DispatcherFactoryInterface
 {
     public const DEFAULT_PIPELINE = 'failure-pipeline-default';
-
-    private array $pipelines;
     /**
      * @var WeakReference[]
      */
     private array $built = [];
-    private ContainerInterface $container;
 
-    public function __construct(array $pipelines, ContainerInterface $container)
+    public function __construct(private array $pipelines, private FailureStrategyFactory $factory)
     {
-        $this->pipelines = $pipelines;
-        $this->container = $container;
-
         if (!isset($this->pipelines[self::DEFAULT_PIPELINE])) {
-            $this->pipelines[self::DEFAULT_PIPELINE] = [$this->getEmptyStrategy()];
+            $this->pipelines[self::DEFAULT_PIPELINE] = [];
         }
     }
 
@@ -36,6 +29,7 @@ final class DispatcherFactory implements DispatcherFactoryInterface
         if (!isset($this->pipelines[$payloadName]) || $this->pipelines[$payloadName] === []) {
             $payloadName = self::DEFAULT_PIPELINE;
         }
+
         if (isset($this->built[$payloadName]) && $result = $this->built[$payloadName]->get()) {
             /** @var DispatcherInterface $result */
             return $result;
@@ -58,24 +52,23 @@ final class DispatcherFactory implements DispatcherFactoryInterface
 
     private function createPipeline(array $pipeline): PipelineInterface
     {
-        $handler = null;
+        $handler = $this->getEmptyPipeline();
         foreach (array_reverse($pipeline) as $strategy) {
-            $strategy = $strategy instanceof FailureStrategyInterface ? $strategy : $this->container->get($strategy);
+            $strategy = $strategy instanceof FailureStrategyInterface ? $strategy : $this->factory->create($strategy);
 
             $handler = $this->wrap($strategy, $handler);
         }
 
-        /** @var PipelineInterface $handler It can't be null here, because $pipeline can't be empty */
         return $handler;
     }
 
-    private function wrap(FailureStrategyInterface $strategy, ?PipelineInterface $pipeline): PipelineInterface
+    private function wrap(FailureStrategyInterface $strategy, PipelineInterface $pipeline): PipelineInterface
     {
         return new class ($strategy, $pipeline) implements PipelineInterface {
             private FailureStrategyInterface $strategy;
-            private ?PipelineInterface $pipeline;
+            private PipelineInterface $pipeline;
 
-            public function __construct(FailureStrategyInterface $strategy, ?PipelineInterface $pipeline)
+            public function __construct(FailureStrategyInterface $strategy, PipelineInterface $pipeline)
             {
                 $this->strategy = $strategy;
                 $this->pipeline = $pipeline;
@@ -88,10 +81,10 @@ final class DispatcherFactory implements DispatcherFactoryInterface
         };
     }
 
-    private function getEmptyStrategy(): FailureStrategyInterface
+    private function getEmptyPipeline(): PipelineInterface
     {
-        return new class () implements FailureStrategyInterface {
-            public function handle(ConsumeRequest $request, Throwable $exception, ?PipelineInterface $pipeline): ConsumeRequest
+        return new class () implements PipelineInterface {
+            public function handle(ConsumeRequest $request, Throwable $exception): ConsumeRequest
             {
                 return $request;
             }

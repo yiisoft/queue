@@ -60,7 +60,7 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
         return $this->maxAttempts > $this->getAttempts($message);
     }
 
-    public function handle(ConsumeRequest $request, Throwable $exception, ?PipelineInterface $pipeline): ConsumeRequest
+    public function handle(ConsumeRequest $request, Throwable $exception, PipelineInterface $pipeline): ConsumeRequest
     {
         $message = $request->getMessage();
         if ($this->suites($message)) {
@@ -72,10 +72,6 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
             );
             $this->queue->push($messageNew, $this->delayMiddleware->withDelay($this->getDelay($message)));
 
-            return $request;
-        }
-
-        if ($pipeline === null) {
             return $request;
         }
 

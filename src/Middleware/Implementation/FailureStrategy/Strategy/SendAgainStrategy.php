@@ -26,7 +26,7 @@ final class SendAgainStrategy implements FailureStrategyInterface
         }
     }
 
-    public function handle(ConsumeRequest $request, Throwable $exception, ?PipelineInterface $pipeline): ConsumeRequest
+    public function handle(ConsumeRequest $request, Throwable $exception, PipelineInterface $pipeline): ConsumeRequest
     {
         $message = $request->getMessage();
         if ($this->suites($message)) {
@@ -41,7 +41,7 @@ final class SendAgainStrategy implements FailureStrategyInterface
             return $request;
         }
 
-        return $pipeline === null ? $request : $pipeline->handle($request, $exception);
+        return $pipeline->handle($request, $exception);
     }
 
     private function suites(MessageInterface $message): bool

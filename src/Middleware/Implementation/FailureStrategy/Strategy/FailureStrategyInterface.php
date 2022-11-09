@@ -10,5 +10,5 @@ use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\Pipel
 
 interface FailureStrategyInterface
 {
-    public function handle(ConsumeRequest $request, Throwable $exception, ?PipelineInterface $pipeline): ConsumeRequest;
+    public function handle(ConsumeRequest $request, Throwable $exception, PipelineInterface $pipeline): ConsumeRequest;
 }
