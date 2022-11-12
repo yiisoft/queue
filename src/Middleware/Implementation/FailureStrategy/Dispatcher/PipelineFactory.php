@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher;
 
 use Throwable;
-use WeakReference;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\FailureStrategyInterface;
 

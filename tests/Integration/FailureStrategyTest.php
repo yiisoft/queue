@@ -12,7 +12,6 @@ use Yiisoft\Yii\Queue\Middleware\CallableFactory;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Implementation\DelayMiddlewareInterface;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\MemoryPipelineFactory;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineFactory;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\FailureStrategyFactory;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\WeakPipelineFactory;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\ExponentialDelayStrategy;
