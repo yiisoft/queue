@@ -48,15 +48,16 @@ class FailureStrategyTest extends TestCase
                     new SendAgainStrategy('test-callable', 1, $this->queue),
                     'handle',
                 ],
-                fn () => new SendAgainStrategy('test-callable-2', 1, $this->queue),
+                fn (): SendAgainStrategy => new SendAgainStrategy('test-callable-2', 1, $this->queue),
                 SendAgainStrategy::class,
                 new ExponentialDelayStrategy(
+                    'test',
                     2,
-                    0,
+                    1,
                     5,
                     2,
+                    $this->createMock(DelayMiddlewareInterface::class),
                     $this->queue,
-                    $this->createMock(DelayMiddlewareInterface::class)
                 ),
             ],
         ];

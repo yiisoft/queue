@@ -16,10 +16,15 @@ final class SendAgainStrategy implements FailureStrategyInterface
 {
     public const META_KEY_RESEND = 'failure-strategy-resend-attempts';
 
+    /**
+     * @param string $id A unique id to differentiate two and more objects of this class
+     * @param int $maxAttempts Maximum attempts count for this strategy with the given $id before it will give up
+     * @param QueueInterface|null $queue
+     */
     public function __construct(
         private string $id,
         private int $maxAttempts,
-        private QueueInterface $queue,
+        private ?QueueInterface $queue = null,
     ) {
         if ($maxAttempts < 1) {
             throw new InvalidArgumentException('maxAttempts parameter must be a positive integer');
@@ -36,9 +41,9 @@ final class SendAgainStrategy implements FailureStrategyInterface
                 metadata: $this->createMeta($message),
                 id: $message->getId(),
             );
-            $this->queue->push($message);
+            $this->queue?->push($message) ?? $request->getQueue()->push($message);
 
-            return $request->withMessage($message);
+            return $request->withMessage($message)->withQueue($this->queue ?? $request->getQueue());
         }
 
         return $pipeline->handle($request, $exception);

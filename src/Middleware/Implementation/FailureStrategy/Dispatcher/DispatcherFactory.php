@@ -24,18 +24,18 @@ final class DispatcherFactory implements DispatcherFactoryInterface
         }
     }
 
-    public function get(string $payloadName): DispatcherInterface
+    public function get(string $channelName): DispatcherInterface
     {
-        if (!isset($this->pipelines[$payloadName]) || $this->pipelines[$payloadName] === []) {
-            $payloadName = self::DEFAULT_PIPELINE;
+        if (!isset($this->pipelines[$channelName]) || $this->pipelines[$channelName] === []) {
+            $channelName = self::DEFAULT_PIPELINE;
         }
 
-        if (isset($this->built[$payloadName]) && $result = $this->built[$payloadName]->get()) {
+        if (isset($this->built[$channelName]) && $result = $this->built[$channelName]->get()) {
             return $result;
         }
 
-        $result = $this->create($this->pipelines[$payloadName]);
-        $this->built[$payloadName] = WeakReference::create($result);
+        $result = $this->create($this->pipelines[$channelName]);
+        $this->built[$channelName] = WeakReference::create($result);
 
         return $result;
     }

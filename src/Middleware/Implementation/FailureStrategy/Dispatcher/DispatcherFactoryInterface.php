@@ -6,5 +6,5 @@ namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher
 
 interface DispatcherFactoryInterface
 {
-    public function get(string $payloadName): DispatcherInterface;
+    public function get(string $channelName): DispatcherInterface;
 }

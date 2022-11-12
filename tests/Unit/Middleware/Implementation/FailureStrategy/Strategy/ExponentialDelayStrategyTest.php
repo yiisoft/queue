@@ -25,89 +25,109 @@ class ExponentialDelayStrategyTest extends TestCase
             [
                 true,
                 [
+                    'test',
                     1,
-                    0,
+                    0.001,
                     1,
                     0.01,
-                    $queue,
                     $middleware,
+                    $queue,
                 ],
             ],
             [
                 true,
                 [
+                    'test',
                     PHP_INT_MAX,
                     PHP_INT_MAX,
                     PHP_INT_MAX,
                     PHP_INT_MAX,
-                    $queue,
                     $middleware,
+                    $queue,
                 ],
             ],
             [
                 false,
                 [
+                    'test',
+                    1,
+                    0,
+                    1,
+                    0.01,
+                    $middleware,
+                    $queue,
+                ],
+            ],
+            [
+                false,
+                [
+                    'test',
                     0,
                     0,
                     1,
                     0.01,
-                    $queue,
                     $middleware,
+                    $queue,
                 ],
             ],
             [
                 false,
                 [
+                    'test',
                     1,
                     0,
                     0,
                     0.01,
-                    $queue,
                     $middleware,
+                    $queue,
                 ],
             ],
             [
                 false,
                 [
+                    'test',
                     1,
                     0,
                     0.01,
                     0,
-                    $queue,
                     $middleware,
+                    $queue,
                 ],
             ],
             [
                 false,
                 [
+                    'test',
                     0,
                     PHP_INT_MAX,
                     PHP_INT_MAX,
                     PHP_INT_MAX,
-                    $queue,
                     $middleware,
+                    $queue,
                 ],
             ],
             [
                 false,
                 [
+                    'test',
                     PHP_INT_MAX,
                     PHP_INT_MAX,
                     0,
                     PHP_INT_MAX,
-                    $queue,
                     $middleware,
+                    $queue,
                 ],
             ],
             [
                 false,
                 [
+                    'test',
                     PHP_INT_MAX,
                     PHP_INT_MAX,
                     PHP_INT_MAX,
                     0,
-                    $queue,
                     $middleware,
+                    $queue,
                 ],
             ],
         ];
@@ -131,12 +151,13 @@ class ExponentialDelayStrategyTest extends TestCase
         $message = new Message('test', null);
         $queue = $this->createMock(QueueInterface::class);
         $strategy = new ExponentialDelayStrategy(
+            'test',
             1,
             1,
             1,
             1,
+            $this->createMock(DelayMiddlewareInterface::class),
             $queue,
-            $this->createMock(DelayMiddlewareInterface::class)
         );
         $pipeline = $this->createMock(PipelineInterface::class);
         $pipeline->expects(self::never())->method('handle');
@@ -144,8 +165,8 @@ class ExponentialDelayStrategyTest extends TestCase
         $result = $strategy->handle($request, new Exception('test'), $pipeline);
 
         self::assertNotEquals($request, $result);
-        self::assertArrayHasKey(ExponentialDelayStrategy::META_KEY_ATTEMPTS, $result->getMessage()->getMetadata());
-        self::assertArrayHasKey(ExponentialDelayStrategy::META_KEY_DELAY, $result->getMessage()->getMetadata());
+        self::assertArrayHasKey(ExponentialDelayStrategy::META_KEY_ATTEMPTS . '-test', $result->getMessage()->getMetadata());
+        self::assertArrayHasKey(ExponentialDelayStrategy::META_KEY_DELAY . '-test', $result->getMessage()->getMetadata());
     }
 
     public function testPipelineFailure(): void
@@ -153,15 +174,16 @@ class ExponentialDelayStrategyTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('test');
 
-        $message = new Message('test', null, [ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2]);
+        $message = new Message('test', null, [ExponentialDelayStrategy::META_KEY_ATTEMPTS . '-test' => 2]);
         $queue = $this->createMock(QueueInterface::class);
         $strategy = new ExponentialDelayStrategy(
+            'test',
             1,
             1,
             1,
             1,
+            $this->createMock(DelayMiddlewareInterface::class),
             $queue,
-            $this->createMock(DelayMiddlewareInterface::class)
         );
         $pipeline = $this->createMock(PipelineInterface::class);
         $exception = new Exception('test');

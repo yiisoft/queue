@@ -8,6 +8,7 @@ use Exception;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\DispatcherFactoryInterface;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\DispatcherInterface;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\FailureStrategyMiddleware;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +27,10 @@ class FailureStrategyMiddlewareTest extends TestCase
             ->method('handleConsume')
             ->willThrowException(new Exception('testException'));
 
-        $middleware = new FailureStrategyMiddleware($dispatcher);
+        $factory = $this->createMock(DispatcherFactoryInterface::class);
+        $factory->expects(self::once())->method('get')->willReturn($dispatcher);
+
+        $middleware = new FailureStrategyMiddleware($factory);
         $middleware->processConsume(
             new ConsumeRequest(
                 $this->createMock(MessageInterface::class),
@@ -38,16 +42,16 @@ class FailureStrategyMiddlewareTest extends TestCase
 
     public function testNotUsed(): void
     {
-        $dispatcher = $this->createMock(DispatcherInterface::class);
-        $dispatcher->expects(self::never())->method('handle');
-
         $handler = $this->createMock(MessageHandlerConsumeInterface::class);
         $handler
             ->expects(self::once())
             ->method('handleConsume')
             ->willReturnArgument(0);
 
-        $middleware = new FailureStrategyMiddleware($dispatcher);
+        $factory = $this->createMock(DispatcherFactoryInterface::class);
+        $factory->expects(self::never())->method('get');
+
+        $middleware = new FailureStrategyMiddleware($factory);
         $middleware->processConsume(
             new ConsumeRequest(
                 $this->createMock(MessageInterface::class),

@@ -271,6 +271,14 @@ along with them.
 
 You can set a middleware pipeline for a message when it will be consumed from a queue server. This is useful to collect metrics, modify message data, etc. In pair with a Push middleware you can deduplicate messages in the queue, calculate time from push to consume, handle errors (push to a queue again, redirect failed message to another queue, send a notification, etc.). Unless Push pipeline, you have only one place to define the middleware stack: in the `ConsumeMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method.
 
+## Error handling
+
+Often when some job is failing, we want to retry its execution a couple more times or redirect it to another queue channel. This can be done in `yiisoft/yii-queue` with Failure Strategies. They are triggered each time message processing is interrupted with any `Throwable`. 
+
+The main way to declare Failure Strategies when using `yiisoft/config` is to configure `yiisoft/yii-queue.fail-strategy-pipelines` in the `params` configuration file (see [yiisoft/config](https://github.com/yiisoft/config) documentation for details). In other case you should configure and add `FailureStrategyMiddleware` to your consume pipeline.
+
+See [error handling docs](docs/guide/error-handling.md) for details.
+
 ## Extra
 
 ### Unit testing

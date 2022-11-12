@@ -24,6 +24,8 @@ class ResendStrategyTest extends TestCase
     private const EXPONENTIAL_STRATEGY_DELAY_INITIAL = 1;
     private const EXPONENTIAL_STRATEGY_DELAY_MAXIMUM = 5;
     private const EXPONENTIAL_STRATEGY_EXPONENT = 2;
+    const KEY_EXPONENTIAL_ATTEMPTS = ExponentialDelayStrategy::META_KEY_ATTEMPTS . '-test';
+    const KEY_EXPONENTIAL_DELAY = ExponentialDelayStrategy::META_KEY_DELAY . '-test';
 
     public function queueSendingStrategyProvider(): array
     {
@@ -70,68 +72,68 @@ class ResendStrategyTest extends TestCase
                 true,
                 [],
                 [
-                    ExponentialDelayStrategy::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_INITIAL * self::EXPONENTIAL_STRATEGY_EXPONENT,
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
+                    self::KEY_EXPONENTIAL_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_INITIAL * self::EXPONENTIAL_STRATEGY_EXPONENT,
+                    self::KEY_EXPONENTIAL_ATTEMPTS => 1,
                 ],
             ],
             [
                 ExponentialDelayStrategy::class,
                 true,
                 [
-                    ExponentialDelayStrategy::META_KEY_DELAY => 1,
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
+                    self::KEY_EXPONENTIAL_DELAY => 1,
+                    self::KEY_EXPONENTIAL_ATTEMPTS => 1,
                 ],
                 [
-                    ExponentialDelayStrategy::META_KEY_DELAY => 1 * self::EXPONENTIAL_STRATEGY_EXPONENT,
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
-                ],
-            ],
-            [
-                ExponentialDelayStrategy::class,
-                true,
-                [
-                    ExponentialDelayStrategy::META_KEY_DELAY => 2,
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
-                ],
-                [
-                    ExponentialDelayStrategy::META_KEY_DELAY => 2 * self::EXPONENTIAL_STRATEGY_EXPONENT,
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
+                    self::KEY_EXPONENTIAL_DELAY => 1 * self::EXPONENTIAL_STRATEGY_EXPONENT,
+                    self::KEY_EXPONENTIAL_ATTEMPTS => 2,
                 ],
             ],
             [
                 ExponentialDelayStrategy::class,
                 true,
                 [
-                    ExponentialDelayStrategy::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
+                    self::KEY_EXPONENTIAL_DELAY => 2,
+                    self::KEY_EXPONENTIAL_ATTEMPTS => 1,
                 ],
                 [
-                    ExponentialDelayStrategy::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
-                ],
-            ],
-            [
-                ExponentialDelayStrategy::class,
-                true,
-                [
-                    ExponentialDelayStrategy::META_KEY_DELAY => 4,
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
-                ],
-                [
-                    ExponentialDelayStrategy::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
+                    self::KEY_EXPONENTIAL_DELAY => 2 * self::EXPONENTIAL_STRATEGY_EXPONENT,
+                    self::KEY_EXPONENTIAL_ATTEMPTS => 2,
                 ],
             ],
             [
                 ExponentialDelayStrategy::class,
                 true,
                 [
-                    ExponentialDelayStrategy::META_KEY_DELAY => 100,
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
+                    self::KEY_EXPONENTIAL_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
+                    self::KEY_EXPONENTIAL_ATTEMPTS => 1,
                 ],
                 [
-                    ExponentialDelayStrategy::META_KEY_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
+                    self::KEY_EXPONENTIAL_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
+                    self::KEY_EXPONENTIAL_ATTEMPTS => 2,
+                ],
+            ],
+            [
+                ExponentialDelayStrategy::class,
+                true,
+                [
+                    self::KEY_EXPONENTIAL_DELAY => 4,
+                    self::KEY_EXPONENTIAL_ATTEMPTS => 1,
+                ],
+                [
+                    self::KEY_EXPONENTIAL_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
+                    self::KEY_EXPONENTIAL_ATTEMPTS => 2,
+                ],
+            ],
+            [
+                ExponentialDelayStrategy::class,
+                true,
+                [
+                    self::KEY_EXPONENTIAL_DELAY => 100,
+                    self::KEY_EXPONENTIAL_ATTEMPTS => 1,
+                ],
+                [
+                    self::KEY_EXPONENTIAL_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
+                    self::KEY_EXPONENTIAL_ATTEMPTS => 2,
                 ],
             ],
         ];
@@ -165,12 +167,13 @@ class ResendStrategyTest extends TestCase
         return match ($strategyName) {
             SendAgainStrategy::class => new SendAgainStrategy('', 2, $queue),
             ExponentialDelayStrategy::class => new ExponentialDelayStrategy(
+                'test',
                 2,
                 self::EXPONENTIAL_STRATEGY_DELAY_INITIAL,
                 self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
                 self::EXPONENTIAL_STRATEGY_EXPONENT,
-                $queue,
                 $this->createMock(DelayMiddlewareInterface::class),
+                $queue,
             ),
             default => throw new RuntimeException('Unknown strategy'),
         };
@@ -205,67 +208,5 @@ class ResendStrategyTest extends TestCase
             ->willReturnCallback($queueAssertion);
 
         return $queue;
-    }
-
-    public function delayZeroProvider(): array
-    {
-        return [
-            'empty meta' => [
-                [],
-                [
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
-                    ExponentialDelayStrategy::META_KEY_DELAY => 0,
-                ],
-            ],
-            'zero delay in meta' => [
-                [
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
-                    ExponentialDelayStrategy::META_KEY_DELAY => 0,
-                ],
-                [
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
-                    ExponentialDelayStrategy::META_KEY_DELAY => 1,
-                ],
-            ],
-            'positive delay in meta' => [
-                [
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 1,
-                    ExponentialDelayStrategy::META_KEY_DELAY => 2,
-                ],
-                [
-                    ExponentialDelayStrategy::META_KEY_ATTEMPTS => 2,
-                    ExponentialDelayStrategy::META_KEY_DELAY => 4,
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider delayZeroProvider
-     */
-    public function testDelayZero(array $messageMeta, array $resultMeta): void
-    {
-        $queueAssertion = static function (MessageInterface $message) use ($resultMeta): MessageInterface {
-            Assert::assertEquals($resultMeta, $message->getMetadata());
-
-            return $message;
-        };
-
-        $queue = $this->createMock(QueueInterface::class);
-        $queue->expects(self::once())
-            ->method('push')
-            ->willReturnCallback($queueAssertion);
-
-        $strategy = new ExponentialDelayStrategy(
-            5,
-            0,
-            5,
-            2,
-            $queue,
-            $this->createMock(DelayMiddlewareInterface::class)
-        );
-        $pipeline = $this->createMock(PipelineInterface::class);
-        $request = new ConsumeRequest(new Message('simple', null, $messageMeta), $queue);
-        $strategy->handle($request, new Exception('testException'), $pipeline);
     }
 }
