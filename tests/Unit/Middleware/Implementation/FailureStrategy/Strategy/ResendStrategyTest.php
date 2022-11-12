@@ -24,8 +24,8 @@ class ResendStrategyTest extends TestCase
     private const EXPONENTIAL_STRATEGY_DELAY_INITIAL = 1;
     private const EXPONENTIAL_STRATEGY_DELAY_MAXIMUM = 5;
     private const EXPONENTIAL_STRATEGY_EXPONENT = 2;
-    const KEY_EXPONENTIAL_ATTEMPTS = ExponentialDelayStrategy::META_KEY_ATTEMPTS . '-test';
-    const KEY_EXPONENTIAL_DELAY = ExponentialDelayStrategy::META_KEY_DELAY . '-test';
+    public const KEY_EXPONENTIAL_ATTEMPTS = ExponentialDelayStrategy::META_KEY_ATTEMPTS . '-test';
+    public const KEY_EXPONENTIAL_DELAY = ExponentialDelayStrategy::META_KEY_DELAY . '-test';
 
     public function queueSendingStrategyProvider(): array
     {

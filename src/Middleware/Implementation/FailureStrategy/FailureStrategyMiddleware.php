@@ -9,7 +9,6 @@ use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareConsumeInterface;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\DispatcherFactoryInterface;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\DispatcherInterface;
 
 final class FailureStrategyMiddleware implements MiddlewareConsumeInterface
 {
