@@ -13,6 +13,9 @@ use Yiisoft\Yii\Queue\Middleware\Implementation\DelayMiddlewareInterface;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 
+/**
+ * Failure strategy which resends the given message to a queue.
+ */
 final class ExponentialDelayStrategy implements FailureStrategyInterface
 {
     public const META_KEY_ATTEMPTS = 'failure-strategy-exponential-delay-attempts';

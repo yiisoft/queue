@@ -17,6 +17,12 @@ use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\FailureStrategyInterface;
 use Yiisoft\Yii\Queue\Middleware\InvalidMiddlewareDefinitionException;
 
+/**
+ * An internal factory to create a Failure Strategy from its definition.
+ * Please don't use it directly.
+ *
+ * @internal
+ */
 final class FailureStrategyFactory
 {
     public function __construct(
@@ -27,8 +33,12 @@ final class FailureStrategyFactory
     }
 
     /**
+     * Creates a Failure Strategy from its definition.
+     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     *
+     * @internal
      */
     public function create(callable|array|string|FailureStrategyInterface $definition): FailureStrategyInterface
     {

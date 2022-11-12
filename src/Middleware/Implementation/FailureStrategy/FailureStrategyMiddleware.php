@@ -8,11 +8,15 @@ use Throwable;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareConsumeInterface;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\DispatcherFactoryInterface;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineFactoryInterface;
 
+/**
+ * A default middleware to enable Failure Strategy mechanics. It will create and call a suitable
+ * Failure Strategy pipeline if a message handling fails.
+ */
 final class FailureStrategyMiddleware implements MiddlewareConsumeInterface
 {
-    public function __construct(private DispatcherFactoryInterface $factory)
+    public function __construct(private PipelineFactoryInterface $factory)
     {
     }
 

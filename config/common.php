@@ -9,8 +9,9 @@ use Yiisoft\Yii\Queue\Cli\SimpleLoop;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\DispatcherFactory;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\DispatcherFactoryInterface;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\MemoryPipelineFactory;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineFactoryInterface;
+use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\WeakPipelineFactory;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
@@ -41,8 +42,11 @@ return [
     QueueInterface::class => Queue::class,
     MiddlewareFactoryPushInterface::class => MiddlewareFactoryPush::class,
     MiddlewareFactoryConsumeInterface::class => MiddlewareFactoryConsume::class,
-    DispatcherFactoryInterface::class => DispatcherFactory::class,
-    DispatcherFactory::class => [
+    PipelineFactoryInterface::class => MemoryPipelineFactory::class,
+    MemoryPipelineFactory::class => [
+        '__construct()' => ['pipelines' => $params['yiisoft/yii-queue']['fail-strategy-pipelines']],
+    ],
+    WeakPipelineFactory::class => [
         '__construct()' => ['pipelines' => $params['yiisoft/yii-queue']['fail-strategy-pipelines']],
     ],
     PushMiddlewareDispatcher::class => [

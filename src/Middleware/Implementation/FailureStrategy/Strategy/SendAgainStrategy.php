@@ -6,12 +6,17 @@ namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy;
 
 use InvalidArgumentException;
 use Throwable;
+use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 
+/**
+ * Failure strategy which resends the given message to a queue with an exponentially increasing delay.
+ * The delay **must** be implemented by the used {@see AdapterInterface} implementation.
+ */
 final class SendAgainStrategy implements FailureStrategyInterface
 {
     public const META_KEY_RESEND = 'failure-strategy-resend-attempts';

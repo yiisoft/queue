@@ -9,50 +9,27 @@ use WeakReference;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\FailureStrategyInterface;
 
-final class DispatcherFactory implements DispatcherFactoryInterface
+use function array_reverse;
+
+abstract class PipelineFactory implements PipelineFactoryInterface
 {
     public const DEFAULT_PIPELINE = 'failure-pipeline-default';
-    /**
-     * @var WeakReference<DispatcherInterface>[]
-     */
-    private array $built = [];
 
-    public function __construct(private array $pipelines, private FailureStrategyFactory $factory)
+    public function __construct(protected array $pipelines, private FailureStrategyFactory $factory)
     {
         if (!isset($this->pipelines[self::DEFAULT_PIPELINE])) {
             $this->pipelines[self::DEFAULT_PIPELINE] = [];
         }
     }
 
-    public function get(string $channelName): DispatcherInterface
-    {
-        if (!isset($this->pipelines[$channelName]) || $this->pipelines[$channelName] === []) {
-            $channelName = self::DEFAULT_PIPELINE;
-        }
-
-        if (isset($this->built[$channelName]) && $result = $this->built[$channelName]->get()) {
-            return $result;
-        }
-
-        $result = $this->create($this->pipelines[$channelName]);
-        $this->built[$channelName] = WeakReference::create($result);
-
-        return $result;
-    }
-
-    private function create(PipelineInterface|array $definition): DispatcherInterface
+    protected function create(PipelineInterface|array $definition): PipelineInterface
     {
         if ($definition instanceof PipelineInterface) {
-            return new Dispatcher($definition);
+            return $definition;
         }
 
-        return new Dispatcher($this->createPipeline($definition));
-    }
-
-    private function createPipeline(array $pipeline): PipelineInterface
-    {
         $handler = $this->getLastPipeline();
-        foreach (array_reverse($pipeline) as $strategy) {
+        foreach (array_reverse($definition) as $strategy) {
             $handler = $this->wrap($this->factory->create($strategy), $handler);
         }
 
