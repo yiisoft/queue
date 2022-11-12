@@ -27,7 +27,7 @@ final class SendAgainStrategy implements FailureStrategyInterface
         private ?QueueInterface $queue = null,
     ) {
         if ($maxAttempts < 1) {
-            throw new InvalidArgumentException('maxAttempts parameter must be a positive integer');
+            throw new InvalidArgumentException('maxAttempts parameter must be a positive integer.');
         }
     }
 
