@@ -6,7 +6,6 @@ namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy;
 
 use InvalidArgumentException;
 use Throwable;
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
