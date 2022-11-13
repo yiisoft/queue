@@ -14,7 +14,8 @@ use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\Pipel
 use Yiisoft\Yii\Queue\QueueInterface;
 
 /**
- * Failure strategy which resends the given message to a queue.
+ * Failure strategy which resends the given message to a queue with an exponentially increasing delay.
+ * The delay mechanism **must** be implemented by the used {@see AdapterInterface} implementation.
  */
 final class ExponentialDelayStrategy implements FailureStrategyInterface
 {
