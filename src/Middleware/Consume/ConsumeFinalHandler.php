@@ -9,7 +9,7 @@ use Closure;
 /**
  * @internal
  */
-final class ConsumeHandler implements MessageHandlerConsumeInterface
+final class ConsumeFinalHandler implements MessageHandlerConsumeInterface
 {
     public function __construct(private Closure $handler)
     {

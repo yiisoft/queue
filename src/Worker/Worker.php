@@ -16,10 +16,14 @@ use Throwable;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Yii\Queue\Exception\JobFailureException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeHandler;
+use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeFinalHandler;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureFinalHandler;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageHandlerFailureInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 
 final class Worker implements WorkerInterface
@@ -31,7 +35,8 @@ final class Worker implements WorkerInterface
         private LoggerInterface $logger,
         private Injector $injector,
         private ContainerInterface $container,
-        private ConsumeMiddlewareDispatcher $middlewareDispatcher,
+        private ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher,
+        private FailureMiddlewareDispatcher $failureMiddlewareDispatcher,
     ) {
     }
 
@@ -56,11 +61,20 @@ final class Worker implements WorkerInterface
         $request = new ConsumeRequest($message, $queue);
         $closure = fn (): mixed => $this->injector->invoke($handler, [$message]);
         try {
-            return $this->middlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure))->getMessage();
+            return $this->consumeMiddlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure))->getMessage();
         } catch (Throwable $exception) {
-            $exception = new JobFailureException($message, $exception);
-            $this->logger->error($exception->getMessage());
-            throw $exception;
+            $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueue());
+
+            try {
+                $result = $this->failureMiddlewareDispatcher->dispatch($queue->getChannelName(), $request, $this->createFailureHandler());
+                $this->logger->info($exception->getMessage());
+
+                return $result->getMessage();
+            } catch (Throwable $exception) {
+                $exception = new JobFailureException($message, $exception);
+                $this->logger->error($exception->getMessage());
+                throw $exception;
+            }
         }
     }
 
@@ -76,12 +90,11 @@ final class Worker implements WorkerInterface
     /**
      * Checks if the handler is a DI container alias
      *
-     * @param array|callable|object|null $definition
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @param callable|object|array|string|null $definition
      *
      * @return callable|null
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function prepare(callable|object|array|string|null $definition): callable|null
     {
@@ -135,6 +148,11 @@ final class Worker implements WorkerInterface
 
     private function createConsumeHandler(Closure $handler): MessageHandlerConsumeInterface
     {
-        return new ConsumeHandler($handler);
+        return new ConsumeFinalHandler($handler);
+    }
+
+    private function createFailureHandler(): MessageHandlerFailureInterface
+    {
+        return new FailureFinalHandler();
     }
 }

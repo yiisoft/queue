@@ -10,12 +10,8 @@ use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Yii\Queue\Middleware\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\MemoryPipelineFactory;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\FailureStrategyFactory;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\WeakPipelineFactory;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\ExponentialDelayStrategy;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\SendAgainStrategy;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
@@ -40,18 +36,18 @@ class FailureStrategyTest extends TestCase
 
         $pipelines = [
             'simple' => [
-                new SendAgainStrategy('test', 1, $this->queue),
+                new SendAgainMiddleware('test', 1, $this->queue),
                 [
-                    'class' => SendAgainStrategy::class,
+                    'class' => SendAgainMiddleware::class,
                     '__construct()' => ['test-factory', 1, $this->queue],
                 ],
                 [
-                    new SendAgainStrategy('test-callable', 1, $this->queue),
+                    new SendAgainMiddleware('test-callable', 1, $this->queue),
                     'handle',
                 ],
-                fn (): SendAgainStrategy => new SendAgainStrategy('test-callable-2', 1, $this->queue),
-                SendAgainStrategy::class,
-                new ExponentialDelayStrategy(
+                fn (): SendAgainMiddleware => new SendAgainMiddleware('test-callable-2', 1, $this->queue),
+                SendAgainMiddleware::class,
+                new ExponentialDelayMiddleware(
                     'test',
                     2,
                     1,
@@ -92,18 +88,18 @@ class FailureStrategyTest extends TestCase
 
         $pipelines = [
             'simple' => [
-                new SendAgainStrategy('test', 1, $this->queue),
+                new SendAgainMiddleware('test', 1, $this->queue),
                 [
-                    'class' => SendAgainStrategy::class,
+                    'class' => SendAgainMiddleware::class,
                     '__construct()' => ['test-factory', 1, $this->queue],
                 ],
                 [
-                    new SendAgainStrategy('test-callable', 1, $this->queue),
+                    new SendAgainMiddleware('test-callable', 1, $this->queue),
                     'handle',
                 ],
-                fn (): SendAgainStrategy => new SendAgainStrategy('test-callable-2', 1, $this->queue),
-                SendAgainStrategy::class,
-                new ExponentialDelayStrategy(
+                fn (): SendAgainMiddleware => new SendAgainMiddleware('test-callable-2', 1, $this->queue),
+                SendAgainMiddleware::class,
+                new ExponentialDelayMiddleware(
                     'test',
                     2,
                     1,
@@ -142,6 +138,6 @@ class FailureStrategyTest extends TestCase
 
     protected function getContainerDefinitions(): array
     {
-        return [SendAgainStrategy::class => new SendAgainStrategy('test-container', 1, $this->queue)];
+        return [SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $this->queue)];
     }
 }

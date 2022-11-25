@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy;
+namespace Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation;
 
 use InvalidArgumentException;
-use Throwable;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Yii\Queue\Middleware\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageHandlerFailureInterface;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 
 /**
  * Failure strategy which resends the given message to a queue with an exponentially increasing delay.
  * The delay mechanism **must** be implemented by the used {@see AdapterInterface} implementation.
  */
-final class ExponentialDelayStrategy implements FailureStrategyInterface
+final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
 {
     public const META_KEY_ATTEMPTS = 'failure-strategy-exponential-delay-attempts';
     public const META_KEY_DELAY = 'failure-strategy-exponential-delay-delay';
@@ -57,20 +57,17 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
         }
     }
 
-    private function suites(MessageInterface $message): bool
-    {
-        return $this->maxAttempts > $this->getAttempts($message);
-    }
-
-    public function handle(ConsumeRequest $request, Throwable $exception, PipelineInterface $pipeline): ConsumeRequest
-    {
+    public function processFailure(
+        FailureHandlingRequest $request,
+        MessageHandlerFailureInterface $handler
+    ): FailureHandlingRequest {
         $message = $request->getMessage();
         if ($this->suites($message)) {
             $messageNew = new Message(
                 handlerName: $message->getHandlerName(),
-                data: $message->getData(),
-                metadata: $this->formNewMeta($message),
-                id: $message->getId(),
+                data:        $message->getData(),
+                metadata:    $this->formNewMeta($message),
+                id:          $message->getId(),
             );
             ($this->queue ?? $request->getQueue())->push(
                 $messageNew,
@@ -80,7 +77,12 @@ final class ExponentialDelayStrategy implements FailureStrategyInterface
             return $request->withMessage($messageNew);
         }
 
-        return $pipeline->handle($request, $exception);
+        return $handler->handleFailure($request);
+    }
+
+    private function suites(MessageInterface $message): bool
+    {
+        return $this->maxAttempts > $this->getAttempts($message);
     }
 
     private function formNewMeta(MessageInterface $message): array

@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy;
+namespace Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation;
 
 use InvalidArgumentException;
-use Throwable;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageHandlerFailureInterface;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 
 /**
  * Failure strategy which resends the given message to a queue.
  */
-final class SendAgainStrategy implements FailureStrategyInterface
+final class SendAgainMiddleware implements MiddlewareFailureInterface
 {
     public const META_KEY_RESEND = 'failure-strategy-resend-attempts';
 
@@ -34,8 +34,10 @@ final class SendAgainStrategy implements FailureStrategyInterface
         }
     }
 
-    public function handle(ConsumeRequest $request, Throwable $exception, PipelineInterface $pipeline): ConsumeRequest
-    {
+    public function processFailure(
+        FailureHandlingRequest $request,
+        MessageHandlerFailureInterface $handler
+    ): FailureHandlingRequest {
         $message = $request->getMessage();
         if ($this->suites($message)) {
             $message = new Message(
@@ -44,12 +46,12 @@ final class SendAgainStrategy implements FailureStrategyInterface
                 metadata: $this->createMeta($message),
                 id: $message->getId(),
             );
-            $this->queue?->push($message) ?? $request->getQueue()->push($message);
+            $message = $this->queue?->push($message) ?? $request->getQueue()->push($message);
 
             return $request->withMessage($message)->withQueue($this->queue ?? $request->getQueue());
         }
 
-        return $pipeline->handle($request, $exception);
+        return $handler->handleFailure($request);
     }
 
     private function suites(MessageInterface $message): bool
