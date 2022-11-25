@@ -44,10 +44,10 @@ final class MiddlewareFailureFactory implements MiddlewareFailureFactoryInterfac
      * Current request and handler could be obtained by type-hinting for {@see ServerRequestInterface}
      * and {@see RequestHandlerInterface}.
      *
-     * @return MiddlewareFailureInterface
      *@throws NotFoundExceptionInterface
-     *
      * @throws ContainerExceptionInterface
+     *
+     * @return MiddlewareFailureInterface
      */
     public function createFailureMiddleware(
         MiddlewareFailureInterface|callable|array|string $middlewareDefinition

@@ -24,7 +24,7 @@ final class FailureMiddlewareDispatcher
 
     /**
      * @param MiddlewareFailureFactoryInterface $middlewareFactory
-     * @param array[][]|callable[][]|string[][]|MiddlewareFailureInterface[][] $middlewareDefinitions
+     * @param array[][]|callable[][]|MiddlewareFailureInterface[][]|string[][] $middlewareDefinitions
      */
     public function __construct(
         private MiddlewareFailureFactoryInterface $middlewareFactory,
