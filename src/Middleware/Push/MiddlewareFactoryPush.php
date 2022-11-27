@@ -14,7 +14,6 @@ use Yiisoft\Factory\Factory;
 use Yiisoft\Factory\NotFoundException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareConsumeInterface;
 use Yiisoft\Yii\Queue\Middleware\InvalidMiddlewareDefinitionException;
 
 use function is_string;

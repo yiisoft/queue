@@ -14,6 +14,7 @@ final class TestMiddleware implements MiddlewareConsumeInterface
     public function __construct(private string $message = 'New middleware test data')
     {
     }
+
     public function processConsume(ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest
     {
         return $request->withMessage(new Message('test', $this->message));
