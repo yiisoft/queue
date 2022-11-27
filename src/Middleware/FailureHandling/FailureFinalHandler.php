@@ -9,7 +9,7 @@ use Throwable;
 /**
  * @internal
  */
-final class FailureFinalHandler implements MessageHandlerFailureInterface
+final class FailureFinalHandler implements MessageFailureHandlerInterface
 {
     /**
      * @throws Throwable

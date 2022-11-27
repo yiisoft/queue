@@ -41,12 +41,12 @@ final class FailureMiddlewareDispatcher
      *
      * @param string $channelName Queue channel for which to get a pipeline
      * @param FailureHandlingRequest $request Request to pass to middleware.
-     * @param MessageHandlerFailureInterface $finishHandler Handler to use in case no middleware produced response.
+     * @param MessageFailureHandlerInterface $finishHandler Handler to use in case no middleware produced response.
      */
     public function dispatch(
         string $channelName,
         FailureHandlingRequest $request,
-        MessageHandlerFailureInterface $finishHandler
+        MessageFailureHandlerInterface $finishHandler
     ): FailureHandlingRequest {
         // FIXME I can get channel name from the $request
         if (!isset($this->middlewareDefinitions[$channelName]) || $this->middlewareDefinitions[$channelName] === []) {
@@ -55,7 +55,7 @@ final class FailureMiddlewareDispatcher
         $definitions = array_reverse($this->middlewareDefinitions[$channelName]);
 
         if (!isset($this->stack[$channelName])) {
-            $this->stack[$channelName] = new MiddlewareFailureStack($this->buildMiddlewares($definitions), $finishHandler);
+            $this->stack[$channelName] = new MiddlewareFailureStack($this->buildMiddlewares(...$definitions), $finishHandler);
         }
 
         return $this->stack[$channelName]->handleFailure($request);

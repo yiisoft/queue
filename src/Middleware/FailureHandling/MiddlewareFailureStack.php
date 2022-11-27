@@ -6,24 +6,24 @@ namespace Yiisoft\Yii\Queue\Middleware\FailureHandling;
 
 use Closure;
 
-final class MiddlewareFailureStack implements MessageHandlerFailureInterface
+final class MiddlewareFailureStack implements MessageFailureHandlerInterface
 {
     /**
      * Contains a stack of middleware wrapped in handlers.
      * Each handler points to the handler of middleware that will be processed next.
      *
-     * @var MessageHandlerFailureInterface|null stack of middleware
+     * @var MessageFailureHandlerInterface|null stack of middleware
      */
-    private ?MessageHandlerFailureInterface $stack = null;
+    private ?MessageFailureHandlerInterface $stack = null;
 
     /**
      * @param Closure[] $middlewares Middlewares.
-     * @param MessageHandlerFailureInterface $finishHandler Fallback handler
+     * @param MessageFailureHandlerInterface $finishHandler Fallback handler
      * events.
      */
     public function __construct(
         private array $middlewares,
-        private MessageHandlerFailureInterface $finishHandler,
+        private MessageFailureHandlerInterface $finishHandler,
     ) {
     }
 
@@ -51,14 +51,14 @@ final class MiddlewareFailureStack implements MessageHandlerFailureInterface
     /**
      * Wrap handler by middlewares.
      */
-    private function wrap(Closure $middlewareFactory, MessageHandlerFailureInterface $handler): MessageHandlerFailureInterface
+    private function wrap(Closure $middlewareFactory, MessageFailureHandlerInterface $handler): MessageFailureHandlerInterface
     {
-        return new class ($middlewareFactory, $handler) implements MessageHandlerFailureInterface {
+        return new class ($middlewareFactory, $handler) implements MessageFailureHandlerInterface {
             private ?MiddlewareFailureInterface $middleware = null;
 
             public function __construct(
                 private Closure $middlewareFactory,
-                private MessageHandlerFailureInterface $handler,
+                private MessageFailureHandlerInterface $handler,
             ) {
             }
 

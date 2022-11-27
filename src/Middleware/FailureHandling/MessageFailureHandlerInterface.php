@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Middleware\FailureHandling;
 
-interface MessageHandlerFailureInterface
+interface MessageFailureHandlerInterface
 {
     public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest;
 }

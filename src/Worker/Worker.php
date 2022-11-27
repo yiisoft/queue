@@ -23,7 +23,7 @@ use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureFinalHandler;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageHandlerFailureInterface;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 
 final class Worker implements WorkerInterface
@@ -152,7 +152,7 @@ final class Worker implements WorkerInterface
         return new ConsumeFinalHandler($handler);
     }
 
-    private function createFailureHandler(): MessageHandlerFailureInterface
+    private function createFailureHandler(): MessageFailureHandlerInterface
     {
         return new FailureFinalHandler();
     }

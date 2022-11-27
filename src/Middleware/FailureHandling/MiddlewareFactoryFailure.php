@@ -7,6 +7,9 @@ namespace Yiisoft\Yii\Queue\Middleware\FailureHandling;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Yiisoft\Definitions\Exception\NotInstantiableClassException;
+use Yiisoft\Factory\Factory;
+use Yiisoft\Factory\NotFoundException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
 use Yiisoft\Yii\Queue\Middleware\InvalidMiddlewareDefinitionException;
@@ -16,13 +19,14 @@ use function is_string;
 /**
  * Creates a middleware based on the definition provided.
  */
-final class MiddlewareFailureFactory implements MiddlewareFailureFactoryInterface
+final class MiddlewareFactoryFailure implements MiddlewareFailureFactoryInterface
 {
     /**
      * @param ContainerInterface $container Container to use for resolving definitions.
      */
     public function __construct(
         private ContainerInterface $container,
+        private Factory $factory,
         private CallableFactory $callableFactory,
     ) {
     }
@@ -61,9 +65,13 @@ final class MiddlewareFailureFactory implements MiddlewareFailureFactoryInterfac
             return $this->container->get($middlewareDefinition);
         }
 
-        $callable = $this->callableFactory->create($middlewareDefinition);
+        try {
+            return $this->factory->create($middlewareDefinition);
+        } catch (NotFoundException|NotInstantiableClassException) {
+            $callable = $this->callableFactory->create($middlewareDefinition);
 
-        return $this->wrapCallable($callable);
+            return $this->wrapCallable($callable);
+        }
     }
 
     private function wrapCallable(callable $callback): MiddlewareFailureInterface
@@ -78,7 +86,7 @@ final class MiddlewareFailureFactory implements MiddlewareFailureFactoryInterfac
                 $this->container = $container;
             }
 
-            public function processFailure(FailureHandlingRequest $request, MessageHandlerFailureInterface $handler): FailureHandlingRequest
+            public function processFailure(FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest
             {
                 $response = (new Injector($this->container))->invoke($this->callback, [$request, $handler]);
                 if ($response instanceof FailureHandlingRequest) {

@@ -6,5 +6,5 @@ namespace Yiisoft\Yii\Queue\Middleware\FailureHandling;
 
 interface MiddlewareFailureInterface
 {
-    public function processFailure(FailureHandlingRequest $request, MessageHandlerFailureInterface $handler): FailureHandlingRequest;
+    public function processFailure(FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest;
 }

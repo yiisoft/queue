@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageHandlerFailureInterface;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 
@@ -36,7 +36,7 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
 
     public function processFailure(
         FailureHandlingRequest $request,
-        MessageHandlerFailureInterface $handler
+        MessageFailureHandlerInterface $handler
     ): FailureHandlingRequest {
         $message = $request->getMessage();
         if ($this->suites($message)) {
