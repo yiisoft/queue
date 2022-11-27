@@ -146,8 +146,7 @@ class SendAgainMiddlewareTest extends TestCase
         bool $suites,
         array $metaInitial,
         array $metaResult
-    ): void
-    {
+    ): void {
         if (!$suites) {
             $this->expectExceptionMessage('testException');
         }
@@ -189,7 +188,8 @@ class SendAgainMiddlewareTest extends TestCase
 
     private function getHandler(array $metaResult, bool $suites): MessageFailureHandlerInterface
     {
-        $pipelineAssertion = static function (FailureHandlingRequest $request) use ($metaResult
+        $pipelineAssertion = static function (FailureHandlingRequest $request) use (
+            $metaResult
         ): FailureHandlingRequest {
             Assert::assertEquals($metaResult, $request->getMessage()->getMetadata());
 

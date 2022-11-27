@@ -18,7 +18,6 @@ use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureFinalHandler;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
@@ -107,7 +106,7 @@ final class MiddlewareTest extends TestCase
         );
 
         $worker = new Worker(
-            ['test' => static fn() => true],
+            ['test' => static fn () => true],
             new SimpleLogger(),
             new Injector($container),
             $container,
