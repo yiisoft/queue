@@ -49,7 +49,7 @@ final class PushMiddlewareDispatcher
      *
      * @param array[]|callable[]|MiddlewarePushInterface[]|string[] $middlewareDefinitions Each array element is:
      *
-     * - A name of PSR-15 middleware class. The middleware instance will be obtained from container executed.
+     * - A name of a middleware class. The middleware instance will be obtained from container executed.
      * - A callable with `function(ServerRequestInterface $request, RequestHandlerInterface $handler):
      *     ResponseInterface` signature.
      * - A controller handler action in format `[TestController::class, 'index']`. `TestController` instance will

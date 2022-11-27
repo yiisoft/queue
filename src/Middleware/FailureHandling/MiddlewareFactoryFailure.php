@@ -21,7 +21,7 @@ use function is_string;
 /**
  * Creates a middleware based on the definition provided.
  */
-final class MiddlewareFactoryFailure implements MiddlewareFailureFactoryInterface
+final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterface
 {
     /**
      * @param ContainerInterface $container Container to use for resolving definitions.

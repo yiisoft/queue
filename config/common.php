@@ -9,9 +9,9 @@ use Yiisoft\Yii\Queue\Cli\SimpleLoop;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\MemoryPipelineFactory;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineFactoryInterface;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\WeakPipelineFactory;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
@@ -42,17 +42,14 @@ return [
     QueueInterface::class => Queue::class,
     MiddlewareFactoryPushInterface::class => MiddlewareFactoryPush::class,
     MiddlewareFactoryConsumeInterface::class => MiddlewareFactoryConsume::class,
-    PipelineFactoryInterface::class => MemoryPipelineFactory::class,
-    MemoryPipelineFactory::class => [
-        '__construct()' => ['pipelines' => $params['yiisoft/yii-queue']['fail-strategy-pipelines']],
-    ],
-    WeakPipelineFactory::class => [
-        '__construct()' => ['pipelines' => $params['yiisoft/yii-queue']['fail-strategy-pipelines']],
-    ],
+    MiddlewareFactoryFailureInterface::class => MiddlewareFactoryFailure::class,
     PushMiddlewareDispatcher::class => [
         '__construct()' => ['middlewareDefinitions' => $params['yiisoft/yii-queue']['middlewares-push']],
     ],
     ConsumeMiddlewareDispatcher::class => [
         '__construct()' => ['middlewareDefinitions' => $params['yiisoft/yii-queue']['middlewares-consume']],
+    ],
+    FailureMiddlewareDispatcher::class => [
+        '__construct()' => ['middlewareDefinitions' => $params['yiisoft/yii-queue']['middlewares-fail']],
     ],
 ];

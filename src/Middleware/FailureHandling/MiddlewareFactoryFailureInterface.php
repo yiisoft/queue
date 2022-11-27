@@ -9,7 +9,7 @@ namespace Yiisoft\Yii\Queue\Middleware\FailureHandling;
  * You may implement this interface if you want to introduce custom definitions or pass additional data to
  * the middleware created.
  */
-interface MiddlewareFailureFactoryInterface
+interface MiddlewareFactoryFailureInterface
 {
     /**
      * Create a middleware based on definition provided.

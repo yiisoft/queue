@@ -15,7 +15,7 @@ use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFailureFactoryInterface;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\App\FakeHandler;
 use Yiisoft\Yii\Queue\Tests\TestCase;
@@ -197,7 +197,7 @@ final class WorkerTest extends TestCase
             new Injector($container),
             $container,
             new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class)),
-            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFailureFactoryInterface::class), []),
+            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), []),
         );
     }
 }

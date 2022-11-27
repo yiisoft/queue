@@ -1,22 +1,22 @@
 # Error handling on message processing
 
-Often when some message handling is failing, we want to retry its execution a couple more times or redirect it to another queue channel. This can be done in `yiisoft/yii-queue` with _Failure Strategies_. They are triggered each time message processing is interrupted with any `Throwable`. 
+Often when some message handling is failing, we want to retry its execution a couple more times or redirect it to another queue channel. This can be done in `yiisoft/yii-queue` with _Failure Handling Middleware Pipeline_. It is triggered each time message processing via Consume Middleware Pipeline is interrupted with any `Throwable`. 
 
 ## Configuration
 
-Here will be described configuration via `yiisoft/config`. If you don't use it - you should add `FailureStrategyMiddleware` to the queue consuming pipeline by your own and configure the `\Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\DispatcherFactory` the way it is described below.  
+Here below is configuration via `yiisoft/config`. If you don't use it - you should add middleware definition list (in the `middlewares-fail` key here) to the `FailureMiddlewareDispatcher` by your own.
 
-Configuration should be passed to the `yiisoft/yii-queue.fail-strategy-pipelines` key of the `params` config. You can also define different failure handling pipelines for each queue channel. Let's see and describe an example:
+Configuration should be passed to the `yiisoft/yii-queue.fail-strategy-pipelines` key of the `params` config to work with the `yiisoft/config`. You can define different failure handling pipelines for each queue channel. Let's see and describe an example:
 
 ```php
 'yiisoft/yii-queue' => [
-    'fail-strategy-pipelines' => [
-        DispatcherFactory::DEFAULT_PIPELINE => [
+    'middlewares-fail' => [
+        FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [
             [
-                'class' => SendAgainStrategy::class,
+                'class' => SendAgainMiddleware::class,
                 '__construct()' => ['id' => 'default-first-resend', 'queue' => null], 
             ],
-            static fn (QueueFactoryInterface $factory) => new SendAgainStrategy(
+            static fn (QueueFactoryInterface $factory) => new SendAgainMiddleware(
                 id: 'default-second-resend', 
                 queue: $factory->get('failed-messages'),
             ),
@@ -24,7 +24,7 @@ Configuration should be passed to the `yiisoft/yii-queue.fail-strategy-pipelines
         
         'failed-messages' => [
             [
-                'class' => ExponentialDelayStrategy::class,
+                'class' => ExponentialDelayMiddleware::class,
                 '__construct()' => [
                     'id' => 'failed-messages',
                     'maxAttempts' => 30,
@@ -39,13 +39,13 @@ Configuration should be passed to the `yiisoft/yii-queue.fail-strategy-pipelines
 ]
 ```
 
-Keys here except `DispatcherFactory::DEFAULT_PIPELINE` are queue channel names, and values are lists of `FailureStrategyInterface` definitions. `DispatcherFactory::DEFAULT_PIPELINE` defines a default pipeline to apply to channels without explicitly defined failure strategy pipeline. Each strategy definition must be one of:
-- A ready-to-use `FailureStrategyInterface` object like `new FooStrategy()`.
-- A valid definition for the [yiisoft/definitions](https://github.com/yiisoft/definitions). It must describe an object, implementing the `FailureStrategyInterface`.
-- A callable: `fn() => // do stuff`, `$object->foo(...)`, etc. It will be executed through the `yiisoft/injector`, so all the dependencies of your callable will be resolved. You can also define a "callable-looking" array, where object will be instantiated with a DI container: `[FooStrategy::class, 'handle']`.
-- A string for your DI container to resolve the middleware, e.g. `FooStrategy::class`.
+Keys here except `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` are queue channel names, and values are lists of `FailureMiddlewareInterface` definitions. `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` defines a default pipeline to apply to channels without explicitly defined failure strategy pipeline. Each middleware definition must be one of:
+- A ready-to-use `MiddlewareFailureInterface` object like `new FooMiddleware()`.
+- A valid definition for the [yiisoft/definitions](https://github.com/yiisoft/definitions). It must describe an object, implementing the `MiddlewareFailureInterface`.
+- A callable: `fn() => // do stuff`, `$object->foo(...)`, etc. It will be executed through the `yiisoft/injector`, so all the dependencies of your callable will be resolved. You can also define a "callable-looking" array, where object will be instantiated with a DI container: `[FooMiddleware::class, 'handle']`.
+- A string for your DI container to resolve the middleware, e.g. `FooMiddleware::class`.
 
-In the example above failures will be handled this way:
+In the example above failures will be handled this way (look the concrete middleware description below):
 
 1. For the first time message will be resent to the same queue channel immediately.
 2. If it fails again, it will be resent to the queue channel named `failed-messages`.
@@ -58,7 +58,7 @@ Failures of messages, which are initially sent to the `failed-messages` channel,
 
 Let's see the built-in defaults.
 
-### SendAgainStrategy
+### SendAgainMiddleware
 
 This strategy simply resends the given message to a queue. Let's see the constructor parameters through which it's configured:
 
@@ -66,9 +66,9 @@ This strategy simply resends the given message to a queue. Let's see the constru
 - `maxAttempts` - Maximum attempts count for this strategy with the given $id before it will give up.
 - `queue` - The strategy will send the message to the given queue when it's not `null`. That means you can use this strategy to push a message not to the same queue channel it came from. When the `queue` parameter is set to `null`, a message will be sent to the same channel it came from.
 
-### ExponentialDelayStrategy
+### ExponentialDelayMiddleware
 
-This strategy does the same thing as the `SendAgainStrategy` with a single difference: it resends a message with an exponentially increasing delay. The delay **must** be implemented by the used `AdapterInterface` implementation.
+This strategy does the same thing as the `SendAgainMiddleware` with a single difference: it resends a message with an exponentially increasing delay. The delay **must** be implemented by the used `AdapterInterface` implementation.
 
 It's configured via constructor parameters, too. Here they are:
 
@@ -79,12 +79,12 @@ It's configured via constructor parameters, too. Here they are:
 - `exponent` - Message handling delay will be increased by this multiplication each time it fails.
 - `queue` - The strategy will send the message to the given queue when it's not `null`. That means you can use this strategy to push a message not to the same queue channel it came from. When the `queue` parameter is set to `null`, a message will be sent to the same channel it came from.
 
-## How to create a custom Failure Strategy?
+## How to create a custom Failure Middleware?
 
-All you need is to implement the `FailureStrategyInterface` and add your implementation definition to the [configuration](#configuration).
+All you need is to implement the `MiddlewareFailureInterface` and add your implementation definition to the [configuration](#configuration).
 This interface has the only method `handle`. And the method has these parameters:
 - `ConsumeRequest $request` - a request for a message handling. It consists of a message and a queue the message came from.
 - `Throwable $exception` - an exception thrown on the `request` handling
-- `PipelineInterface $pipeline` - failure strategy pipeline continuation. Your Strategy should call `$pipeline->handle()` when it doesn't interrupt failure pipeline execution.
+- `MessageFailureHandlerInterface $handler` - failure strategy pipeline continuation. Your Middleware should call `$pipeline->handle()` when it shouldn't interrupt failure pipeline execution.
 
-> Note: your strategy have to check by its own if it should be applied. Look into [`SendAgainStrategy::suites()`](../../src/Middleware/Implementation/FailureStrategy/Strategy/SendAgainStrategy.php#L52) for an example.
+> Note: your strategy have to check by its own if it should be applied. Look into [`SendAgainMiddleware::suites()`](../../src/Middleware/Implementation/FailureMiddleware/Middleware/SendAgainMiddleware.php#L52) for an example.
