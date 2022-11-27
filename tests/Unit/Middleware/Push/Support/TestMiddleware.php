@@ -11,8 +11,12 @@ use Yiisoft\Yii\Queue\Middleware\Push\PushRequest;
 
 final class TestMiddleware implements MiddlewarePushInterface
 {
+    public function __construct(private string $message = 'New middleware test data')
+    {
+    }
+
     public function processPush(PushRequest $request, MessageHandlerPushInterface $handler): PushRequest
     {
-        return $request->withMessage(new Message('test', 'New middleware test data'));
+        return $request->withMessage(new Message('test', $this->message));
     }
 }
