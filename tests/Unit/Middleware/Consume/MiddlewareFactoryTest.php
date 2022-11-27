@@ -6,6 +6,7 @@ namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Yiisoft\Factory\Factory;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Message\Message;
@@ -184,8 +185,9 @@ final class MiddlewareFactoryTest extends TestCase
     private function getMiddlewareFactory(ContainerInterface $container = null): MiddlewareFactoryConsumeInterface
     {
         $container = $container ?? $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
+        $factory = new Factory($container);
 
-        return new MiddlewareFactoryConsume($container, new CallableFactory($container));
+        return new MiddlewareFactoryConsume($container, $factory, new CallableFactory($container));
     }
 
     private function getContainer(array $instances = []): ContainerInterface

@@ -7,8 +7,14 @@ namespace Yiisoft\Yii\Queue\Middleware\Push;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Yiisoft\Definitions\Exception\InvalidConfigException;
+use Yiisoft\Definitions\Exception\NotInstantiableClassException;
+use Yiisoft\Definitions\Exception\NotInstantiableException;
+use Yiisoft\Factory\Factory;
+use Yiisoft\Factory\NotFoundException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
+use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareConsumeInterface;
 use Yiisoft\Yii\Queue\Middleware\InvalidMiddlewareDefinitionException;
 
 use function is_string;
@@ -23,6 +29,7 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
      */
     public function __construct(
         private ContainerInterface $container,
+        private Factory $factory,
         private CallableFactory $callableFactory,
     ) {
     }
@@ -59,6 +66,14 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
         if (is_string($middlewareDefinition) && is_subclass_of($middlewareDefinition, MiddlewarePushInterface::class)) {
             /** @var MiddlewarePushInterface */
             return $this->container->get($middlewareDefinition);
+        }
+
+        try {
+            $result = $this->factory->create($middlewareDefinition);
+            if ($result instanceof MiddlewarePushInterface) {
+                return $result;
+            }
+        } catch (NotFoundException|NotInstantiableClassException|NotInstantiableException|InvalidConfigException) {
         }
 
         $callable = $this->callableFactory->create($middlewareDefinition);

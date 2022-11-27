@@ -6,6 +6,7 @@ namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Yiisoft\Factory\Factory;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Message\Message;
@@ -37,7 +38,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $this->assertSame('New closure test data', $request->getMessage()->getData());
     }
 
-    public function testArrayMiddlewareCall(): void
+    public function testArrayMiddlewareCallableDefinition(): void
     {
         $request = $this->getConsumeRequest();
         $container = $this->createContainer(
@@ -48,6 +49,19 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this->createDispatcher($container)->withMiddlewares([[TestCallableMiddleware::class, 'index']]);
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('New test data', $request->getMessage()->getData());
+    }
+
+    public function testFactoryArrayDefinition(): void
+    {
+        $request = $this->getConsumeRequest();
+        $container = $this->createContainer();
+        $definition = [
+            'class' => TestMiddleware::class,
+            '__construct()' => ['message' => 'New test data from the definition'],
+        ];
+        $dispatcher = $this->createDispatcher($container)->withMiddlewares([$definition]);
+        $request = $dispatcher->dispatch($request, $this->getRequestHandler());
+        $this->assertSame('New test data from the definition', $request->getMessage()->getData());
     }
 
     public function testMiddlewareFullStackCalled(): void
@@ -149,10 +163,11 @@ final class MiddlewareDispatcherTest extends TestCase
         ContainerInterface $container = null,
     ): ConsumeMiddlewareDispatcher {
         $container = $container ?? $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
+        $factory = new Factory($container);
         $callableFactory = new CallableFactory($container);
 
         return new ConsumeMiddlewareDispatcher(
-            new MiddlewareFactoryConsume($container, $callableFactory),
+            new MiddlewareFactoryConsume($container, $factory, $callableFactory),
         );
     }
 
