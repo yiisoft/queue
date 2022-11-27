@@ -164,7 +164,6 @@ final class MiddlewareDispatcherTest extends TestCase
         $factory = new Factory($container);
         $callableFactory = new CallableFactory($container);
 
-
         return new FailureMiddlewareDispatcher(new MiddlewareFactoryFailure($container, $factory, $callableFactory), []);
     }
 

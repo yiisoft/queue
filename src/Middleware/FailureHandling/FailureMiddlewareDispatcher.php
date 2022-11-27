@@ -22,8 +22,8 @@ final class FailureMiddlewareDispatcher
      * @param array[][]|callable[][]|MiddlewareFailureInterface[][]|string[][] $middlewareDefinitions
      */
     public function __construct(
-        private array $middlewareDefinitions,
         private MiddlewareFactoryFailureInterface $middlewareFactory,
+        private array $middlewareDefinitions,
     ) {
         $this->init();
     }
