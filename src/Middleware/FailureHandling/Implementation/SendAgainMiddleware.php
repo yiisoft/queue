@@ -30,7 +30,7 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
         private ?QueueInterface $queue = null,
     ) {
         if ($maxAttempts < 1) {
-            throw new InvalidArgumentException('maxAttempts parameter must be a positive integer.');
+            throw new InvalidArgumentException("maxAttempts parameter must be a positive integer, $this->maxAttempts given.");
         }
     }
 

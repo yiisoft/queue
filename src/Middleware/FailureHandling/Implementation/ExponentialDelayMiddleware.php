@@ -41,19 +41,19 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
         private ?QueueInterface $queue = null,
     ) {
         if ($maxAttempts <= 0) {
-            throw new InvalidArgumentException('maxAttempts parameter must be a positive integer.');
+            throw new InvalidArgumentException("maxAttempts parameter must be a positive integer, $this->maxAttempts given.");
         }
 
         if ($delayInitial <= 0) {
-            throw new InvalidArgumentException('delayInitial parameter must be a positive float.');
+            throw new InvalidArgumentException("delayInitial parameter must be a positive float, $this->delayInitial given.");
         }
 
         if ($delayMaximum < $delayInitial) {
-            throw new InvalidArgumentException('delayMaximum parameter must not be less then delayInitial.');
+            throw new InvalidArgumentException("delayMaximum parameter must not be less then delayInitial, , $this->delayMaximum given.");
         }
 
         if ($exponent <= 0) {
-            throw new InvalidArgumentException('exponent parameter must not be zero or less.');
+            throw new InvalidArgumentException("exponent parameter must not be zero or less, $this->exponent given.");
         }
     }
 
