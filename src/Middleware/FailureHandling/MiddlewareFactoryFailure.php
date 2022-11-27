@@ -62,10 +62,7 @@ final class MiddlewareFactoryFailure implements MiddlewareFailureFactoryInterfac
             return $middlewareDefinition;
         }
 
-        if (is_string($middlewareDefinition) && is_subclass_of(
-            $middlewareDefinition,
-            MiddlewareFailureInterface::class
-        )) {
+        if (is_string($middlewareDefinition) && is_subclass_of($middlewareDefinition, MiddlewareFailureInterface::class)) {
             /** @var MiddlewareFailureInterface */
             return $this->container->get($middlewareDefinition);
         }
