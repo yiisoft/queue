@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Yiisoft\Yii\Queue\Command\ListenCommand;
 use Yiisoft\Yii\Queue\Command\RunCommand;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureHandling\FailureStrategyMiddleware;
 
 return [
     'yiisoft/yii-console' => [
