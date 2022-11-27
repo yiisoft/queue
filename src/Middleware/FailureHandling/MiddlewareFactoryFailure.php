@@ -7,7 +7,9 @@ namespace Yiisoft\Yii\Queue\Middleware\FailureHandling;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Definitions\Exception\NotInstantiableClassException;
+use Yiisoft\Definitions\Exception\NotInstantiableException;
 use Yiisoft\Factory\Factory;
 use Yiisoft\Factory\NotFoundException;
 use Yiisoft\Injector\Injector;
@@ -60,18 +62,25 @@ final class MiddlewareFactoryFailure implements MiddlewareFailureFactoryInterfac
             return $middlewareDefinition;
         }
 
-        if (is_string($middlewareDefinition) && is_subclass_of($middlewareDefinition, MiddlewareFailureInterface::class)) {
+        if (is_string($middlewareDefinition) && is_subclass_of(
+                $middlewareDefinition,
+                MiddlewareFailureInterface::class
+            )) {
             /** @var MiddlewareFailureInterface */
             return $this->container->get($middlewareDefinition);
         }
 
         try {
-            return $this->factory->create($middlewareDefinition);
-        } catch (NotFoundException|NotInstantiableClassException) {
-            $callable = $this->callableFactory->create($middlewareDefinition);
-
-            return $this->wrapCallable($callable);
+            $result = $this->factory->create($middlewareDefinition);
+            if ($result instanceof MiddlewareFailureInterface) {
+                return $result;
+            }
+        } catch (NotFoundException|NotInstantiableClassException|NotInstantiableException|InvalidConfigException) {
         }
+
+        $callable = $this->callableFactory->create($middlewareDefinition);
+
+        return $this->wrapCallable($callable);
     }
 
     private function wrapCallable(callable $callback): MiddlewareFailureInterface
