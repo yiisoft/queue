@@ -132,6 +132,7 @@ final class MiddlewareTest extends TestCase
         $callableFactory = new CallableFactory($container);
 
         $queue->expects(self::exactly(7))->method('push')->willReturnCallback($queueCallback);
+        $queue->method('getChannelName')->willReturn('simple');
 
         $middlewares = [
             'simple' => [
@@ -167,7 +168,7 @@ final class MiddlewareTest extends TestCase
         $finalHandler = new FailureFinalHandler();
         try {
             do {
-                $request = $dispatcher->dispatch('simple', $request, $finalHandler);
+                $request = $dispatcher->dispatch($request, $finalHandler);
                 $iteration++;
             } while (true);
         } catch (InvalidArgumentException $thrown) {

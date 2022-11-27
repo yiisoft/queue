@@ -18,22 +18,14 @@ final class FailureMiddlewareDispatcher
     private array $stack = [];
 
     /**
-     * @var array[][]|callable[][]|MiddlewareFailureInterface[][]|string[][]
-     */
-    private array $middlewareDefinitions;
-
-    /**
      * @param MiddlewareFailureFactoryInterface $middlewareFactory
      * @param array[][]|callable[][]|MiddlewareFailureInterface[][]|string[][] $middlewareDefinitions
      */
     public function __construct(
         private MiddlewareFailureFactoryInterface $middlewareFactory,
-        array $middlewareDefinitions,
+        private array $middlewareDefinitions,
     ) {
-        $this->middlewareDefinitions = $middlewareDefinitions;
-        if (!isset($this->middlewareDefinitions[self::DEFAULT_PIPELINE])) {
-            $this->middlewareDefinitions[self::DEFAULT_PIPELINE] = [];
-        }
+        $this->init();
     }
 
     /**
@@ -44,11 +36,10 @@ final class FailureMiddlewareDispatcher
      * @param MessageFailureHandlerInterface $finishHandler Handler to use in case no middleware produced response.
      */
     public function dispatch(
-        string $channelName,
         FailureHandlingRequest $request,
         MessageFailureHandlerInterface $finishHandler
     ): FailureHandlingRequest {
-        // FIXME I can get channel name from the $request
+        $channelName = $request->getQueue()->getChannelName();
         if (!isset($this->middlewareDefinitions[$channelName]) || $this->middlewareDefinitions[$channelName] === []) {
             $channelName = self::DEFAULT_PIPELINE;
         }
@@ -84,13 +75,22 @@ final class FailureMiddlewareDispatcher
     public function withMiddlewares(array $middlewareDefinitions): self
     {
         $instance = clone $this;
-        $instance->middlewareDefinitions = array_reverse($middlewareDefinitions);
+        $instance->middlewareDefinitions = $middlewareDefinitions;
 
         // Fixes a memory leak.
         unset($instance->stack);
         $instance->stack = [];
 
+        $instance->init();
+
         return $instance;
+    }
+
+    private function init(): void
+    {
+        if (!isset($this->middlewareDefinitions[self::DEFAULT_PIPELINE])) {
+            $this->middlewareDefinitions[self::DEFAULT_PIPELINE] = [];
+        }
     }
 
     /**

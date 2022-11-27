@@ -66,7 +66,7 @@ final class Worker implements WorkerInterface
             $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueue());
 
             try {
-                $result = $this->failureMiddlewareDispatcher->dispatch($queue->getChannelName(), $request, $this->createFailureHandler());
+                $result = $this->failureMiddlewareDispatcher->dispatch($request, $this->createFailureHandler());
                 $this->logger->info($exception->getMessage());
 
                 return $result->getMessage();
