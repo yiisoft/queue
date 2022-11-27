@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Implementation\FailureStrategy\Strategy;
+namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
 
 use Exception;
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Yii\Queue\Middleware\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\ExponentialDelayStrategy;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
-class ExponentialDelayStrategyTest extends TestCase
+class ExponentialDelayMiddlewareTest extends TestCase
 {
     public function constructorRequirementsProvider(): array
     {
@@ -142,15 +142,15 @@ class ExponentialDelayStrategyTest extends TestCase
             $this->expectException(InvalidArgumentException::class);
         }
 
-        $strategy = new ExponentialDelayStrategy(...$arguments);
-        self::assertInstanceOf(ExponentialDelayStrategy::class, $strategy);
+        $strategy = new ExponentialDelayMiddleware(...$arguments);
+        self::assertInstanceOf(ExponentialDelayMiddleware::class, $strategy);
     }
 
     public function testPipelineSuccess(): void
     {
         $message = new Message('test', null);
         $queue = $this->createMock(QueueInterface::class);
-        $strategy = new ExponentialDelayStrategy(
+        $middleware = new ExponentialDelayMiddleware(
             'test',
             1,
             1,
@@ -159,14 +159,14 @@ class ExponentialDelayStrategyTest extends TestCase
             $this->createMock(DelayMiddlewareInterface::class),
             $queue,
         );
-        $pipeline = $this->createMock(PipelineInterface::class);
-        $pipeline->expects(self::never())->method('handle');
-        $request = new ConsumeRequest($message, $queue);
-        $result = $strategy->handle($request, new Exception('test'), $pipeline);
+        $nextHandler = $this->createMock(MessageFailureHandlerInterface::class);
+        $nextHandler->expects(self::never())->method('handleFailure');
+        $request = new FailureHandlingRequest($message, new Exception('test'), $queue);
+        $result = $middleware->processFailure($request, $nextHandler);
 
         self::assertNotEquals($request, $result);
-        self::assertArrayHasKey(ExponentialDelayStrategy::META_KEY_ATTEMPTS . '-test', $result->getMessage()->getMetadata());
-        self::assertArrayHasKey(ExponentialDelayStrategy::META_KEY_DELAY . '-test', $result->getMessage()->getMetadata());
+        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test', $result->getMessage()->getMetadata());
+        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_DELAY . '-test', $result->getMessage()->getMetadata());
     }
 
     public function testPipelineFailure(): void
@@ -174,9 +174,9 @@ class ExponentialDelayStrategyTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('test');
 
-        $message = new Message('test', null, [ExponentialDelayStrategy::META_KEY_ATTEMPTS . '-test' => 2]);
+        $message = new Message('test', null, [ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test' => 2]);
         $queue = $this->createMock(QueueInterface::class);
-        $strategy = new ExponentialDelayStrategy(
+        $middleware = new ExponentialDelayMiddleware(
             'test',
             1,
             1,
@@ -185,10 +185,10 @@ class ExponentialDelayStrategyTest extends TestCase
             $this->createMock(DelayMiddlewareInterface::class),
             $queue,
         );
-        $pipeline = $this->createMock(PipelineInterface::class);
+        $nextHandler = $this->createMock(MessageFailureHandlerInterface::class);
         $exception = new Exception('test');
-        $pipeline->expects(self::once())->method('handle')->willThrowException($exception);
-        $request = new ConsumeRequest($message, $queue);
-        $strategy->handle($request, $exception, $pipeline);
+        $nextHandler->expects(self::once())->method('handleFailure')->willThrowException($exception);
+        $request = new FailureHandlingRequest($message, $exception, $queue);
+        $middleware->processFailure($request, $nextHandler);
     }
 }

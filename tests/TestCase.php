@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
+use Yiisoft\Factory\Factory;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
@@ -18,6 +19,8 @@ use Yiisoft\Yii\Queue\Cli\SimpleLoop;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Queue;
@@ -131,6 +134,7 @@ abstract class TestCase extends BaseTestCase
             new Injector($this->getContainer()),
             $this->getContainer(),
             $this->getConsumeMiddlewareDispatcher(),
+            $this->getFailureMiddlewareDispatcher(),
         );
     }
 
@@ -194,5 +198,22 @@ abstract class TestCase extends BaseTestCase
                 new CallableFactory($this->getContainer()),
             ),
         );
+    }
+
+    protected function getFailureMiddlewareDispatcher(): FailureMiddlewareDispatcher
+    {
+        return new FailureMiddlewareDispatcher(
+            new MiddlewareFactoryFailure(
+                $this->getContainer(),
+                $this->getFactory(),
+                new CallableFactory($this->getContainer()),
+            ),
+            [],
+        );
+    }
+
+    protected function getFactory(): Factory
+    {
+        return new Factory($this->getContainer());
     }
 }

@@ -2,73 +2,72 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Implementation\FailureStrategy\Strategy;
+namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
 
 use Exception;
 use PHPUnit\Framework\Assert;
 use RuntimeException;
-use Throwable;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Yii\Queue\Middleware\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Dispatcher\PipelineInterface;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\ExponentialDelayStrategy;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\FailureStrategyInterface;
-use Yiisoft\Yii\Queue\Middleware\Implementation\FailureStrategy\Strategy\SendAgainStrategy;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
-class ResendStrategyTest extends TestCase
+class SendAgainMiddlewareTest extends TestCase
 {
     private const EXPONENTIAL_STRATEGY_DELAY_INITIAL = 1;
     private const EXPONENTIAL_STRATEGY_DELAY_MAXIMUM = 5;
     private const EXPONENTIAL_STRATEGY_EXPONENT = 2;
-    public const KEY_EXPONENTIAL_ATTEMPTS = ExponentialDelayStrategy::META_KEY_ATTEMPTS . '-test';
-    public const KEY_EXPONENTIAL_DELAY = ExponentialDelayStrategy::META_KEY_DELAY . '-test';
+    public const KEY_EXPONENTIAL_ATTEMPTS = ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test';
+    public const KEY_EXPONENTIAL_DELAY = ExponentialDelayMiddleware::META_KEY_DELAY . '-test';
 
     public function queueSendingStrategyProvider(): array
     {
         return [
-            [
-                SendAgainStrategy::class,
+            /*[
+                SendAgainMiddleware::class,
                 true,
                 [],
-                [SendAgainStrategy::META_KEY_RESEND . '-' => 1],
+                [SendAgainMiddleware::META_KEY_RESEND . '-' => 1],
             ],
             [
-                SendAgainStrategy::class,
+                SendAgainMiddleware::class,
                 true,
-                [SendAgainStrategy::META_KEY_RESEND . '-' => 1],
-                [SendAgainStrategy::META_KEY_RESEND . '-' => 2],
-            ],
+                [SendAgainMiddleware::META_KEY_RESEND . '-' => 1],
+                [SendAgainMiddleware::META_KEY_RESEND . '-' => 2],
+            ],*/
             [
-                SendAgainStrategy::class,
+                SendAgainMiddleware::class,
                 false,
-                [SendAgainStrategy::META_KEY_RESEND . '-' => 2],
-                [SendAgainStrategy::META_KEY_RESEND . '-' => 2],
+                [SendAgainMiddleware::META_KEY_RESEND . '-' => 2],
+                [SendAgainMiddleware::META_KEY_RESEND . '-' => 2],
             ],
             [
-                SendAgainStrategy::class,
+                SendAgainMiddleware::class,
                 true,
-                [SendAgainStrategy::META_KEY_RESEND . '-' => -1],
-                [SendAgainStrategy::META_KEY_RESEND . '-' => 1],
+                [SendAgainMiddleware::META_KEY_RESEND . '-' => -1],
+                [SendAgainMiddleware::META_KEY_RESEND . '-' => 1],
             ],
             [
-                SendAgainStrategy::class,
+                SendAgainMiddleware::class,
                 true,
-                [SendAgainStrategy::META_KEY_RESEND . '-' => -100],
-                [SendAgainStrategy::META_KEY_RESEND . '-' => 1],
+                [SendAgainMiddleware::META_KEY_RESEND . '-' => -100],
+                [SendAgainMiddleware::META_KEY_RESEND . '-' => 1],
             ],
             [
-                SendAgainStrategy::class,
+                SendAgainMiddleware::class,
                 false,
-                [SendAgainStrategy::META_KEY_RESEND . '-' => 5],
-                [SendAgainStrategy::META_KEY_RESEND . '-' => 5],
+                [SendAgainMiddleware::META_KEY_RESEND . '-' => 5],
+                [SendAgainMiddleware::META_KEY_RESEND . '-' => 5],
             ],
 
             [
-                ExponentialDelayStrategy::class,
+                ExponentialDelayMiddleware::class,
                 true,
                 [],
                 [
@@ -77,7 +76,7 @@ class ResendStrategyTest extends TestCase
                 ],
             ],
             [
-                ExponentialDelayStrategy::class,
+                ExponentialDelayMiddleware::class,
                 true,
                 [
                     self::KEY_EXPONENTIAL_DELAY => 1,
@@ -89,7 +88,7 @@ class ResendStrategyTest extends TestCase
                 ],
             ],
             [
-                ExponentialDelayStrategy::class,
+                ExponentialDelayMiddleware::class,
                 true,
                 [
                     self::KEY_EXPONENTIAL_DELAY => 2,
@@ -101,7 +100,7 @@ class ResendStrategyTest extends TestCase
                 ],
             ],
             [
-                ExponentialDelayStrategy::class,
+                ExponentialDelayMiddleware::class,
                 true,
                 [
                     self::KEY_EXPONENTIAL_DELAY => self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
@@ -113,7 +112,7 @@ class ResendStrategyTest extends TestCase
                 ],
             ],
             [
-                ExponentialDelayStrategy::class,
+                ExponentialDelayMiddleware::class,
                 true,
                 [
                     self::KEY_EXPONENTIAL_DELAY => 4,
@@ -125,7 +124,7 @@ class ResendStrategyTest extends TestCase
                 ],
             ],
             [
-                ExponentialDelayStrategy::class,
+                ExponentialDelayMiddleware::class,
                 true,
                 [
                     self::KEY_EXPONENTIAL_DELAY => 100,
@@ -152,21 +151,29 @@ class ResendStrategyTest extends TestCase
             $this->expectExceptionMessage('testException');
         }
 
-        $pipeline = $this->getPipeline($metaResult, $suites);
+        $handler = $this->getHandler($metaResult, $suites);
         $queue = $this->getPreparedQueue($metaResult, $suites);
 
         $strategy = $this->getStrategy($strategyName, $queue);
-        $request = new ConsumeRequest(new Message('test', null, $metaInitial), $queue);
-        $result = $strategy->handle($request, new Exception('testException'), $pipeline);
+        $request = new FailureHandlingRequest(
+            new Message(
+                'test',
+                null,
+                $metaInitial
+            ),
+            new Exception('testException'),
+            $queue
+        );
+        $result = $strategy->processFailure($request, $handler);
 
-        self::assertInstanceOf(ConsumeRequest::class, $result);
+        self::assertInstanceOf(FailureHandlingRequest::class, $result);
     }
 
-    private function getStrategy(string $strategyName, QueueInterface $queue): FailureStrategyInterface
+    private function getStrategy(string $strategyName, QueueInterface $queue): MiddlewareFailureInterface
     {
         return match ($strategyName) {
-            SendAgainStrategy::class => new SendAgainStrategy('', 2, $queue),
-            ExponentialDelayStrategy::class => new ExponentialDelayStrategy(
+            SendAgainMiddleware::class => new SendAgainMiddleware('', 2, $queue),
+            ExponentialDelayMiddleware::class => new ExponentialDelayMiddleware(
                 'test',
                 2,
                 self::EXPONENTIAL_STRATEGY_DELAY_INITIAL,
@@ -179,19 +186,21 @@ class ResendStrategyTest extends TestCase
         };
     }
 
-    private function getPipeline(array $metaResult, bool $suites): PipelineInterface
+    private function getHandler(array $metaResult, bool $suites): MessageFailureHandlerInterface
     {
-        $pipelineAssertion = static function (ConsumeRequest $request, Throwable $exception) use ($metaResult): ConsumeRequest {
+        $pipelineAssertion = static function (FailureHandlingRequest $request) use (
+            $metaResult
+        ): FailureHandlingRequest {
             Assert::assertEquals($metaResult, $request->getMessage()->getMetadata());
 
-            throw $exception;
+            throw $request->getException();
         };
-        $pipeline = $this->createMock(PipelineInterface::class);
-        $pipeline->expects($suites ? self::never() : self::once())
-            ->method('handle')
+        $handler = $this->createMock(MessageFailureHandlerInterface::class);
+        $handler->expects($suites ? self::never() : self::once())
+            ->method('handleFailure')
             ->willReturnCallback($pipelineAssertion);
 
-        return $pipeline;
+        return $handler;
     }
 
     private function getPreparedQueue(array $metaResult, bool $suites): QueueInterface

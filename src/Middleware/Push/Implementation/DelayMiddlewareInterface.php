@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\Implementation;
+namespace Yiisoft\Yii\Queue\Middleware\Push\Implementation;
 
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewarePushInterface;
 
