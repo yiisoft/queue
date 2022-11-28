@@ -52,6 +52,7 @@ final class MiddlewareTest extends TestCase
         $pushMiddlewareDispatcher = new PushMiddlewareDispatcher(
             new MiddlewareFactoryPush(
                 $this->createMock(ContainerInterface::class),
+                new Factory($this->createMock(ContainerInterface::class)),
                 new CallableFactory(
                     $this->createMock(ContainerInterface::class)
                 ),
@@ -95,7 +96,13 @@ final class MiddlewareTest extends TestCase
         $callableFactory = new CallableFactory($container);
 
         $consumeMiddlewareDispatcher = new ConsumeMiddlewareDispatcher(
-            new MiddlewareFactoryConsume($container, $callableFactory),
+            new MiddlewareFactoryConsume(
+                $this->createMock(ContainerInterface::class),
+                new Factory($this->createMock(ContainerInterface::class)),
+                new CallableFactory(
+                    $this->createMock(ContainerInterface::class)
+                ),
+            ),
             new TestMiddleware('common 1'),
             new TestMiddleware('common 2'),
         );

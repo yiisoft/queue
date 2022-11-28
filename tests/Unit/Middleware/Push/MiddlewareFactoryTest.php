@@ -6,6 +6,7 @@ namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Push;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Yiisoft\Factory\Factory;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
@@ -31,7 +32,7 @@ final class MiddlewareFactoryTest extends TestCase
         self::assertInstanceOf(TestMiddleware::class, $middleware);
     }
 
-    public function testCreateFromArray(): void
+    public function testCreateCallableFromArray(): void
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware([TestCallableMiddleware::class, 'index']);
@@ -174,8 +175,9 @@ final class MiddlewareFactoryTest extends TestCase
     private function getMiddlewareFactory(ContainerInterface $container = null): MiddlewareFactoryPushInterface
     {
         $container = $container ?? $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
+        $factory = new Factory($container);
 
-        return new MiddlewareFactoryPush($container, new CallableFactory($container));
+        return new MiddlewareFactoryPush($container, $factory, new CallableFactory($container));
     }
 
     private function getContainer(array $instances = []): ContainerInterface

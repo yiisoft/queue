@@ -185,6 +185,7 @@ abstract class TestCase extends BaseTestCase
         return new PushMiddlewareDispatcher(
             new MiddlewareFactoryPush(
                 $this->getContainer(),
+                new Factory($this->getContainer()),
                 new CallableFactory($this->getContainer()),
             ),
         );
@@ -195,6 +196,7 @@ abstract class TestCase extends BaseTestCase
         return new ConsumeMiddlewareDispatcher(
             new MiddlewareFactoryConsume(
                 $this->getContainer(),
+                new Factory($this->getContainer()),
                 new CallableFactory($this->getContainer()),
             ),
         );
