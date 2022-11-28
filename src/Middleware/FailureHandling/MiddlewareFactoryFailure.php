@@ -50,7 +50,7 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
      * Current request and handler could be obtained by type-hinting for {@see ServerRequestInterface}
      * and {@see RequestHandlerInterface}.
      *
-     *@throws NotFoundExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
      *
      * @return MiddlewareFailureInterface

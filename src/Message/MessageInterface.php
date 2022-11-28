@@ -30,7 +30,7 @@ interface MessageInterface
     public function getData(): mixed;
 
     /**
-     * Returns some message metadata: timings, attempts count, metrics, etc.
+     * Returns message metadata: timings, attempts count, metrics, etc.
      *
      * @return array
      */

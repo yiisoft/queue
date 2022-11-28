@@ -7,7 +7,7 @@ namespace Yiisoft\Yii\Queue\Middleware\FailureHandling;
 use Throwable;
 
 /**
- * @internal
+ * @internal Internal package class, please don't use it directly
  */
 final class FailureFinalHandler implements MessageFailureHandlerInterface
 {

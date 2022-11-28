@@ -8,8 +8,8 @@ final class Message implements MessageInterface
 {
     /**
      * @param string $handlerName
-     * @param mixed $data Message data, encodable by a used adapter
-     * @param mixed $metadata Message metadata
+     * @param mixed $data Message data, encodable by a queue adapter
+     * @param array $metadata Message metadata, encodable by a queue adapter
      * @param string|null $id Message id
      */
     public function __construct(
