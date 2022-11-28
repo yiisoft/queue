@@ -76,7 +76,7 @@ It's configured via constructor parameters, too. Here they are:
 - `maxAttempts` - Maximum attempts count for this strategy with the given $id before it will give up.
 - `delayInitial` - The initial delay that will be applied to a message for the first time. It must be a positive float. 
 - `delayMaximum` - The maximum delay which can be applied to a single message. Must be above the `delayInitial`.
-- `exponent` - Message handling delay will be increased by this multiplication each time it fails.
+- `exponent` - Message handling delay will be muliplied by exponent each time it fails.
 - `queue` - The strategy will send the message to the given queue when it's not `null`. That means you can use this strategy to push a message not to the same queue channel it came from. When the `queue` parameter is set to `null`, a message will be sent to the same channel it came from.
 
 ## How to create a custom Failure Middleware?

@@ -257,7 +257,7 @@ You have three places to define push middlewares:
 
 1. `PushMiddlewareDispatcher`. You can pass it either to the constructor, or to the `withMiddlewares()` method, which  
 creates a completely new dispatcher object with only those middlewares, which are passed as arguments. 
-If you use [yiisoft/config](yiisoft/config), you can just add middleware to the `middlewares-push` key of the 
+If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-push` key of the 
 `yiisoft/yii-queue` array in the `params`.
 2. Pass middlewares to either `Queue::withMiddlewares()` or `Queue::withMiddlewaresAdded()` methods. The difference is 
 that the former will completely replace an existing middleware stack, while the latter will add passed middlewares to 
@@ -271,7 +271,7 @@ along with them.
 
 ### Consume pipeline
 
-You can set a middleware pipeline for a message when it will be consumed from a queue server. This is useful to collect metrics, modify message data, etc. In pair with a Push middleware you can deduplicate messages in the queue, calculate time from push to consume, handle errors (push to a queue again, redirect failed message to another queue, send a notification, etc.). Unless Push pipeline, you have only one place to define the middleware stack: in the `ConsumeMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can just add middleware to the `middlewares-consume` key of the `yiisoft/yii-queue` array in the `params`.
+You can set a middleware pipeline for a message when it will be consumed from a queue server. This is useful to collect metrics, modify message data, etc. In pair with a Push middleware you can deduplicate messages in the queue, calculate time from push to consume, handle errors (push to a queue again, redirect failed message to another queue, send a notification, etc.). Unless Push pipeline, you have only one place to define the middleware stack: in the `ConsumeMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-consume` key of the `yiisoft/yii-queue` array in the `params`.
 
 ### Error handling pipeline
 
@@ -279,7 +279,7 @@ Often when some job is failing, we want to retry its execution a couple more tim
 - You should set up the middleware pipeline separately for each queue channel. That means, the format should be `['channel-name' => [FooMiddleware::class]]` instead of `[FooMiddleware::class]`, like for the other two pipelines. There is also a default key, which will be used for those channels without their own one: `FailureMiddlewareDispatcher::DEFAULT_PIPELINE`.
 - The last middleware will throw the exception, which will come with the `FailureHandlingRequest` object. If you don't want the exception to be thrown, your middlewares should `return` a request without calling `$handler->handleFailure()`.
 
-You can declare error handling middleware pipeline in the `FailureMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can just add middleware to the `middlewares-fail` key of the `yiisoft/yii-queue` array in the `params`.
+You can declare error handling middleware pipeline in the `FailureMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-fail` key of the `yiisoft/yii-queue` array in the `params`.
 
 See [error handling docs](docs/guide/error-handling.md) for details.
 
