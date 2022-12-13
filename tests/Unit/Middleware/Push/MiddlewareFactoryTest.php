@@ -6,11 +6,10 @@ namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Push;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Yiisoft\Factory\Factory;
+use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\InvalidCallableConfigurationException;
 use Yiisoft\Yii\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Yii\Queue\Middleware\Push\MessageHandlerPushInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
@@ -21,7 +20,6 @@ use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Push\Support\InvalidController;
 use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Push\Support\TestCallableMiddleware;
 use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Push\Support\TestMiddleware;
-use Yiisoft\Test\Support\Container\SimpleContainer;
 
 final class MiddlewareFactoryTest extends TestCase
 {
@@ -108,38 +106,34 @@ final class MiddlewareFactoryTest extends TestCase
         );
     }
 
-    public function testInvalidMiddlewareWithWrongCallable(): void
+    public function invalidMiddlewareDefinitionProvider(): array
     {
-        $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
-        $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
-            static function () {
-                return 42;
-            }
-        );
+        return [
+            'wrong string' => ['test'],
+            'wrong class' => [TestCallableMiddleware::class],
+            'wrong array size' => [['test']],
+            'array not a class' => [['class', 'test']],
+            'wrong array type' => [['class' => TestCallableMiddleware::class, 'index']],
+            'wrong array with int items' => [[7, 42]],
+            'array with wrong method name' => [[TestCallableMiddleware::class, 'notExists']],
+            'array wrong class' => [['class' => TestCallableMiddleware::class]],
+        ];
+    }
 
+    /**
+     * @dataProvider invalidMiddlewareDefinitionProvider
+     */
+    public function testInvalidMiddleware(mixed $definition): void
+    {
         $this->expectException(InvalidMiddlewareDefinitionException::class);
-        $middleware->processPush(
-            $this->getPushRequest(),
-            $this->createMock(MessageHandlerPushInterface::class)
-        );
-    }
-
-    public function testInvalidMiddlewareWithWrongString(): void
-    {
-        $this->expectException(InvalidCallableConfigurationException::class);
-        $this->getMiddlewareFactory()->createPushMiddleware('test');
-    }
-
-    public function testInvalidMiddlewareWithWrongClass(): void
-    {
-        $this->expectException(InvalidCallableConfigurationException::class);
-        $this->getMiddlewareFactory()->createPushMiddleware(TestCallableMiddleware::class);
+        $this->getMiddlewareFactory()->createPushMiddleware($definition);
     }
 
     public function testInvalidMiddlewareWithWrongController(): void
     {
         $container = $this->getContainer([InvalidController::class => new InvalidController()]);
-        $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware([InvalidController::class, 'index']);
+        $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware([InvalidController::class, 'index']
+        );
 
         $this->expectException(InvalidMiddlewareDefinitionException::class);
         $middleware->processPush(
@@ -148,36 +142,11 @@ final class MiddlewareFactoryTest extends TestCase
         );
     }
 
-    public function testInvalidMiddlewareWithWrongArraySize(): void
-    {
-        $this->expectException(InvalidCallableConfigurationException::class);
-        $this->getMiddlewareFactory()->createPushMiddleware(['test']);
-    }
-
-    public function testInvalidMiddlewareWithWrongArrayClass(): void
-    {
-        $this->expectException(InvalidCallableConfigurationException::class);
-        $this->getMiddlewareFactory()->createPushMiddleware(['class', 'test']);
-    }
-
-    public function testInvalidMiddlewareWithWrongArrayType(): void
-    {
-        $this->expectException(InvalidCallableConfigurationException::class);
-        $this->getMiddlewareFactory()->createPushMiddleware(['class' => TestCallableMiddleware::class, 'index']);
-    }
-
-    public function testInvalidMiddlewareWithWrongArrayWithIntItems(): void
-    {
-        $this->expectException(InvalidCallableConfigurationException::class);
-        $this->getMiddlewareFactory()->createPushMiddleware([7, 42]);
-    }
-
     private function getMiddlewareFactory(ContainerInterface $container = null): MiddlewareFactoryPushInterface
     {
         $container = $container ?? $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
-        $factory = new Factory($container);
 
-        return new MiddlewareFactoryPush($container, $factory, new CallableFactory($container));
+        return new MiddlewareFactoryPush($container, new CallableFactory($container));
     }
 
     private function getContainer(array $instances = []): ContainerInterface

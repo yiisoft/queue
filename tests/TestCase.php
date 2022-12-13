@@ -180,23 +180,21 @@ abstract class TestCase extends BaseTestCase
         return false;
     }
 
-    protected function getPushMiddlewareDispatcher()
+    protected function getPushMiddlewareDispatcher(): PushMiddlewareDispatcher
     {
         return new PushMiddlewareDispatcher(
             new MiddlewareFactoryPush(
                 $this->getContainer(),
-                new Factory($this->getContainer()),
                 new CallableFactory($this->getContainer()),
             ),
         );
     }
 
-    protected function getConsumeMiddlewareDispatcher()
+    protected function getConsumeMiddlewareDispatcher(): ConsumeMiddlewareDispatcher
     {
         return new ConsumeMiddlewareDispatcher(
             new MiddlewareFactoryConsume(
                 $this->getContainer(),
-                new Factory($this->getContainer()),
                 new CallableFactory($this->getContainer()),
             ),
         );
@@ -207,15 +205,9 @@ abstract class TestCase extends BaseTestCase
         return new FailureMiddlewareDispatcher(
             new MiddlewareFactoryFailure(
                 $this->getContainer(),
-                $this->getFactory(),
                 new CallableFactory($this->getContainer()),
             ),
             [],
         );
-    }
-
-    protected function getFactory(): Factory
-    {
-        return new Factory($this->getContainer());
     }
 }

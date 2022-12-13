@@ -163,11 +163,10 @@ final class MiddlewareDispatcherTest extends TestCase
         ContainerInterface $container = null,
     ): ConsumeMiddlewareDispatcher {
         $container = $container ?? $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
-        $factory = new Factory($container);
         $callableFactory = new CallableFactory($container);
 
         return new ConsumeMiddlewareDispatcher(
-            new MiddlewareFactoryConsume($container, $factory, $callableFactory),
+            new MiddlewareFactoryConsume($container, $callableFactory),
         );
     }
 

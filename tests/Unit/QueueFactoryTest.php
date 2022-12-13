@@ -6,12 +6,15 @@ namespace Yiisoft\Yii\Queue\Tests\Unit;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use stdClass;
 use Yiisoft\Factory\Factory;
+use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
+use Yiisoft\Yii\Queue\Middleware\CallableFactory;
 use Yiisoft\Yii\Queue\QueueFactory;
 use Yiisoft\Yii\Queue\QueueInterface;
 
@@ -33,7 +36,9 @@ class QueueFactoryTest extends TestCase
         $factory = new QueueFactory(
             [],
             $queue,
-            $this->createYiiFactory(),
+            $this->getContainer(),
+            new CallableFactory($this->getContainer()),
+            new Injector($this->getContainer()),
             true,
             $adapter
         );
@@ -51,7 +56,9 @@ class QueueFactoryTest extends TestCase
         new QueueFactory(
             [],
             $this->createMock(QueueInterface::class),
-            $this->createYiiFactory(),
+            $this->getContainer(),
+            new CallableFactory($this->getContainer()),
+            new Injector($this->getContainer()),
             true
         );
     }
@@ -64,7 +71,9 @@ class QueueFactoryTest extends TestCase
         $factory = new QueueFactory(
             [],
             $queue,
-            $this->createYiiFactory(),
+            $this->getContainer(),
+            new CallableFactory($this->getContainer()),
+            new Injector($this->getContainer()),
             false
         );
 
@@ -79,7 +88,9 @@ class QueueFactoryTest extends TestCase
         $factory = new QueueFactory(
             ['test' => new stdClass()],
             $queue,
-            $this->createYiiFactory(),
+            $this->getContainer(),
+            new CallableFactory($this->getContainer()),
+            new Injector($this->getContainer()),
             false
         );
 
@@ -101,7 +112,9 @@ class QueueFactoryTest extends TestCase
         $factory = new QueueFactory(
             ['test' => $adapterNew],
             $queue,
-            $this->createYiiFactory(),
+            $this->getContainer(),
+            new CallableFactory($this->getContainer()),
+            new Injector($this->getContainer()),
             false,
             $adapterDefault
         );
@@ -123,7 +136,9 @@ class QueueFactoryTest extends TestCase
         $factory = new QueueFactory(
             ['test' => $adapterNew],
             $queue,
-            $this->createYiiFactory(),
+            $this->getContainer(),
+            new CallableFactory($this->getContainer()),
+            new Injector($this->getContainer()),
             false
         );
 
@@ -133,5 +148,10 @@ class QueueFactoryTest extends TestCase
     private function createYiiFactory(): Factory
     {
         return new Factory(new SimpleContainer());
+    }
+
+    private function getContainer(array $instances = []): ContainerInterface
+    {
+        return new SimpleContainer($instances);
     }
 }

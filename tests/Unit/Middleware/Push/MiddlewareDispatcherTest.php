@@ -177,11 +177,10 @@ final class MiddlewareDispatcherTest extends TestCase
         ContainerInterface $container = null,
     ): PushMiddlewareDispatcher {
         $container = $container ?? $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
-        $factory = new Factory($container);
         $callableFactory = new CallableFactory($container);
 
         return new PushMiddlewareDispatcher(
-            new MiddlewareFactoryPush($container, $factory, $callableFactory),
+            new MiddlewareFactoryPush($container, $callableFactory),
         );
     }
 

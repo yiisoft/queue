@@ -18,12 +18,12 @@ class ChannelIncorrectlyConfigured extends InvalidArgumentException implements F
      * ChannelIncorrectlyConfigured constructor.
      *
      * @param string $channel
-     * @param mixed|object $object
+     * @param mixed|object $definition
      */
-    public function __construct(string $channel, $object, int $code = 0, ?Throwable $previous = null)
+    public function __construct(string $channel, $definition, int $code = 0, ?Throwable $previous = null)
     {
         $adapterClass = AdapterInterface::class;
-        $realType = is_object($object) ? get_class($object) : gettype($object);
+        $realType = is_object($definition) ? get_class($definition) : gettype($definition);
         $message = "Channel \"$channel\" is not properly configured: definition must return $adapterClass, $realType returned";
 
         $this->channel = $channel;
