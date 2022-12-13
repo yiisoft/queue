@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Middleware\Consume;
 
 use Closure;
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Yiisoft\Definitions\ArrayDefinition;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Definitions\Helpers\DefinitionValidator;
@@ -114,7 +112,8 @@ final class MiddlewareFactoryConsume implements MiddlewareFactoryConsumeInterfac
         };
     }
 
-    private function tryGetFromCallable(callable|MiddlewareConsumeInterface|array|string $definition
+    private function tryGetFromCallable(
+        callable|MiddlewareConsumeInterface|array|string $definition
     ): ?MiddlewareConsumeInterface {
         if ($definition instanceof Closure) {
             return $this->wrapCallable($definition);
@@ -134,7 +133,8 @@ final class MiddlewareFactoryConsume implements MiddlewareFactoryConsumeInterfac
         }
     }
 
-    private function tryGetFromArrayDefinition(callable|MiddlewareConsumeInterface|array|string $definition
+    private function tryGetFromArrayDefinition(
+        callable|MiddlewareConsumeInterface|array|string $definition
     ): ?MiddlewareConsumeInterface {
         if (!is_array($definition)) {
             return null;

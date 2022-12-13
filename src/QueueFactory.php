@@ -72,9 +72,9 @@ final class QueueFactory implements QueueFactoryInterface
     /**
      * @param string $channel
      *
-     * @return QueueInterface
      * @throws ChannelIncorrectlyConfigured
      *
+     * @return QueueInterface
      */
     private function create(string $channel): QueueInterface
     {

@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
-use Yiisoft\Factory\Factory;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;

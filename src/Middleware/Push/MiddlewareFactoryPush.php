@@ -112,7 +112,8 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
         };
     }
 
-    private function tryGetFromCallable(callable|MiddlewarePushInterface|array|string $definition
+    private function tryGetFromCallable(
+        callable|MiddlewarePushInterface|array|string $definition
     ): ?MiddlewarePushInterface {
         if ($definition instanceof Closure) {
             return $this->wrapCallable($definition);
@@ -132,7 +133,8 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
         }
     }
 
-    private function tryGetFromArrayDefinition(callable|MiddlewarePushInterface|array|string $definition
+    private function tryGetFromArrayDefinition(
+        callable|MiddlewarePushInterface|array|string $definition
     ): ?MiddlewarePushInterface {
         if (!is_array($definition)) {
             return null;

@@ -115,7 +115,8 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
         };
     }
 
-    private function tryGetFromCallable(callable|MiddlewareFailureInterface|array|string $definition
+    private function tryGetFromCallable(
+        callable|MiddlewareFailureInterface|array|string $definition
     ): ?MiddlewareFailureInterface {
         if ($definition instanceof Closure) {
             return $this->wrapCallable($definition);
@@ -135,7 +136,8 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
         }
     }
 
-    private function tryGetFromArrayDefinition(callable|MiddlewareFailureInterface|array|string $definition
+    private function tryGetFromArrayDefinition(
+        callable|MiddlewareFailureInterface|array|string $definition
     ): ?MiddlewareFailureInterface {
         if (!is_array($definition)) {
             return null;

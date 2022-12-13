@@ -7,7 +7,6 @@ namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\FailureHandling;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Yiisoft\Factory\Factory;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Message\Message;

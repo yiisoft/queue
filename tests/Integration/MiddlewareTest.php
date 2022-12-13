@@ -8,7 +8,6 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Yiisoft\Factory\Factory;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;

@@ -132,7 +132,8 @@ final class MiddlewareFactoryTest extends TestCase
     public function testInvalidMiddlewareWithWrongController(): void
     {
         $container = $this->getContainer([InvalidController::class => new InvalidController()]);
-        $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware([InvalidController::class, 'index']
+        $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
+            [InvalidController::class, 'index']
         );
 
         $this->expectException(InvalidMiddlewareDefinitionException::class);
