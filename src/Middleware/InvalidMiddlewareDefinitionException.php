@@ -18,7 +18,7 @@ final class InvalidMiddlewareDefinitionException extends InvalidArgumentExceptio
     /**
      * @param array|callable|string $middlewareDefinition
      */
-    public function __construct($middlewareDefinition, $code = 0, ?Throwable $previous = null)
+    public function __construct($middlewareDefinition, int $code = 0, ?Throwable $previous = null)
     {
         $message = 'Parameter should be either middleware class name or a callable.';
 
