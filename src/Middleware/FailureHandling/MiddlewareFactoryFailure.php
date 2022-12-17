@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Middleware\FailureHandling;
 
+use Closure;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Yiisoft\Definitions\ArrayDefinition;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
-use Yiisoft\Definitions\Exception\NotInstantiableClassException;
-use Yiisoft\Definitions\Exception\NotInstantiableException;
-use Yiisoft\Factory\Factory;
-use Yiisoft\Factory\NotFoundException;
+use Yiisoft\Definitions\Helpers\DefinitionValidator;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
+use Yiisoft\Yii\Queue\Middleware\InvalidCallableConfigurationException;
 use Yiisoft\Yii\Queue\Middleware\InvalidMiddlewareDefinitionException;
 
 use function is_string;
@@ -28,7 +28,6 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
      */
     public function __construct(
         private ContainerInterface $container,
-        private Factory $factory,
         private CallableFactory $callableFactory,
     ) {
     }
@@ -62,22 +61,30 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
             return $middlewareDefinition;
         }
 
-        if (is_string($middlewareDefinition) && is_subclass_of($middlewareDefinition, MiddlewareFailureInterface::class)) {
-            /** @var MiddlewareFailureInterface */
-            return $this->container->get($middlewareDefinition);
+        if (is_string($middlewareDefinition)) {
+            return $this->getFromContainer($middlewareDefinition);
         }
 
-        try {
-            $result = $this->factory->create($middlewareDefinition);
-            if ($result instanceof MiddlewareFailureInterface) {
-                return $result;
+        return $this->tryGetFromCallable($middlewareDefinition)
+            ?? $this->tryGetFromArrayDefinition($middlewareDefinition)
+            ?? throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
+    }
+
+    private function getFromContainer(string $middlewareDefinition): MiddlewareFailureInterface
+    {
+        if (class_exists($middlewareDefinition)) {
+            if (is_subclass_of($middlewareDefinition, MiddlewareFailureInterface::class)) {
+                /** @var MiddlewareFailureInterface */
+                return $this->container->get($middlewareDefinition);
             }
-        } catch (NotFoundException|NotInstantiableClassException|NotInstantiableException|InvalidConfigException) {
+        } elseif ($this->container->has($middlewareDefinition)) {
+            $middleware = $this->container->get($middlewareDefinition);
+            if ($middleware instanceof MiddlewareFailureInterface) {
+                return $middleware;
+            }
         }
 
-        $callable = $this->callableFactory->create($middlewareDefinition);
-
-        return $this->wrapCallable($callable);
+        throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
     }
 
     private function wrapCallable(callable $callback): MiddlewareFailureInterface
@@ -106,5 +113,48 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
                 throw new InvalidMiddlewareDefinitionException($this->callback);
             }
         };
+    }
+
+    private function tryGetFromCallable(
+        callable|MiddlewareFailureInterface|array|string $definition
+    ): ?MiddlewareFailureInterface {
+        if ($definition instanceof Closure) {
+            return $this->wrapCallable($definition);
+        }
+
+        if (
+            is_array($definition)
+            && array_keys($definition) === [0, 1]
+        ) {
+            try {
+                return $this->wrapCallable($this->callableFactory->create($definition));
+            } catch (InvalidCallableConfigurationException $exception) {
+                throw new InvalidMiddlewareDefinitionException($definition, previous: $exception);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private function tryGetFromArrayDefinition(
+        callable|MiddlewareFailureInterface|array|string $definition
+    ): ?MiddlewareFailureInterface {
+        if (!is_array($definition)) {
+            return null;
+        }
+
+        try {
+            DefinitionValidator::validateArrayDefinition($definition);
+
+            $middleware = ArrayDefinition::fromConfig($definition)->resolve($this->container);
+            if ($middleware instanceof MiddlewareFailureInterface) {
+                return $middleware;
+            }
+
+            throw new InvalidMiddlewareDefinitionException($definition);
+        } catch (InvalidConfigException) {
+        }
+
+        throw new InvalidMiddlewareDefinitionException($definition);
     }
 }

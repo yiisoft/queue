@@ -6,7 +6,6 @@ namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Yiisoft\Factory\Factory;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Message\Message;
@@ -163,11 +162,10 @@ final class MiddlewareDispatcherTest extends TestCase
         ContainerInterface $container = null,
     ): ConsumeMiddlewareDispatcher {
         $container = $container ?? $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
-        $factory = new Factory($container);
         $callableFactory = new CallableFactory($container);
 
         return new ConsumeMiddlewareDispatcher(
-            new MiddlewareFactoryConsume($container, $factory, $callableFactory),
+            new MiddlewareFactoryConsume($container, $callableFactory),
         );
     }
 

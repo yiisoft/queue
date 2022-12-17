@@ -62,7 +62,7 @@ final class InvalidMiddlewareDefinitionExceptionTest extends TestCase
     {
         $exception = new InvalidMiddlewareDefinitionException($definition);
         self::assertSame(
-            'Parameter should be either PSR middleware class name or a callable.',
+            'Parameter should be either middleware class name or a callable.',
             $exception->getMessage()
         );
     }
