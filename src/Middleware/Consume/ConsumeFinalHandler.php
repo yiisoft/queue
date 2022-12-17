@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Middleware\Consume;
 
-use Closure;
+use Psr\Log\LoggerInterface;
 
 /**
  * @internal
  */
 final class ConsumeFinalHandler implements MessageHandlerConsumeInterface
 {
-    public function __construct(private Closure $handler)
+    public function __construct(private string $handler, private LoggerInterface $logger)
     {
     }
 
     public function handleConsume(ConsumeRequest $request): ConsumeRequest
     {
-        $handler = $this->handler;
-        $handler($request->getMessage());
+        $class = $this->handler;
+        $handler = new $class($this->logger);
+        $handler->handle($request->getMessage());
 
         return $request;
     }

@@ -59,9 +59,8 @@ final class Worker implements WorkerInterface
         }
 
         $request = new ConsumeRequest($message, $queue);
-        $closure = fn (): mixed => $this->injector->invoke($handler, [$message]);
         try {
-            return $this->consumeMiddlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure))->getMessage();
+            return $this->consumeMiddlewareDispatcher->dispatch($request, $this->createConsumeHandler($handler[0]::class))->getMessage();
         } catch (Throwable $exception) {
             $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueue());
 
@@ -147,9 +146,9 @@ final class Worker implements WorkerInterface
         return $definition;
     }
 
-    private function createConsumeHandler(Closure $handler): MessageHandlerConsumeInterface
+    private function createConsumeHandler(string $handler): MessageHandlerConsumeInterface
     {
-        return new ConsumeFinalHandler($handler);
+        return new ConsumeFinalHandler($handler, $this->logger);
     }
 
     private function createFailureHandler(): MessageFailureHandlerInterface
