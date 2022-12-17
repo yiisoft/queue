@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
+use Yiisoft\Factory\Factory;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
@@ -179,21 +180,23 @@ abstract class TestCase extends BaseTestCase
         return false;
     }
 
-    protected function getPushMiddlewareDispatcher(): PushMiddlewareDispatcher
+    protected function getPushMiddlewareDispatcher()
     {
         return new PushMiddlewareDispatcher(
             new MiddlewareFactoryPush(
                 $this->getContainer(),
+                new Factory($this->getContainer()),
                 new CallableFactory($this->getContainer()),
             ),
         );
     }
 
-    protected function getConsumeMiddlewareDispatcher(): ConsumeMiddlewareDispatcher
+    protected function getConsumeMiddlewareDispatcher()
     {
         return new ConsumeMiddlewareDispatcher(
             new MiddlewareFactoryConsume(
                 $this->getContainer(),
+                new Factory($this->getContainer()),
                 new CallableFactory($this->getContainer()),
             ),
         );
@@ -204,9 +207,15 @@ abstract class TestCase extends BaseTestCase
         return new FailureMiddlewareDispatcher(
             new MiddlewareFactoryFailure(
                 $this->getContainer(),
+                $this->getFactory(),
                 new CallableFactory($this->getContainer()),
             ),
             [],
         );
+    }
+
+    protected function getFactory(): Factory
+    {
+        return new Factory($this->getContainer());
     }
 }

@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Yiisoft\Factory\Factory;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
@@ -51,6 +52,7 @@ final class MiddlewareTest extends TestCase
         $pushMiddlewareDispatcher = new PushMiddlewareDispatcher(
             new MiddlewareFactoryPush(
                 $this->createMock(ContainerInterface::class),
+                new Factory($this->createMock(ContainerInterface::class)),
                 new CallableFactory(
                     $this->createMock(ContainerInterface::class)
                 ),
@@ -96,6 +98,7 @@ final class MiddlewareTest extends TestCase
         $consumeMiddlewareDispatcher = new ConsumeMiddlewareDispatcher(
             new MiddlewareFactoryConsume(
                 $this->createMock(ContainerInterface::class),
+                new Factory($this->createMock(ContainerInterface::class)),
                 new CallableFactory(
                     $this->createMock(ContainerInterface::class)
                 ),
@@ -105,7 +108,7 @@ final class MiddlewareTest extends TestCase
         );
 
         $failureMiddlewareDispatcher = new FailureMiddlewareDispatcher(
-            new MiddlewareFactoryFailure($container, $callableFactory),
+            new MiddlewareFactoryFailure($container, new Factory($container), $callableFactory),
             [],
         );
 
@@ -163,7 +166,7 @@ final class MiddlewareTest extends TestCase
             ],
         ];
         $dispatcher = new FailureMiddlewareDispatcher(
-            new MiddlewareFactoryFailure($container, $callableFactory),
+            new MiddlewareFactoryFailure($container, new Factory($container), $callableFactory),
             $middlewares,
         );
 

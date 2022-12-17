@@ -6,8 +6,6 @@ namespace Yiisoft\Yii\Queue\Middleware;
 
 use InvalidArgumentException;
 
-use Throwable;
-
 use function get_class;
 use function is_array;
 use function is_object;
@@ -18,16 +16,16 @@ final class InvalidMiddlewareDefinitionException extends InvalidArgumentExceptio
     /**
      * @param array|callable|string $middlewareDefinition
      */
-    public function __construct($middlewareDefinition, int $code = 0, ?Throwable $previous = null)
+    public function __construct($middlewareDefinition)
     {
-        $message = 'Parameter should be either middleware class name or a callable.';
+        $message = 'Parameter should be either PSR middleware class name or a callable.';
 
         $definitionString = $this->convertDefinitionToString($middlewareDefinition);
         if ($definitionString !== null) {
             $message .= ' Got ' . $definitionString . '.';
         }
 
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message);
     }
 
     /**
