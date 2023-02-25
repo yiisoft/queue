@@ -8,7 +8,6 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use stdClass;
-use Yiisoft\Factory\Factory;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
@@ -25,7 +24,12 @@ class QueueFactoryTest extends TestCase
         $queue = $this->createMock(QueueInterface::class);
         $queue
             ->expects(self::once())
-            ->method('withAdapter');
+            ->method('withAdapter')
+            ->willReturn($queue);
+        $queue
+            ->expects(self::once())
+            ->method('withChannelName')
+            ->willReturn($queue);
 
         $adapter = $this->createMock(AdapterInterface::class);
         $adapter
@@ -108,6 +112,11 @@ class QueueFactoryTest extends TestCase
             ->method('withAdapter')
             ->with($adapterNew)
             ->willReturn($queue);
+        $queue
+            ->expects(self::once())
+            ->method('withChannelName')
+            ->with('test')
+            ->willReturn($queue);
 
         $factory = new QueueFactory(
             ['test' => $adapterNew],
@@ -132,6 +141,11 @@ class QueueFactoryTest extends TestCase
             ->method('withAdapter')
             ->with($adapterNew)
             ->willReturn($queue);
+        $queue
+            ->expects(self::once())
+            ->method('withChannelName')
+            ->with('test')
+            ->willReturn($queue);
 
         $factory = new QueueFactory(
             ['test' => $adapterNew],
@@ -143,11 +157,6 @@ class QueueFactoryTest extends TestCase
         );
 
         $factory->get('test');
-    }
-
-    private function createYiiFactory(): Factory
-    {
-        return new Factory(new SimpleContainer());
     }
 
     private function getContainer(array $instances = []): ContainerInterface

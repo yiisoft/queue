@@ -11,7 +11,6 @@ use WeakReference;
 use Yiisoft\Definitions\ArrayDefinition;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Definitions\Helpers\DefinitionValidator;
-use Yiisoft\Factory\Factory;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
@@ -30,7 +29,9 @@ final class QueueFactory implements QueueFactoryInterface
      * "Definition" here is a {@see Factory} definition
      * @param QueueInterface $queue A default queue implementation. `$queue->withAdapter()` will be returned
      * with the `get` method
-     * @param Factory $yiiFactory
+     * @param ContainerInterface $container
+     * @param CallableFactory $callableFactory
+     * @param Injector $injector
      * @param bool $enableRuntimeChannelDefinition A flag whether to enable a such behavior when there is no
      * explicit channel adapter definition: `return $this->queue->withAdapter($this->adapter->withChannel($channel)`
      * When this flag is set to false, only explicit definitions from the $definition parameter are used.
@@ -83,7 +84,7 @@ final class QueueFactory implements QueueFactoryInterface
             $this->checkDefinitionType($channel, $definition);
             $adapter = $this->createFromDefinition($channel, $definition);
 
-            return $this->queue->withAdapter($adapter);
+            return $this->queue->withChannelName($channel)->withAdapter($adapter);
         }
 
         if ($this->enableRuntimeChannelDefinition === false) {
@@ -91,7 +92,7 @@ final class QueueFactory implements QueueFactoryInterface
         }
 
         /** @psalm-suppress PossiblyNullReference */
-        return $this->queue->withAdapter($this->defaultAdapter->withChannel($channel));
+        return $this->queue->withChannelName($channel)->withAdapter($this->defaultAdapter->withChannel($channel));
     }
 
     private function checkDefinitionType(string $channel, mixed $definition): void
