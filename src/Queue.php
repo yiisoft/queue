@@ -134,7 +134,15 @@ final class Queue implements QueueInterface
         return $instance;
     }
 
-    protected function handle(MessageInterface $message): void
+    public function withChannelName(string $channel): self
+    {
+        $instance = clone $this;
+        $instance->channelName = $channel;
+
+        return $instance;
+    }
+
+    private function handle(MessageInterface $message): void
     {
         $this->worker->process($message, $this);
     }
