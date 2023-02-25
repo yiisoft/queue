@@ -60,7 +60,7 @@ final class QueueFactoryTest extends TestCase
                 'test-channel' => [
                     'class' => FakeAdapter::class,
                     'withChannel()' => ['test-channel'],
-                ]
+                ],
             ],
             $queue,
             $container,
