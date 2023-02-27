@@ -59,7 +59,7 @@ final class Worker implements WorkerInterface
         }
 
         $request = new ConsumeRequest($message, $queue);
-        $closure = fn (): mixed => $this->injector->invoke($handler, [$message]);
+        $closure = fn (MessageInterface $message): mixed => $this->injector->invoke($handler, [$message]);
         try {
             return $this->consumeMiddlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure))->getMessage();
         } catch (Throwable $exception) {
