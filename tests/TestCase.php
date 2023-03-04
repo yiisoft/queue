@@ -23,7 +23,6 @@ use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Queue;
-use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Worker\Worker;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
