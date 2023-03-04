@@ -33,7 +33,7 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 abstract class TestCase extends BaseTestCase
 {
     protected ?ContainerInterface $container = null;
-    protected QueueInterface|MockObject|null $queue = null;
+    protected Queue|null $queue = null;
     protected ?AdapterInterface $adapter = null;
     protected ?LoopInterface $loop = null;
     protected ?WorkerInterface $worker = null;
@@ -53,6 +53,9 @@ abstract class TestCase extends BaseTestCase
         $this->executionTimes = 0;
     }
 
+    /**
+     * @return Queue The same object every time
+     */
     protected function getQueue(): Queue
     {
         if ($this->queue === null) {
