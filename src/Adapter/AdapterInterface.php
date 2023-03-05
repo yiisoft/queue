@@ -12,6 +12,8 @@ interface AdapterInterface
 {
     /**
      * Returns the first message from the queue if it exists (null otherwise).
+     *
+     * @param callable(MessageInterface): bool  $callback
      */
     public function runExisting(callable $callback): void;
 
@@ -36,7 +38,7 @@ interface AdapterInterface
     /**
      * Listen to the queue and pass messages to the given handler as they come.
      *
-     * @param callable $handler The handler which will execute jobs.
+     * @param callable(MessageInterface): bool $handler The handler which will execute jobs.
      */
     public function subscribe(callable $handler): void;
 
