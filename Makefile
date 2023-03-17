@@ -1,6 +1,9 @@
 COMPOSE_PROJECT_NAME=yii-queue
 COMPOSE_FILE=tests/docker-compose.yml
 
+build:
+	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose up -d --build
+
 test: test72 test71 test70 test56
 test72:
 	docker-compose build php72
