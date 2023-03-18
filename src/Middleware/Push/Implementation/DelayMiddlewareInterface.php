@@ -14,9 +14,9 @@ interface DelayMiddlewareInterface extends MiddlewarePushInterface
     /**
      * Set a new delay value into the middleware object
      *
-     * @param float $delay Delay value in seconds
+     * @param float $seconds Delay value in seconds
      *
      * @return $this A new middleware object with changed delay value
      */
-    public function withDelay(float $delay): self;
+    public function withDelay(float $seconds): self;
 }
