@@ -72,7 +72,7 @@ final class Queue implements QueueInterface
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
-        $callback = function (MessageInterface $message) use (&$max, &$count): bool {
+        $handlerCallback = function (MessageInterface $message) use (&$max, &$count): bool {
             if (($max > 0 && $max <= $count) || !$this->loop->canContinue()) {
                 return false;
             }
@@ -84,7 +84,7 @@ final class Queue implements QueueInterface
         };
 
         /** @psalm-suppress PossiblyNullReference */
-        $this->adapter->runExisting($callback);
+        $this->adapter->runExisting($handlerCallback);
 
         $this->logger->info(
             'Processed {count} queue messages.',
