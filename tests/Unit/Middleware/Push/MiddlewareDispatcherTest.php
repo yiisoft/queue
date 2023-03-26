@@ -81,6 +81,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $middleware2 = static function (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest {
             /**
              * @noinspection NullPointerExceptionInspection
+             *
              * @psalm-suppress PossiblyNullReference
              */
             $request = $request->withAdapter($request->getAdapter()->withChannel('new channel'));
