@@ -30,10 +30,10 @@ final class SynchronousAdapter implements AdapterInterface
         });
     }
 
-    public function runExisting(callable $callback): void
+    public function runExisting(callable $handlerCallback): void
     {
         while (isset($this->messages[$this->current])) {
-            $callback($this->messages[$this->current]);
+            $handlerCallback($this->messages[$this->current]);
             unset($this->messages[$this->current]);
             $this->current++;
         }
@@ -66,9 +66,9 @@ final class SynchronousAdapter implements AdapterInterface
         $message->setId((string) $key);
     }
 
-    public function subscribe(callable $handler): void
+    public function subscribe(callable $handlerCallback): void
     {
-        $this->runExisting($handler);
+        $this->runExisting($handlerCallback);
     }
 
     public function withChannel(string $channel): self

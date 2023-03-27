@@ -1,4 +1,4 @@
-COMPOSE_PROJECT_NAME=yii2-queue
+COMPOSE_PROJECT_NAME=yii-queue
 COMPOSE_FILE=tests/docker-compose.yml
 
 test: test72 test71 test70 test56

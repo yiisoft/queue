@@ -13,9 +13,9 @@ interface AdapterInterface
     /**
      * Returns the first message from the queue if it exists (null otherwise).
      *
-     * @param callable(MessageInterface): bool  $callback
+     * @param callable(MessageInterface): bool  $handlerCallback The handler which will handle messages. Returns false if it cannot continue handling messages
      */
-    public function runExisting(callable $callback): void;
+    public function runExisting(callable $handlerCallback): void;
 
     /**
      * Returns status code of a message with the given id.
@@ -38,9 +38,9 @@ interface AdapterInterface
     /**
      * Listen to the queue and pass messages to the given handler as they come.
      *
-     * @param callable(MessageInterface): bool $handler The handler which will execute jobs.
+     * @param callable(MessageInterface): void $handlerCallback The handler which will handle messages. Returns false if it cannot continue handling messages.
      */
-    public function subscribe(callable $handler): void;
+    public function subscribe(callable $handlerCallback): void;
 
     public function withChannel(string $channel): self;
 }
