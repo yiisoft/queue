@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit\Debug;
 
-use Yiisoft\Validator\Result;
-use Yiisoft\Validator\Rule\Number;
 use Yiisoft\Yii\Debug\Collector\CollectorInterface;
 use Yiisoft\Yii\Debug\Tests\Shared\AbstractCollectorTestCase;
 use Yiisoft\Yii\Queue\Debug\QueueCollector;
@@ -28,10 +26,6 @@ final class QueueCollectorTest extends AbstractCollectorTestCase
      */
     protected function collectTestData(CollectorInterface $collector): void
     {
-        $ruleNumber = new Number(min: 200);
-        $result = new Result();
-        $result->addError($ruleNumber->getLessThanMinMessage());
-
         $collector->collectStatus('12345', JobStatus::done());
         $collector->collectPush('chan1', $this->pushMessage);
         $collector->collectPush('chan2', $this->pushMessage);
