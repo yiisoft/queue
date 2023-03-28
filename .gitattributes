@@ -28,6 +28,7 @@
 /.gitignore         export-ignore
 /.scrutinizer.yml   export-ignore
 /phpunit.xml.dist   export-ignore
+/Makefile           export-ignore
 /tests              export-ignore
 /docs               export-ignore
 

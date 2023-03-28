@@ -1,56 +1,32 @@
-COMPOSE_PROJECT_NAME=yii-queue
-COMPOSE_FILE=tests/docker-compose.yml
+export COMPOSE_PROJECT_NAME=yii-queue
 
 build:
-	COMPOSE_FILE=tests/docker/docker-compose.yml docker-compose up -d --build
+	docker-compose -f tests/docker-compose.yml up -d --build
 
-test: test72 test71 test70 test56
-test72:
-	docker-compose build php72
-	docker-compose run php72 vendor/bin/phpunit
-	docker-compose down
-test71:
-	docker-compose build php71
-	docker-compose run php71 vendor/bin/phpunit
-	docker-compose down
-test70:
-	docker-compose build php70
-	docker-compose run php70 vendor/bin/phpunit
-	docker-compose down
-test56:
-	docker-compose build php56
-	docker-compose run php56 vendor/bin/phpunit
-	docker-compose down
+down:
+	docker-compose -f tests/docker-compose.yml down
 
-benchmark: benchmark72 benchmark71 benchmark70 benchmark56
-benchmark72:
-	docker-compose build php72
-	docker-compose run php72 tests/yii benchmark/waiting
-	docker-compose down
-benchmark71:
-	docker-compose build php71
-	docker-compose run php71 tests/yii benchmark/waiting
-	docker-compose down
-benchmark70:
-	docker-compose build php70
-	docker-compose run php70 tests/yii benchmark/waiting
-	docker-compose down
-benchmark56:
-	docker-compose build php56
-	docker-compose run php56 tests/yii benchmark/waiting
-	docker-compose down
+test:
+	docker-compose -f tests/docker-compose.yml build --pull php$(v)
+	docker-compose -f tests/docker-compose.yml run php$(v) vendor/bin/phpunit --colors=always -v --debug
+	make down
 
-check-cs:
-	docker-compose build php72
-	docker-compose run php72 php-cs-fixer fix --diff --dry-run
-	docker-compose down
+mutation-test:
+	docker-compose -f tests/docker-compose.yml build --pull php$(v)
+	docker-compose -f tests/docker-compose.yml run php$(v) php -dpcov.enabled=1 -dpcov.directory=. vendor/bin/roave-infection-static-analysis-plugin -j2 --ignore-msi-with-no-mutations --only-covered
+	make down
+
+coverage:
+	docker-compose -f tests/docker-compose.yml run php$(v) vendor/bin/phpunit --coverage-clover coverage.xml
+	make down
+
+static-analyze:
+	docker-compose -f tests/docker-compose.yml run php$(v) vendor/bin/psalm --config=psalm.xml --shepherd --stats --php-version=$(v)
+	make down
 
 clean:
 	docker-compose down
 	sudo rm -rf tests/runtime/*
-	sudo rm -f .php_cs.cache
 	sudo rm -rf composer.lock
 	sudo rm -rf vendor/
-
-clean-all: clean
 	sudo rm -rf tests/runtime/.composer*
