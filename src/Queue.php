@@ -59,7 +59,7 @@ final class Queue implements QueueInterface
 
         $this->logger->info(
             'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
-            ['name' => $message->getHandlerName(), 'id' => $message->getId() ?? 'null']
+            ['handlerName' => $message->getHandlerName(), 'id' => $message->getId() ?? 'null']
         );
 
         return $message;
