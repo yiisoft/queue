@@ -34,12 +34,11 @@ final class SynchronousAdapter implements AdapterInterface
 
     public function runExisting(callable $handlerCallback): void
     {
-        while (isset($this->messages[$this->current])) {
-            do {
-                $result = $handlerCallback($this->messages[$this->current]);
-                unset($this->messages[$this->current]);
-                $this->current++;
-            } while ($result === true);
+        $result = true;
+        while (isset($this->messages[$this->current]) && $result === true) {
+            $result = $handlerCallback($this->messages[$this->current]);
+            unset($this->messages[$this->current]);
+            $this->current++;
         }
     }
 
