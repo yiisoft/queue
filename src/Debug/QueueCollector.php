@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Debug;
 
-use Yiisoft\Yii\Debug\Collector\CollectorInterface;
 use Yiisoft\Yii\Debug\Collector\CollectorTrait;
-use Yiisoft\Yii\Debug\Collector\IndexCollectorInterface;
+use Yiisoft\Yii\Debug\Collector\SummaryCollectorInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 
-final class QueueCollector implements CollectorInterface, IndexCollectorInterface
+final class QueueCollector implements SummaryCollectorInterface
 {
     use CollectorTrait;
 
@@ -76,7 +75,7 @@ final class QueueCollector implements CollectorInterface, IndexCollectorInterfac
         $this->processingMessages = [];
     }
 
-    public function getIndexData(): array
+    public function getSummary(): array
     {
         $countPushes = array_sum(array_map(fn ($messages) => is_countable($messages) ? count($messages) : 0, $this->pushes));
         $countStatuses = count($this->statuses);
