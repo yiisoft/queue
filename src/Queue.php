@@ -73,11 +73,9 @@ final class Queue implements QueueInterface
         $count = 0;
 
         $handlerCallback = function (MessageInterface $message) use (&$max, &$count): bool {
-            if (($max > 0 && $max <= $count) || !$this->loop->canContinue()) {
+            if (($max > 0 && $max <= $count) || !$this->handle($message)) {
                 return false;
             }
-
-            $this->handle($message);
             $count++;
 
             return true;
@@ -142,9 +140,11 @@ final class Queue implements QueueInterface
         return $instance;
     }
 
-    private function handle(MessageInterface $message): void
+    private function handle(MessageInterface $message): bool
     {
         $this->worker->process($message, $this);
+
+        return $this->loop->canContinue();
     }
 
     private function checkAdapter(): void
