@@ -19,3 +19,4 @@ composer.lock
 
 # PHPUnit
 .phpunit.result.cache
+coverage.html

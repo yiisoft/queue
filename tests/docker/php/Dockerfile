@@ -1,7 +1,7 @@
 ARG PHP_VERSION
 FROM php:${PHP_VERSION}-fpm-alpine
 
-RUN apk add autoconf g++ make linux-headers
+RUN apk add git autoconf g++ make linux-headers
 
 RUN pecl install xdebug pcov
 RUN docker-php-ext-enable xdebug pcov
