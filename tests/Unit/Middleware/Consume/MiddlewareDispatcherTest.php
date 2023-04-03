@@ -37,7 +37,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $this->assertSame('New closure test data', $request->getMessage()->getData());
     }
 
-    public function testArrayMiddlewareCall(): void
+    public function testArrayMiddlewareCallableDefinition(): void
     {
         $request = $this->getConsumeRequest();
         $container = $this->createContainer(
@@ -48,6 +48,19 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this->createDispatcher($container)->withMiddlewares([[TestCallableMiddleware::class, 'index']]);
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('New test data', $request->getMessage()->getData());
+    }
+
+    public function testFactoryArrayDefinition(): void
+    {
+        $request = $this->getConsumeRequest();
+        $container = $this->createContainer();
+        $definition = [
+            'class' => TestMiddleware::class,
+            '__construct()' => ['message' => 'New test data from the definition'],
+        ];
+        $dispatcher = $this->createDispatcher($container)->withMiddlewares([$definition]);
+        $request = $dispatcher->dispatch($request, $this->getRequestHandler());
+        $this->assertSame('New test data from the definition', $request->getMessage()->getData());
     }
 
     public function testMiddlewareFullStackCalled(): void

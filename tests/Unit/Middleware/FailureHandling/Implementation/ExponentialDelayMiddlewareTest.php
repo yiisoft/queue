@@ -1,0 +1,194 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
+
+use Exception;
+use InvalidArgumentException;
+use Yiisoft\Yii\Queue\Message\Message;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Yii\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
+use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Yii\Queue\Tests\TestCase;
+
+class ExponentialDelayMiddlewareTest extends TestCase
+{
+    public function constructorRequirementsProvider(): array
+    {
+        $queue = $this->createMock(QueueInterface::class);
+        $middleware = $this->createMock(DelayMiddlewareInterface::class);
+
+        return [
+            [
+                true,
+                [
+                    'test',
+                    1,
+                    0.001,
+                    1,
+                    0.01,
+                    $middleware,
+                    $queue,
+                ],
+            ],
+            [
+                true,
+                [
+                    'test',
+                    PHP_INT_MAX,
+                    PHP_INT_MAX,
+                    PHP_INT_MAX,
+                    PHP_INT_MAX,
+                    $middleware,
+                    $queue,
+                ],
+            ],
+            [
+                false,
+                [
+                    'test',
+                    1,
+                    0,
+                    1,
+                    0.01,
+                    $middleware,
+                    $queue,
+                ],
+            ],
+            [
+                false,
+                [
+                    'test',
+                    0,
+                    0,
+                    1,
+                    0.01,
+                    $middleware,
+                    $queue,
+                ],
+            ],
+            [
+                false,
+                [
+                    'test',
+                    1,
+                    0,
+                    0,
+                    0.01,
+                    $middleware,
+                    $queue,
+                ],
+            ],
+            [
+                false,
+                [
+                    'test',
+                    1,
+                    0,
+                    0.01,
+                    0,
+                    $middleware,
+                    $queue,
+                ],
+            ],
+            [
+                false,
+                [
+                    'test',
+                    0,
+                    PHP_INT_MAX,
+                    PHP_INT_MAX,
+                    PHP_INT_MAX,
+                    $middleware,
+                    $queue,
+                ],
+            ],
+            [
+                false,
+                [
+                    'test',
+                    PHP_INT_MAX,
+                    PHP_INT_MAX,
+                    0,
+                    PHP_INT_MAX,
+                    $middleware,
+                    $queue,
+                ],
+            ],
+            [
+                false,
+                [
+                    'test',
+                    PHP_INT_MAX,
+                    PHP_INT_MAX,
+                    PHP_INT_MAX,
+                    0,
+                    $middleware,
+                    $queue,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider constructorRequirementsProvider
+     */
+    public function testConstructorRequirements(bool $success, array $arguments): void
+    {
+        if (!$success) {
+            $this->expectException(InvalidArgumentException::class);
+        }
+
+        $strategy = new ExponentialDelayMiddleware(...$arguments);
+        self::assertInstanceOf(ExponentialDelayMiddleware::class, $strategy);
+    }
+
+    public function testPipelineSuccess(): void
+    {
+        $message = new Message('test', null);
+        $queue = $this->createMock(QueueInterface::class);
+        $middleware = new ExponentialDelayMiddleware(
+            'test',
+            1,
+            1,
+            1,
+            1,
+            $this->createMock(DelayMiddlewareInterface::class),
+            $queue,
+        );
+        $nextHandler = $this->createMock(MessageFailureHandlerInterface::class);
+        $nextHandler->expects(self::never())->method('handleFailure');
+        $request = new FailureHandlingRequest($message, new Exception('test'), $queue);
+        $result = $middleware->processFailure($request, $nextHandler);
+
+        self::assertNotEquals($request, $result);
+        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test', $result->getMessage()->getMetadata());
+        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_DELAY . '-test', $result->getMessage()->getMetadata());
+    }
+
+    public function testPipelineFailure(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('test');
+
+        $message = new Message('test', null, [ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test' => 2]);
+        $queue = $this->createMock(QueueInterface::class);
+        $middleware = new ExponentialDelayMiddleware(
+            'test',
+            1,
+            1,
+            1,
+            1,
+            $this->createMock(DelayMiddlewareInterface::class),
+            $queue,
+        );
+        $nextHandler = $this->createMock(MessageFailureHandlerInterface::class);
+        $exception = new Exception('test');
+        $nextHandler->expects(self::once())->method('handleFailure')->willThrowException($exception);
+        $request = new FailureHandlingRequest($message, $exception, $queue);
+        $middleware->processFailure($request, $nextHandler);
+    }
+}

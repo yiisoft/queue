@@ -28,9 +28,8 @@
     "require": {
         "php": "^8.0",
         "psr/log": "^2.0|^3.0",
-        "yiisoft/yii-console": "^1.0",
-        "yiisoft/definitions": "^1.0|^2.0",
-        "yiisoft/factory": "^1.0",
+        "yiisoft/yii-console": "^2.0",
+        "yiisoft/definitions": "^1.0|^2.0|^3.0",
         "yiisoft/friendly-exception": "^1.0",
         "yiisoft/injector": "^1.0"
     },
@@ -39,7 +38,7 @@
         "phpunit/phpunit": "^9.5",
         "roave/infection-static-analysis-plugin": "^1.16",
         "spatie/phpunit-watcher": "^1.23",
-        "vimeo/psalm": "^4.18",
+        "vimeo/psalm": "^4.30|^5.8",
         "yiisoft/test-support": "^3.0"
     },
     "suggest": {
@@ -63,7 +62,7 @@
             "source-directory": "config"
         },
         "config-plugin": {
-            "common": "common.php",
+            "di": "di.php",
             "params": "params.php"
         }
     },

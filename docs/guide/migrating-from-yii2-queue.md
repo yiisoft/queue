@@ -17,10 +17,9 @@ and more structured than the old one allowing better maintenance.
 There was a concept in [yiisoft/yii2-queue] called `Job`: you had to push it to the queue, and it was executed after
 being consumed. In the new package it is divided into two different concepts: a message and a handler.
 
-- A `Message` is a class implementing `MessageInterface`. It contains 3 types of data:
+- A `Message` is a class implementing `MessageInterface`. It contains 2 types of data:
     - Name. Worker uses it to find the right handler for a message.
     - Data. Any serializable data which should be used by the message handler.
-    - Behaviors. Message behaviors used by adapters. For example, priority setting, message delaying, etc. [See more](behaviors.md).
     
     All the message data is fully serializable (that means message `data` must be serializable too). It allows you to
     freely choose where and how to send and process jobs. Both can be implemented in a single application, or
