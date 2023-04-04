@@ -3,6 +3,7 @@ FROM php:${PHP_VERSION}-fpm-alpine
 
 RUN apk add git autoconf g++ make linux-headers
 
+RUN docker-php-ext-install pcntl
 RUN pecl install xdebug pcov
 RUN docker-php-ext-enable xdebug pcov
 
