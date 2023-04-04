@@ -17,7 +17,6 @@ composer.lock
 # PHP CS Fixer
 .php_cs.cache
 
-# Env variables
-.env
-
+# PHPUnit
 .phpunit.result.cache
+coverage.html
