@@ -5,8 +5,6 @@
 /.gitattributes
 /.github
 /.gitignore
-/.php_cs.cache
-/.travis.yml
 /composer.lock
 /tests/runtime/*
 /vendor
