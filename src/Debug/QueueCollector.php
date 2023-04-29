@@ -60,7 +60,7 @@ final class QueueCollector implements SummaryCollectorInterface
         ];
     }
 
-    public function collectWorkerProcessing(MessageInterface $message, QueueInterface $queue)
+    public function collectWorkerProcessing(MessageInterface $message, QueueInterface $queue): void
     {
         if (!$this->isActive()) {
             return;
