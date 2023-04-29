@@ -38,7 +38,7 @@ interface AdapterInterface
     /**
      * Listen to the queue and pass messages to the given handler as they come.
      *
-     * @param callable(MessageInterface): void $handlerCallback The handler which will handle messages. Returns false if it cannot continue handling messages.
+     * @param callable(MessageInterface): bool $handlerCallback The handler which will handle messages. Returns false if it cannot continue handling messages.
      */
     public function subscribe(callable $handlerCallback): void;
 

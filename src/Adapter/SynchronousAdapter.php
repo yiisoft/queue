@@ -25,15 +25,18 @@ final class SynchronousAdapter implements AdapterInterface
 
     public function __destruct()
     {
-        $this->runExisting(function (MessageInterface $message) {
+        $this->runExisting(function (MessageInterface $message): bool {
             $this->worker->process($message, $this->queue);
+
+            return true;
         });
     }
 
     public function runExisting(callable $handlerCallback): void
     {
-        while (isset($this->messages[$this->current])) {
-            $handlerCallback($this->messages[$this->current]);
+        $result = true;
+        while (isset($this->messages[$this->current]) && $result === true) {
+            $result = $handlerCallback($this->messages[$this->current]);
             unset($this->messages[$this->current]);
             $this->current++;
         }
