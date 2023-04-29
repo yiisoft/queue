@@ -37,7 +37,7 @@
         "phpunit/phpunit": "^9.5",
         "roave/infection-static-analysis-plugin": "^1.16",
         "spatie/phpunit-watcher": "^1.23",
-        "yiisoft/yii-debug": "dev-split-debug",
+        "yiisoft/yii-debug": "dev-master",
         "vimeo/psalm": "^4.30|^5.8",
         "yiisoft/test-support": "^3.0"
     },
