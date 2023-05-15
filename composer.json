@@ -27,7 +27,6 @@
     "prefer-stable": true,
     "require": {
         "php": "^8.0",
-        "ext-pcntl": "*",
         "psr/log": "^2.0|^3.0",
         "psr/container": "^1.0|^2.0",
         "yiisoft/yii-console": "^2.0",
