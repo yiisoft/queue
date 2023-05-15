@@ -1,6 +1,13 @@
 {
-    "symbol-whitelist" : [
+    "symbol-whitelist": [
         "Yiisoft\\Yii\\Debug\\Collector\\CollectorTrait",
-        "Yiisoft\\Yii\\Debug\\Collector\\SummaryCollectorInterface"
+        "Yiisoft\\Yii\\Debug\\Collector\\SummaryCollectorInterface",
+        "pcntl_signal",
+        "pcntl_signal_dispatch",
+        "SIGCONT",
+        "SIGHUP",
+        "SIGINT",
+        "SIGTERM",
+        "SIGTSTP"
     ]
 }
