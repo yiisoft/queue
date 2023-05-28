@@ -15,31 +15,39 @@ use Yiisoft\Yii\Queue\QueueFactoryInterface;
 final class RunCommand extends Command
 {
     protected static $defaultName = 'queue/run';
-    protected static $defaultDescription = 'Runs all the existing messages in the queue. Exits once messages are over.';
+    protected static $defaultDescription = 'Runs all the existing messages in the given queues. ' .
+        'Exits once messages are over.';
 
     private QueueFactoryInterface $queueFactory;
+    private array $channels;
 
-    public function __construct(QueueFactoryInterface $queueFactory)
+    public function __construct(QueueFactoryInterface $queueFactory, array $channels)
     {
         parent::__construct();
+
         $this->queueFactory = $queueFactory;
+        $this->channels = $channels;
     }
 
     public function configure(): void
     {
         $this->addArgument(
             'channel',
-            InputArgument::OPTIONAL,
-            'Queue channel name to connect to',
-            QueueFactory::DEFAULT_CHANNEL_NAME
+            InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
+            'Queue channel name list to connect to',
+            $this->channels,
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->queueFactory
-            ->get($input->getArgument('channel'))
-            ->run();
+        /** @var string $channel */
+        foreach ($input->getArgument('channel') as $channel) {
+            $output->writeln("Processing channel $channel");
+            $this->queueFactory
+                ->get($channel)
+                ->run();
+        }
 
         return ExitCode::OK;
     }

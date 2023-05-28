@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Command\ListenCommand;
 use Yiisoft\Yii\Queue\Command\RunCommand;
 use Yiisoft\Yii\Queue\Debug\QueueCollector;
@@ -19,7 +20,9 @@ return [
     ],
     'yiisoft/yii-queue' => [
         'handlers' => [],
-        'channel-definitions' => [],
+        'channel-definitions' => [
+            QueueFactoryInterface::DEFAULT_CHANNEL_NAME => AdapterInterface::class,
+        ],
         'middlewares-push' => [],
         'middlewares-consume' => [],
         'middlewares-fail' => [],
