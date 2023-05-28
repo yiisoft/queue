@@ -7,9 +7,9 @@ namespace Yiisoft\Yii\Queue\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Yii\Console\ExitCode;
-use Yiisoft\Yii\Queue\QueueFactory;
 use Yiisoft\Yii\Queue\QueueFactoryInterface;
 
 final class RunCommand extends Command
@@ -36,7 +36,15 @@ final class RunCommand extends Command
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
             'Queue channel name list to connect to',
             $this->channels,
-        );
+        )
+            ->addOption(
+                'maximum',
+                'm',
+                InputOption::VALUE_REQUIRED,
+                'Maximum number of messages to process in each channel',
+                0,
+            )
+            ->addUsage('[channel1 [channel2 [...]]] --maximum 100');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -46,7 +54,7 @@ final class RunCommand extends Command
             $output->writeln("Processing channel $channel");
             $this->queueFactory
                 ->get($channel)
-                ->run();
+                ->run((int)$input->getOption('maximum'));
         }
 
         return ExitCode::OK;
