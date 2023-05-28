@@ -66,7 +66,7 @@ final class ListenAllCommand extends Command
                 $queue->run();
             }
 
-            usleep($input->getOption('pause'));
+            sleep($input->getOption('pause'));
         }
 
         return ExitCode::OK;
