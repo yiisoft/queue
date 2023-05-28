@@ -6,6 +6,7 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Cli\SignalLoop;
 use Yiisoft\Yii\Queue\Cli\SimpleLoop;
+use Yiisoft\Yii\Queue\Command\ListenAllCommand;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
@@ -51,5 +52,10 @@ return [
     ],
     FailureMiddlewareDispatcher::class => [
         '__construct()' => ['middlewareDefinitions' => $params['yiisoft/yii-queue']['middlewares-fail']],
+    ],
+    ListenAllCommand::class => [
+        '__construct()' => [
+            'channels' => array_keys($params['yiisoft/yii-queue']['channel-definitions']),
+        ],
     ],
 ];
