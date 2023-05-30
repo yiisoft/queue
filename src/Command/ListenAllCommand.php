@@ -48,9 +48,17 @@ final class ListenAllCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Pause between queue channel iterations in seconds. May save some CPU. Default: 1',
                 1,
+            )
+            ->addOption(
+                'maximum',
+                'm',
+                InputOption::VALUE_REQUIRED,
+                'Maximum number of messages to process in each channel before switching to another channel. ' .
+                   'Default is 0 (no limits).',
+                0,
             );
 
-        $this->addUsage('[channel1 [channel2 [...]]] [--timeout=<timeout>]');
+        $this->addUsage('[channel1 [channel2 [...]]] [--timeout=<timeout>] [--maximum=<maximum>]');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -62,11 +70,14 @@ final class ListenAllCommand extends Command
         }
 
         while ($this->loop->canContinue()) {
+            $hasMessages = false;
             foreach ($queues as $queue) {
-                $queue->run();
+                $hasMessages = $queue->run((int)$input->getOption('maximum')) > 0 || $hasMessages;
             }
 
-            sleep($input->getOption('pause'));
+            if (!$hasMessages) {
+                sleep((int)$input->getOption('pause'));
+            }
         }
 
         return ExitCode::OK;
