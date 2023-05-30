@@ -65,7 +65,7 @@ final class Queue implements QueueInterface
         return $message;
     }
 
-    public function run(int $max = 0): void
+    public function run(int $max = 0): int
     {
         $this->checkAdapter();
 
@@ -88,6 +88,8 @@ final class Queue implements QueueInterface
             'Processed {count} queue messages.',
             ['count' => $count]
         );
+
+        return $count;
     }
 
     public function listen(): void
