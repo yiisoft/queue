@@ -192,13 +192,13 @@ console commands, which the component automatically registers in your applicatio
 The following command obtains and executes tasks in a loop until the queue is empty:
 
 ```sh
-yii queue/run
+yii queue:run
 ```
 
 The following command launches a daemon which infinitely queries the queue:
 
 ```sh
-yii queue/listen
+yii queue:listen
 ```
 
 See the documentation for more details about adapter specific console commands and their options.
