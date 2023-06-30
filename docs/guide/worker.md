@@ -57,7 +57,7 @@ Here's an example:
 ```conf
 [program:yii-queue-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=/usr/bin/php /var/www/my_project/yii queue/listen --verbose=1 --color=0
+command=/usr/bin/php /var/www/my_project/yii queue:listen --verbose=1 --color=0
 autostart=true
 autorestart=true
 user=www-data
@@ -66,7 +66,7 @@ redirect_stderr=true
 stdout_logfile=/var/www/my_project/log/yii-queue-worker.log
 ```
 
-In this case Supervisor should start 4 `queue/listen` workers. The worker output will be written
+In this case Supervisor should start 4 `queue:listen` workers. The worker output will be written
 to the specified log file.
 
 For more info about Supervisor's configuration and usage see its [documentation](http://supervisord.org).
@@ -89,7 +89,7 @@ Requires=mysql.service
 [Service]
 User=www-data
 Group=www-data
-ExecStart=/usr/bin/php /var/www/my_project/yii queue/listen --verbose
+ExecStart=/usr/bin/php /var/www/my_project/yii queue:listen --verbose
 Restart=on-failure
 
 [Install]
@@ -125,12 +125,12 @@ To learn all features of systemd, check its [documentation](https://freedesktop.
 
 ### Cron
 
-You can also start workers using cron that executes `queue/run` command.
+You can also start workers using cron that executes `queue:run` command.
 
 Config example:
 
 ```shell
-* * * * * /usr/bin/php /var/www/my_project/yii queue/run
+* * * * * /usr/bin/php /var/www/my_project/yii queue:run
 ```
 
 In this case cron will run the command every minute.

@@ -13,8 +13,8 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 return [
     'yiisoft/yii-console' => [
         'commands' => [
-            'queue/run' => RunCommand::class,
-            'queue/listen' => ListenCommand::class,
+            'queue:run' => RunCommand::class,
+            'queue:listen' => ListenCommand::class,
         ],
     ],
     'yiisoft/yii-queue' => [
