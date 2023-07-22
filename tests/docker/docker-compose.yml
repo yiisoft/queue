@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  yii-queue-php:
+    container_name: yii-queue-php
+    build:
+      context: ../..
+      dockerfile: tests/docker/php/Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.1}
+    volumes:
+      - ../runtime:/app/tests/runtime
+      - ../..:/app
