@@ -10,6 +10,6 @@ class TestJobStatus extends JobStatus
 {
     public static function withStatus(int $status): self
     {
-        return new TestJobStatus($status);
+        return new self($status);
     }
 }
