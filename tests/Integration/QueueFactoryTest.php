@@ -15,6 +15,7 @@ use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Queue;
 use Yiisoft\Yii\Queue\QueueFactory;
+use Yiisoft\Yii\Queue\QueueFactoryInterface;
 use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
@@ -23,12 +24,7 @@ final class QueueFactoryTest extends TestCase
     public function testQuickChange(): void
     {
         $worker = $this->createMock(WorkerInterface::class);
-        $queue = new Queue(
-            $worker,
-            $this->createMock(LoopInterface::class),
-            $this->createMock(LoggerInterface::class),
-            new PushMiddlewareDispatcher($this->createMock(MiddlewareFactoryPushInterface::class)),
-        );
+        $queue = $this->getDefaultQueue($worker);
         $container = $this->createMock(ContainerInterface::class);
         $factory = new QueueFactory(
             [],
@@ -48,18 +44,17 @@ final class QueueFactoryTest extends TestCase
     public function testConfiguredChange(): void
     {
         $worker = $this->createMock(WorkerInterface::class);
-        $queue = new Queue(
-            $worker,
-            $this->createMock(LoopInterface::class),
-            $this->createMock(LoggerInterface::class),
-            new PushMiddlewareDispatcher($this->createMock(MiddlewareFactoryPushInterface::class)),
-        );
+        $queue = $this->getDefaultQueue($worker);
         $container = $this->createMock(ContainerInterface::class);
         $factory = new QueueFactory(
             [
                 'test-channel' => [
                     'class' => FakeAdapter::class,
                     'withChannel()' => ['test-channel'],
+                ],
+                QueueFactoryInterface::DEFAULT_CHANNEL_NAME => [
+                    'class' => FakeAdapter::class,
+                    'withChannel()' => [QueueFactoryInterface::DEFAULT_CHANNEL_NAME],
                 ],
             ],
             $queue,
@@ -72,5 +67,16 @@ final class QueueFactoryTest extends TestCase
         $queue = $factory->get('test-channel');
 
         self::assertEquals('test-channel', $queue->getChannelName());
+        self::assertEquals(QueueFactoryInterface::DEFAULT_CHANNEL_NAME, $factory->get()->getChannelName());
+    }
+
+    private function getDefaultQueue(WorkerInterface $worker): Queue
+    {
+        return new Queue(
+            $worker,
+            $this->createMock(LoopInterface::class),
+            $this->createMock(LoggerInterface::class),
+            new PushMiddlewareDispatcher($this->createMock(MiddlewareFactoryPushInterface::class)),
+        );
     }
 }
