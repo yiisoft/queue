@@ -160,11 +160,6 @@ final class WorkerTest extends TestCase
 
     public function testJobFailWithDefinitionHandlerException(): void
     {
-        $this->expectException(JobFailureException::class);
-        $this->expectExceptionMessage(
-            "Processing of message #null is stopped because of an exception:\nTest exception."
-        );
-
         $message = new Message('simple', ['test-data']);
         $logger = new SimpleLogger();
         $handler = new FakeHandler();
@@ -176,6 +171,10 @@ final class WorkerTest extends TestCase
 
         try {
             $worker->process($message, $queue);
+        } catch (JobFailureException $exception) {
+            self::assertSame($exception::class, JobFailureException::class);
+            self::assertSame($exception->getMessage(), "Processing of message #null is stopped because of an exception:\nTest exception.");
+            self::assertEquals(['test-data'], $exception->getQueueMessage()->getData());
         } finally {
             $messages = $logger->getMessages();
             $this->assertNotEmpty($messages);

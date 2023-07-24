@@ -69,36 +69,44 @@ class QueueFactoryTest extends TestCase
 
     public function testThrowExceptionOnEmptyDefinition(): void
     {
-        $this->expectException(ChannelNotConfiguredException::class);
+        try {
+            $queue = $this->createMock(QueueInterface::class);
+            $factory = new QueueFactory(
+                [],
+                $queue,
+                $this->getContainer(),
+                new CallableFactory($this->getContainer()),
+                new Injector($this->getContainer()),
+                false
+            );
 
-        $queue = $this->createMock(QueueInterface::class);
-        $factory = new QueueFactory(
-            [],
-            $queue,
-            $this->getContainer(),
-            new CallableFactory($this->getContainer()),
-            new Injector($this->getContainer()),
-            false
-        );
-
-        $factory->get('test');
+            $factory->get('test');
+        } catch (ChannelNotConfiguredException $exception) {
+            self::assertSame($exception::class, ChannelNotConfiguredException::class);
+            self::assertSame($exception->getName(), 'Queue channel is not properly configured');
+            $this->assertMatchesRegularExpression('/"test"/', $exception->getSolution());
+        }
     }
 
     public function testThrowExceptionOnIncorrectDefinition(): void
     {
-        $this->expectException(ChannelIncorrectlyConfigured::class);
+        try {
+            $queue = $this->createMock(QueueInterface::class);
+            $factory = new QueueFactory(
+                ['test' => new stdClass()],
+                $queue,
+                $this->getContainer(),
+                new CallableFactory($this->getContainer()),
+                new Injector($this->getContainer()),
+                false
+            );
 
-        $queue = $this->createMock(QueueInterface::class);
-        $factory = new QueueFactory(
-            ['test' => new stdClass()],
-            $queue,
-            $this->getContainer(),
-            new CallableFactory($this->getContainer()),
-            new Injector($this->getContainer()),
-            false
-        );
-
-        $factory->get('test');
+            $factory->get('test');
+        } catch (ChannelIncorrectlyConfigured $exception) {
+            self::assertSame($exception::class, ChannelIncorrectlyConfigured::class);
+            self::assertSame($exception->getName(), 'Incorrect queue channel configuration');
+            $this->assertMatchesRegularExpression('/"test"/', $exception->getSolution());
+        }
     }
 
     public function testSuccessfulDefinitionWithDefaultAdapter(): void
