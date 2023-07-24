@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
+use Yiisoft\Yii\Queue\Cli\SignalLoop;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
@@ -96,7 +97,7 @@ final class QueueTest extends TestCase
         self::assertTrue($status->isDone());
     }
 
-    public function testThrowExceptionAdapterNotConfiguredException(): void
+    public function testAdapterNotConfiguredException(): void
     {
         try {
             $queue = $this->getQueue();
@@ -108,5 +109,31 @@ final class QueueTest extends TestCase
             self::assertSame($exception->getName(), 'Adapter is not configured');
             $this->assertMatchesRegularExpression('/withAdapter/', $exception->getSolution());
         }
+    }
+
+    public function testAdapterNotConfiguredExceptionForRun(): void
+    {
+        try {
+            $this->getQueue()->run();
+        } catch (AdapterNotConfiguredException $exception) {
+            self::assertSame($exception::class, AdapterNotConfiguredException::class);
+            self::assertSame($exception->getName(), 'Adapter is not configured');
+            $this->assertMatchesRegularExpression('/withAdapter/', $exception->getSolution());
+        }
+    }
+
+    public function testRunWithSignalLoop(): void
+    {
+        $this->loop = new SignalLoop();
+        $queue = $this
+            ->getQueue()
+            ->withAdapter($this->getAdapter());
+        $message = new Message('simple', null);
+        $message2 = clone $message;
+        $queue->push($message);
+        $queue->push($message2);
+        $queue->run();
+
+        self::assertEquals(2, $this->executionTimes);
     }
 }
