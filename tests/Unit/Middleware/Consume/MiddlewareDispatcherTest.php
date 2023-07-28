@@ -24,11 +24,12 @@ final class MiddlewareDispatcherTest extends TestCase
     public function testCallableMiddlewareCalled(): void
     {
         $request = $this->getConsumeRequest();
+        $queue = $this->createMock(QueueInterface::class);
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static function (ConsumeRequest $request): ConsumeRequest {
-                    return $request->withMessage(new Message('test', 'New closure test data'));
+                static function (ConsumeRequest $request) use ($queue): ConsumeRequest {
+                    return $request->withMessage(new Message('test', 'New closure test data'))->withQueue($queue);
                 },
             ]
         );

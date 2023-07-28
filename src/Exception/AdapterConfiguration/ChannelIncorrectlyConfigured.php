@@ -19,11 +19,13 @@ class ChannelIncorrectlyConfigured extends InvalidArgumentException implements F
      *
      * @param string $channel
      * @param mixed|object $definition
+     * @param int $code
+     * @param Throwable|null $previous
      */
     public function __construct(string $channel, $definition, int $code = 0, ?Throwable $previous = null)
     {
         $adapterClass = AdapterInterface::class;
-        $realType = is_object($definition) ? get_class($definition) : gettype($definition);
+        $realType = get_debug_type($definition);
         $message = "Channel \"$channel\" is not properly configured: definition must return $adapterClass, $realType returned";
 
         $this->channel = $channel;
