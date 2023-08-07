@@ -72,4 +72,18 @@ final class SynchronousAdapterTest extends TestCase
 
         self::assertTrue($executed);
     }
+
+    public function testStatusIdLessZero(): void
+    {
+        $adapter = $this->getAdapter();
+        $this->expectException(\InvalidArgumentException::class);
+        $adapter->status('-1');
+    }
+
+    public function testStatusNotMessage(): void
+    {
+        $adapter = $this->getAdapter();
+        $this->expectException(\InvalidArgumentException::class);
+        $adapter->status('1');
+    }
 }
