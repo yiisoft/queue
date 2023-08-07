@@ -110,5 +110,4 @@ class QueueDecoratorTest extends TestCase
 
         $this->assertInstanceOf(QueueInterface::class, $decorator->withChannelName('test'));
     }
-
 }
