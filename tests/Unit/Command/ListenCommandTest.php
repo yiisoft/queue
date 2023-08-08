@@ -17,8 +17,8 @@ final class ListenCommandTest extends TestCase
     public function testConfigure(): void
     {
         $command = new ListenCommand($this->createMock(QueueFactoryInterface::class));
-        $chanelArgument = $command->getNativeDefinition()->getArgument('channel');
-        $this->assertEquals('channel', $chanelArgument->getName());
+        $channelArgument = $command->getNativeDefinition()->getArgument('channel');
+        $this->assertEquals('channel', $channelArgument->getName());
     }
 
     public function testExecute(): void
