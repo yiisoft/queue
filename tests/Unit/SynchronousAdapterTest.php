@@ -77,6 +77,7 @@ final class SynchronousAdapterTest extends TestCase
     {
         $adapter = $this->getAdapter();
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('This adapter IDs start with 0.');
         $adapter->status('-1');
     }
 
