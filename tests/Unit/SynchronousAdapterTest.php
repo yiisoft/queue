@@ -72,4 +72,20 @@ final class SynchronousAdapterTest extends TestCase
 
         self::assertTrue($executed);
     }
+
+    public function testStatusIdLessZero(): void
+    {
+        $adapter = $this->getAdapter();
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('This adapter IDs start with 0.');
+        $adapter->status('-1');
+    }
+
+    public function testStatusNotMessage(): void
+    {
+        $adapter = $this->getAdapter();
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('There is no message with the given ID.');
+        $adapter->status('1');
+    }
 }
