@@ -84,6 +84,7 @@ final class SynchronousAdapterTest extends TestCase
     {
         $adapter = $this->getAdapter();
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('There is no message with the given ID.');
         $adapter->status('1');
     }
 }
