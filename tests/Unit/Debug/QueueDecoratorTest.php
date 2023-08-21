@@ -10,6 +10,7 @@ use Yiisoft\Yii\Queue\Debug\QueueCollector;
 use Yiisoft\Yii\Queue\Debug\QueueDecorator;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Yii\Queue\Tests\Unit\Support\TestJobStatus;
 
 class QueueDecoratorTest extends TestCase
@@ -109,5 +110,15 @@ class QueueDecoratorTest extends TestCase
         );
 
         $this->assertInstanceOf(QueueInterface::class, $decorator->withChannelName('test'));
+    }
+
+    public function testImmutable(): void
+    {
+        $queueDecorator = new QueueDecorator(
+            $this->createMock(QueueInterface::class),
+            new QueueCollector()
+        );
+        $this->assertNotSame($queueDecorator, $queueDecorator->withAdapter(new FakeAdapter()));
+        $this->assertNotSame($queueDecorator, $queueDecorator->withChannelName('test'));
     }
 }
