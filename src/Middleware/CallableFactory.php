@@ -29,17 +29,18 @@ final class CallableFactory
     /**
      * Create real callable listener from definition.
      *
-     * @param mixed $definition Definition to create listener from.
+     * @param string|array|callable $definition Definition to create listener from.
      *
      * @throws InvalidCallableConfigurationException Failed to create listener.
      * @throws ContainerExceptionInterface Error while retrieving the entry from container.
      */
-    public function create(mixed $definition): callable
+    public function create(string|array|callable $definition): callable
     {
         $callable = null;
 
         if (is_string($definition) && $this->container->has($definition)) {
             // Object with an __invoke() method
+            /** @var callable $callable */
             $callable = $this->container->get($definition);
         }
 

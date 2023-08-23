@@ -68,6 +68,9 @@ final class QueueCollector implements SummaryCollectorInterface
         $this->processingMessages[$queue->getChannelName()][] = $message;
     }
 
+    /**
+     * @scrutinizer ignore-unused Called in yiisoft/yii-debug
+     */
     private function reset(): void
     {
         $this->pushes = [];
@@ -77,9 +80,13 @@ final class QueueCollector implements SummaryCollectorInterface
 
     public function getSummary(): array
     {
-        $countPushes = array_sum(array_map(fn ($messages) => is_countable($messages) ? count($messages) : 0, $this->pushes));
+        $countPushes = array_sum(
+            array_map(fn ($messages) => is_countable($messages) ? count($messages) : 0, $this->pushes)
+        );
         $countStatuses = count($this->statuses);
-        $countProcessingMessages = array_sum(array_map(fn ($messages) => is_countable($messages) ? count($messages) : 0, $this->processingMessages));
+        $countProcessingMessages = array_sum(
+            array_map(fn ($messages) => is_countable($messages) ? count($messages) : 0, $this->processingMessages)
+        );
 
         return [
             'queue' => [

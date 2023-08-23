@@ -61,6 +61,7 @@ final class QueueFactory implements QueueFactoryInterface
         }
 
         if (isset($this->queueCollection[$channel]) && $this->queueCollection[$channel]->get() !== null) {
+            /** @var QueueInterface $queue */
             $queue = $this->queueCollection[$channel]->get();
         } else {
             $queue = $this->create($channel);
@@ -132,6 +133,7 @@ final class QueueFactory implements QueueFactoryInterface
                 return $this->container->get($definition);
             }
         } elseif ($this->container->has($definition)) {
+            /** @var AdapterInterface $middleware */
             $middleware = $this->container->get($definition);
             if ($middleware instanceof AdapterInterface) {
                 return $middleware;

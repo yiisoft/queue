@@ -38,7 +38,7 @@ final class RunCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->queueFactory
-            ->get($input->getArgument('channel'))
+            ->get((string)$input->getArgument('channel'))
             ->run();
 
         return ExitCode::OK;
