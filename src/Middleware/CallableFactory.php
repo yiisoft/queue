@@ -29,7 +29,7 @@ final class CallableFactory
     /**
      * Create real callable listener from definition.
      *
-     * @param string|array|callable $definition Definition to create listener from.
+     * @param array|callable|string $definition Definition to create listener from.
      *
      * @throws InvalidCallableConfigurationException Failed to create listener.
      * @throws ContainerExceptionInterface Error while retrieving the entry from container.
