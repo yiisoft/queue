@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Yii\Queue\Tests\Unit\Debug;
 
 use Yiisoft\Yii\Debug\Collector\CollectorInterface;
-use Yiisoft\Yii\Debug\Collector\SummaryCollectorInterface;
 use Yiisoft\Yii\Debug\Tests\Shared\AbstractCollectorTestCase;
 use Yiisoft\Yii\Queue\Debug\QueueCollector;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
