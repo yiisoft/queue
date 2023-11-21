@@ -1,0 +1,36 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Application;
+use Yiisoft\Config\Config;
+use Yiisoft\Config\ConfigPaths;
+use Yiisoft\Config\Modifier\RecursiveMerge;
+use Yiisoft\Di\Container;
+use Yiisoft\Di\ContainerConfig;
+
+require_once './vendor/autoload.php';
+
+/** @var array $definitions */
+$definitions = require_once 'definitions.php';
+
+$config = new Config(
+    new ConfigPaths('.', 'config', 'vendor'),
+    modifiers: [RecursiveMerge::groups('di', 'params')],
+    paramsGroup: 'params',
+);
+$definitions = array_merge($definitions, $config->get('di'));
+$containerConfig = ContainerConfig::create()->withDefinitions($definitions);
+$container = new Container($containerConfig);
+
+if ($container->has(LoggerInterface::class) === false) {
+    throw new RuntimeException(
+        'Logger is not configured, install your logger of choice and configure it properly in /bin/definitions.php.'
+    );
+}
+
+/** @var Application $application */
+$application = $container->get(Application::class);
+$application->run();

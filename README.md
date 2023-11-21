@@ -37,6 +37,38 @@ or add
 
 to the `require` section of your `composer.json` file.
 
+## Usage with Yii Console
+
+Just install `yiisoft/yii-console` package and you are ready to go.
+
+## Usage with Symfony Console
+
+To use this package without the Yii Framework, it is quite simple. You only need to add the configuration of your chosen logger, 
+example with [yiisoft/log-target-file](https://github.com/yiisoft/log-target-file).
+
+./bin/definitions.php
+
+```php
+    LoggerInterface::class => [
+        'class' => Logger::class,
+        '__construct()' => [
+            'targets' => ReferencesArray::from([
+                FileTarget::class,
+            ]),
+        ],
+    ],
+```
+
+And in .config/params.php add config for aliases for the logger.
+
+```php
+    'yiisoft/aliases' => [
+        'aliases' => [
+            '@runtime' => your_runtime_path,
+        ],
+    ],
+```
+
 ## Ready for yiisoft/config
 
 If you are using [yiisoft/config](https://github.com/yiisoft/config), you'll find out this package has some defaults
