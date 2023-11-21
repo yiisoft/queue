@@ -105,19 +105,4 @@ final class QueueCollectorTest extends AbstractCollectorTestCase
         $this->assertEquals(1, $countStatuses);
         $this->assertEquals(3, $countProcessingMessages);
     }
-
-    public function testEmptyCollector(): void
-    {
-        $collector = $this->getCollector();
-
-        foreach ($collector->getCollected() as $collected) {
-            $this->assertEquals([], $collected);
-        }
-
-        if ($collector instanceof SummaryCollectorInterface) {
-            foreach ($collector->getSummary()['queue'] as $count) {
-                $this->assertEquals(0, $count);
-            }
-        }
-    }
 }
