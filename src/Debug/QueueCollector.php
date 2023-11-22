@@ -21,6 +21,10 @@ final class QueueCollector implements SummaryCollectorInterface
 
     public function getCollected(): array
     {
+        if (!$this->isActive()) {
+            return [];
+        }
+
         return [
             'pushes' => $this->pushes,
             'statuses' => $this->statuses,
@@ -77,6 +81,10 @@ final class QueueCollector implements SummaryCollectorInterface
 
     public function getSummary(): array
     {
+        if (!$this->isActive()) {
+            return [];
+        }
+
         $countPushes = array_sum(array_map(fn ($messages) => is_countable($messages) ? count($messages) : 0, $this->pushes));
         $countStatuses = count($this->statuses);
         $countProcessingMessages = array_sum(array_map(fn ($messages) => is_countable($messages) ? count($messages) : 0, $this->processingMessages));
