@@ -42,7 +42,6 @@
         "spatie/phpunit-watcher": "^1.23",
         "vimeo/psalm": "^4.30|^5.8",
         "yiisoft/test-support": "^3.0",
-        "yiisoft/yii-console": "^2.0",
         "yiisoft/yii-debug": "dev-master"
     },
     "suggest": {
