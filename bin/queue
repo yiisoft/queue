@@ -8,7 +8,27 @@ use Symfony\Component\Console\Application;
 use Yiisoft\Di\Container;
 use Yiisoft\Di\ContainerConfig;
 
-require_once './vendor/autoload.php';
+$vendorPath = null;
+
+$composerAutoload = [
+    __DIR__ . '/../vendor/autoload.php', // in yii2-dev repo
+    __DIR__ . '/../../autoload.php', // installed as a composer binary
+];
+
+foreach ($composerAutoload as $autoload) {
+    if (file_exists($autoload)) {
+        require_once $autoload;
+
+        $vendorPath = dirname($autoload);
+
+        break;
+    }
+}
+
+if ($vendorPath === null) {
+    fwrite(STDERR, 'Can not find vendor/autoload.php' . PHP_EOL);
+    exit(1);
+}
 
 /** @var array $definitions */
 $definitions = require_once 'definitions.php';
