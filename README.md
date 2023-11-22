@@ -43,30 +43,34 @@ Just install `yiisoft/yii-console` package and you are ready to go.
 
 ## Usage with Symfony Console
 
-To use this package without the Yii Framework, it is quite simple. You only need to add the configuration of your chosen logger, 
-example with [yiisoft/log-target-file](https://github.com/yiisoft/log-target-file).
+1. Copy configuration file `./vendor/yiisoft/yii-queue/bin/definitions.php` to `root` folder of your project.
 
-./bin/definitions.php
+```shell
+cp ./vendor/yiisoft/yii-queue/bin/definitions.php ./
+```
+
+2. Edit `./definitions.php` and add definitions for your logger and queue adapter.
+
+Here's a sample configuration.
 
 ```php
+use Psr\Log\LoggerInterface;
+use Yiisoft\Definitions\ReferencesArray;
+use Yiisoft\Log\Logger;
+use Yiisoft\Log\Target\File\FileTarget;
+
+return [
     LoggerInterface::class => [
         'class' => Logger::class,
         '__construct()' => [
-            'targets' => ReferencesArray::from([
-                FileTarget::class,
-            ]),
+            'targets' => ReferencesArray::from(
+                [
+                    FileTarget::class
+                ],
+            ),
         ],
     ],
-```
-
-And in .config/params.php add config for aliases for the logger.
-
-```php
-    'yiisoft/aliases' => [
-        'aliases' => [
-            '@runtime' => your_runtime_path,
-        ],
-    ],
+];
 ```
 
 ## Ready for yiisoft/config

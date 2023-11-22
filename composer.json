@@ -29,7 +29,6 @@
         "php": "^8.0",
         "psr/log": "^2.0|^3.0",
         "psr/container": "^1.0|^2.0",
-        "yiisoft/config": "^1.4",
         "yiisoft/definitions": "^1.0|^2.0|^3.0",
         "yiisoft/friendly-exception": "^1.0",
         "yiisoft/injector": "^1.0",
