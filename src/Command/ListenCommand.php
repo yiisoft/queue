@@ -17,12 +17,9 @@ final class ListenCommand extends Command
     protected static $defaultName = 'queue:listen';
     protected static $defaultDescription = 'Listens the queue and executes messages as they come. Needs to be stopped manually.';
 
-    private QueueFactoryInterface $queueFactory;
-
-    public function __construct(QueueFactoryInterface $queueFactory)
+    public function __construct(private QueueFactoryInterface $queueFactory)
     {
         parent::__construct();
-        $this->queueFactory = $queueFactory;
     }
 
     public function configure(): void

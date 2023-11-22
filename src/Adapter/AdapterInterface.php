@@ -30,8 +30,6 @@ interface AdapterInterface
 
     /**
      * Pushing a message to the queue. Adapter sets message ID if available.
-     *
-     * @param MessageInterface $message
      */
     public function push(MessageInterface $message): void;
 

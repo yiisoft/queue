@@ -28,7 +28,6 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
      * @param float $delayInitial The first delay period
      * @param float $delayMaximum The maximum delay period
      * @param float $exponent Message handling delay will be increased by this multiplication each time it fails
-     * @param DelayMiddlewareInterface $delayMiddleware
      * @param QueueInterface|null $queue
      */
     public function __construct(

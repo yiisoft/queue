@@ -17,9 +17,7 @@ class ChannelIncorrectlyConfigured extends InvalidArgumentException implements F
     /**
      * ChannelIncorrectlyConfigured constructor.
      *
-     * @param string $channel
      * @param mixed|object $definition
-     * @param int $code
      * @param Throwable|null $previous
      */
     public function __construct(string $channel, $definition, int $code = 0, ?Throwable $previous = null)
