@@ -8,7 +8,15 @@ use Symfony\Component\Console\Application;
 use Yiisoft\Di\Container;
 use Yiisoft\Di\ContainerConfig;
 
-require_once './vendor/autoload.php';
+$autoload = $GLOBALS['_composer_autoload_path'] ?? './vendor/autoload.php';
+
+if (!file_exists($autoload)) {
+    throw new RuntimeException(
+        'Please run "composer install" in your project root to install the required dependencies.'
+    );
+}
+
+require_once $autoload;
 
 /** @var array $definitions */
 $definitions = require_once 'definitions.php';
