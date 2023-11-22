@@ -6,7 +6,6 @@ namespace Yiisoft\Yii\Queue\Adapter;
 
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Message\Behaviors\ExecutableBehaviorInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\QueueFactory;
 use Yiisoft\Yii\Queue\QueueInterface;
@@ -14,26 +13,30 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 
 final class SynchronousAdapter implements AdapterInterface
 {
-    private const BEHAVIORS_AVAILABLE = [];
-
     private array $messages = [];
     private int $current = 0;
 
-    public function __construct(private WorkerInterface $worker, private QueueInterface $queue, private string $channel = QueueFactory::DEFAULT_CHANNEL_NAME, private ?BehaviorChecker $behaviorChecker = null)
-    {
+    public function __construct(
+        private WorkerInterface $worker,
+        private QueueInterface $queue,
+        private string $channel = QueueFactory::DEFAULT_CHANNEL_NAME,
+    ) {
     }
 
     public function __destruct()
     {
-        $this->runExisting(function (MessageInterface $message) {
+        $this->runExisting(function (MessageInterface $message): bool {
             $this->worker->process($message, $this->queue);
+
+            return true;
         });
     }
 
-    public function runExisting(callable $callback): void
+    public function runExisting(callable $handlerCallback): void
     {
-        while (isset($this->messages[$this->current])) {
-            $callback($this->messages[$this->current]);
+        $result = true;
+        while (isset($this->messages[$this->current]) && $result === true) {
+            $result = $handlerCallback($this->messages[$this->current]);
             unset($this->messages[$this->current]);
             $this->current++;
         }
@@ -60,26 +63,15 @@ final class SynchronousAdapter implements AdapterInterface
 
     public function push(MessageInterface $message): void
     {
-        $behaviors = $message->getBehaviors();
-        if ($this->behaviorChecker !== null) {
-            $this->behaviorChecker->check(self::class, $behaviors, self::BEHAVIORS_AVAILABLE);
-        }
-
-        foreach ($behaviors as $behavior) {
-            if ($behavior instanceof ExecutableBehaviorInterface) {
-                $behavior->execute();
-            }
-        }
-
         $key = count($this->messages) + $this->current;
         $this->messages[] = $message;
 
         $message->setId((string) $key);
     }
 
-    public function subscribe(callable $handler): void
+    public function subscribe(callable $handlerCallback): void
     {
-        $this->runExisting($handler);
+        $this->runExisting($handlerCallback);
     }
 
     public function withChannel(string $channel): self

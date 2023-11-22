@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\Unit;
 
-use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
-use Yiisoft\Yii\Queue\Message\Behaviors\DelayBehavior;
+use Yiisoft\Yii\Queue\Cli\SignalLoop;
+use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Yii\Queue\Tests\TestCase;
@@ -36,29 +36,6 @@ final class QueueTest extends TestCase
         $queue->push($message);
 
         self::assertSame([$message], $adapter->pushMessages);
-    }
-
-    public function testPushNotSuccessful(): void
-    {
-        $this->needsRealAdapter = false;
-        $behavior = new DelayBehavior(2);
-        $exception = new BehaviorNotSupportedException($this->getAdapter()::class, $behavior);
-        $this
-            ->getAdapter()
-            ->method('push')
-            ->willThrowException($exception);
-        $expectedException = null;
-
-        $queue = $this
-            ->getQueue()
-            ->withAdapter($this->getAdapter());
-        $message = new Message('simple', null);
-        try {
-            $queue->push($message);
-        } catch (BehaviorNotSupportedException $expectedException) {
-        } finally {
-            self::assertInstanceOf(BehaviorNotSupportedException::class, $expectedException);
-        }
     }
 
     public function testRun(): void
@@ -118,5 +95,45 @@ final class QueueTest extends TestCase
         $queue->run();
         $status = $queue->status($id);
         self::assertTrue($status->isDone());
+    }
+
+    public function testAdapterNotConfiguredException(): void
+    {
+        try {
+            $queue = $this->getQueue();
+            $message = new Message('simple', null);
+            $queue->push($message);
+            $queue->status($message->getId());
+        } catch (AdapterNotConfiguredException $exception) {
+            self::assertSame($exception::class, AdapterNotConfiguredException::class);
+            self::assertSame($exception->getName(), 'Adapter is not configured');
+            $this->assertMatchesRegularExpression('/withAdapter/', $exception->getSolution());
+        }
+    }
+
+    public function testAdapterNotConfiguredExceptionForRun(): void
+    {
+        try {
+            $this->getQueue()->run();
+        } catch (AdapterNotConfiguredException $exception) {
+            self::assertSame($exception::class, AdapterNotConfiguredException::class);
+            self::assertSame($exception->getName(), 'Adapter is not configured');
+            $this->assertMatchesRegularExpression('/withAdapter/', $exception->getSolution());
+        }
+    }
+
+    public function testRunWithSignalLoop(): void
+    {
+        $this->loop = new SignalLoop();
+        $queue = $this
+            ->getQueue()
+            ->withAdapter($this->getAdapter());
+        $message = new Message('simple', null);
+        $message2 = clone $message;
+        $queue->push($message);
+        $queue->push($message2);
+        $queue->run();
+
+        self::assertEquals(2, $this->executionTimes);
     }
 }

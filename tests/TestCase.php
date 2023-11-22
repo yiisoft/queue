@@ -18,6 +18,8 @@ use Yiisoft\Yii\Queue\Cli\SimpleLoop;
 use Yiisoft\Yii\Queue\Middleware\CallableFactory;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Queue;
@@ -30,7 +32,7 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 abstract class TestCase extends BaseTestCase
 {
     protected ?ContainerInterface $container = null;
-    protected ?Queue $queue = null;
+    protected Queue|null $queue = null;
     protected ?AdapterInterface $adapter = null;
     protected ?LoopInterface $loop = null;
     protected ?WorkerInterface $worker = null;
@@ -50,6 +52,9 @@ abstract class TestCase extends BaseTestCase
         $this->executionTimes = 0;
     }
 
+    /**
+     * @return Queue The same object every time
+     */
     protected function getQueue(): Queue
     {
         if ($this->queue === null) {
@@ -130,6 +135,7 @@ abstract class TestCase extends BaseTestCase
             new Injector($this->getContainer()),
             $this->getContainer(),
             $this->getConsumeMiddlewareDispatcher(),
+            $this->getFailureMiddlewareDispatcher(),
         );
     }
 
@@ -175,7 +181,7 @@ abstract class TestCase extends BaseTestCase
         return false;
     }
 
-    protected function getPushMiddlewareDispatcher()
+    protected function getPushMiddlewareDispatcher(): PushMiddlewareDispatcher
     {
         return new PushMiddlewareDispatcher(
             new MiddlewareFactoryPush(
@@ -185,13 +191,24 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
-    protected function getConsumeMiddlewareDispatcher()
+    protected function getConsumeMiddlewareDispatcher(): ConsumeMiddlewareDispatcher
     {
         return new ConsumeMiddlewareDispatcher(
             new MiddlewareFactoryConsume(
                 $this->getContainer(),
                 new CallableFactory($this->getContainer()),
             ),
+        );
+    }
+
+    protected function getFailureMiddlewareDispatcher(): FailureMiddlewareDispatcher
+    {
+        return new FailureMiddlewareDispatcher(
+            new MiddlewareFactoryFailure(
+                $this->getContainer(),
+                new CallableFactory($this->getContainer()),
+            ),
+            [],
         );
     }
 }

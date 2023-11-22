@@ -10,6 +10,7 @@ on:
       - 'psalm.xml'
 
   push:
+    branches: [ 'master' ]
     paths-ignore:
       - 'docs/**'
       - 'README.md'
@@ -26,6 +27,6 @@ jobs:
     uses: yiisoft/actions/.github/workflows/phpunit.yml@master
     with:
       os: >-
-        ['ubuntu-latest', 'windows-latest']
+        ['ubuntu-latest']
       php: >-
-        ['8.0', '8.1']
+        ['8.0', '8.1', '8.2']

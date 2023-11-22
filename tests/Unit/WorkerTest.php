@@ -14,6 +14,8 @@ use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
+use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\App\FakeHandler;
 use Yiisoft\Yii\Queue\Tests\TestCase;
@@ -158,11 +160,6 @@ final class WorkerTest extends TestCase
 
     public function testJobFailWithDefinitionHandlerException(): void
     {
-        $this->expectException(JobFailureException::class);
-        $this->expectExceptionMessage(
-            "Processing of message #null is stopped because of an exception:\nTest exception."
-        );
-
         $message = new Message('simple', ['test-data']);
         $logger = new SimpleLogger();
         $handler = new FakeHandler();
@@ -174,6 +171,10 @@ final class WorkerTest extends TestCase
 
         try {
             $worker->process($message, $queue);
+        } catch (JobFailureException $exception) {
+            self::assertSame($exception::class, JobFailureException::class);
+            self::assertSame($exception->getMessage(), "Processing of message #null is stopped because of an exception:\nTest exception.");
+            self::assertEquals(['test-data'], $exception->getQueueMessage()->getData());
         } finally {
             $messages = $logger->getMessages();
             $this->assertNotEmpty($messages);
@@ -194,7 +195,8 @@ final class WorkerTest extends TestCase
             $logger,
             new Injector($container),
             $container,
-            new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class))
+            new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class)),
+            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), []),
         );
     }
 }

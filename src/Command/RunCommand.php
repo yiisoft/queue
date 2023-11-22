@@ -14,7 +14,7 @@ use Yiisoft\Yii\Queue\QueueFactoryInterface;
 
 final class RunCommand extends Command
 {
-    protected static $defaultName = 'queue/run';
+    protected static $defaultName = 'queue:run';
     protected static $defaultDescription = 'Runs all the existing messages in the queue. Exits once messages are over.';
 
     public function __construct(private QueueFactoryInterface $queueFactory)

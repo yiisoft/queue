@@ -1,53 +1,31 @@
-COMPOSE_PROJECT_NAME=yii2-queue
-COMPOSE_FILE=tests/docker-compose.yml
+export COMPOSE_PROJECT_NAME=yii-queue
 
-test: test72 test71 test70 test56
-test72:
-	docker-compose build php72
-	docker-compose run php72 vendor/bin/phpunit
-	docker-compose down
-test71:
-	docker-compose build php71
-	docker-compose run php71 vendor/bin/phpunit
-	docker-compose down
-test70:
-	docker-compose build php70
-	docker-compose run php70 vendor/bin/phpunit
-	docker-compose down
-test56:
-	docker-compose build php56
-	docker-compose run php56 vendor/bin/phpunit
-	docker-compose down
+help:			## Display help information
+	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
-benchmark: benchmark72 benchmark71 benchmark70 benchmark56
-benchmark72:
-	docker-compose build php72
-	docker-compose run php72 tests/yii benchmark/waiting
-	docker-compose down
-benchmark71:
-	docker-compose build php71
-	docker-compose run php71 tests/yii benchmark/waiting
-	docker-compose down
-benchmark70:
-	docker-compose build php70
-	docker-compose run php70 tests/yii benchmark/waiting
-	docker-compose down
-benchmark56:
-	docker-compose build php56
-	docker-compose run php56 tests/yii benchmark/waiting
-	docker-compose down
+build:			## Build an image from a docker-compose file. Params: {{ v=8.1 }}. Default latest PHP 8.1
+	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml up -d --build
 
-check-cs:
-	docker-compose build php72
-	docker-compose run php72 php-cs-fixer fix --diff --dry-run
-	docker-compose down
+down:			## Stop and remove containers, networks
+	docker-compose -f tests/docker/docker-compose.yml down
 
-clean:
-	docker-compose down
-	sudo rm -rf tests/runtime/*
-	sudo rm -f .php_cs.cache
-	sudo rm -rf composer.lock
-	sudo rm -rf vendor/
+sh:			## Enter the container with the application
+	docker exec -it yii-queue-php sh
 
-clean-all: clean
-	sudo rm -rf tests/runtime/.composer*
+test:			## Run tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
+	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml build --pull yii-queue-php
+	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml run yii-queue-php vendor/bin/phpunit --debug
+	make down
+
+mutation-test:		## Run mutation tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
+	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml build --pull yii-queue-php
+	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml run yii-queue-php php -dpcov.enabled=1 -dpcov.directory=. vendor/bin/roave-infection-static-analysis-plugin -j2 --ignore-msi-with-no-mutations --only-covered
+	make down
+
+coverage:		## Run code coverage. Params: {{ v=8.1 }}. Default latest PHP 8.1
+	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml run yii-queue-php vendor/bin/phpunit --coverage-clover coverage.xml
+	make down
+
+static-analyze:		## Run code static analyze. Params: {{ v=8.1 }}. Default latest PHP 8.1
+	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml run yii-queue-php vendor/bin/psalm --config=psalm.xml --shepherd --stats --php-version=$(v)
+	make down

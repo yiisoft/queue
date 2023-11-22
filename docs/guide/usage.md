@@ -45,8 +45,7 @@ $queue->push($message);
 To push a job into the queue that should run after 5 minutes:
 
 ```php
-$message->attachBehavior(new DelayBehavior(5 * 60));
-$queue->push($message);
+// TODO
 ```
 
 **Important:** Not every adapter (such as synchronous adapter) supports delayed execution.

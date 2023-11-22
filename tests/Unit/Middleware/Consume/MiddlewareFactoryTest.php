@@ -15,7 +15,6 @@ use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareConsumeInterface;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
-use Yiisoft\Yii\Queue\Middleware\InvalidCallableConfigurationException;
 use Yiisoft\Yii\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
@@ -25,10 +24,17 @@ use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\TestMiddleware;
 
 final class MiddlewareFactoryTest extends TestCase
 {
-    public function testCreateFromString(): void
+    public function testCreateFromClassString(): void
     {
         $container = $this->getContainer([TestMiddleware::class => new TestMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(TestMiddleware::class);
+        self::assertInstanceOf(TestMiddleware::class, $middleware);
+    }
+
+    public function testCreateFromAliasString(): void
+    {
+        $container = $this->getContainer(['test' => new TestMiddleware()]);
+        $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware('test');
         self::assertInstanceOf(TestMiddleware::class, $middleware);
     }
 
@@ -125,16 +131,27 @@ final class MiddlewareFactoryTest extends TestCase
         );
     }
 
-    public function testInvalidMiddlewareWithWrongString(): void
+    public function invalidMiddlewareDefinitionProvider(): array
     {
-        $this->expectException(InvalidCallableConfigurationException::class);
-        $this->getMiddlewareFactory()->createConsumeMiddleware('test');
+        return [
+            'wrong string' => ['test'],
+            'wrong class' => [TestCallableMiddleware::class],
+            'wrong array size' => [['test']],
+            'array not a class' => [['class', 'test']],
+            'wrong array type' => [['class' => TestCallableMiddleware::class, 'index']],
+            'wrong array with int items' => [[7, 42]],
+            'array with wrong method name' => [[TestCallableMiddleware::class, 'notExists']],
+            'array wrong class' => [['class' => InvalidController::class]],
+        ];
     }
 
-    public function testInvalidMiddlewareWithWrongClass(): void
+    /**
+     * @dataProvider invalidMiddlewareDefinitionProvider
+     */
+    public function testInvalidMiddleware(mixed $definition): void
     {
-        $this->expectException(InvalidCallableConfigurationException::class);
-        $this->getMiddlewareFactory()->createConsumeMiddleware(TestCallableMiddleware::class);
+        $this->expectException(InvalidMiddlewareDefinitionException::class);
+        $this->getMiddlewareFactory()->createConsumeMiddleware($definition);
     }
 
     public function testInvalidMiddlewareWithWrongController(): void
@@ -149,30 +166,6 @@ final class MiddlewareFactoryTest extends TestCase
             $this->getConsumeRequest(),
             $this->createMock(MessageHandlerConsumeInterface::class)
         );
-    }
-
-    public function testInvalidMiddlewareWithWrongArraySize(): void
-    {
-        $this->expectException(InvalidCallableConfigurationException::class);
-        $this->getMiddlewareFactory()->createConsumeMiddleware(['test']);
-    }
-
-    public function testInvalidMiddlewareWithWrongArrayClass(): void
-    {
-        $this->expectException(InvalidCallableConfigurationException::class);
-        $this->getMiddlewareFactory()->createConsumeMiddleware(['class', 'test']);
-    }
-
-    public function testInvalidMiddlewareWithWrongArrayType(): void
-    {
-        $this->expectException(InvalidCallableConfigurationException::class);
-        $this->getMiddlewareFactory()->createConsumeMiddleware(['class' => TestCallableMiddleware::class, 'index']);
-    }
-
-    public function testInvalidMiddlewareWithWrongArrayWithIntItems(): void
-    {
-        $this->expectException(InvalidCallableConfigurationException::class);
-        $this->getMiddlewareFactory()->createConsumeMiddleware([7, 42]);
     }
 
     private function getMiddlewareFactory(ContainerInterface $container = null): MiddlewareFactoryConsumeInterface

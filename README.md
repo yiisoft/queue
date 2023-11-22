@@ -25,8 +25,8 @@ The preferred way to install this extension is through [composer](http://getcomp
 
 Either run
 
-```
-php composer.phar require --prefer-dist yiisoft/yii-queue
+```shell
+composer require yiisoft/yii-queue
 ```
 
 or add
@@ -40,7 +40,7 @@ to the `require` section of your `composer.json` file.
 ## Ready for yiisoft/config
 
 If you are using [yiisoft/config](https://github.com/yiisoft/config), you'll find out this package has some defaults
-in the [`common`](config/common.php) and [`params`](config/params.php) configurations saving your time. Things you should
+in the [`common`](config/di.php) and [`params`](config/params.php) configurations saving your time. Things you should
 change to start working with the queue:
 - Optionally: define default `\Yiisoft\Yii\Queue\Adapter\AdapterInterface` implementation.
 - And/or define channel-specific `AdapterInterface` implementations in the `channel-definitions` params key to be used
@@ -192,13 +192,13 @@ console commands, which the component automatically registers in your applicatio
 The following command obtains and executes tasks in a loop until the queue is empty:
 
 ```sh
-yii queue/run
+yii queue:run
 ```
 
 The following command launches a daemon which infinitely queries the queue:
 
 ```sh
-yii queue/listen
+yii queue:listen
 ```
 
 See the documentation for more details about adapter specific console commands and their options.
@@ -215,11 +215,12 @@ twice for a queue message. That means you can add extra functionality on message
 of the two classes: `PushMiddlewareDispatcher` and `ConsumeMiddlewareDispatcher` respectively.
 
 You can use any of these formats to define a middleware:
-- A ready-to-use middleware object: `new FooMiddleware()`. It must implement either `MiddlewarePushInterface`,
-    or `MiddlewareConsumeInterface` depending on the place you use it.
+- A ready-to-use middleware object: `new FooMiddleware()`. It must implement `MiddlewarePushInterface`,
+ `MiddlewareConsumeInterface` or `MiddlewareFailureInterface` depending on the place you use it.
 - An array in the format of [yiisoft/definitions](https://github.com/yiisoft/definitions).
     **Only if you use yiisoft/definitions and yiisoft/di**.
-- A `callable`: `fn() => // do stuff`, `$object->foo(...)`, etc. It will be executed through the [yiisoft/injector](yiisoft/injector), so all the dependencies of your callable will be resolved
+- A `callable`: `fn() => // do stuff`, `$object->foo(...)`, etc. It will be executed through the
+[yiisoft/injector](https://github.com/yiisoft/injector), so all the dependencies of your callable will be resolved.
 - A string for your DI container to resolve the middleware, e.g. `FooMiddleware::class`
 
 Middleware will be executed forwards in the same order they are defined. If you define it like the following:
@@ -252,14 +253,35 @@ With push middlewares you can define an adapter object at the runtime, not in th
 There is a restriction: by the time all middlewares are executed in the forward order, the adapter must be specified
 in the `PushRequest` object. You will get a `AdapterNotConfiguredException`, if it isn't.
 
-You have two places to define push middlewares:
+You have three places to define push middlewares:
+
 1. `PushMiddlewareDispatcher`. You can pass it either to the constructor, or to the `withMiddlewares()` method, which  
-    creates a completely new dispatcher object with only those middlewares, which are passed as arguments.
-2. Put middlewares into the `Queue::push()` method like this: `$queue->push($message, ...$middlewares)`. These middlewares will always be executed after those which are in the `PushMiddlewareDispatcher`.
+creates a completely new dispatcher object with only those middlewares, which are passed as arguments. 
+If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-push` key of the 
+`yiisoft/yii-queue` array in the `params`.
+2. Pass middlewares to either `Queue::withMiddlewares()` or `Queue::withMiddlewaresAdded()` methods. The difference is 
+that the former will completely replace an existing middleware stack, while the latter will add passed middlewares to 
+the end of the existing stack. These middlewares will be executed after the common ones, passed directly to the 
+`PushMiddlewareDispatcher`. It's useful when defining a queue channel. Both methods return a new instance of the `Queue` 
+class.
+3. Put middlewares into the `Queue::push()` method like this: `$queue->push($message, ...$middlewares)`. These
+middlewares have the lowest priority and will be executed after those which are in the `PushMiddlewareDispatcher` and 
+the ones passed to the `Queue::withMiddlewares()` and `Queue::withMiddlewaresAdded()` and only for the message passed 
+along with them.
 
 ### Consume pipeline
 
-You can set a middleware pipeline for a message when it will be consumed from a queue server. This is useful to collect metrics, modify message data, etc. In pair with a Push middleware you can deduplicate messages in the queue, calculate time from push to consume, handle errors (push to a queue again, redirect failed message to another queue, send a notification, etc.). Unless Push pipeline, you have only one place to define the middleware stack: in the `ConsumeMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method.
+You can set a middleware pipeline for a message when it will be consumed from a queue server. This is useful to collect metrics, modify message data, etc. In pair with a Push middleware you can deduplicate messages in the queue, calculate time from push to consume, handle errors (push to a queue again, redirect failed message to another queue, send a notification, etc.). Unless Push pipeline, you have only one place to define the middleware stack: in the `ConsumeMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-consume` key of the `yiisoft/yii-queue` array in the `params`.
+
+### Error handling pipeline
+
+Often when some job is failing, we want to retry its execution a couple more times or redirect it to another queue channel. This can be done in `yiisoft/yii-queue` with Failure middleware pipeline. They are triggered each time message processing via the Consume middleware pipeline is interrupted with any `Throwable`. The key differences from the previous two pipelines:
+- You should set up the middleware pipeline separately for each queue channel. That means, the format should be `['channel-name' => [FooMiddleware::class]]` instead of `[FooMiddleware::class]`, like for the other two pipelines. There is also a default key, which will be used for those channels without their own one: `FailureMiddlewareDispatcher::DEFAULT_PIPELINE`.
+- The last middleware will throw the exception, which will come with the `FailureHandlingRequest` object. If you don't want the exception to be thrown, your middlewares should `return` a request without calling `$handler->handleFailure()`.
+
+You can declare error handling middleware pipeline in the `FailureMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-fail` key of the `yiisoft/yii-queue` array in the `params`.
+
+See [error handling docs](docs/guide/error-handling.md) for details.
 
 ## Extra
 

@@ -49,17 +49,16 @@ final class PushMiddlewareDispatcher
      *
      * @param array[]|callable[]|MiddlewarePushInterface[]|string[] $middlewareDefinitions Each array element is:
      *
-     * - A name of PSR-15 middleware class. The middleware instance will be obtained from container executed.
+     * - A name of a middleware class. The middleware instance will be obtained from container executed.
      * - A callable with `function(ServerRequestInterface $request, RequestHandlerInterface $handler):
      *     ResponseInterface` signature.
-     * - A controller handler action in format `[TestController::class, 'index']`. `TestController` instance will
+     * - A "callable-like" array in format `[FooMiddleware::class, 'index']`. `FooMiddleware` instance will
      *   be created and `index()` method will be executed.
      * - A function returning a middleware. The middleware returned will be executed.
      *
-     * For handler action and callable
-     * typed parameters are automatically injected using dependency injection container.
-     * Current request and handler could be obtained by type-hinting for {@see ServerRequestInterface}
-     * and {@see RequestHandlerInterface}.
+     * For callables typed parameters are automatically injected using dependency injection container.
+     *
+     * @return self New instance of the {@see PushMiddlewareDispatcher}
      */
     public function withMiddlewares(array $middlewareDefinitions): self
     {

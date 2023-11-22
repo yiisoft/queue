@@ -7,7 +7,6 @@ namespace Yiisoft\Yii\Queue;
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Exception\BehaviorNotSupportedException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewarePushInterface;
 
@@ -22,8 +21,6 @@ interface QueueInterface
      *
      * @param MessageInterface $message
      * @param array|callable|MiddlewarePushInterface|string ...$middlewareDefinitions
-     *
-     * @throws BehaviorNotSupportedException
      *
      * @return MessageInterface
      */
@@ -53,4 +50,6 @@ interface QueueInterface
     public function withAdapter(AdapterInterface $adapter): self;
 
     public function getChannelName(): string;
+
+    public function withChannelName(string $channel): self;
 }

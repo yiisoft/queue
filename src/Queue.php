@@ -59,7 +59,7 @@ final class Queue implements QueueInterface
 
         $this->logger->info(
             'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
-            ['name' => $message->getHandlerName(), 'id' => $message->getId() ?? 'null']
+            ['handlerName' => $message->getHandlerName(), 'id' => $message->getId() ?? 'null']
         );
 
         return $message;
@@ -72,19 +72,17 @@ final class Queue implements QueueInterface
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
-        $callback = function (MessageInterface $message) use (&$max, &$count): bool {
-            if (($max > 0 && $max <= $count) || !$this->loop->canContinue()) {
+        $handlerCallback = function (MessageInterface $message) use (&$max, &$count): bool {
+            if (($max > 0 && $max <= $count) || !$this->handle($message)) {
                 return false;
             }
-
-            $this->handle($message);
             $count++;
 
             return true;
         };
 
         /** @psalm-suppress PossiblyNullReference */
-        $this->adapter->runExisting($callback);
+        $this->adapter->runExisting($handlerCallback);
 
         $this->logger->info(
             'Processed {count} queue messages.',
@@ -134,9 +132,19 @@ final class Queue implements QueueInterface
         return $instance;
     }
 
-    protected function handle(MessageInterface $message): void
+    public function withChannelName(string $channel): self
+    {
+        $instance = clone $this;
+        $instance->channelName = $channel;
+
+        return $instance;
+    }
+
+    private function handle(MessageInterface $message): bool
     {
         $this->worker->process($message, $this);
+
+        return $this->loop->canContinue();
     }
 
     private function checkAdapter(): void
@@ -151,7 +159,7 @@ final class Queue implements QueueInterface
         return new class (
             $this->adapterPushHandler,
             $this->pushMiddlewareDispatcher,
-            $middlewares
+            [...array_values($this->middlewareDefinitions), ...array_values($middlewares)]
         ) implements MessageHandlerPushInterface {
             public function __construct(
                 private AdapterPushHandler $adapterPushHandler,

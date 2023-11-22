@@ -18,7 +18,7 @@ final class FakeAdapter implements AdapterInterface
         $this->pushMessages[] = $message;
     }
 
-    public function runExisting(callable $callback): void
+    public function runExisting(callable $handlerCallback): void
     {
         //skip
     }
@@ -28,7 +28,7 @@ final class FakeAdapter implements AdapterInterface
         //skip
     }
 
-    public function subscribe(callable $handler): void
+    public function subscribe(callable $handlerCallback): void
     {
         //skip
     }

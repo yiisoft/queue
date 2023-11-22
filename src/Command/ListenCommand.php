@@ -14,7 +14,7 @@ use Yiisoft\Yii\Queue\QueueFactoryInterface;
 
 final class ListenCommand extends Command
 {
-    protected static $defaultName = 'queue/listen';
+    protected static $defaultName = 'queue:listen';
     protected static $defaultDescription = 'Listens the queue and executes messages as they come. Needs to be stopped manually.';
 
     public function __construct(private QueueFactoryInterface $queueFactory)
