@@ -29,9 +29,6 @@ final class QueueFactory implements QueueFactoryInterface
      * "Definition" here is a {@see Factory} definition
      * @param QueueInterface $queue A default queue implementation. `$queue->withAdapter()` will be returned
      * with the `get` method
-     * @param ContainerInterface $container
-     * @param CallableFactory $callableFactory
-     * @param Injector $injector
      * @param bool $enableRuntimeChannelDefinition A flag whether to enable a such behavior when there is no
      * explicit channel adapter definition: `return $this->queue->withAdapter($this->adapter->withChannel($channel)`
      * When this flag is set to false, only explicit definitions from the $definition parameter are used.
@@ -71,10 +68,8 @@ final class QueueFactory implements QueueFactoryInterface
     }
 
     /**
-     * @param string $channel
      *
      * @throws ChannelIncorrectlyConfigured
-     *
      * @return QueueInterface
      */
     private function create(string $channel): QueueInterface

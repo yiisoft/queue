@@ -31,14 +31,12 @@ final class InvalidMiddlewareDefinitionException extends InvalidArgumentExceptio
     }
 
     /**
-     * @param mixed $middlewareDefinition
-     *
      * @return string|null
      */
     private function convertDefinitionToString(mixed $middlewareDefinition): ?string
     {
         if (is_object($middlewareDefinition)) {
-            return 'an instance of "' . get_class($middlewareDefinition) . '"';
+            return 'an instance of "' . $middlewareDefinition::class . '"';
         }
 
         if (is_string($middlewareDefinition)) {
