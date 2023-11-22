@@ -24,12 +24,6 @@ $definitions = require_once 'definitions.php';
 $containerConfig = ContainerConfig::create()->withDefinitions($definitions);
 $container = new Container($containerConfig);
 
-if ($container->has(LoggerInterface::class) === false) {
-    throw new RuntimeException(
-        'Logger is not configured, install your logger of choice and configure it properly in /bin/definitions.php.'
-    );
-}
-
 /** @var Application $application */
 $application = $container->get(Application::class);
 $application->run();
