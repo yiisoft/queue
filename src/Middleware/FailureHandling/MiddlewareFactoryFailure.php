@@ -90,13 +90,11 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
     private function wrapCallable(callable $callback): MiddlewareFailureInterface
     {
         return new class ($callback, $this->container) implements MiddlewareFailureInterface {
-            private ContainerInterface $container;
             private $callback;
 
-            public function __construct(callable $callback, ContainerInterface $container)
+            public function __construct(callable $callback, private ContainerInterface $container)
             {
                 $this->callback = $callback;
-                $this->container = $container;
             }
 
             public function processFailure(FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest

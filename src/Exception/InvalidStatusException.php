@@ -40,8 +40,6 @@ class InvalidStatusException extends InvalidArgumentException implements Friendl
 
     /**
      * Get the wrong status value
-     *
-     * @return int
      */
     public function getStatus(): int
     {

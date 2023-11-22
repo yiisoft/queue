@@ -159,7 +159,7 @@ final class MiddlewareDispatcherTest extends TestCase
     private function createDispatcher(
         ContainerInterface $container = null,
     ): FailureMiddlewareDispatcher {
-        $container = $container ?? $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
         $callableFactory = new CallableFactory($container);
 
         return new FailureMiddlewareDispatcher(new MiddlewareFactoryFailure($container, $callableFactory), []);

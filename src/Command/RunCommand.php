@@ -16,12 +16,9 @@ final class RunCommand extends Command
     protected static $defaultName = 'queue:run';
     protected static $defaultDescription = 'Runs all the existing messages in the queue. Exits once messages are over.';
 
-    private QueueFactoryInterface $queueFactory;
-
-    public function __construct(QueueFactoryInterface $queueFactory)
+    public function __construct(private QueueFactoryInterface $queueFactory)
     {
         parent::__construct();
-        $this->queueFactory = $queueFactory;
     }
 
     public function configure(): void
