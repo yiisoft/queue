@@ -68,7 +68,6 @@ final class QueueFactory implements QueueFactoryInterface
     }
 
     /**
-     *
      * @throws ChannelIncorrectlyConfigured
      * @return QueueInterface
      */

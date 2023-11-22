@@ -8,7 +8,6 @@ use InvalidArgumentException;
 
 use Throwable;
 
-use function get_class;
 use function is_array;
 use function is_object;
 use function is_string;
