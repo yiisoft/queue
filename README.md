@@ -43,13 +43,13 @@ Install `yiisoft/yii-console` package and you are ready to go.
 
 ## Usage with Symfony Console
 
-1. Copy configuration file `./vendor/yiisoft/yii-queue/bin/definitions.php` to `root` folder of your project.
+1. Copy configuration file `./vendor/yiisoft/yii-queue/bin/QueueContainer.php` to `root` folder of your project.
 
 ```shell
-cp ./vendor/yiisoft/yii-queue/bin/definitions.php ./
+cp ./vendor/yiisoft/yii-queue/bin/QueueContainer.php ./
 ```
 
-2. Edit `./definitions.php` and add definitions for your logger and queue adapter.
+2. Edit `./QueueContainer.php` and add definitions for your logger and queue adapter.
 
 Here's a sample configuration.
 

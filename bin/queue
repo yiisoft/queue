@@ -16,11 +16,9 @@ if (!file_exists($autoload)) {
 }
 
 require_once $autoload;
+require_once 'QueueContainer.php';
 
-/** @var array $definitions */
-$definitions = require_once 'definitions.php';
-
-$containerConfig = ContainerConfig::create()->withDefinitions($definitions);
+$containerConfig = ContainerConfig::create()->withDefinitions(QueueContainer::definitions());
 $container = new Container($containerConfig);
 
 /** @var Application $application */
