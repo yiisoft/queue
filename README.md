@@ -37,11 +37,7 @@ or add
 
 to the `require` section of your `composer.json` file.
 
-## Usage with Yii Console
-
-Install `yiisoft/yii-console` package and you are ready to go.
-
-## Usage with Symfony Console
+## Usage with Queue utility
 
 1. Copy configuration file `./vendor/yiisoft/yii-queue/bin/QueueContainer.php` to `root` folder of your project.
 
@@ -72,6 +68,16 @@ return [
     ],
 ];
 ```
+
+## Usage with Yii Console
+
+Install `yiisoft/yii-console` package and you are ready to go.
+
+## Usage with Symfony Console
+
+Install `yiisoft/yii-queue` and the commands are automatically registered by the symfony console.
+
+> https://symfony.com/doc/current/console.html#registering-the-command
 
 ## Ready for yiisoft/config
 
