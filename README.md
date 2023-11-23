@@ -39,7 +39,7 @@ to the `require` section of your `composer.json` file.
 
 ## Usage with Yii Console
 
-Just install `yiisoft/yii-console` package and you are ready to go.
+Install `yiisoft/yii-console` package and you are ready to go.
 
 ## Usage with Symfony Console
 

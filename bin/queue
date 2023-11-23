@@ -3,12 +3,11 @@
 
 declare(strict_types=1);
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application;
 use Yiisoft\Di\Container;
 use Yiisoft\Di\ContainerConfig;
 
-$autoload = $GLOBALS['_composer_autoload_path'] ?? './vendor/autoload.php';
+$autoload = $_composer_autoload_path ?? './vendor/autoload.php';
 
 if (!file_exists($autoload)) {
     throw new RuntimeException(
