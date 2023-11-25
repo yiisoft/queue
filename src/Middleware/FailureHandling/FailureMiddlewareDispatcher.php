@@ -18,7 +18,6 @@ final class FailureMiddlewareDispatcher
     private array $stack = [];
 
     /**
-     * @param MiddlewareFactoryFailureInterface $middlewareFactory
      * @param array[][]|callable[][]|MiddlewareFailureInterface[][]|string[][] $middlewareDefinitions
      */
     public function __construct(

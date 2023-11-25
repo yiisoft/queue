@@ -87,13 +87,11 @@ final class MiddlewareFactoryConsume implements MiddlewareFactoryConsumeInterfac
     private function wrapCallable(callable $callback): MiddlewareConsumeInterface
     {
         return new class ($callback, $this->container) implements MiddlewareConsumeInterface {
-            private ContainerInterface $container;
             private $callback;
 
-            public function __construct(callable $callback, ContainerInterface $container)
+            public function __construct(callable $callback, private ContainerInterface $container)
             {
                 $this->callback = $callback;
-                $this->container = $container;
             }
 
             public function processConsume(ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest

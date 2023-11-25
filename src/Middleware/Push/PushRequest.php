@@ -13,9 +13,6 @@ final class PushRequest
     {
     }
 
-    /**
-     * @return MessageInterface
-     */
     public function getMessage(): MessageInterface
     {
         return $this->message;

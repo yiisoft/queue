@@ -38,6 +38,7 @@
     "require-dev": {
         "maglnet/composer-require-checker": "^4.2",
         "phpunit/phpunit": "^9.5",
+        "rector/rector": "^0.18.10",
         "roave/infection-static-analysis-plugin": "^1.16",
         "spatie/phpunit-watcher": "^1.23",
         "yiisoft/yii-debug": "dev-master",
@@ -74,7 +75,7 @@
         "allow-plugins": {
             "infection/extension-installer": true,
             "composer/package-versions-deprecated": true,
-            "yiisoft/config": true
+            "yiisoft/config": false
         }
     },
     "scripts": {

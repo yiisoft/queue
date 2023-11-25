@@ -19,11 +19,8 @@ use function is_string;
  */
 final class CallableFactory
 {
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
-        $this->container = $container;
     }
 
     /**
@@ -65,13 +62,8 @@ final class CallableFactory
     }
 
     /**
-     * @param string $className
-     * @param string $methodName
-     *
      * @throws ContainerExceptionInterface Error while retrieving the entry from container.
      * @throws NotFoundExceptionInterface
-     *
-     * @return callable|null
      */
     private function fromDefinition(string $className, string $methodName): ?callable
     {
