@@ -63,7 +63,7 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
         $message = $request->getMessage();
         if ($this->suites($message)) {
             $messageNew = new Message(
-                handlerName: $message->getHandlerName(),
+                handlerName: $message->getHandler(),
                 data:        $message->getData(),
                 metadata:    $this->formNewMeta($message),
                 id:          $message->getId(),

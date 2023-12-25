@@ -7,6 +7,7 @@ namespace Yiisoft\Yii\Queue\Tests\Unit;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\QueueFactory;
+use Yiisoft\Yii\Queue\Tests\Support\NullMessageHandler;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 
 final class SynchronousAdapterTest extends TestCase
@@ -21,7 +22,7 @@ final class SynchronousAdapterTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new Message('simple', null);
+        $message = new Message(NullMessageHandler::class, null);
         $queue->push($message);
         $id = $message->getId();
         $wrongId = "$id ";
@@ -30,7 +31,7 @@ final class SynchronousAdapterTest extends TestCase
 
     public function testIdSetting(): void
     {
-        $message = new Message('simple', []);
+        $message = new Message(NullMessageHandler::class, []);
         $adapter = $this->getAdapter();
 
         $ids = [];

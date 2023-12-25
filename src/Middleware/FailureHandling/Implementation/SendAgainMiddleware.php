@@ -41,7 +41,7 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
         $message = $request->getMessage();
         if ($this->suites($message)) {
             $message = new Message(
-                handlerName: $message->getHandlerName(),
+                handlerName: $message->getHandler(),
                 data: $message->getData(),
                 metadata: $this->createMeta($message),
                 id: $message->getId(),

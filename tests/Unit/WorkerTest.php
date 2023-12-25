@@ -11,13 +11,14 @@ use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Yii\Queue\Exception\JobFailureException;
 use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
 use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Tests\App\FakeHandler;
+use Yiisoft\Yii\Queue\Tests\Support\ExceptionMessageHandler;
+use Yiisoft\Yii\Queue\Tests\Support\StackMessageHandler;
 use Yiisoft\Yii\Queue\Tests\TestCase;
 use Yiisoft\Yii\Queue\Worker\Worker;
 
@@ -25,21 +26,16 @@ final class WorkerTest extends TestCase
 {
     public function testJobExecutedWithCallableHandler(): void
     {
-        $handleMessage = null;
-        $message = new Message('simple', ['test-data']);
+        $message = new Message(StackMessageHandler::class, ['test-data']);
         $logger = new SimpleLogger();
-        $container = new SimpleContainer();
-        $handlers = [
-            'simple' => function (MessageInterface $message) use (&$handleMessage) {
-                $handleMessage = $message;
-            },
-        ];
+        $stackMessageHandler = new StackMessageHandler();
+        $container = new SimpleContainer([StackMessageHandler::class => $stackMessageHandler]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($handlers, $logger, $container);
+        $worker = $this->createWorkerByParams([], $logger, $container);
 
         $worker->process($message, $queue);
-        $this->assertSame($message, $handleMessage);
+        $this->assertSame($message, $stackMessageHandler->processedMessages[0]);
 
         $messages = $logger->getMessages();
         $this->assertNotEmpty($messages);
@@ -48,14 +44,13 @@ final class WorkerTest extends TestCase
 
     public function testJobExecutedWithDefinitionHandler(): void
     {
-        $message = new Message('simple', ['test-data']);
+        $message = new Message(FakeHandler::class, ['test-data']);
         $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
-        $handlers = ['simple' => FakeHandler::class];
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($handlers, $logger, $container);
+        $worker = $this->createWorkerByParams([], $logger, $container);
 
         $worker->process($message, $queue);
         $this->assertSame([$message], $handler::$processedMessages);
@@ -63,29 +58,13 @@ final class WorkerTest extends TestCase
 
     public function testJobExecutedWithDefinitionClassHandler(): void
     {
-        $message = new Message('simple', ['test-data']);
+        $message = new Message(FakeHandler::class, ['test-data']);
         $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
-        $handlers = ['simple' => [FakeHandler::class, 'execute']];
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($handlers, $logger, $container);
-
-        $worker->process($message, $queue);
-        $this->assertSame([$message], $handler::$processedMessages);
-    }
-
-    public function testJobFailWithDefinitionNotFoundClassButExistInContainerHandler(): void
-    {
-        $message = new Message('simple', ['test-data']);
-        $logger = new SimpleLogger();
-        $handler = new FakeHandler();
-        $container = new SimpleContainer(['not-found-class-name' => $handler]);
-        $handlers = ['simple' => ['not-found-class-name', 'execute']];
-
-        $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($handlers, $logger, $container);
+        $worker = $this->createWorkerByParams([], $logger, $container);
 
         $worker->process($message, $queue);
         $this->assertSame([$message], $handler::$processedMessages);
@@ -93,81 +72,26 @@ final class WorkerTest extends TestCase
 
     public function testJobExecutedWithStaticDefinitionHandler(): void
     {
-        $message = new Message('simple', ['test-data']);
+        $message = new Message(StackMessageHandler::class, ['test-data']);
         $logger = new SimpleLogger();
-        $handler = new FakeHandler();
-        $container = new SimpleContainer([FakeHandler::class => $handler]);
-        $handlers = ['simple' => [FakeHandler::class, 'staticExecute']];
+        $stackMessageHandler = new StackMessageHandler();
+        $container = new SimpleContainer([StackMessageHandler::class => $stackMessageHandler]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($handlers, $logger, $container);
+        $worker = $this->createWorkerByParams([], $logger, $container);
 
         $worker->process($message, $queue);
-        $this->assertSame([$message], $handler::$processedMessages);
-    }
-
-    public function testJobFailWithDefinitionUndefinedMethodHandler(): void
-    {
-        $this->expectExceptionMessage("Queue handler with name simple doesn't exist");
-
-        $message = new Message('simple', ['test-data']);
-        $logger = new SimpleLogger();
-        $handler = new FakeHandler();
-        $container = new SimpleContainer([FakeHandler::class => $handler]);
-        $handlers = ['simple' => [FakeHandler::class, 'undefinedMethod']];
-
-        $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($handlers, $logger, $container);
-
-        $worker->process($message, $queue);
-    }
-
-    public function testJobFailWithDefinitionUndefinedClassHandler(): void
-    {
-        $this->expectExceptionMessage("Queue handler with name simple doesn't exist");
-
-        $message = new Message('simple', ['test-data']);
-        $logger = new SimpleLogger();
-        $handler = new FakeHandler();
-        $container = new SimpleContainer([FakeHandler::class => $handler]);
-        $handlers = ['simple' => ['UndefinedClass', 'handle']];
-
-        $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($handlers, $logger, $container);
-
-        try {
-            $worker->process($message, $queue);
-        } finally {
-            $messages = $logger->getMessages();
-            $this->assertNotEmpty($messages);
-            $this->assertStringContainsString('UndefinedClass doesn\'t exist.', $messages[1]['message']);
-        }
-    }
-
-    public function testJobFailWithDefinitionClassNotFoundInContainerHandler(): void
-    {
-        $this->expectExceptionMessage("Queue handler with name simple doesn't exist");
-        $message = new Message('simple', ['test-data']);
-        $logger = new SimpleLogger();
-        $container = new SimpleContainer();
-        $handlers = ['simple' => [FakeHandler::class, 'execute']];
-
-        $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($handlers, $logger, $container);
-
-        $worker->process($message, $queue);
+        $this->assertSame([$message], $stackMessageHandler->processedMessages);
     }
 
     public function testJobFailWithDefinitionHandlerException(): void
     {
-        $message = new Message('simple', ['test-data']);
+        $message = new Message(ExceptionMessageHandler::class, ['test-data']);
         $logger = new SimpleLogger();
-        $handler = new FakeHandler();
-        $container = new SimpleContainer([FakeHandler::class => $handler]);
-        $handlers = ['simple' => [FakeHandler::class, 'executeWithException']];
+        $container = new SimpleContainer([ExceptionMessageHandler::class => new ExceptionMessageHandler()]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($handlers, $logger, $container);
+        $worker = $this->createWorkerByParams([], $logger, $container);
 
         try {
             $worker->process($message, $queue);

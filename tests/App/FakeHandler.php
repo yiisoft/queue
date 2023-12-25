@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Tests\App;
 
-use Yiisoft\Yii\Queue\Message\MessageInterface;
 use RuntimeException;
+use Yiisoft\Yii\Queue\Message\MessageHandlerInterface;
+use Yiisoft\Yii\Queue\Message\MessageInterface;
 
-final class FakeHandler
+final class FakeHandler implements MessageHandlerInterface
 {
     public static array $processedMessages = [];
 
@@ -26,13 +27,15 @@ final class FakeHandler
         self::$processedMessages[] = $message;
     }
 
-    public static function staticExecute(MessageInterface $message): void
-    {
-        self::$processedMessages[] = $message;
-    }
-
     public function executeWithException(MessageInterface $message): void
     {
         throw new RuntimeException('Test exception');
+    }
+
+    public function handle(MessageInterface $message): MessageInterface
+    {
+        self::$processedMessages[] = $message;
+
+        return $message;
     }
 }

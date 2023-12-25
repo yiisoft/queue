@@ -19,7 +19,7 @@ final class Message implements MessageInterface
     ) {
     }
 
-    public function getHandlerName(): string
+    public function getHandler(): string
     {
         return $this->handlerName;
     }
