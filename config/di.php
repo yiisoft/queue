@@ -25,10 +25,6 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 /* @var array $params */
 
 return [
-    QueueWorker::class => [
-        'class' => QueueWorker::class,
-        '__construct()' => [$params['yiisoft/yii-queue']['handlers']],
-    ],
     WorkerInterface::class => QueueWorker::class,
     LoopInterface::class => static function (ContainerInterface $container): LoopInterface {
         return $container->get(extension_loaded('pcntl')

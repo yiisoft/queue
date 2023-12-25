@@ -24,7 +24,6 @@ final class MessageConsumingTest extends TestCase
         $stackMessageHandler = new StackMessageHandler();
         $container = new SimpleContainer([StackMessageHandler::class => $stackMessageHandler]);
         $worker = new Worker(
-            [],
             new NullLogger(),
             new Injector($container),
             $container,

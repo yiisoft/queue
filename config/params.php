@@ -18,7 +18,6 @@ return [
         ],
     ],
     'yiisoft/yii-queue' => [
-        'handlers' => [],
         'channel-definitions' => [],
         'middlewares-push' => [],
         'middlewares-consume' => [],

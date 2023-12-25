@@ -32,7 +32,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([StackMessageHandler::class => $stackMessageHandler]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams([], $logger, $container);
+        $worker = $this->createWorkerByParams($logger, $container);
 
         $worker->process($message, $queue);
         $this->assertSame($message, $stackMessageHandler->processedMessages[0]);
@@ -50,7 +50,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([FakeHandler::class => $handler]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams([], $logger, $container);
+        $worker = $this->createWorkerByParams($logger, $container);
 
         $worker->process($message, $queue);
         $this->assertSame([$message], $handler::$processedMessages);
@@ -64,7 +64,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([FakeHandler::class => $handler]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams([], $logger, $container);
+        $worker = $this->createWorkerByParams($logger, $container);
 
         $worker->process($message, $queue);
         $this->assertSame([$message], $handler::$processedMessages);
@@ -78,7 +78,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([StackMessageHandler::class => $stackMessageHandler]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams([], $logger, $container);
+        $worker = $this->createWorkerByParams($logger, $container);
 
         $worker->process($message, $queue);
         $this->assertSame([$message], $stackMessageHandler->processedMessages);
@@ -91,7 +91,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([ExceptionMessageHandler::class => new ExceptionMessageHandler()]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams([], $logger, $container);
+        $worker = $this->createWorkerByParams($logger, $container);
 
         try {
             $worker->process($message, $queue);
@@ -110,12 +110,10 @@ final class WorkerTest extends TestCase
     }
 
     private function createWorkerByParams(
-        array $handlers,
         LoggerInterface $logger,
         ContainerInterface $container
     ): Worker {
         return new Worker(
-            $handlers,
             $logger,
             new Injector($container),
             $container,

@@ -111,7 +111,6 @@ final class MiddlewareTest extends TestCase
         );
 
         $worker = new Worker(
-            [],
             new SimpleLogger(),
             new Injector($container),
             $container,

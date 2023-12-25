@@ -111,7 +111,6 @@ abstract class TestCase extends BaseTestCase
     protected function createWorker(): WorkerInterface
     {
         return new Worker(
-            [],
             new NullLogger(),
             new Injector($this->getContainer()),
             $this->getContainer(),

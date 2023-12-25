@@ -25,10 +25,7 @@ use Yiisoft\Yii\Queue\QueueInterface;
 
 final class Worker implements WorkerInterface
 {
-    private array $handlersCached = [];
-
     public function __construct(
-        private array $handlers,
         private LoggerInterface $logger,
         private Injector $injector,
         private ContainerInterface $container,
