@@ -27,7 +27,8 @@ use Yiisoft\Yii\Queue\Worker\WorkerInterface;
 return [
     WorkerInterface::class => QueueWorker::class,
     LoopInterface::class => static function (ContainerInterface $container): LoopInterface {
-        return $container->get(extension_loaded('pcntl')
+        return $container->get(
+            extension_loaded('pcntl')
             ? SignalLoop::class
             : SimpleLoop::class
         );
