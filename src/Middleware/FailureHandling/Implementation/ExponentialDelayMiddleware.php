@@ -7,6 +7,7 @@ namespace Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation;
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Message\Message;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\Message\ParametrizedMessageInterface;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
@@ -62,11 +63,12 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
     ): FailureHandlingRequest {
         $message = $request->getMessage();
         if ($this->suites($message)) {
+            $id = $message instanceof ParametrizedMessageInterface ? $message->getId() : null;
             $messageNew = new Message(
                 handlerName: $message->getHandlerName(),
                 data:        $message->getData(),
                 metadata:    $this->formNewMeta($message),
-                id:          $message->getId(),
+                id:          $id,
             );
             ($this->queue ?? $request->getQueue())->push(
                 $messageNew,

@@ -10,6 +10,7 @@ use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\Message\ParametrizedMessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Yii\Queue\Middleware\Push\MessageHandlerPushInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\MiddlewarePushInterface;
@@ -59,7 +60,10 @@ final class Queue implements QueueInterface
 
         $this->logger->info(
             'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
-            ['handlerName' => $message->getHandlerName(), 'id' => $message->getId() ?? 'null']
+            [
+                'handlerName' => $message->getHandlerName(),
+                'id' => $message instanceof ParametrizedMessageInterface ? ($message->getId() ?? 'null') : 'null',
+            ]
         );
 
         return $message;

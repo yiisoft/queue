@@ -14,9 +14,6 @@ final class FailureHandlingRequest
     {
     }
 
-    /**
-     * @return MessageInterface
-     */
     public function getMessage(): MessageInterface
     {
         return $this->message;

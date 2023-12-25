@@ -7,6 +7,7 @@ namespace Yiisoft\Yii\Queue\Adapter;
 use InvalidArgumentException;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Yii\Queue\Message\ParametrizedMessageInterface;
 use Yiisoft\Yii\Queue\QueueFactory;
 use Yiisoft\Yii\Queue\QueueInterface;
 use Yiisoft\Yii\Queue\Worker\WorkerInterface;
@@ -66,7 +67,9 @@ final class SynchronousAdapter implements AdapterInterface
         $key = count($this->messages) + $this->current;
         $this->messages[] = $message;
 
-        $message->setId((string) $key);
+        if ($message instanceof ParametrizedMessageInterface) {
+            $message->setId((string) $key);
+        }
     }
 
     public function subscribe(callable $handlerCallback): void

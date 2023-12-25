@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Yii\Queue\Message;
 
-final class Message implements MessageInterface
+final class Message implements ParametrizedMessageInterface
 {
+    use ParametrizedMessageTrait;
+
     /**
      * @param mixed $data Message data, encodable by a queue adapter
      * @param array $metadata Message metadata, encodable by a queue adapter
@@ -15,8 +17,9 @@ final class Message implements MessageInterface
         private string $handlerName,
         private mixed $data,
         private array $metadata = [],
-        private ?string $id = null
+        ?string $id = null
     ) {
+        $this->setId($id);
     }
 
     public function getHandlerName(): string
@@ -27,16 +30,6 @@ final class Message implements MessageInterface
     public function getData(): mixed
     {
         return $this->data;
-    }
-
-    public function setId(?string $id): void
-    {
-        $this->id = $id;
-    }
-
-    public function getId(): ?string
-    {
-        return $this->id;
     }
 
     public function getMetadata(): array

@@ -6,15 +6,6 @@ namespace Yiisoft\Yii\Queue\Message;
 
 interface MessageInterface
 {
-    public function setId(?string $id): void;
-
-    /**
-     * Returns unique message ID.
-     *
-     * @return string|null
-     */
-    public function getId(): ?string;
-
     /**
      * Returns handler name.
      *
