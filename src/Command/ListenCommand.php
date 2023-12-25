@@ -8,7 +8,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Yiisoft\Yii\Console\ExitCode;
 use Yiisoft\Yii\Queue\QueueFactory;
 use Yiisoft\Yii\Queue\QueueFactoryInterface;
 
@@ -38,6 +37,6 @@ final class ListenCommand extends Command
             ->get($input->getArgument('channel'))
             ->listen();
 
-        return ExitCode::OK;
+        return 0;
     }
 }
