@@ -32,10 +32,8 @@ final class FakeHandler implements MessageHandlerInterface
         throw new RuntimeException('Test exception');
     }
 
-    public function handle(MessageInterface $message): MessageInterface
+    public function handle(MessageInterface $message): void
     {
         self::$processedMessages[] = $message;
-
-        return $message;
     }
 }

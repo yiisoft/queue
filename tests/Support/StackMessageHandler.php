@@ -11,10 +11,8 @@ class StackMessageHandler implements MessageHandlerInterface
 {
     public array $processedMessages = [];
 
-    public function handle(MessageInterface $message): MessageInterface
+    public function handle(MessageInterface $message): void
     {
         $this->processedMessages[] = $message;
-
-        return $message;
     }
 }

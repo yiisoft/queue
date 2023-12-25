@@ -9,8 +9,7 @@ use Yiisoft\Yii\Queue\Message\MessageInterface;
 
 class NullMessageHandler implements MessageHandlerInterface
 {
-    public function handle(MessageInterface $message): MessageInterface
+    public function handle(MessageInterface $message): void
     {
-        return $message;
     }
 }

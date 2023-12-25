@@ -10,7 +10,7 @@ use Yiisoft\Yii\Queue\Message\MessageInterface;
 
 class ExceptionMessageHandler implements MessageHandlerInterface
 {
-    public function handle(MessageInterface $message): MessageInterface
+    public function handle(MessageInterface $message): void
     {
         throw new RuntimeException('Test exception');
     }
