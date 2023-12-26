@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\Push;
+namespace Yiisoft\Queue\Middleware\Push;
 
-use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
+use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 
 /**
  * @internal

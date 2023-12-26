@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\FailureHandling;
+namespace Yiisoft\Queue\Middleware\FailureHandling;
 
 use Throwable;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\QueueInterface;
 
 final class FailureHandlingRequest
 {

@@ -10,9 +10,9 @@ use Yiisoft\Definitions\ArrayDefinition;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Definitions\Helpers\DefinitionValidator;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\InvalidCallableConfigurationException;
-use Yiisoft\Yii\Queue\Middleware\InvalidMiddlewareDefinitionException;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
+use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 
 use function is_string;
 
