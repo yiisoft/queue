@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\FailureHandling;
+namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Yii\Queue\QueueInterface;
-use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Yii\Queue\Tests\Unit\Middleware\FailureHandling\Support\TestCallableMiddleware;
-use Yiisoft\Yii\Queue\Tests\Unit\Middleware\FailureHandling\Support\TestMiddleware;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support\TestCallableMiddleware;
+use Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support\TestMiddleware;
 
 final class MiddlewareDispatcherTest extends TestCase
 {

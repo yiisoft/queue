@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\App;
+namespace Yiisoft\Queue\Tests\App;
 
-use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Message\MessageInterface;
 use RuntimeException;
 
 final class FakeHandler

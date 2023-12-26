@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\Push;
+namespace Yiisoft\Queue\Middleware\Push;
 
 use Closure;
 use Psr\Container\ContainerInterface;

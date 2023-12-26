@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Integration;
+namespace Yiisoft\Queue\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Yii\Queue\Adapter\SynchronousAdapter;
-use Yiisoft\Yii\Queue\Cli\LoopInterface;
-use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Queue;
-use Yiisoft\Yii\Queue\QueueFactory;
-use Yiisoft\Yii\Queue\QueueFactoryInterface;
-use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Yii\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Adapter\SynchronousAdapter;
+use Yiisoft\Queue\Cli\LoopInterface;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\QueueFactory;
+use Yiisoft\Queue\QueueFactoryInterface;
+use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Worker\WorkerInterface;
 
 final class QueueFactoryTest extends TestCase
 {

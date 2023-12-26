@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Worker;
+namespace Yiisoft\Queue\Worker;
 
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\QueueInterface;
 
 interface WorkerInterface
 {

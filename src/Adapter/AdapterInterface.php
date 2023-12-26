@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Adapter;
+namespace Yiisoft\Queue\Adapter;
 
 use InvalidArgumentException;
-use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\Message\MessageInterface;
 
 interface AdapterInterface
 {
