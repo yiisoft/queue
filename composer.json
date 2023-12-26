@@ -49,12 +49,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Yiisoft\\Yii\\Queue\\": "src"
+            "Yiisoft\\Queue\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Yiisoft\\Yii\\Queue\\Tests\\": "tests"
+            "Yiisoft\\Queue\\Tests\\": "tests"
         }
     },
     "extra": {
