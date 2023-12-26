@@ -91,7 +91,7 @@ final class QueueTest extends TestCase
 
         self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
         /**
-         * @var string|int $id
+         * @var int|string $id
          */
         $id = $envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY];
 
