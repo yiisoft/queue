@@ -9,6 +9,7 @@ use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
 use Yiisoft\Yii\Queue\Cli\LoopInterface;
 use Yiisoft\Yii\Queue\Enum\JobStatus;
 use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
+use Yiisoft\Yii\Queue\Message\IdEnvelope;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Yii\Queue\Middleware\Push\MessageHandlerPushInterface;
@@ -57,9 +58,10 @@ final class Queue implements QueueInterface
             ->dispatch($request, $this->createPushHandler($middlewareDefinitions))
             ->getMessage();
 
+        $messageId = $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
         $this->logger->info(
             'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
-            ['handlerName' => $message->getHandlerName(), 'id' => $message->getId() ?? 'null']
+            ['handlerName' => $message->getHandlerName(), 'id' => $messageId]
         );
 
         return $message;
@@ -100,7 +102,7 @@ final class Queue implements QueueInterface
         $this->logger->info('Finish listening to the queue.');
     }
 
-    public function status(string $id): JobStatus
+    public function status(string|int $id): JobStatus
     {
         $this->checkAdapter();
 
@@ -159,7 +161,7 @@ final class Queue implements QueueInterface
         return new class (
             $this->adapterPushHandler,
             $this->pushMiddlewareDispatcher,
-            [...array_values($this->middlewareDefinitions), ...array_values($middlewares)]
+            array_merge($this->middlewareDefinitions, $middlewares)
         ) implements MessageHandlerPushInterface {
             public function __construct(
                 private AdapterPushHandler $adapterPushHandler,

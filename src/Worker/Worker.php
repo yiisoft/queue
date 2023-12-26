@@ -15,6 +15,7 @@ use RuntimeException;
 use Throwable;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Yii\Queue\Exception\JobFailureException;
+use Yiisoft\Yii\Queue\Message\IdEnvelope;
 use Yiisoft\Yii\Queue\Message\MessageInterface;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeFinalHandler;
 use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
@@ -45,7 +46,7 @@ final class Worker implements WorkerInterface
      */
     public function process(MessageInterface $message, QueueInterface $queue): MessageInterface
     {
-        $this->logger->info('Processing message #{message}.', ['message' => $message->getId()]);
+        $this->logger->info('Processing message #{message}.', ['message' => $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null']);
 
         $name = $message->getHandlerName();
         $handler = $this->getHandler($name);

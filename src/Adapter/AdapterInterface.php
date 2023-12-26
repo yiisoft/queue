@@ -26,12 +26,12 @@ interface AdapterInterface
      *
      * @return JobStatus
      */
-    public function status(string $id): JobStatus;
+    public function status(string|int $id): JobStatus;
 
     /**
      * Pushing a message to the queue. Adapter sets message ID if available.
      */
-    public function push(MessageInterface $message): void;
+    public function push(MessageInterface $message): MessageInterface;
 
     /**
      * Listen to the queue and pass messages to the given handler as they come.

@@ -13,9 +13,11 @@ final class FakeAdapter implements AdapterInterface
     public array $pushMessages = [];
     public string $channel = 'default';
 
-    public function push(MessageInterface $message): void
+    public function push(MessageInterface $message): MessageInterface
     {
         $this->pushMessages[] = $message;
+
+        return $message;
     }
 
     public function runExisting(callable $handlerCallback): void
@@ -23,7 +25,7 @@ final class FakeAdapter implements AdapterInterface
         //skip
     }
 
-    public function status(string $id): JobStatus
+    public function status(string|int $id): JobStatus
     {
         //skip
     }

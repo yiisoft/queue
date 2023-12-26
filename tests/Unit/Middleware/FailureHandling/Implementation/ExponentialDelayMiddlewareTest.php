@@ -150,6 +150,7 @@ class ExponentialDelayMiddlewareTest extends TestCase
     {
         $message = new Message('test', null);
         $queue = $this->createMock(QueueInterface::class);
+        $queue->method('push')->willReturnArgument(0);
         $middleware = new ExponentialDelayMiddleware(
             'test',
             1,
@@ -165,8 +166,9 @@ class ExponentialDelayMiddlewareTest extends TestCase
         $result = $middleware->processFailure($request, $nextHandler);
 
         self::assertNotEquals($request, $result);
-        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test', $result->getMessage()->getMetadata());
-        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_DELAY . '-test', $result->getMessage()->getMetadata());
+        $message = $result->getMessage();
+        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test', $message->getMetadata());
+        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_DELAY . '-test', $message->getMetadata());
     }
 
     public function testPipelineFailure(): void

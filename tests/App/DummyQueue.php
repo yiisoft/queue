@@ -13,7 +13,7 @@ use Yiisoft\Yii\Queue\QueueInterface;
 
 final class DummyQueue implements QueueInterface
 {
-    public function __construct(private $channelName)
+    public function __construct(private string $channelName)
     {
     }
 
@@ -32,7 +32,7 @@ final class DummyQueue implements QueueInterface
     {
     }
 
-    public function status(string $id): JobStatus
+    public function status(string|int $id): JobStatus
     {
         throw new Exception('`status()` method is not implemented yet.');
     }
