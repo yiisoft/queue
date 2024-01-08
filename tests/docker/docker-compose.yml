@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   queue-php:
-    container_name: queue-php
+    container_name: yii-queue-php
     build:
       context: ../..
       dockerfile: tests/docker/php/Dockerfile
