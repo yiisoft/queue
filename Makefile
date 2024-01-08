@@ -1,4 +1,4 @@
-export COMPOSE_PROJECT_NAME=queue
+export COMPOSE_PROJECT_NAME=yii-queue
 
 help:			## Display help information
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
