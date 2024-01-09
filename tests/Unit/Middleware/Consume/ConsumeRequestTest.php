@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume;
+namespace Yiisoft\Queue\Tests\Unit\Middleware\Consume;
 
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Yii\Queue\QueueInterface;
-use Yiisoft\Yii\Queue\Tests\TestCase;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Tests\TestCase;
 
 final class ConsumeRequestTest extends TestCase
 {

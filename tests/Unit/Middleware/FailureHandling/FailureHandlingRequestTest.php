@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\FailureHandling;
+namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling;
 
 use Exception;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Yii\Queue\QueueInterface;
-use Yiisoft\Yii\Queue\Tests\TestCase;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Tests\TestCase;
 
 final class FailureHandlingRequestTest extends TestCase
 {

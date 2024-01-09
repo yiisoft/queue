@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
+namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
 
 use Exception;
 use PHPUnit\Framework\Assert;
 use RuntimeException;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
-use Yiisoft\Yii\Queue\Tests\TestCase;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
+use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
+use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
+use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Tests\TestCase;
 
 class SendAgainMiddlewareTest extends TestCase
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue;
+namespace Yiisoft\Queue;
 
 use Closure;
 use InvalidArgumentException;
@@ -12,11 +12,11 @@ use Yiisoft\Definitions\ArrayDefinition;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Definitions\Helpers\DefinitionValidator;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
-use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
-use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
-use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\InvalidCallableConfigurationException;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
+use Yiisoft\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
 
 final class QueueFactory implements QueueFactoryInterface
 {

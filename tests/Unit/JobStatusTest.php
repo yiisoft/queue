@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit;
+namespace Yiisoft\Queue\Tests\Unit;
 
-use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Exception\InvalidStatusException;
-use Yiisoft\Yii\Queue\Tests\TestCase;
-use Yiisoft\Yii\Queue\Tests\Unit\Support\TestJobStatus;
+use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\Exception\InvalidStatusException;
+use Yiisoft\Queue\Tests\TestCase;
+use Yiisoft\Queue\Tests\Unit\Support\TestJobStatus;
 
 final class JobStatusTest extends TestCase
 {

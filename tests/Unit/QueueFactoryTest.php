@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit;
+namespace Yiisoft\Queue\Tests\Unit;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -10,12 +10,12 @@ use Psr\Container\ContainerInterface;
 use stdClass;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
-use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
-use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
-use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\QueueFactory;
-use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
+use Yiisoft\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\QueueFactory;
+use Yiisoft\Queue\QueueInterface;
 
 class QueueFactoryTest extends TestCase
 {

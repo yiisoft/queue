@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit;
+namespace Yiisoft\Queue\Tests\Unit;
 
-use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\QueueFactory;
-use Yiisoft\Yii\Queue\Tests\TestCase;
+use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\QueueFactory;
+use Yiisoft\Queue\Tests\TestCase;
 
 final class SynchronousAdapterTest extends TestCase
 {

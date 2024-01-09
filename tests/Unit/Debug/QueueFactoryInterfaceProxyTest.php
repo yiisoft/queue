@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Debug;
+namespace Yiisoft\Queue\Tests\Unit\Debug;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Yii\Queue\Debug\QueueCollector;
-use Yiisoft\Yii\Queue\Debug\QueueDecorator;
-use Yiisoft\Yii\Queue\Debug\QueueFactoryInterfaceProxy;
-use Yiisoft\Yii\Queue\QueueFactoryInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Queue\Debug\QueueCollector;
+use Yiisoft\Queue\Debug\QueueDecorator;
+use Yiisoft\Queue\Debug\QueueFactoryInterfaceProxy;
+use Yiisoft\Queue\QueueFactoryInterface;
+use Yiisoft\Queue\QueueInterface;
 
 class QueueFactoryInterfaceProxyTest extends TestCase
 {

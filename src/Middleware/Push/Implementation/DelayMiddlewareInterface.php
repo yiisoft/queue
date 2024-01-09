@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\Push\Implementation;
+namespace Yiisoft\Queue\Middleware\Push\Implementation;
 
-use Yiisoft\Yii\Queue\Middleware\Push\MiddlewarePushInterface;
+use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 
 /**
  * A middleware interface for message delaying. It must be implemented in an adapter package or in a project.

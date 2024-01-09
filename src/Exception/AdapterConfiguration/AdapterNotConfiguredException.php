@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Exception\AdapterConfiguration;
+namespace Yiisoft\Queue\Exception\AdapterConfiguration;
 
 use RuntimeException;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
-use Yiisoft\Yii\Queue\Queue;
-use Yiisoft\Yii\Queue\QueueFactory;
+use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\QueueFactory;
 
 class AdapterNotConfiguredException extends RuntimeException implements FriendlyExceptionInterface
 {

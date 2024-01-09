@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
+namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
 
 use Exception;
 use InvalidArgumentException;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
-use Yiisoft\Yii\Queue\Tests\TestCase;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
+use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Tests\TestCase;
 
 class ExponentialDelayMiddlewareTest extends TestCase
 {

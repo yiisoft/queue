@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Support;
+namespace Yiisoft\Queue\Tests\Unit\Support;
 
-use Yiisoft\Yii\Queue\Enum\JobStatus;
+use Yiisoft\Queue\Enum\JobStatus;
 
 class TestJobStatus extends JobStatus
 {

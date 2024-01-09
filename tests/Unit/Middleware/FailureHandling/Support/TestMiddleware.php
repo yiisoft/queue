@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\FailureHandling\Support;
+namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support;
 
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 
 final class TestMiddleware implements MiddlewareFailureInterface
 {

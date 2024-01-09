@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\Consume;
+namespace Yiisoft\Queue\Middleware\Consume;
 
 interface MiddlewareConsumeInterface
 {
