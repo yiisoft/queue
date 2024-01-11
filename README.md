@@ -37,6 +37,48 @@ or add
 
 to the `require` section of your `composer.json` file.
 
+## Usage with Queue utility
+
+1. Copy configuration file `./vendor/yiisoft/yii-queue/bin/QueueContainer.php` to `root` folder of your project.
+
+```shell
+cp ./vendor/yiisoft/yii-queue/bin/QueueContainer.php ./
+```
+
+2. Edit `./QueueContainer.php` and add definitions for your logger and queue adapter.
+
+Here's a sample configuration.
+
+```php
+use Psr\Log\LoggerInterface;
+use Yiisoft\Definitions\ReferencesArray;
+use Yiisoft\Log\Logger;
+use Yiisoft\Log\Target\File\FileTarget;
+
+return [
+    LoggerInterface::class => [
+        'class' => Logger::class,
+        '__construct()' => [
+            'targets' => ReferencesArray::from(
+                [
+                    FileTarget::class
+                ],
+            ),
+        ],
+    ],
+];
+```
+
+## Usage with Yii Console
+
+Install `yiisoft/yii-console` package and you are ready to go.
+
+## Usage with Symfony Console
+
+Install `yiisoft/yii-queue` and the commands are automatically registered by the symfony console.
+
+> https://symfony.com/doc/current/console.html#registering-the-command
+
 ## Ready for yiisoft/config
 
 If you are using [yiisoft/config](https://github.com/yiisoft/config), you'll find out this package has some defaults

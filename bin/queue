@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Symfony\Component\Console\Application;
+use Yiisoft\Di\Container;
+use Yiisoft\Di\ContainerConfig;
+
+$autoload = $_composer_autoload_path ?? './vendor/autoload.php';
+
+if (!file_exists($autoload)) {
+    throw new RuntimeException(
+        'Please run "composer install" in your project root to install the required dependencies.'
+    );
+}
+
+require_once $autoload;
+require_once 'QueueContainer.php';
+
+$containerConfig = ContainerConfig::create()->withDefinitions(QueueContainer::definitions());
+$container = new Container($containerConfig);
+
+/** @var Application $application */
+$application = $container->get(Application::class);
+$application->run();

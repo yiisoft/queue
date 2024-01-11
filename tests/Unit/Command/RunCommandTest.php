@@ -31,6 +31,6 @@ final class RunCommandTest extends TestCase
         $command = new RunCommand($queueFactory);
         $exitCode = $command->run($input, $this->createMock(OutputInterface::class));
 
-        $this->assertEquals(0, $exitCode);
+        $this->assertSame(0, $exitCode);
     }
 }
