@@ -43,7 +43,7 @@ final class WorkerTest extends TestCase
 
         $messages = $logger->getMessages();
         $this->assertNotEmpty($messages);
-        $this->assertStringContainsString('Processing message #{message}.', $messages[0]['message']);
+        $this->assertStringContainsString('Processing message #null.', $messages[0]['message']);
     }
 
     public function testJobExecutedWithDefinitionHandler(): void

@@ -45,7 +45,7 @@ interface QueueInterface
      *
      * @return JobStatus
      */
-    public function status(string $id): JobStatus;
+    public function status(string|int $id): JobStatus;
 
     public function withAdapter(AdapterInterface $adapter): self;
 

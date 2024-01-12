@@ -8,6 +8,7 @@ use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\QueueFactory;
 use Yiisoft\Queue\Tests\TestCase;
+use Yiisoft\Queue\Message\IdEnvelope;
 
 final class SynchronousAdapterTest extends TestCase
 {
@@ -22,8 +23,11 @@ final class SynchronousAdapterTest extends TestCase
             ->getQueue()
             ->withAdapter($this->getAdapter());
         $message = new Message('simple', null);
-        $queue->push($message);
-        $id = $message->getId();
+        $envelope = $queue->push($message);
+
+        self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
+        $id = $envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY];
+
         $wrongId = "$id ";
         self::assertEquals(JobStatus::waiting(), $queue->status($wrongId));
     }
@@ -34,12 +38,12 @@ final class SynchronousAdapterTest extends TestCase
         $adapter = $this->getAdapter();
 
         $ids = [];
-        $adapter->push($message);
-        $ids[] = $message->getId();
-        $adapter->push($message);
-        $ids[] = $message->getId();
-        $adapter->push($message);
-        $ids[] = $message->getId();
+        $envelope = $adapter->push($message);
+        $ids[] = $envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY];
+        $envelope = $adapter->push($message);
+        $ids[] = $envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY];
+        $envelope = $adapter->push($message);
+        $ids[] = $envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY];
 
         self::assertCount(3, array_unique($ids));
     }

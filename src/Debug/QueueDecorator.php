@@ -18,7 +18,7 @@ final class QueueDecorator implements QueueInterface
     ) {
     }
 
-    public function status(string $id): JobStatus
+    public function status(string|int $id): JobStatus
     {
         $result = $this->queue->status($id);
         $this->collector->collectStatus($id, $result);

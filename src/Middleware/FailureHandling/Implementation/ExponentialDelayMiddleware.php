@@ -12,6 +12,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 
 /**
  * Failure strategy which resends the given message to a queue with an exponentially increasing delay.
@@ -62,15 +63,12 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
     ): FailureHandlingRequest {
         $message = $request->getMessage();
         if ($this->suites($message)) {
-            $messageNew = new Message(
-                handlerName: $message->getHandlerName(),
-                data:        $message->getData(),
-                metadata:    $this->formNewMeta($message),
-                id:          $message->getId(),
-            );
-            ($this->queue ?? $request->getQueue())->push(
-                $messageNew,
-                $this->delayMiddleware->withDelay($this->getDelay($message))
+            $envelope = new FailureEnvelope($message, $this->createNewMeta($message));
+            $queue = $this->queue ?? $request->getQueue();
+            $middlewareDefinitions = $this->delayMiddleware->withDelay($this->getDelay($envelope));
+            $messageNew = $queue->push(
+                $envelope,
+                $middlewareDefinitions
             );
 
             return $request->withMessage($messageNew);
@@ -84,7 +82,7 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
         return $this->maxAttempts > $this->getAttempts($message);
     }
 
-    private function formNewMeta(MessageInterface $message): array
+    private function createNewMeta(MessageInterface $message): array
     {
         $meta = $message->getMetadata();
         $meta[self::META_KEY_DELAY . "-$this->id"] = $this->getDelay($message);

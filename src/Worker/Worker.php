@@ -25,6 +25,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Message\IdEnvelope;
 
 final class Worker implements WorkerInterface
 {
@@ -45,7 +46,7 @@ final class Worker implements WorkerInterface
      */
     public function process(MessageInterface $message, QueueInterface $queue): MessageInterface
     {
-        $this->logger->info('Processing message #{message}.', ['message' => $message->getId()]);
+        $this->logger->info('Processing message #{message}.', ['message' => $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null']);
 
         $name = $message->getHandlerName();
         $handler = $this->getHandler($name);
