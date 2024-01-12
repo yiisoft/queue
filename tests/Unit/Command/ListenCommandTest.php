@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Command;
+namespace Yiisoft\Queue\Tests\Unit\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Yiisoft\Yii\Queue\Command\ListenCommand;
-use Yiisoft\Yii\Queue\QueueFactoryInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Queue\Command\ListenCommand;
+use Yiisoft\Queue\QueueFactoryInterface;
+use Yiisoft\Queue\QueueInterface;
 
 final class ListenCommandTest extends TestCase
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\FailureHandling;
+namespace Yiisoft\Queue\Middleware\FailureHandling;
 
 use Closure;
 

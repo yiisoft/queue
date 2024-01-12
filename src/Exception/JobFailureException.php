@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Exception;
+namespace Yiisoft\Queue\Exception;
 
 use RuntimeException;
 use Throwable;
-use Yiisoft\Yii\Queue\Message\IdEnvelope;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Message\MessageInterface;
 
 class JobFailureException extends RuntimeException
 {

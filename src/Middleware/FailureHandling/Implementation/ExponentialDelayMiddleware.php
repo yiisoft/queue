@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation;
+namespace Yiisoft\Queue\Middleware\FailureHandling\Implementation;
 
 use InvalidArgumentException;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureEnvelope;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
+use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
+use Yiisoft\Queue\QueueInterface;
 
 /**
  * Failure strategy which resends the given message to a queue with an exponentially increasing delay.

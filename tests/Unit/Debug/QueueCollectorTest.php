@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Debug;
+namespace Yiisoft\Queue\Tests\Unit\Debug;
 
 use Yiisoft\Yii\Debug\Collector\CollectorInterface;
 use Yiisoft\Yii\Debug\Tests\Shared\AbstractCollectorTestCase;
-use Yiisoft\Yii\Queue\Debug\QueueCollector;
-use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Tests\App\DummyQueue;
+use Yiisoft\Queue\Debug\QueueCollector;
+use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Tests\App\DummyQueue;
 
 final class QueueCollectorTest extends AbstractCollectorTestCase
 {

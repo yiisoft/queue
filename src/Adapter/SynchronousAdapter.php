@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Adapter;
+namespace Yiisoft\Queue\Adapter;
 
 use InvalidArgumentException;
-use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Message\IdEnvelope;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\QueueFactory;
-use Yiisoft\Yii\Queue\QueueInterface;
-use Yiisoft\Yii\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\QueueFactory;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Worker\WorkerInterface;
 
 final class SynchronousAdapter implements AdapterInterface
 {

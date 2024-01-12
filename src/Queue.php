@@ -2,21 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue;
+namespace Yiisoft\Queue;
 
 use Psr\Log\LoggerInterface;
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
-use Yiisoft\Yii\Queue\Cli\LoopInterface;
-use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
-use Yiisoft\Yii\Queue\Message\IdEnvelope;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\AdapterPushHandler;
-use Yiisoft\Yii\Queue\Middleware\Push\MessageHandlerPushInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\MiddlewarePushInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\Push\PushRequest;
-use Yiisoft\Yii\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Cli\LoopInterface;
+use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\Push\AdapterPushHandler;
+use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
+use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Push\PushRequest;
+use Yiisoft\Queue\Worker\WorkerInterface;
 
 final class Queue implements QueueInterface
 {

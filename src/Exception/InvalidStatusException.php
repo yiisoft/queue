@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Exception;
+namespace Yiisoft\Queue\Exception;
 
 use InvalidArgumentException;
 use Throwable;
@@ -34,7 +34,7 @@ class InvalidStatusException extends InvalidArgumentException implements Friendl
             [2] JobStatus::RESERVED
             [3] JobStatus::DONE
 
-            Please consider using one of them or extending \Yiisoft\Yii\Queue\Enum\JobStatus class with your ows values.
+            Please consider using one of them or extending \Yiisoft\Queue\Enum\JobStatus class with your ows values.
             SOLUTION;
     }
 

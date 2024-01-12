@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Cli;
+namespace Yiisoft\Queue\Cli;
 
 class SignalLoop implements LoopInterface
 {

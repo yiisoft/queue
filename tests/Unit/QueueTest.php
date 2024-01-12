@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit;
+namespace Yiisoft\Queue\Tests\Unit;
 
-use Yiisoft\Yii\Queue\Cli\SignalLoop;
-use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
-use Yiisoft\Yii\Queue\Message\IdEnvelope;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Yii\Queue\Tests\TestCase;
+use Yiisoft\Queue\Cli\SignalLoop;
+use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\TestCase;
 
 final class QueueTest extends TestCase
 {

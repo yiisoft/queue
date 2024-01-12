@@ -10,14 +10,14 @@ An extension for running tasks asynchronously via queues.
 
 Documentation is at [docs/guide/README.md](docs/guide/README.md).
 
-[![Latest Stable Version](https://poser.pugx.org/yiisoft/yii-queue/v/stable.svg)](https://packagist.org/packages/yiisoft/yii-queue)
-[![Total Downloads](https://poser.pugx.org/yiisoft/yii-queue/downloads.svg)](https://packagist.org/packages/yiisoft/yii-queue)
-[![Build status](https://github.com/yiisoft/yii-queue/workflows/build/badge.svg)](https://github.com/yiisoft/yii-queue/actions)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yiisoft/yii-queue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/yii-queue/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/yiisoft/yii-queue/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/yii-queue/?branch=master)
-[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fyii-queue%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/yii-queue/master)
-[![static analysis](https://github.com/yiisoft/yii-queue/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/yii-queue/actions?query=workflow%3A%22static+analysis%22)
-[![type-coverage](https://shepherd.dev/github/yiisoft/yii-queue/coverage.svg)](https://shepherd.dev/github/yiisoft/yii-queue)
+[![Latest Stable Version](https://poser.pugx.org/yiisoft/queue/v/stable.svg)](https://packagist.org/packages/yiisoft/queue)
+[![Total Downloads](https://poser.pugx.org/yiisoft/queue/downloads.svg)](https://packagist.org/packages/yiisoft/queue)
+[![Build status](https://github.com/yiisoft/queue/workflows/build/badge.svg)](https://github.com/yiisoft/queue/actions)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yiisoft/queue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/queue/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/yiisoft/queue/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/queue/?branch=master)
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fqueue%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/queue/master)
+[![static analysis](https://github.com/yiisoft/queue/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/queue/actions?query=workflow%3A%22static+analysis%22)
+[![type-coverage](https://shepherd.dev/github/yiisoft/queue/coverage.svg)](https://shepherd.dev/github/yiisoft/queue)
 
 ## Installation
 
@@ -26,13 +26,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```shell
-composer require yiisoft/yii-queue
+composer require yiisoft/queue
 ```
 
 or add
 
 ```
-"yiisoft/yii-queue": "~3.0"
+"yiisoft/queue": "~3.0"
 ```
 
 to the `require` section of your `composer.json` file.
@@ -42,11 +42,11 @@ to the `require` section of your `composer.json` file.
 If you are using [yiisoft/config](https://github.com/yiisoft/config), you'll find out this package has some defaults
 in the [`common`](config/di.php) and [`params`](config/params.php) configurations saving your time. Things you should
 change to start working with the queue:
-- Optionally: define default `\Yiisoft\Yii\Queue\Adapter\AdapterInterface` implementation.
+- Optionally: define default `\Yiisoft\Queue\Adapter\AdapterInterface` implementation.
 - And/or define channel-specific `AdapterInterface` implementations in the `channel-definitions` params key to be used
   with the [queue factory](#different-queue-channels).
 - Define [message handlers](docs/guide/worker.md#handler-format) in the `handlers` params key to be used with the `QueueWorker`.
-- Resolve other `\Yiisoft\Yii\Queue\Queue` dependencies (psr-compliant event dispatcher).
+- Resolve other `\Yiisoft\Queue\Queue` dependencies (psr-compliant event dispatcher).
 
 ## Differences to yii2-queue
 
@@ -58,8 +58,8 @@ Though, there are some key differences which are described in the "[migrating fr
 Each queue task consists of two parts:
 
 1. A message is a class implementing `MessageInterface`. For simple cases you can use the default implementation,
-   `Yiisoft\Yii\Queue\Message\Message`. For more complex cases you should implement the interface by your own.
-2. A message handler is a callable called by a `Yiisoft\Yii\Queue\Worker\Worker`. The handler handles each queue message.
+   `Yiisoft\Queue\Message\Message`. For more complex cases you should implement the interface by your own.
+2. A message handler is a callable called by a `Yiisoft\Queue\Worker\Worker`. The handler handles each queue message.
 
 For example, if you need to download and save a file, your message may look like the following:
 
@@ -68,7 +68,7 @@ $data = [
     'url' => $url,
     'destinationFile' => $filename,
 ];
-$message = new \Yiisoft\Yii\Queue\Message\Message('file-download', $data);
+$message = new \Yiisoft\Queue\Message\Message('file-download', $data);
 ```
 
 Then you should push it to the queue:
@@ -89,7 +89,7 @@ class FileDownloader
         $this->absolutePath = $absolutePath;
     }
 
-    public function handle(\Yiisoft\Yii\Queue\Message\MessageInterface $downloadMessage): void
+    public function handle(\Yiisoft\Queue\Message\MessageInterface $downloadMessage): void
     {
         $fileName = $downloadMessage->getData()['destinationFile'];
         $path = "$this->absolutePath/$fileName"; 
@@ -98,11 +98,11 @@ class FileDownloader
 }
 ```
 
-The last thing we should do is to create a configuration for the `Yiisoft\Yii\Queue\Worker\Worker`:
+The last thing we should do is to create a configuration for the `Yiisoft\Queue\Worker\Worker`:
 
 ```php
 $handlers = ['file-download' => [new FileDownloader('/path/to/save/files'), 'handle']];
-$worker = new \Yiisoft\Yii\Queue\Worker\Worker(
+$worker = new \Yiisoft\Queue\Worker\Worker(
     $handlers, // Here it is
     $logger,
     $injector,
@@ -157,7 +157,7 @@ the `$definitions` constructor parameter of the factory, where keys are channel 
 for the [`Yiisoft\Factory\Factory`](https://github.com/yiisoft/factory). Below are some examples:
 
 ```php
-use Yiisoft\Yii\Queue\Adapter\SynchronousAdapter;
+use Yiisoft\Queue\Adapter\SynchronousAdapter;
 
 [
     'channel1' => new SynchronousAdapter(),
@@ -258,7 +258,7 @@ You have three places to define push middlewares:
 1. `PushMiddlewareDispatcher`. You can pass it either to the constructor, or to the `withMiddlewares()` method, which  
 creates a completely new dispatcher object with only those middlewares, which are passed as arguments. 
 If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-push` key of the 
-`yiisoft/yii-queue` array in the `params`.
+`yiisoft/queue` array in the `params`.
 2. Pass middlewares to either `Queue::withMiddlewares()` or `Queue::withMiddlewaresAdded()` methods. The difference is 
 that the former will completely replace an existing middleware stack, while the latter will add passed middlewares to 
 the end of the existing stack. These middlewares will be executed after the common ones, passed directly to the 
@@ -271,15 +271,15 @@ along with them.
 
 ### Consume pipeline
 
-You can set a middleware pipeline for a message when it will be consumed from a queue server. This is useful to collect metrics, modify message data, etc. In pair with a Push middleware you can deduplicate messages in the queue, calculate time from push to consume, handle errors (push to a queue again, redirect failed message to another queue, send a notification, etc.). Unless Push pipeline, you have only one place to define the middleware stack: in the `ConsumeMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-consume` key of the `yiisoft/yii-queue` array in the `params`.
+You can set a middleware pipeline for a message when it will be consumed from a queue server. This is useful to collect metrics, modify message data, etc. In pair with a Push middleware you can deduplicate messages in the queue, calculate time from push to consume, handle errors (push to a queue again, redirect failed message to another queue, send a notification, etc.). Unless Push pipeline, you have only one place to define the middleware stack: in the `ConsumeMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-consume` key of the `yiisoft/queue` array in the `params`.
 
 ### Error handling pipeline
 
-Often when some job is failing, we want to retry its execution a couple more times or redirect it to another queue channel. This can be done in `yiisoft/yii-queue` with Failure middleware pipeline. They are triggered each time message processing via the Consume middleware pipeline is interrupted with any `Throwable`. The key differences from the previous two pipelines:
+Often when some job is failing, we want to retry its execution a couple more times or redirect it to another queue channel. This can be done in `yiisoft/queue` with Failure middleware pipeline. They are triggered each time message processing via the Consume middleware pipeline is interrupted with any `Throwable`. The key differences from the previous two pipelines:
 - You should set up the middleware pipeline separately for each queue channel. That means, the format should be `['channel-name' => [FooMiddleware::class]]` instead of `[FooMiddleware::class]`, like for the other two pipelines. There is also a default key, which will be used for those channels without their own one: `FailureMiddlewareDispatcher::DEFAULT_PIPELINE`.
 - The last middleware will throw the exception, which will come with the `FailureHandlingRequest` object. If you don't want the exception to be thrown, your middlewares should `return` a request without calling `$handler->handleFailure()`.
 
-You can declare error handling middleware pipeline in the `FailureMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-fail` key of the `yiisoft/yii-queue` array in the `params`.
+You can declare error handling middleware pipeline in the `FailureMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-fail` key of the `yiisoft/queue` array in the `params`.
 
 See [error handling docs](docs/guide/error-handling.md) for details.
 
