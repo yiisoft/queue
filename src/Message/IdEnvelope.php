@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
+/**
+ * ID envelope allows to identify a message.
+ */
 final class IdEnvelope implements EnvelopeInterface
 {
     use EnvelopeTrait;
