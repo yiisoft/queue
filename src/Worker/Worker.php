@@ -25,6 +25,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Message\IdEnvelope;
 
 final class Worker implements WorkerInterface
 {

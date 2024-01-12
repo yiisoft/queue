@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\FailureHandling;
+namespace Yiisoft\Queue\Middleware\FailureHandling;
 
-use Yiisoft\Yii\Queue\Message\EnvelopeInterface;
-use Yiisoft\Yii\Queue\Message\EnvelopeTrait;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Message\EnvelopeInterface;
+use Yiisoft\Queue\Message\EnvelopeTrait;
+use Yiisoft\Queue\Message\MessageInterface;
 
 final class FailureEnvelope implements EnvelopeInterface
 {

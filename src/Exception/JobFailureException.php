@@ -7,6 +7,7 @@ namespace Yiisoft\Queue\Exception;
 use RuntimeException;
 use Throwable;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Message\IdEnvelope;
 
 class JobFailureException extends RuntimeException
 {

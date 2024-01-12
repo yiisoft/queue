@@ -8,6 +8,7 @@ use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\QueueFactory;
 use Yiisoft\Queue\Tests\TestCase;
+use Yiisoft\Queue\Message\IdEnvelope;
 
 final class SynchronousAdapterTest extends TestCase
 {

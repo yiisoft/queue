@@ -12,6 +12,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 
 /**
  * Failure strategy which resends the given message to a queue with an exponentially increasing delay.

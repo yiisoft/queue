@@ -16,6 +16,7 @@ use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Push\PushRequest;
 use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Message\IdEnvelope;
 
 final class Queue implements QueueInterface
 {

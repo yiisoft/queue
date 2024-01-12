@@ -9,6 +9,7 @@ use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
+use Yiisoft\Queue\Message\IdEnvelope;
 
 final class QueueTest extends TestCase
 {
