@@ -9,6 +9,8 @@ namespace Yiisoft\Queue\Message;
  */
 interface EnvelopeInterface extends MessageInterface
 {
+    public const ENVELOPE_STACK_KEY = 'envelopes';
+
     public function getMessage(): MessageInterface;
 
     public function withMessage(MessageInterface $message): self;
