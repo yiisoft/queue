@@ -31,6 +31,10 @@ trait EnvelopeTrait
         return $this->message->getData();
     }
 
+    public static function fromMessage(MessageInterface $message): self
+    {
+        return new static($message);
+    }
     public function getMetadata(): array
     {
         return array_merge($this->message->getMetadata(), [

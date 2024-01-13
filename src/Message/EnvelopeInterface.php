@@ -11,6 +11,8 @@ interface EnvelopeInterface extends MessageInterface
 {
     public const ENVELOPE_STACK_KEY = 'envelopes';
 
+    public static function fromMessage(MessageInterface $message): self;
+
     public function getMessage(): MessageInterface;
 
     public function withMessage(MessageInterface $message): self;
