@@ -12,8 +12,10 @@ use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
+use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Worker\Worker;
+use Yiisoft\Test\Support\Container\SimpleContainer;
 
 final class MessageConsumingTest extends TestCase
 {

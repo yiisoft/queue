@@ -6,8 +6,7 @@ namespace Yiisoft\Queue\Tests\App;
 
 use Yiisoft\Queue\Message\MessageInterface;
 use RuntimeException;
-use Yiisoft\Yii\Queue\Message\MessageHandlerInterface;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Message\MessageHandlerInterface;
 
 final class FakeHandler implements MessageHandlerInterface
 {

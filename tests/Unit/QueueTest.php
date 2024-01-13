@@ -10,6 +10,8 @@ use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
+use Yiisoft\Queue\Tests\Support\NullMessageHandler;
+use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 
 final class QueueTest extends TestCase
 {

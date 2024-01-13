@@ -22,4 +22,5 @@ final class FailureEnvelope implements EnvelopeInterface
     {
         return array_merge($this->message->getMetadata(), $this->meta);
     }
+
 }

@@ -20,6 +20,8 @@ use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeHandler;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Worker\Worker;
+use Yiisoft\Queue\Tests\Support\ExceptionMessageHandler;
+use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 
 final class WorkerTest extends TestCase
 {

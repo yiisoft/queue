@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Support;
+namespace Yiisoft\Queue\Tests\Support;
 
 use RuntimeException;
-use Yiisoft\Yii\Queue\Message\MessageHandlerInterface;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Message\MessageHandlerInterface;
+use Yiisoft\Queue\Message\MessageInterface;
 
 class ExceptionMessageHandler implements MessageHandlerInterface
 {

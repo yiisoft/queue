@@ -80,8 +80,8 @@ $queue->push($message);
 Its handler may look like the following:
 
 ```php
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Message\MessageHandlerInterface;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Message\MessageHandlerInterface;
 
 class FileDownloader implements MessageHandlerInterface
 {

@@ -24,6 +24,8 @@ use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Tests\Support\NullMessageHandler;
+use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 
 /**
  * Base Test Case.

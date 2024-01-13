@@ -11,6 +11,7 @@ use RuntimeException;
 use Throwable;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Exception\JobFailureException;
+use Yiisoft\Queue\Message\MessageHandlerInterface;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
