@@ -6,7 +6,6 @@ namespace Yiisoft\Queue\Message;
 
 use InvalidArgumentException;
 use JsonException;
-use Yiisoft\Queue\Exception\NoKeyInPayloadException;
 
 final class MessageSerializer implements MessageSerializerInterface
 {
@@ -26,7 +25,6 @@ final class MessageSerializer implements MessageSerializerInterface
 
     /**
      * @throws JsonException
-     * @throws NoKeyInPayloadException
      * @throws InvalidArgumentException
      */
     public function unserialize(string $value): MessageInterface
