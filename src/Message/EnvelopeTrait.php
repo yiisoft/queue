@@ -35,6 +35,7 @@ trait EnvelopeTrait
     {
         return new static($message);
     }
+
     public function getMetadata(): array
     {
         return array_merge($this->message->getMetadata(), [
