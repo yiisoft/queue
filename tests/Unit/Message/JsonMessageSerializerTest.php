@@ -8,9 +8,9 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\EnvelopeInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
+use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Message\JsonMessageSerializer;
 
 /**
  * Testing message serialization options
@@ -140,6 +140,17 @@ final class JsonMessageSerializerTest extends TestCase
 
         $this->assertInstanceOf(IdEnvelope::class, $message);
         $this->assertEquals('test-id', $message->getId());
+        $this->assertEquals([
+            EnvelopeInterface::ENVELOPE_STACK_KEY => [
+                IdEnvelope::class,
+            ],
+            IdEnvelope::MESSAGE_ID_KEY => 'test-id',
+        ], $message->getMetadata());
+
+        $this->assertEquals([
+            EnvelopeInterface::ENVELOPE_STACK_KEY => [],
+            IdEnvelope::MESSAGE_ID_KEY => 'test-id',
+        ], $message->getMessage()->getMetadata());
     }
 
     private function createSerializer(): JsonMessageSerializer
