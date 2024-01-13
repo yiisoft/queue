@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests;
+namespace Yiisoft\Queue\Tests;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase as BaseTestCase;
@@ -10,22 +10,20 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
-use Yiisoft\Yii\Queue\Adapter\SynchronousAdapter;
-use Yiisoft\Yii\Queue\Cli\LoopInterface;
-use Yiisoft\Yii\Queue\Cli\SimpleLoop;
-use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
-use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Queue;
-use Yiisoft\Yii\Queue\Tests\Support\NullMessageHandler;
-use Yiisoft\Yii\Queue\Tests\Support\StackMessageHandler;
-use Yiisoft\Yii\Queue\Worker\Worker;
-use Yiisoft\Yii\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Adapter\SynchronousAdapter;
+use Yiisoft\Queue\Cli\LoopInterface;
+use Yiisoft\Queue\Cli\SimpleLoop;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
+use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\Worker\Worker;
+use Yiisoft\Queue\Worker\WorkerInterface;
 
 /**
  * Base Test Case.

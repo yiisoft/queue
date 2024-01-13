@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\App;
+namespace Yiisoft\Queue\Tests\App;
 
+use Yiisoft\Queue\Message\MessageInterface;
 use RuntimeException;
 use Yiisoft\Yii\Queue\Message\MessageHandlerInterface;
 use Yiisoft\Yii\Queue\Message\MessageInterface;

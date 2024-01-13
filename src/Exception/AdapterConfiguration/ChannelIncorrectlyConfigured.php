@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Exception\AdapterConfiguration;
+namespace Yiisoft\Queue\Exception\AdapterConfiguration;
 
 use InvalidArgumentException;
 use Throwable;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
-use Yiisoft\Yii\Queue\QueueFactory;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\QueueFactory;
 
 class ChannelIncorrectlyConfigured extends InvalidArgumentException implements FriendlyExceptionInterface
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\Consume;
+namespace Yiisoft\Queue\Middleware\Consume;
 
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\QueueInterface;
 
 final class ConsumeRequest
 {

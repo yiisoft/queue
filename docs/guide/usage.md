@@ -7,9 +7,9 @@ You can configure it with a DI container in the following way:
 ```php
 $logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
 
-$worker = $DIContainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);
-$loop = $DIContainer->get(\Yiisoft\Yii\Queue\Cli\LoopInterface::class);
-$adapter = $DIContainer->get(\Yiisoft\Yii\Queue\Adapter\AdapterInterface::class);
+$worker = $DIContainer->get(\Yiisoft\Queue\Worker\WorkerInterface::class);
+$loop = $DIContainer->get(\Yiisoft\Queue\Cli\LoopInterface::class);
+$adapter = $DIContainer->get(\Yiisoft\Queue\Adapter\AdapterInterface::class);
 
 $queue = new Queue(
     $adapter,
@@ -20,7 +20,7 @@ $queue = new Queue(
 ```
 
 See also the documentation for concrete adapters ([synchronous adapter](adapter-sync.md), 
-[AMQP adapter](https://github.com/yiisoft/yii-queue-amqp)) and [workers](worker.md)
+[AMQP adapter](https://github.com/yiisoft/queue-amqp)) and [workers](worker.md)
 
 
 ## Usage
@@ -33,7 +33,7 @@ $data = [
     'url' => $url,
     'destinationFile' => $filename,
 ];
-$message = new \Yiisoft\Yii\Queue\Message\Message('file-download', $data);
+$message = new \Yiisoft\Queue\Message\Message('file-download', $data);
 ```
 
 Here's how to send a task to the queue:

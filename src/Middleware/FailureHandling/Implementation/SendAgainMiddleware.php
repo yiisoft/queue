@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation;
+namespace Yiisoft\Queue\Middleware\FailureHandling\Implementation;
 
 use InvalidArgumentException;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
+use Yiisoft\Queue\QueueInterface;
 
 /**
  * Failure strategy which resends the given message to a queue.
@@ -40,15 +40,11 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
     ): FailureHandlingRequest {
         $message = $request->getMessage();
         if ($this->suites($message)) {
-            $message = new Message(
-                handlerName: $message->getHandler(),
-                data: $message->getData(),
-                metadata: $this->createMeta($message),
-                id: $message->getId(),
-            );
-            $message = $this->queue?->push($message) ?? $request->getQueue()->push($message);
+            $envelope = new FailureEnvelope($message, $this->createMeta($message));
+            $envelope = ($this->queue ?? $request->getQueue())->push($envelope);
 
-            return $request->withMessage($message)->withQueue($this->queue ?? $request->getQueue());
+            return $request->withMessage($envelope)
+                ->withQueue($this->queue ?? $request->getQueue());
         }
 
         return $handler->handleFailure($request);
@@ -57,11 +53,6 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
     private function suites(MessageInterface $message): bool
     {
         return $this->getAttempts($message) < $this->maxAttempts;
-    }
-
-    private function getMetaKey(): string
-    {
-        return self::META_KEY_RESEND . "-$this->id";
     }
 
     private function createMeta(MessageInterface $message): array
@@ -80,5 +71,10 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
         }
 
         return (int) $result;
+    }
+
+    private function getMetaKey(): string
+    {
+        return self::META_KEY_RESEND . "-$this->id";
     }
 }

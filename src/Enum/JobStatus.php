@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Enum;
+namespace Yiisoft\Queue\Enum;
 
-use Yiisoft\Yii\Queue\Exception\InvalidStatusException;
+use Yiisoft\Queue\Exception\InvalidStatusException;
 
 class JobStatus
 {

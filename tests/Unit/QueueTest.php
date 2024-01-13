@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit;
+namespace Yiisoft\Queue\Tests\Unit;
 
-use Yiisoft\Yii\Queue\Cli\SignalLoop;
-use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Yii\Queue\Tests\Support\NullMessageHandler;
-use Yiisoft\Yii\Queue\Tests\Support\StackMessageHandler;
-use Yiisoft\Yii\Queue\Tests\TestCase;
+use Yiisoft\Queue\Cli\SignalLoop;
+use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\TestCase;
+use Yiisoft\Queue\Message\IdEnvelope;
 
 final class QueueTest extends TestCase
 {
@@ -82,8 +81,13 @@ final class QueueTest extends TestCase
             ->getQueue()
             ->withAdapter($this->getAdapter());
         $message = new Message(NullMessageHandler::class, null);
-        $queue->push($message);
-        $id = $message->getId();
+        $envelope = $queue->push($message);
+
+        self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
+        /**
+         * @var int|string $id
+         */
+        $id = $envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY];
 
         $status = $queue->status($id);
         self::assertTrue($status->isWaiting());
@@ -98,8 +102,8 @@ final class QueueTest extends TestCase
         try {
             $queue = $this->getQueue();
             $message = new Message(NullMessageHandler::class, null);
-            $queue->push($message);
-            $queue->status($message->getId());
+            $envelope = $queue->push($message);
+            $queue->status($envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY]);
         } catch (AdapterNotConfiguredException $exception) {
             self::assertSame($exception::class, AdapterNotConfiguredException::class);
             self::assertSame($exception->getName(), 'Adapter is not configured');

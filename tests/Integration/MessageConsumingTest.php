@@ -2,20 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Integration;
+namespace Yiisoft\Queue\Tests\Integration;
 
 use Psr\Log\NullLogger;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
-use Yiisoft\Yii\Queue\Tests\Support\StackMessageHandler;
-use Yiisoft\Yii\Queue\Tests\TestCase;
-use Yiisoft\Yii\Queue\Worker\Worker;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
+use Yiisoft\Queue\Tests\TestCase;
+use Yiisoft\Queue\Worker\Worker;
 
 final class MessageConsumingTest extends TestCase
 {

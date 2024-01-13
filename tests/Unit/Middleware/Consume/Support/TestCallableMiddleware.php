@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support;
+namespace Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support;
 
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
 
 final class TestCallableMiddleware
 {

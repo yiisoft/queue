@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
+namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
 
 use Exception;
 use InvalidArgumentException;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
-use Yiisoft\Yii\Queue\Tests\TestCase;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
+use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Tests\TestCase;
 
 class ExponentialDelayMiddlewareTest extends TestCase
 {
@@ -150,6 +150,7 @@ class ExponentialDelayMiddlewareTest extends TestCase
     {
         $message = new Message('test', null);
         $queue = $this->createMock(QueueInterface::class);
+        $queue->method('push')->willReturnArgument(0);
         $middleware = new ExponentialDelayMiddleware(
             'test',
             1,
@@ -165,8 +166,9 @@ class ExponentialDelayMiddlewareTest extends TestCase
         $result = $middleware->processFailure($request, $nextHandler);
 
         self::assertNotEquals($request, $result);
-        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test', $result->getMessage()->getMetadata());
-        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_DELAY . '-test', $result->getMessage()->getMetadata());
+        $message = $result->getMessage();
+        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test', $message->getMetadata());
+        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_DELAY . '-test', $message->getMetadata());
     }
 
     public function testPipelineFailure(): void

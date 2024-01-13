@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Debug;
+namespace Yiisoft\Queue\Tests\Unit\Debug;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
-use Yiisoft\Yii\Queue\Debug\QueueCollector;
-use Yiisoft\Yii\Queue\Debug\QueueDecorator;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
-use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Yii\Queue\Tests\Unit\Support\TestJobStatus;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Debug\QueueCollector;
+use Yiisoft\Queue\Debug\QueueDecorator;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\Unit\Support\TestJobStatus;
 
 class QueueDecoratorTest extends TestCase
 {

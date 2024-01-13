@@ -1,15 +1,15 @@
 # Error handling on message processing
 
-Often when some message handling is failing, we want to retry its execution a couple more times or redirect it to another queue channel. This can be done in `yiisoft/yii-queue` with _Failure Handling Middleware Pipeline_. It is triggered each time message processing via Consume Middleware Pipeline is interrupted with any `Throwable`. 
+Often when some message handling is failing, we want to retry its execution a couple more times or redirect it to another queue channel. This can be done in `yiisoft/queue` with _Failure Handling Middleware Pipeline_. It is triggered each time message processing via Consume Middleware Pipeline is interrupted with any `Throwable`. 
 
 ## Configuration
 
 Here below is configuration via `yiisoft/config`. If you don't use it - you should add middleware definition list (in the `middlewares-fail` key here) to the `FailureMiddlewareDispatcher` by your own.
 
-Configuration should be passed to the `yiisoft/yii-queue.fail-strategy-pipelines` key of the `params` config to work with the `yiisoft/config`. You can define different failure handling pipelines for each queue channel. Let's see and describe an example:
+Configuration should be passed to the `yiisoft/queue.fail-strategy-pipelines` key of the `params` config to work with the `yiisoft/config`. You can define different failure handling pipelines for each queue channel. Let's see and describe an example:
 
 ```php
-'yiisoft/yii-queue' => [
+'yiisoft/queue' => [
     'middlewares-fail' => [
         FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [
             [
