@@ -21,6 +21,9 @@ trait EnvelopeTrait
         return $instance;
     }
 
+    /**
+     * @return class-string<MessageHandlerInterface>
+     */
     public function getHandler(): string
     {
         return $this->message->getHandler();

@@ -7,12 +7,13 @@ namespace Yiisoft\Queue\Message;
 final class Message implements MessageInterface
 {
     /**
+     * @param class-string<MessageHandlerInterface> $handler Message handler class name
      * @param mixed $data Message data, encodable by a queue adapter
      * @param array $metadata Message metadata, encodable by a queue adapter
      * @param string|null $id Message id
      */
     public function __construct(
-        private string $handlerName,
+        private string $handler,
         private mixed $data,
         private array $metadata = [],
     ) {
@@ -20,7 +21,7 @@ final class Message implements MessageInterface
 
     public function getHandler(): string
     {
-        return $this->handlerName;
+        return $this->handler;
     }
 
     public function getData(): mixed
