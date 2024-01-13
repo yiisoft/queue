@@ -8,7 +8,6 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Message\Message;
-use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;

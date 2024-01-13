@@ -5,12 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Worker;
 
 use Closure;
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionException;
-use ReflectionMethod;
 use RuntimeException;
 use Throwable;
 use Yiisoft\Injector\Injector;

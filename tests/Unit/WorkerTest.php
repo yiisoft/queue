@@ -11,7 +11,6 @@ use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Exception\JobFailureException;
 use Yiisoft\Queue\Message\Message;
-use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
@@ -77,7 +76,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer(['not-found-class-name' => $handler]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams( $logger, $container);
+        $worker = $this->createWorkerByParams($logger, $container);
 
         $worker->process($message, $queue);
         $this->assertSame([$message], $handler::$processedMessages);
@@ -91,7 +90,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([FakeHandler::class => $handler]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams( $logger, $container);
+        $worker = $this->createWorkerByParams($logger, $container);
 
         $worker->process($message, $queue);
         $this->assertSame([$message], $handler::$processedMessages);
@@ -107,7 +106,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([FakeHandler::class => $handler]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams( $logger, $container);
+        $worker = $this->createWorkerByParams($logger, $container);
 
         $worker->process($message, $queue);
     }
@@ -122,7 +121,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([FakeHandler::class => $handler]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams( $logger, $container);
+        $worker = $this->createWorkerByParams($logger, $container);
 
         try {
             $worker->process($message, $queue);
@@ -141,7 +140,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer();
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams( $logger, $container);
+        $worker = $this->createWorkerByParams($logger, $container);
 
         $worker->process($message, $queue);
     }

@@ -8,7 +8,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
-use RuntimeException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
