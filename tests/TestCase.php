@@ -130,7 +130,6 @@ abstract class TestCase extends BaseTestCase
     protected function createWorker(): WorkerInterface
     {
         return new Worker(
-            $this->getMessageHandlers(),
             new NullLogger(),
             new Injector($this->getContainer()),
             $this->getContainer(),
@@ -157,23 +156,6 @@ abstract class TestCase extends BaseTestCase
     protected function getEventHandlers(): array
     {
         return $this->eventHandlers;
-    }
-
-    protected function getMessageHandlers(): array
-    {
-        return [
-            'simple' => fn () => $this->executionTimes++,
-            'exceptional' => function () {
-                $this->executionTimes++;
-
-                throw new RuntimeException('test');
-            },
-            'retryable' => function () {
-                $this->executionTimes++;
-
-                throw new RuntimeException('test');
-            },
-        ];
     }
 
     protected function needsRealAdapter(): bool

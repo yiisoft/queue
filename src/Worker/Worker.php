@@ -29,10 +29,7 @@ use Yiisoft\Queue\Message\IdEnvelope;
 
 final class Worker implements WorkerInterface
 {
-    private array $handlersCached = [];
-
     public function __construct(
-        private array $handlers,
         private LoggerInterface $logger,
         private Injector $injector,
         private ContainerInterface $container,
@@ -49,9 +46,9 @@ final class Worker implements WorkerInterface
         $this->logger->info('Processing message #{message}.', ['message' => $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null']);
 
         $name = $message->getHandlerName();
-        $handler = $this->getHandler($name);
+        $handler = $this->container->get($name);
         if ($handler === null) {
-            throw new RuntimeException("Queue handler with name $name doesn't exist");
+            throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist.', $name));
         }
 
         $request = new ConsumeRequest($message, $queue);
@@ -72,73 +69,6 @@ final class Worker implements WorkerInterface
                 throw $exception;
             }
         }
-    }
-
-    private function getHandler(string $name): ?callable
-    {
-        if (!array_key_exists($name, $this->handlersCached)) {
-            $this->handlersCached[$name] = $this->prepare($this->handlers[$name] ?? null);
-        }
-
-        return $this->handlersCached[$name];
-    }
-
-    /**
-     * Checks if the handler is a DI container alias
-     *
-     * @param array|callable|object|string|null $definition
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    private function prepare(callable|object|array|string|null $definition): callable|null
-    {
-        if (is_string($definition) && $this->container->has($definition)) {
-            return $this->container->get($definition);
-        }
-
-        if (
-            is_array($definition)
-            && array_keys($definition) === [0, 1]
-            && is_string($definition[0])
-            && is_string($definition[1])
-        ) {
-            [$className, $methodName] = $definition;
-
-            if (!class_exists($className) && $this->container->has($className)) {
-                return [
-                    $this->container->get($className),
-                    $methodName,
-                ];
-            }
-
-            if (!class_exists($className)) {
-                $this->logger->error("$className doesn't exist.");
-
-                return null;
-            }
-
-            try {
-                $reflection = new ReflectionMethod($className, $methodName);
-            } catch (ReflectionException $e) {
-                $this->logger->error($e->getMessage());
-
-                return null;
-            }
-            if ($reflection->isStatic()) {
-                return [$className, $methodName];
-            }
-            if ($this->container->has($className)) {
-                return [
-                    $this->container->get($className),
-                    $methodName,
-                ];
-            }
-
-            return null;
-        }
-
-        return $definition;
     }
 
     private function createConsumeHandler(Closure $handler): MessageHandlerConsumeInterface
