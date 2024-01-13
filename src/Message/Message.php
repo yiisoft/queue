@@ -19,18 +19,27 @@ final class Message implements MessageInterface
     ) {
     }
 
-    public function getHandler(): string
-    {
-        return $this->handler;
-    }
-
     public function getData(): mixed
     {
         return $this->data;
     }
 
+    public function withData(mixed $data): self
+    {
+        $new = clone $this;
+        $new->data = $data;
+        return $new;
+    }
+
     public function getMetadata(): array
     {
         return $this->metadata;
+    }
+
+    public function withMetadata(array $metadata): self
+    {
+        $new = clone $this;
+        $new->metadata = $metadata;
+        return $new;
     }
 }

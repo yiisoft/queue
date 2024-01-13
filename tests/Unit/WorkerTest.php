@@ -7,6 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Exception\JobFailureException;
@@ -26,21 +27,47 @@ final class WorkerTest extends TestCase
 {
     public function testJobExecutedWithDefinitionClassHandler(): void
     {
-        $message = new Message(FakeHandler::class, ['test-data']);
-        $logger = new SimpleLogger();
+        $message = new HandlerEnvelope(
+            new Message(FakeHandler::class, ['test-data']),
+            FakeHandler::class,
+        );
+
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
 
         $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($logger, $container);
+        $worker = $this->createWorkerByParams(new SimpleLogger(), $container);
 
         $worker->process($message, $queue);
+
         $this->assertSame([$message], $handler::$processedMessages);
+    }
+
+    public function testHandlerIsReplacedWithEnvelopsOne(): void
+    {
+        $message = new HandlerEnvelope(
+            new Message(ExceptionMessageHandler::class, ['test-data']),
+            StackMessageHandler::class,
+        );
+
+        $stackMessageHandler = new StackMessageHandler();
+        $container = new SimpleContainer([
+            StackMessageHandler::class => $stackMessageHandler,
+        ]);
+
+        $queue = $this->createMock(QueueInterface::class);
+        $worker = $this->createWorkerByParams(new SimpleLogger(), $container);
+
+        $worker->process($message, $queue);
+        $this->assertSame([$message], $stackMessageHandler->processedMessages);
     }
 
     public function testJobFailWithDefinitionHandlerException(): void
     {
-        $message = new Message(ExceptionMessageHandler::class, ['test-data']);
+        $message = new HandlerEnvelope(
+            new Message(ExceptionMessageHandler::class, ['test-data']),
+            ExceptionMessageHandler::class,
+        );
         $logger = new SimpleLogger();
         $container = new SimpleContainer([ExceptionMessageHandler::class => new ExceptionMessageHandler()]);
 

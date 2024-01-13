@@ -11,6 +11,7 @@ use RuntimeException;
 use Throwable;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Exception\JobFailureException;
+use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\MessageHandlerInterface;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
@@ -42,7 +43,7 @@ final class Worker implements WorkerInterface
     {
         $this->logger->info('Processing message #{message}.', ['message' => $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null']);
 
-        $handlerClass = $message->getHandler();
+        $handlerClass = $message instanceof HandlerEnvelope ? $message->getHandler() : null;
 
         if (!is_subclass_of($handlerClass, MessageHandlerInterface::class, true)) {
             throw new RuntimeException(sprintf(

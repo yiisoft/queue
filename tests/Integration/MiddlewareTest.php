@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Tests\Support\NullMessageHandler;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
@@ -118,7 +119,10 @@ final class MiddlewareTest extends TestCase
             $failureMiddlewareDispatcher,
         );
 
-        $message = new Message(NullMessageHandler::class, ['initial']);
+        $message = new HandlerEnvelope(
+            new Message(NullMessageHandler::class, ['initial']),
+            NullMessageHandler::class)
+        ;
         $messageConsumed = $worker->process($message, $this->createMock(QueueInterface::class));
 
         self::assertEquals($stack, $messageConsumed->getData());
@@ -129,7 +133,10 @@ final class MiddlewareTest extends TestCase
         $exception = new InvalidArgumentException('test');
         $this->expectExceptionObject($exception);
 
-        $message = new Message(NullMessageHandler::class, null, []);
+        $message = new HandlerEnvelope(
+            new Message(NullMessageHandler::class, null, []),
+            NullMessageHandler::class,
+        );
         $queueCallback = static fn (MessageInterface $message): MessageInterface => $message;
         $queue = $this->createMock(QueueInterface::class);
         $container = new SimpleContainer([SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queue)]);

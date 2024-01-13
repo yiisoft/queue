@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit;
 
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
+use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
@@ -37,7 +38,10 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new Message(StackMessageHandler::class, null);
+        $message = new HandlerEnvelope(
+            new Message(StackMessageHandler::class, null),
+            StackMessageHandler::class,
+        );
         $message2 = clone $message;
         $queue->push($message);
         $queue->push($message2);
@@ -49,7 +53,10 @@ final class QueueTest extends TestCase
 
     public function testRunPartly(): void
     {
-        $message = new Message(StackMessageHandler::class, null);
+        $message = new HandlerEnvelope(
+            new Message(StackMessageHandler::class, null),
+            StackMessageHandler::class,
+        );
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
@@ -67,7 +74,10 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new Message(StackMessageHandler::class, null);
+        $message = new HandlerEnvelope(
+            new Message(StackMessageHandler::class, null),
+            StackMessageHandler::class,
+        );
         $message2 = clone $message;
         $queue->push($message);
         $queue->push($message2);
@@ -82,7 +92,10 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new Message(NullMessageHandler::class, null);
+        $message = new HandlerEnvelope(
+            new Message(NullMessageHandler::class, null),
+            NullMessageHandler::class,
+        );
         $envelope = $queue->push($message);
 
         self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
@@ -130,7 +143,10 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new Message(StackMessageHandler::class, null);
+        $message = new HandlerEnvelope(
+            new Message(StackMessageHandler::class, null),
+            StackMessageHandler::class,
+        );
         $message2 = clone $message;
         $queue->push($message);
         $queue->push($message2);

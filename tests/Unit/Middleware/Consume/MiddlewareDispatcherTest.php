@@ -69,12 +69,12 @@ final class MiddlewareDispatcherTest extends TestCase
         $request = $this->getConsumeRequest();
 
         $middleware1 = static function (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest {
-            $request = $request->withMessage(new Message($request->getMessage()->getHandler(), 'new test data'));
+            $request = $request->withMessage($request->getMessage()->withData('new test data'));
 
             return $handler->handleConsume($request);
         };
         $middleware2 = static function (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest {
-            $request = $request->withMessage(new Message('new handler', $request->getMessage()->getData()));
+            $request = $request->withMessage($request->getMessage()->withMetadata(['new' => 'metadata']));
 
             return $handler->handleConsume($request);
         };
@@ -83,7 +83,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('new test data', $request->getMessage()->getData());
-        $this->assertSame('new handler', $request->getMessage()->getHandler());
+        $this->assertSame(['new' => 'metadata'], $request->getMessage()->getMetadata());
     }
 
     public function testMiddlewareStackInterrupted(): void
@@ -91,10 +91,10 @@ final class MiddlewareDispatcherTest extends TestCase
         $request = $this->getConsumeRequest();
 
         $middleware1 = static function (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest {
-            return $request->withMessage(new Message($request->getMessage()->getHandler(), 'first'));
+            return $request->withMessage($request->getMessage()->withData('first'));
         };
         $middleware2 = static function (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest {
-            return $request->withMessage(new Message($request->getMessage()->getHandler(), 'second'));
+            return $request->withMessage($request->getMessage()->withData('second'));
         };
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);

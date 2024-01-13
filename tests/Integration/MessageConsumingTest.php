@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Tests\Integration;
 
 use Psr\Log\NullLogger;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
@@ -33,7 +34,11 @@ final class MessageConsumingTest extends TestCase
 
         $messages = [1, 'foo', 'bar-baz'];
         foreach ($messages as $message) {
-            $worker->process(new Message(StackMessageHandler::class, $message), $this->getQueue());
+            $worker->process(
+                new HandlerEnvelope(
+                    new Message(StackMessageHandler::class, $message),
+                    StackMessageHandler::class
+                ), $this->getQueue());
         }
 
         $data = array_map(fn (MessageInterface $message) => $message->getData(), $stackMessageHandler->processedMessages);

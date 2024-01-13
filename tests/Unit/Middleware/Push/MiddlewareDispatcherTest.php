@@ -72,7 +72,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $request = $this->getPushRequest();
 
         $middleware1 = static function (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest {
-            $request = $request->withMessage(new Message($request->getMessage()->getHandler(), 'new test data'));
+            $request = $request->withMessage($request->getMessage()->withData('new test data'));
 
             return $handler->handlePush($request);
         };
@@ -102,8 +102,8 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $request = $this->getPushRequest();
 
-        $middleware1 = static fn (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest => $request->withMessage(new Message($request->getMessage()->getHandler(), 'first'));
-        $middleware2 = static fn (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest => $request->withMessage(new Message($request->getMessage()->getHandler(), 'second'));
+        $middleware1 = static fn (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest => $request->withMessage($request->getMessage()->withData('first'));
+        $middleware2 = static fn (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest => $request->withMessage($request->getMessage()->withData('second'));
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 

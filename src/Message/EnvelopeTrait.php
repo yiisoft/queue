@@ -38,4 +38,20 @@ trait EnvelopeTrait
     {
         return $this->message->getMetadata();
     }
+
+    public function withData(mixed $data): self
+    {
+        $instance = clone $this;
+        $instance->message = $instance->message->withData($data);
+
+        return $instance;
+    }
+
+    public function withMetadata(array $metadata): self
+    {
+        $instance = clone $this;
+        $instance->message = $instance->message->withMetadata($metadata);
+
+        return $instance;
+    }
 }

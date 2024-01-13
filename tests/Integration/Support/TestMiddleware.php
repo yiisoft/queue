@@ -23,7 +23,7 @@ final class TestMiddleware implements MiddlewarePushInterface, MiddlewareConsume
         $message = $request->getMessage();
         $stack = $message->getData();
         $stack[] = $this->stage;
-        $messageNew = new Message($message->getHandler(), $stack);
+        $messageNew = $message->withData($stack);
 
         return $handler->handlePush($request->withMessage($messageNew));
     }
@@ -33,7 +33,7 @@ final class TestMiddleware implements MiddlewarePushInterface, MiddlewareConsume
         $message = $request->getMessage();
         $stack = $message->getData();
         $stack[] = $this->stage;
-        $messageNew = new Message($message->getHandler(), $stack);
+        $messageNew = $message->withData($stack);
 
         return $handler->handleConsume($request->withMessage($messageNew));
     }
