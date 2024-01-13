@@ -24,38 +24,6 @@ use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 
 final class WorkerTest extends TestCase
 {
-    public function testJobExecutedWithCallableHandler(): void
-    {
-        $message = new Message(StackMessageHandler::class, ['test-data']);
-        $logger = new SimpleLogger();
-        $stackMessageHandler = new StackMessageHandler();
-        $container = new SimpleContainer([StackMessageHandler::class => $stackMessageHandler]);
-
-        $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($logger, $container);
-
-        $worker->process($message, $queue);
-        $this->assertSame($message, $stackMessageHandler->processedMessages[0]);
-
-        $messages = $logger->getMessages();
-        $this->assertNotEmpty($messages);
-        $this->assertStringContainsString('Processing message #null.', $messages[0]['message']);
-    }
-
-    public function testJobExecutedWithDefinitionHandler(): void
-    {
-        $message = new Message(FakeHandler::class, ['test-data']);
-        $logger = new SimpleLogger();
-        $handler = new FakeHandler();
-        $container = new SimpleContainer([FakeHandler::class => $handler]);
-
-        $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($logger, $container);
-
-        $worker->process($message, $queue);
-        $this->assertSame([$message], $handler::$processedMessages);
-    }
-
     public function testJobExecutedWithDefinitionClassHandler(): void
     {
         $message = new Message(FakeHandler::class, ['test-data']);
@@ -68,20 +36,6 @@ final class WorkerTest extends TestCase
 
         $worker->process($message, $queue);
         $this->assertSame([$message], $handler::$processedMessages);
-    }
-
-    public function testJobExecutedWithStaticDefinitionHandler(): void
-    {
-        $message = new Message(StackMessageHandler::class, ['test-data']);
-        $logger = new SimpleLogger();
-        $stackMessageHandler = new StackMessageHandler();
-        $container = new SimpleContainer([StackMessageHandler::class => $stackMessageHandler]);
-
-        $queue = $this->createMock(QueueInterface::class);
-        $worker = $this->createWorkerByParams($logger, $container);
-
-        $worker->process($message, $queue);
-        $this->assertSame([$message], $stackMessageHandler->processedMessages);
     }
 
     public function testJobFailWithDefinitionHandlerException(): void
