@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Message;
 use InvalidArgumentException;
 use JsonException;
 
-final class MessageSerializer implements MessageSerializerInterface
+final class JsonMessageSerializer implements MessageSerializerInterface
 {
     /**
      * @throws JsonException

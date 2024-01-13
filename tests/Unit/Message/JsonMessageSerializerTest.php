@@ -10,12 +10,12 @@ use Yiisoft\Queue\Message\EnvelopeInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Message\MessageSerializer;
+use Yiisoft\Queue\Message\JsonMessageSerializer;
 
 /**
  * Testing message serialization options
  */
-final class MessageSerializerTest extends TestCase
+final class JsonMessageSerializerTest extends TestCase
 {
     /**
      * @dataProvider dataUnsupportedPayloadFormat
@@ -142,8 +142,8 @@ final class MessageSerializerTest extends TestCase
         $this->assertEquals('test-id', $message->getId());
     }
 
-    private function createSerializer(): MessageSerializer
+    private function createSerializer(): JsonMessageSerializer
     {
-        return new MessageSerializer();
+        return new JsonMessageSerializer();
     }
 }
