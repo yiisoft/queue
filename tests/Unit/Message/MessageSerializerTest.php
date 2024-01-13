@@ -100,6 +100,7 @@ final class MessageSerializerTest extends TestCase
         $this->assertEquals([IdEnvelope::class], $message->getMetadata()[EnvelopeInterface::ENVELOPE_STACK_KEY]);
 
         $this->assertInstanceOf(IdEnvelope::class, $message);
+        $this->assertNull($message->getId());
         $this->assertInstanceOf(Message::class, $message->getMessage());
     }
 
@@ -134,6 +135,11 @@ final class MessageSerializerTest extends TestCase
             ),
             $json,
         );
+
+        $message = $serializer->unserialize($json);
+
+        $this->assertInstanceOf(IdEnvelope::class, $message);
+        $this->assertEquals('test-id', $message->getId());
     }
 
     private function createSerializer(): MessageSerializer
