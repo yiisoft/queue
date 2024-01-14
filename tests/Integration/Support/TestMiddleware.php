@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Integration\Support;
 
-use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\MessageHandlerInterface;
 use Yiisoft\Queue\Middleware\MiddlewareInterface;
 use Yiisoft\Queue\Middleware\Request;

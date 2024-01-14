@@ -39,7 +39,7 @@ final class SynchronousAdapterTest extends TestCase
 
     public function testIdSetting(): void
     {
-        $message =new HandlerEnvelope(
+        $message = new HandlerEnvelope(
             new Message([]),
             NullMessageHandler::class,
         );

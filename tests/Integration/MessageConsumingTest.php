@@ -38,7 +38,9 @@ final class MessageConsumingTest extends TestCase
                 new HandlerEnvelope(
                     new Message($message),
                     StackMessageHandler::class
-                ), $this->getQueue());
+                ),
+                $this->getQueue()
+            );
         }
 
         $data = array_map(fn (MessageInterface $message) => $message->getData(), $stackMessageHandler->processedMessages);

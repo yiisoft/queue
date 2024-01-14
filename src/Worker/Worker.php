@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Worker;
 
-use Psr\Container\ContainerExceptionInterface;
 use Closure;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;

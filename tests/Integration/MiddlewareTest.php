@@ -119,7 +119,8 @@ final class MiddlewareTest extends TestCase
 
         $message = new HandlerEnvelope(
             new Message(['initial']),
-            NullMessageHandler::class)
+            NullMessageHandler::class
+        )
         ;
         $messageConsumed = $worker->process($message, $this->createMock(QueueInterface::class));
 

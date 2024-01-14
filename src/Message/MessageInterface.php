@@ -6,7 +6,6 @@ namespace Yiisoft\Queue\Message;
 
 interface MessageInterface
 {
-
     /**
      * Returns payload data.
      *
