@@ -57,7 +57,7 @@ final class Worker implements WorkerInterface
             throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist', $handlerClass));
         }
 
-        $request = new Request($message, $queue);
+        $request = new Request($message, $queue->getAdapter());
         $closure = fn (MessageInterface $message): mixed => $this->injector->invoke([$handler, 'handle'], [$message]);
         try {
             return $this->consumeMiddlewareDispatcher->dispatch($request, new ConsumeFinalHandler($closure))->getMessage();

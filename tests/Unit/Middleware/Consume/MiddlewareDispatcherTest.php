@@ -29,8 +29,8 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static function (Request $request) use ($queue): Request {
-                    return $request->withMessage(new Message('New closure test data'))->withQueue($queue);
+                static function (Request $request) use ($adapter): Request {
+                    return $request->withMessage(new Message('New closure test data'))->withAdapter($adapter);
                 },
             ]
         );
@@ -69,12 +69,12 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $request = $this->getRequest();
 
-        $middleware1 = static function (Request $request, MessageHandlerConsumeInterface $handler): Request {
+        $middleware1 = static function (Request $request, MessageHandlerInterface $handler): Request {
             $request = $request->withMessage($request->getMessage()->withData('new test data'));
 
             return $handler->handle($request);
         };
-        $middleware2 = static function (Request $request, MessageHandlerConsumeInterface $handler): Request {
+        $middleware2 = static function (Request $request, MessageHandlerInterface $handler): Request {
             $request = $request->withMessage($request->getMessage()->withMetadata(['new' => 'metadata']));
 
             return $handler->handle($request);
@@ -91,10 +91,10 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $request = $this->getRequest();
 
-        $middleware1 = static function (Request $request, MessageHandlerConsumeInterface $handler): Request {
+        $middleware1 = static function (Request $request, MessageHandlerInterface $handler): Request {
             return $request->withMessage($request->getMessage()->withData('first'));
         };
-        $middleware2 = static function (Request $request, MessageHandlerConsumeInterface $handler): Request {
+        $middleware2 = static function (Request $request, MessageHandlerInterface $handler): Request {
             return $request->withMessage($request->getMessage()->withData('second'));
         };
 
@@ -180,7 +180,7 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         return new Request(
             new Message('data'),
-            $this->createMock(QueueInterface::class)
+            $this->createMock(AdapterInterface::class)
         );
     }
 }

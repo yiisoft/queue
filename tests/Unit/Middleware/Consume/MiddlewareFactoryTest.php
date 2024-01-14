@@ -55,10 +55,10 @@ final class MiddlewareFactoryTest extends TestCase
     public function testCreateFromClosureResponse(): void
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
-        $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
+        $middleware = $this->getMiddlewareFactory($container)->createMiddleware(
             fn (): Request => new Request(
                 new Message('test data'),
-                $this->createMock(QueueInterface::class),
+                $this->createMock(AdapterInterface::class),
             )
         );
         self::assertSame(
@@ -80,7 +80,7 @@ final class MiddlewareFactoryTest extends TestCase
         $handler = $this->createMock(MessageHandlerInterface::class);
         $handler->expects($this->once())->method('handle')->willReturnCallback(
             static fn (Request $request): Request => $request->withMessage(
-                new Message('test', 'New middleware test data')
+                new Message('New middleware test data')
             )
         );
 
@@ -200,8 +200,8 @@ final class MiddlewareFactoryTest extends TestCase
     private function getRequest(): Request
     {
         return new Request(
-            new Message('data'),
-            $this->createMock(QueueInterface::class)
+            new Message(['data']),
+            $this->createMock(AdapterInterface::class)
         );
     }
 }

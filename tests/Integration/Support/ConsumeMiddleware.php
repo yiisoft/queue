@@ -20,7 +20,7 @@ final class ConsumeMiddleware implements MiddlewareInterface
         $message = $request->getMessage();
         $stack = $message->getData();
         $stack[] = $this->stage;
-        $messageNew = new Message($message->getHandlerName(), $stack);
+        $messageNew = new Message($stack);
 
         return $handler->handle($request->withMessage($messageNew));
     }

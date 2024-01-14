@@ -17,6 +17,6 @@ final class TestMiddleware implements MiddlewareInterface
 
     public function process(Request $request, MessageHandlerInterface $handler): Request
     {
-        return $request->withMessage(new Message('test', $this->message));
+        return $request->withMessage(new Message($this->message));
     }
 }

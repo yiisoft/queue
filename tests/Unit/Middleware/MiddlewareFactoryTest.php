@@ -46,7 +46,7 @@ final class MiddlewareFactoryTest extends TestCase
     public function testCreateFromClosureResponse(): void
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
-        $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
+        $middleware = $this->getMiddlewareFactory($container)->createMiddleware(
             static function (): Request {
                 return new Request(new Message('test data'), new FakeAdapter());
             }
