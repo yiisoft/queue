@@ -7,7 +7,6 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\Consume;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\Request;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\TestCase;
 
 final class ConsumeRequestTest extends TestCase
