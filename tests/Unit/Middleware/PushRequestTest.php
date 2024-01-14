@@ -9,7 +9,7 @@ use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 
-final class RequestTest extends TestCase
+final class PushRequestTest extends TestCase
 {
     public function testImmutable(): void
     {
