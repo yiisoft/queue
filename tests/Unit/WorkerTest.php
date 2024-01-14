@@ -14,8 +14,6 @@ use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Exception\JobFailureException;
 use Yiisoft\Queue\Message\Message;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeHandler;
 use Yiisoft\Queue\Tests\TestCase;

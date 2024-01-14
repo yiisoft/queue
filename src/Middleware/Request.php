@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Middleware;
 
-use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueInterface;
 

@@ -75,6 +75,7 @@ trait EnvelopeTrait
 
         return $instance;
     }
+
     public function withQueue(QueueInterface $queue): self
     {
         $instance = clone $this;

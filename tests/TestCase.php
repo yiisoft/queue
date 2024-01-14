@@ -17,8 +17,6 @@ use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;

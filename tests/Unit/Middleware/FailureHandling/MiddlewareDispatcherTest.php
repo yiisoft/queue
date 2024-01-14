@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling;
 
-use Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Queue\Middleware\MessageHandlerInterface;
@@ -47,7 +46,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this
             ->createDispatcher($container)
             ->withMiddlewares([
-                [TestCallableMiddleware::class, 'index']
+                [TestCallableMiddleware::class, 'index'],
             ]);
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('New test data', $request->getMessage()->getData());

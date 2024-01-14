@@ -7,7 +7,6 @@ namespace Yiisoft\Queue\Middleware\FailureHandling;
 use Throwable;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Request;
-use Yiisoft\Queue\QueueInterface;
 
 // TODO: remove class
 final class FailureHandlingRequest extends Request

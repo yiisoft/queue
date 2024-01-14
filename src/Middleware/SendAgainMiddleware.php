@@ -30,7 +30,8 @@ final class SendAgainMiddleware implements MiddlewareInterface
         }
     }
 
-    public function process(Request $request, MessageHandlerInterface $handler): Request {
+    public function process(Request $request, MessageHandlerInterface $handler): Request
+    {
         $message = $request->getMessage();
         if ($this->suites($message)) {
             $envelope = new FailureEnvelope($message, $this->createMeta($message));

@@ -49,7 +49,7 @@ final class MiddlewareFactoryTest extends TestCase
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $queue = $this->createMock(QueueInterface::class);
         $middleware = $this->getMiddlewareFactory($container)->createMiddleware(
-            static function () use($queue): Request {
+            static function () use ($queue): Request {
                 return new Request(new Message('test data'), $queue);
             }
         );

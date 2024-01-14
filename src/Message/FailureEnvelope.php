@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
-use Yiisoft\Queue\Message\EnvelopeInterface;
-use Yiisoft\Queue\Message\EnvelopeTrait;
-use Yiisoft\Queue\Message\MessageInterface;
-
 final class FailureEnvelope implements EnvelopeInterface
 {
     use EnvelopeTrait;

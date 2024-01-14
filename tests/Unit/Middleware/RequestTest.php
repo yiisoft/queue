@@ -7,7 +7,6 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 
 final class RequestTest extends TestCase

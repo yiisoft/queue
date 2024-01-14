@@ -6,7 +6,6 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeQueue;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
@@ -34,8 +33,8 @@ final class MiddlewareDispatcherTest extends TestCase
                         $request->getQueue()->getAdapter() === null
                             ? $request->getQueue()
                             : $request->getQueue()->withAdapter(
-                            $request->getQueue()->getAdapter()->withChannel('closure-channel')
-                        )
+                                $request->getQueue()->getAdapter()->withChannel('closure-channel')
+                            )
                     ),
             ]
         );
