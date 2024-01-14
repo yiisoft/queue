@@ -147,6 +147,6 @@ final class MiddlewareFactory implements MiddlewareFactoryInterface
         } catch (InvalidConfigException) {
         }
 
-        throw new InvalidMiddlewareDefinitionException($definition);
+        return null;
     }
 }

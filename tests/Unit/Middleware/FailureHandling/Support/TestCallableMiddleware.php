@@ -6,10 +6,11 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support;
 
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Queue\Middleware\Request;
 
 final class TestCallableMiddleware
 {
-    public function index(FailureHandlingRequest $request): FailureHandlingRequest
+    public function index(Request $request): Request
     {
         return $request->withMessage(new Message('New test data'));
     }

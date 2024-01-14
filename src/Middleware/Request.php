@@ -6,9 +6,14 @@ namespace Yiisoft\Queue\Middleware;
 
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\QueueInterface;
 
-final class Request
+// TODO: fix later
+//final class Request
+class Request
 {
+
+    private ?QueueInterface $queue = null;
     public function __construct(private MessageInterface $message, private ?AdapterInterface $adapter)
     {
     }
@@ -35,6 +40,14 @@ final class Request
     {
         $instance = clone $this;
         $instance->adapter = $adapter;
+
+        return $instance;
+    }
+
+    public function withQueue(QueueInterface $queue): self
+    {
+        $instance = clone $this;
+        $instance->queue = $queue;
 
         return $instance;
     }

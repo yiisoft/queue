@@ -12,6 +12,7 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
 use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Middleware\FailureFinalHandler;
+use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\Tests\Support\NullMessageHandler;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
@@ -22,10 +23,8 @@ use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\SendAgainMiddleware;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueInterface;
@@ -104,8 +103,8 @@ final class MiddlewareTest extends TestCase
             new TestMiddleware('common 2'),
         );
 
-        $failureMiddlewareDispatcher = new FailureMiddlewareDispatcher(
-            new MiddlewareFactoryFailure($container, $callableFactory),
+        $failureMiddlewareDispatcher = new MiddlewareDispatcher(
+            new MiddlewareFactory($container, $callableFactory),
             [],
         );
 
@@ -129,9 +128,6 @@ final class MiddlewareTest extends TestCase
 
     public function testFullStackFailure(): void
     {
-        $exception = new InvalidArgumentException('test');
-        $this->expectExceptionObject($exception);
-
         $message = new HandlerEnvelope(
             new Message(null, []),
             NullMessageHandler::class,
@@ -145,46 +141,49 @@ final class MiddlewareTest extends TestCase
         $queue->method('getChannelName')->willReturn('simple');
 
         $middlewares = [
-            'simple' => [
-                new SendAgainMiddleware('test', 1, $queue),
-                [
-                    'class' => SendAgainMiddleware::class,
-                    '__construct()' => ['test-factory', 1, $queue],
-                ],
-                [
-                    new SendAgainMiddleware('test-callable', 1, $queue),
-                    'processFailure',
-                ],
-                fn (): SendAgainMiddleware => new SendAgainMiddleware('test-callable-2', 1, $queue),
-                SendAgainMiddleware::class,
-                new ExponentialDelayMiddleware(
-                    'test',
-                    2,
-                    1,
-                    5,
-                    2,
-                    $this->createMock(DelayMiddlewareInterface::class),
-                    $queue,
-                ),
+            new SendAgainMiddleware('test', 1, $queue),
+            [
+                'class' => SendAgainMiddleware::class,
+                '__construct()' => ['test-factory', 1, $queue],
             ],
+            [
+                new SendAgainMiddleware('test-callable', 1, $queue),
+                'process',
+            ],
+            fn (): SendAgainMiddleware => new SendAgainMiddleware('test-callable-2', 1, $queue),
+            SendAgainMiddleware::class,
+            new ExponentialDelayMiddleware(
+                'test',
+                2,
+                1,
+                5,
+                2,
+                $this->createMock(DelayMiddlewareInterface::class),
+                $queue,
+            ),
         ];
-        $dispatcher = new FailureMiddlewareDispatcher(
-            new MiddlewareFactoryFailure($container, $callableFactory),
-            $middlewares,
+        $dispatcher = new MiddlewareDispatcher(
+            new MiddlewareFactory($container, $callableFactory),
+            ...$middlewares,
         );
 
         $iteration = 0;
-        $request = new FailureHandlingRequest($message, $exception, $queue);
-        $finalHandler = new FailureFinalHandler();
+        $exception = new InvalidArgumentException('test');
+        $request = new Request($message, $queue->getAdapter());
+        $finalHandler = new FailureFinalHandler($exception);
+
+        $ex = null;
         try {
             do {
                 $request = $dispatcher->dispatch($request, $finalHandler);
                 $iteration++;
             } while (true);
-        } catch (InvalidArgumentException $thrown) {
-            self::assertEquals(7, $iteration);
-
-            throw $thrown;
+        } catch (InvalidArgumentException $e) {
+            $ex = $e;
         }
+
+        self::assertEquals(7, $iteration);
+        $this->assertNotNull($ex);
+        self::assertSame($exception, $ex);
     }
 }

@@ -6,20 +6,14 @@ namespace Yiisoft\Queue\Middleware\FailureHandling;
 
 use Throwable;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\QueueInterface;
 
-final class FailureHandlingRequest
+final class FailureHandlingRequest extends Request
 {
     public function __construct(private MessageInterface $message, private ?Throwable $exception, private QueueInterface $queue)
     {
-    }
-
-    /**
-     * @return MessageInterface
-     */
-    public function getMessage(): MessageInterface
-    {
-        return $this->message;
+        parent::__construct($message, $queue->getAdapter());
     }
 
     public function getException(): ?Throwable
@@ -30,14 +24,6 @@ final class FailureHandlingRequest
     public function getQueue(): QueueInterface
     {
         return $this->queue;
-    }
-
-    public function withMessage(MessageInterface $message): self
-    {
-        $instance = clone $this;
-        $instance->message = $message;
-
-        return $instance;
     }
 
     public function withException(Throwable $exception): self

@@ -113,7 +113,7 @@ abstract class TestCase extends BaseTestCase
             new Injector($this->getContainer()),
             $this->getContainer(),
             $this->getMiddlewareDispatcher(),
-            $this->getFailureMiddlewareDispatcher(),
+            $this->getMiddlewareDispatcher(),
         );
     }
 
@@ -152,17 +152,6 @@ abstract class TestCase extends BaseTestCase
                 $this->getContainer(),
                 new CallableFactory($this->getContainer()),
             ),
-        );
-    }
-
-    protected function getFailureMiddlewareDispatcher(): FailureMiddlewareDispatcher
-    {
-        return new FailureMiddlewareDispatcher(
-            new MiddlewareFactoryFailure(
-                $this->getContainer(),
-                new CallableFactory($this->getContainer()),
-            ),
-            [],
         );
     }
 }

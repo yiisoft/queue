@@ -6,17 +6,15 @@ namespace Yiisoft\Queue\Middleware;
 
 use InvalidArgumentException;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Message\FailureEnvelope;
 
 /**
  * Failure strategy which resends the given message to a queue with an exponentially increasing delay.
  * The delay mechanism **must** be implemented by the used {@see AdapterInterface} implementation.
  */
-final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
+final class ExponentialDelayMiddleware implements MiddlewareInterface
 {
     public const META_KEY_ATTEMPTS = 'failure-strategy-exponential-delay-attempts';
     public const META_KEY_DELAY = 'failure-strategy-exponential-delay-delay';
@@ -55,10 +53,10 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
         }
     }
 
-    public function processFailure(
-        FailureHandlingRequest $request,
-        MessageFailureHandlerInterface $handler
-    ): FailureHandlingRequest {
+    public function process(
+        Request $request,
+        MessageHandlerInterface $handler
+    ): Request {
         $message = $request->getMessage();
         if ($this->suites($message)) {
             $envelope = new FailureEnvelope($message, $this->createNewMeta($message));
@@ -72,7 +70,7 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
             return $request->withMessage($messageNew);
         }
 
-        return $handler->handleFailure($request);
+        return $handler->handle($request);
     }
 
     private function suites(MessageInterface $message): bool

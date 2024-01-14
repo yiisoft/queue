@@ -99,7 +99,7 @@ final class WorkerTest extends TestCase
             new Injector($container),
             $container,
             new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class)),
-            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), []),
+            new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class)),
         );
     }
 }

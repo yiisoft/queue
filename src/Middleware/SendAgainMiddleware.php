@@ -7,15 +7,12 @@ namespace Yiisoft\Queue\Middleware;
 use InvalidArgumentException;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Message\FailureEnvelope;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Queue\QueueInterface;
 
 /**
  * Failure strategy which resends the given message to a queue.
  */
-final class SendAgainMiddleware implements MiddlewareFailureInterface
+final class SendAgainMiddleware implements MiddlewareInterface
 {
     public const META_KEY_RESEND = 'failure-strategy-resend-attempts';
 
@@ -34,20 +31,18 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
         }
     }
 
-    public function processFailure(
-        FailureHandlingRequest $request,
-        MessageFailureHandlerInterface $handler
-    ): FailureHandlingRequest {
+    public function process(Request $request, MessageHandlerInterface $handler): Request {
         $message = $request->getMessage();
         if ($this->suites($message)) {
             $envelope = new FailureEnvelope($message, $this->createMeta($message));
             $envelope = ($this->queue ?? $request->getQueue())->push($envelope);
 
-            return $request->withMessage($envelope)
+            $request1 = $request->withMessage($envelope);
+            return $request1
                 ->withQueue($this->queue ?? $request->getQueue());
         }
 
-        return $handler->handleFailure($request);
+        return $handler->handle($request);
     }
 
     private function suites(MessageInterface $message): bool

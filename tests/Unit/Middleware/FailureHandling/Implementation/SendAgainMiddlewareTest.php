@@ -11,9 +11,9 @@ use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\ExponentialDelayMiddleware;
+use Yiisoft\Queue\Middleware\MessageHandlerInterface;
+use Yiisoft\Queue\Middleware\MiddlewareInterface;
 use Yiisoft\Queue\Middleware\SendAgainMiddleware;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\TestCase;
@@ -163,12 +163,12 @@ class SendAgainMiddlewareTest extends TestCase
             new Exception('testException'),
             $queue
         );
-        $result = $strategy->processFailure($request, $handler);
+        $result = $strategy->process($request, $handler);
 
         self::assertInstanceOf(FailureHandlingRequest::class, $result);
     }
 
-    private function getStrategy(string $strategyName, QueueInterface $queue): MiddlewareFailureInterface
+    private function getStrategy(string $strategyName, QueueInterface $queue): MiddlewareInterface
     {
         return match ($strategyName) {
             SendAgainMiddleware::class => new SendAgainMiddleware('', 2, $queue),
@@ -185,7 +185,7 @@ class SendAgainMiddlewareTest extends TestCase
         };
     }
 
-    private function getHandler(array $metaResult, bool $suites): MessageFailureHandlerInterface
+    private function getHandler(array $metaResult, bool $suites): MessageHandlerInterface
     {
         $pipelineAssertion = static function (FailureHandlingRequest $request) use (
             $metaResult
@@ -194,9 +194,9 @@ class SendAgainMiddlewareTest extends TestCase
 
             throw $request->getException();
         };
-        $handler = $this->createMock(MessageFailureHandlerInterface::class);
+        $handler = $this->createMock(MessageHandlerInterface::class);
         $handler->expects($suites ? self::never() : self::once())
-            ->method('handleFailure')
+            ->method('handle')
             ->willReturnCallback($pipelineAssertion);
 
         return $handler;

@@ -17,7 +17,6 @@ use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\QueueInterface;
@@ -30,7 +29,7 @@ final class Worker implements WorkerInterface
         private Injector $injector,
         private ContainerInterface $container,
         private MiddlewareDispatcher $consumeMiddlewareDispatcher,
-        private FailureMiddlewareDispatcher $failureMiddlewareDispatcher,
+        private MiddlewareDispatcher $failureMiddlewareDispatcher,
     ) {
     }
 
@@ -61,10 +60,8 @@ final class Worker implements WorkerInterface
         try {
             return $this->consumeMiddlewareDispatcher->dispatch($request, new ConsumeFinalHandler($closure))->getMessage();
         } catch (Throwable $exception) {
-            $request = new FailureHandlingRequest($request->getMessage(), $exception, $queue);
-
             try {
-                $result = $this->failureMiddlewareDispatcher->dispatch($request, new FailureFinalHandler());
+                $result = $this->failureMiddlewareDispatcher->dispatch($request, new FailureFinalHandler($exception));
                 $this->logger->info($exception->getMessage());
 
                 return $result->getMessage();
@@ -74,15 +71,5 @@ final class Worker implements WorkerInterface
                 throw $exception;
             }
         }
-    }
-
-    private function createConsumeHandler(Closure $handler): MessageHandlerConsumeInterface
-    {
-        return new ConsumeFinalHandler($handler);
-    }
-
-    private function createFailureHandler(): MessageFailureHandlerInterface
-    {
-        return new FailureFinalHandler();
     }
 }

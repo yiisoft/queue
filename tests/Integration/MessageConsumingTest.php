@@ -9,8 +9,6 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
 use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\MiddlewareFactoryInterface;
@@ -29,7 +27,7 @@ final class MessageConsumingTest extends TestCase
             new Injector($container),
             $container,
             new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class)),
-            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), [])
+            new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class), [])
         );
 
         $messages = [1, 'foo', 'bar-baz'];
