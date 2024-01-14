@@ -39,7 +39,8 @@ final class JsonMessageSerializer implements MessageSerializerInterface
             throw new InvalidArgumentException('Metadata must be array. Got ' . get_debug_type($meta) . '.');
         }
 
-        $message = new Message('$name', $payload['data'] ?? null, $meta);
+        // TODO: will be removed later
+        $message = new Message($payload['name'] ?? '$name', $payload['data'] ?? null, $meta);
 
         if (isset($meta[EnvelopeInterface::ENVELOPE_STACK_KEY]) && is_array($meta[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
             $message = $message->withMetadata(
