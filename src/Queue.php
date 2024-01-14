@@ -60,7 +60,7 @@ final class Queue implements QueueInterface
 
         $messageId = $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
         $this->logger->info(
-            'ed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
+            'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
             ['handlerName' => $message->getHandlerName(), 'id' => $messageId]
         );
 
