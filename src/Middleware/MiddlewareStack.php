@@ -2,39 +2,39 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Middleware\Push;
+namespace Yiisoft\Queue\Middleware;
 
 use Closure;
 
-final class MiddlewarePushStack implements MessageHandlerPushInterface
+final class MiddlewareStack implements MessageHandlerInterface
 {
     /**
      * Contains a stack of middleware wrapped in handlers.
      * Each handler points to the handler of middleware that will be processed next.
      *
-     * @var MessageHandlerPushInterface|null stack of middleware
+     * @var MessageHandlerInterface|null stack of middleware
      */
-    private ?MessageHandlerPushInterface $stack = null;
+    private ?MessageHandlerInterface $stack = null;
 
     /**
      * @param Closure[] $middlewares Middlewares.
-     * @param MessageHandlerPushInterface $finishHandler Fallback handler
+     * @param MessageHandlerInterface $finishHandler Fallback handler
      * events.
      */
     public function __construct(
         private array $middlewares,
-        private MessageHandlerPushInterface $finishHandler,
+        private MessageHandlerInterface $finishHandler,
     ) {
     }
 
-    public function handlePush(PushRequest $request): PushRequest
+    public function handle(Request $request): Request
     {
         if ($this->stack === null) {
             $this->build();
         }
 
         /** @psalm-suppress PossiblyNullReference */
-        return $this->stack->handlePush($request);
+        return $this->stack->handle($request);
     }
 
     private function build(): void
@@ -51,24 +51,24 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
     /**
      * Wrap handler by middlewares.
      */
-    private function wrap(Closure $middlewareFactory, MessageHandlerPushInterface $handler): MessageHandlerPushInterface
+    private function wrap(Closure $middlewareFactory, MessageHandlerInterface $handler): MessageHandlerInterface
     {
-        return new class ($middlewareFactory, $handler) implements MessageHandlerPushInterface {
-            private ?MiddlewarePushInterface $middleware = null;
+        return new class ($middlewareFactory, $handler) implements MessageHandlerInterface {
+            private ?MiddlewareInterface $middleware = null;
 
             public function __construct(
                 private Closure $middlewareFactory,
-                private MessageHandlerPushInterface $handler,
+                private MessageHandlerInterface $handler,
             ) {
             }
 
-            public function handlePush(PushRequest $request): PushRequest
+            public function handle(Request $request): Request
             {
                 if ($this->middleware === null) {
                     $this->middleware = ($this->middlewareFactory)();
                 }
 
-                return $this->middleware->processPush($request, $this->handler);
+                return $this->middleware->process($request, $this->handler);
             }
         };
     }

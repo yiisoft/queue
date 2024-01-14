@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Middleware\Push;
+namespace Yiisoft\Queue\Middleware;
 
 use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 
 /**
  * @internal
  */
-final class AdapterPushHandler implements MessageHandlerPushInterface
+final class AdapterHandler implements MessageHandlerInterface
 {
-    public function handlePush(PushRequest $request): PushRequest
+    public function handle(Request $request): Request
     {
         if (($adapter = $request->getAdapter()) === null) {
             throw new AdapterNotConfiguredException();

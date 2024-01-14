@@ -11,8 +11,8 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\MiddlewareFactoryInterface;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueFactory;
 use Yiisoft\Queue\QueueFactoryInterface;
@@ -76,7 +76,7 @@ final class QueueFactoryTest extends TestCase
             $worker,
             $this->createMock(LoopInterface::class),
             $this->createMock(LoggerInterface::class),
-            new PushMiddlewareDispatcher($this->createMock(MiddlewareFactoryPushInterface::class)),
+            new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class)),
         );
     }
 }

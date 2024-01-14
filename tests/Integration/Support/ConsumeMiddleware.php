@@ -9,7 +9,7 @@ use Yiisoft\Queue\Middleware\MessageHandlerInterface;
 use Yiisoft\Queue\Middleware\MiddlewareInterface;
 use Yiisoft\Queue\Middleware\Request;
 
-final class TestMiddleware implements MiddlewareInterface
+final class ConsumeMiddleware implements MiddlewareInterface
 {
     public function __construct(private string $stage)
     {
@@ -20,17 +20,7 @@ final class TestMiddleware implements MiddlewareInterface
         $message = $request->getMessage();
         $stack = $message->getData();
         $stack[] = $this->stage;
-        $messageNew = $message->withData($stack);
-
-        return $handler->handle($request->withMessage($messageNew));
-    }
-
-    public function process2(Request $request, MessageHandlerInterface $handler): Request
-    {
-        $message = $request->getMessage();
-        $stack = $message->getData();
-        $stack[] = $this->stage;
-        $messageNew = $message->withData($stack);
+        $messageNew = new Message($message->getHandlerName(), $stack);
 
         return $handler->handle($request->withMessage($messageNew));
     }

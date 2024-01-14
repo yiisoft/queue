@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
 use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Tests\Support\NullMessageHandler;
 use Yiisoft\Test\Support\Container\SimpleContainer;
@@ -18,17 +19,14 @@ use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\MiddlewareFactory;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\Integration\Support\TestMiddleware;
@@ -50,8 +48,8 @@ final class MiddlewareTest extends TestCase
             'message 2',
         ];
 
-        $pushMiddlewareDispatcher = new PushMiddlewareDispatcher(
-            new MiddlewareFactoryPush(
+        $pushMiddlewareDispatcher = new MiddlewareDispatcher(
+            new MiddlewareFactory(
                 $this->createMock(ContainerInterface::class),
                 new CallableFactory(
                     $this->createMock(ContainerInterface::class)
@@ -95,8 +93,8 @@ final class MiddlewareTest extends TestCase
         $container = new SimpleContainer([NullMessageHandler::class => new NullMessageHandler()]);
         $callableFactory = new CallableFactory($container);
 
-        $consumeMiddlewareDispatcher = new ConsumeMiddlewareDispatcher(
-            new MiddlewareFactoryConsume(
+        $consumeMiddlewareDispatcher = new MiddlewareDispatcher(
+            new MiddlewareFactory(
                 $this->createMock(ContainerInterface::class),
                 new CallableFactory(
                     $this->createMock(ContainerInterface::class)

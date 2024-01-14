@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Middleware\Push;
+namespace Yiisoft\Queue\Middleware;
 
 use Closure;
 
-final class PushMiddlewareDispatcher
+final class MiddlewareDispatcher
 {
     /**
      * Contains a middleware pipeline handler.
      *
-     * @var MiddlewarePushStack|null The middleware stack.
+     * @var MiddlewareStack|null The middleware stack.
      */
-    private ?MiddlewarePushStack $stack = null;
+    private ?MiddlewareStack $stack = null;
     /**
-     * @var array[]|callable[]|MiddlewarePushInterface[]|string[]
+     * @var array[]|callable[]|MiddlewareInterface[]|string[]
      */
     private array $middlewareDefinitions;
 
     public function __construct(
-        private MiddlewareFactoryPushInterface $middlewareFactory,
-        array|callable|string|MiddlewarePushInterface ...$middlewareDefinitions,
+        private MiddlewareFactoryInterface $middlewareFactory,
+        array|callable|string|MiddlewareInterface ...$middlewareDefinitions,
     ) {
         $this->middlewareDefinitions = array_reverse($middlewareDefinitions);
     }
@@ -29,25 +29,25 @@ final class PushMiddlewareDispatcher
     /**
      * Dispatch request through middleware to get response.
      *
-     * @param PushRequest $request Request to pass to middleware.
-     * @param MessageHandlerPushInterface $finishHandler Handler to use in case no middleware produced response.
+     * @param Request $request Request to pass to middleware.
+     * @param MessageHandlerInterface $finishHandler Handler to use in case no middleware produced response.
      */
     public function dispatch(
-        PushRequest $request,
-        MessageHandlerPushInterface $finishHandler
-    ): PushRequest {
+        Request $request,
+        MessageHandlerInterface $finishHandler
+    ): Request {
         if ($this->stack === null) {
-            $this->stack = new MiddlewarePushStack($this->buildMiddlewares(), $finishHandler);
+            $this->stack = new MiddlewareStack($this->buildMiddlewares(), $finishHandler);
         }
 
-        return $this->stack->handlePush($request);
+        return $this->stack->handle($request);
     }
 
     /**
      * Returns new instance with middleware handlers replaced with the ones provided.
      * Last specified handler will be executed first.
      *
-     * @param array[]|callable[]|MiddlewarePushInterface[]|string[] $middlewareDefinitions Each array element is:
+     * @param array[]|callable[]|MiddlewareInterface[]|string[] $middlewareDefinitions Each array element is:
      *
      * - A name of a middleware class. The middleware instance will be obtained from container executed.
      * - A callable with `function(ServerRequestInterface $request, RequestHandlerInterface $handler):
@@ -89,7 +89,7 @@ final class PushMiddlewareDispatcher
         $factory = $this->middlewareFactory;
 
         foreach ($this->middlewareDefinitions as $middlewareDefinition) {
-            $middlewares[] = static fn (): MiddlewarePushInterface => $factory->createPushMiddleware(
+            $middlewares[] = static fn (): MiddlewareInterface => $factory->createMiddleware(
                 $middlewareDefinition
             );
         }

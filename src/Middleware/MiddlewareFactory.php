@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Middleware\Push;
+namespace Yiisoft\Queue\Middleware;
 
 use Closure;
 use Psr\Container\ContainerInterface;
@@ -10,16 +10,13 @@ use Yiisoft\Definitions\ArrayDefinition;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Definitions\Helpers\DefinitionValidator;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
-use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 
 use function is_string;
 
 /**
  * Creates a middleware based on the definition provided.
  */
-final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
+final class MiddlewareFactory implements MiddlewareFactoryInterface
 {
     /**
      * @param ContainerInterface $container Container to use for resolving definitions.
@@ -31,7 +28,7 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
     }
 
     /**
-     * @param array|callable|MiddlewarePushInterface|string $middlewareDefinition Middleware definition in one of the
+     * @param array|callable|MiddlewareInterface|string $middlewareDefinition Middleware definition in one of the
      *     following formats:
      *
      * - A middleware object.
@@ -49,12 +46,12 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
      *
      * @throws InvalidMiddlewareDefinitionException
      *
-     * @return MiddlewarePushInterface
+     * @return MiddlewareInterface
      */
-    public function createPushMiddleware(
-        MiddlewarePushInterface|callable|array|string $middlewareDefinition
-    ): MiddlewarePushInterface {
-        if ($middlewareDefinition instanceof MiddlewarePushInterface) {
+    public function createMiddleware(
+        MiddlewareInterface|callable|array|string $middlewareDefinition
+    ): MiddlewareInterface {
+        if ($middlewareDefinition instanceof MiddlewareInterface) {
             return $middlewareDefinition;
         }
 
@@ -67,16 +64,16 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
             ?? throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
     }
 
-    private function getFromContainer(string $middlewareDefinition): MiddlewarePushInterface
+    private function getFromContainer(string $middlewareDefinition): MiddlewareInterface
     {
         if (class_exists($middlewareDefinition)) {
-            if (is_subclass_of($middlewareDefinition, MiddlewarePushInterface::class)) {
-                /** @var MiddlewarePushInterface */
+            if (is_subclass_of($middlewareDefinition, MiddlewareInterface::class)) {
+                /** @var MiddlewareInterface */
                 return $this->container->get($middlewareDefinition);
             }
         } elseif ($this->container->has($middlewareDefinition)) {
             $middleware = $this->container->get($middlewareDefinition);
-            if ($middleware instanceof MiddlewarePushInterface) {
+            if ($middleware instanceof MiddlewareInterface) {
                 return $middleware;
             }
         }
@@ -84,9 +81,9 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
         throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
     }
 
-    private function wrapCallable(callable $callback): MiddlewarePushInterface
+    private function wrapCallable(callable $callback): MiddlewareInterface
     {
-        return new class ($callback, $this->container) implements MiddlewarePushInterface {
+        return new class ($callback, $this->container) implements MiddlewareInterface {
             private $callback;
 
             public function __construct(callable $callback, private ContainerInterface $container)
@@ -94,15 +91,15 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
                 $this->callback = $callback;
             }
 
-            public function processPush(PushRequest $request, MessageHandlerPushInterface $handler): PushRequest
+            public function process(Request $request, MessageHandlerInterface $handler): Request
             {
                 $response = (new Injector($this->container))->invoke($this->callback, [$request, $handler]);
-                if ($response instanceof PushRequest) {
+                if ($response instanceof Request) {
                     return $response;
                 }
 
-                if ($response instanceof MiddlewarePushInterface) {
-                    return $response->processPush($request, $handler);
+                if ($response instanceof MiddlewareInterface) {
+                    return $response->process($request, $handler);
                 }
 
                 throw new InvalidMiddlewareDefinitionException($this->callback);
@@ -111,8 +108,8 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
     }
 
     private function tryGetFromCallable(
-        callable|MiddlewarePushInterface|array|string $definition
-    ): ?MiddlewarePushInterface {
+        callable|MiddlewareInterface|array|string $definition
+    ): ?MiddlewareInterface {
         if ($definition instanceof Closure) {
             return $this->wrapCallable($definition);
         }
@@ -132,8 +129,8 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
     }
 
     private function tryGetFromArrayDefinition(
-        callable|MiddlewarePushInterface|array|string $definition
-    ): ?MiddlewarePushInterface {
+        callable|MiddlewareInterface|array|string $definition
+    ): ?MiddlewareInterface {
         if (!is_array($definition)) {
             return null;
         }
@@ -142,7 +139,7 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
             DefinitionValidator::validateArrayDefinition($definition);
 
             $middleware = ArrayDefinition::fromConfig($definition)->resolve($this->container);
-            if ($middleware instanceof MiddlewarePushInterface) {
+            if ($middleware instanceof MiddlewareInterface) {
                 return $middleware;
             }
 

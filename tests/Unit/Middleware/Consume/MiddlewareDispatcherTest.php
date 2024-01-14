@@ -6,29 +6,30 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\Consume;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Yiisoft\Queue\Tests\Unit\Middleware\Support\TestCallableMiddleware;
+use Yiisoft\Queue\Tests\Unit\Middleware\Support\TestMiddleware;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Request;
+use Yiisoft\Queue\Middleware\MessageHandlerInterface;
+use Yiisoft\Queue\Middleware\MiddlewareFactory;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware;
-use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestMiddleware;
 
 final class MiddlewareDispatcherTest extends TestCase
 {
     public function testCallableMiddlewareCalled(): void
     {
-        $request = $this->getConsumeRequest();
+        $request = $this->getRequest();
         $queue = $this->createMock(QueueInterface::class);
+        $adapter = $this->createMock(AdapterInterface::class);
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static function (ConsumeRequest $request) use ($queue): ConsumeRequest {
+                static function (Request $request) use ($queue): Request {
                     return $request->withMessage(new Message('New closure test data'))->withQueue($queue);
                 },
             ]
@@ -40,7 +41,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
     public function testArrayMiddlewareCallableDefinition(): void
     {
-        $request = $this->getConsumeRequest();
+        $request = $this->getRequest();
         $container = $this->createContainer(
             [
                 TestCallableMiddleware::class => new TestCallableMiddleware(),
@@ -53,7 +54,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
     public function testFactoryArrayDefinition(): void
     {
-        $request = $this->getConsumeRequest();
+        $request = $this->getRequest();
         $container = $this->createContainer();
         $definition = [
             'class' => TestMiddleware::class,
@@ -66,17 +67,17 @@ final class MiddlewareDispatcherTest extends TestCase
 
     public function testMiddlewareFullStackCalled(): void
     {
-        $request = $this->getConsumeRequest();
+        $request = $this->getRequest();
 
-        $middleware1 = static function (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest {
+        $middleware1 = static function (Request $request, MessageHandlerConsumeInterface $handler): Request {
             $request = $request->withMessage($request->getMessage()->withData('new test data'));
 
-            return $handler->handleConsume($request);
+            return $handler->handle($request);
         };
-        $middleware2 = static function (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest {
+        $middleware2 = static function (Request $request, MessageHandlerConsumeInterface $handler): Request {
             $request = $request->withMessage($request->getMessage()->withMetadata(['new' => 'metadata']));
 
-            return $handler->handleConsume($request);
+            return $handler->handle($request);
         };
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
@@ -88,12 +89,12 @@ final class MiddlewareDispatcherTest extends TestCase
 
     public function testMiddlewareStackInterrupted(): void
     {
-        $request = $this->getConsumeRequest();
+        $request = $this->getRequest();
 
-        $middleware1 = static function (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest {
+        $middleware1 = static function (Request $request, MessageHandlerConsumeInterface $handler): Request {
             return $request->withMessage($request->getMessage()->withData('first'));
         };
-        $middleware2 = static function (ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest {
+        $middleware2 = static function (Request $request, MessageHandlerConsumeInterface $handler): Request {
             return $request->withMessage($request->getMessage()->withData('second'));
         };
 
@@ -130,7 +131,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
     public function testResetStackOnWithMiddlewares(): void
     {
-        $request = $this->getConsumeRequest();
+        $request = $this->getRequest();
         $container = $this->createContainer(
             [
                 TestCallableMiddleware::class => new TestCallableMiddleware(),
@@ -149,10 +150,10 @@ final class MiddlewareDispatcherTest extends TestCase
         self::assertSame('New middleware test data', $request->getMessage()->getData());
     }
 
-    private function getRequestHandler(): MessageHandlerConsumeInterface
+    private function getRequestHandler(): MessageHandlerInterface
     {
-        return new class () implements MessageHandlerConsumeInterface {
-            public function handleConsume(ConsumeRequest $request): ConsumeRequest
+        return new class () implements MessageHandlerInterface {
+            public function handle(Request $request): Request
             {
                 return $request;
             }
@@ -161,12 +162,12 @@ final class MiddlewareDispatcherTest extends TestCase
 
     private function createDispatcher(
         ContainerInterface $container = null,
-    ): ConsumeMiddlewareDispatcher {
+    ): MiddlewareDispatcher {
         $container ??= $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
         $callableFactory = new CallableFactory($container);
 
-        return new ConsumeMiddlewareDispatcher(
-            new MiddlewareFactoryConsume($container, $callableFactory),
+        return new MiddlewareDispatcher(
+            new MiddlewareFactory($container, $callableFactory),
         );
     }
 
@@ -175,9 +176,9 @@ final class MiddlewareDispatcherTest extends TestCase
         return new SimpleContainer($instances);
     }
 
-    private function getConsumeRequest(): ConsumeRequest
+    private function getRequest(): Request
     {
-        return new ConsumeRequest(
+        return new Request(
             new Message('data'),
             $this->createMock(QueueInterface::class)
         );

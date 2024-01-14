@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
+use Yiisoft\Queue\Middleware\MiddlewareInterface;
 
 /**
  * @internal Please don't use this interface. It is only used here to make tests simpler and will be removed
@@ -19,10 +19,10 @@ interface QueueInterface
     /**
      * Pushes a message into the queue.
      *
-     * @param array|callable|MiddlewarePushInterface|string ...$middlewareDefinitions
+     * @param array|callable|MiddlewareInterface|string ...$middlewareDefinitions
      * @return MessageInterface
      */
-    public function push(MessageInterface $message, MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): MessageInterface;
+    public function push(MessageInterface $message, MiddlewareInterface|callable|array|string ...$middlewareDefinitions): MessageInterface;
 
     /**
      * Execute all existing jobs and exit
@@ -44,6 +44,8 @@ interface QueueInterface
     public function status(string|int $id): JobStatus;
 
     public function withAdapter(AdapterInterface $adapter): self;
+
+    public function getAdapter(): ?AdapterInterface;
 
     public function getChannelName(): string;
 

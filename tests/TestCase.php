@@ -9,18 +9,16 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Queue\Middleware\MiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -90,7 +88,7 @@ abstract class TestCase extends BaseTestCase
             $this->getWorker(),
             $this->getLoop(),
             new NullLogger(),
-            $this->getPushMiddlewareDispatcher(),
+            $this->getMiddlewareDispatcher(),
         );
     }
 
@@ -114,7 +112,7 @@ abstract class TestCase extends BaseTestCase
             new NullLogger(),
             new Injector($this->getContainer()),
             $this->getContainer(),
-            $this->getConsumeMiddlewareDispatcher(),
+            $this->getMiddlewareDispatcher(),
             $this->getFailureMiddlewareDispatcher(),
         );
     }
@@ -147,20 +145,10 @@ abstract class TestCase extends BaseTestCase
         return false;
     }
 
-    protected function getPushMiddlewareDispatcher(): PushMiddlewareDispatcher
+    protected function getMiddlewareDispatcher(): MiddlewareDispatcher
     {
-        return new PushMiddlewareDispatcher(
-            new MiddlewareFactoryPush(
-                $this->getContainer(),
-                new CallableFactory($this->getContainer()),
-            ),
-        );
-    }
-
-    protected function getConsumeMiddlewareDispatcher(): ConsumeMiddlewareDispatcher
-    {
-        return new ConsumeMiddlewareDispatcher(
-            new MiddlewareFactoryConsume(
+        return new MiddlewareDispatcher(
+            new MiddlewareFactory(
                 $this->getContainer(),
                 new CallableFactory($this->getContainer()),
             ),

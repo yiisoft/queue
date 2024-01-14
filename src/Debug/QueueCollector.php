@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Debug;
 
+use Yiisoft\Queue\Middleware\MiddlewareInterface;
 use Yiisoft\Yii\Debug\Collector\CollectorTrait;
 use Yiisoft\Yii\Debug\Collector\SummaryCollectorInterface;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
 
 final class QueueCollector implements SummaryCollectorInterface
@@ -53,7 +53,7 @@ final class QueueCollector implements SummaryCollectorInterface
     public function collectPush(
         string $channel,
         MessageInterface $message,
-        string|array|callable|MiddlewarePushInterface ...$middlewareDefinitions,
+        string|array|callable|MiddlewareInterface ...$middlewareDefinitions,
     ): void {
         if (!$this->isActive()) {
             return;

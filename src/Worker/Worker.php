@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Worker;
 
+use Psr\Container\ContainerExceptionInterface;
 use Closure;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -14,14 +15,12 @@ use Yiisoft\Queue\Exception\JobFailureException;
 use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\MessageHandlerInterface;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
-use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
+use Yiisoft\Queue\Middleware\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
@@ -31,7 +30,7 @@ final class Worker implements WorkerInterface
         private LoggerInterface $logger,
         private Injector $injector,
         private ContainerInterface $container,
-        private ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher,
+        private MiddlewareDispatcher $consumeMiddlewareDispatcher,
         private FailureMiddlewareDispatcher $failureMiddlewareDispatcher,
     ) {
     }
@@ -58,15 +57,15 @@ final class Worker implements WorkerInterface
             throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist', $handlerClass));
         }
 
-        $request = new ConsumeRequest($message, $queue);
+        $request = new Request($message, $queue);
         $closure = fn (MessageInterface $message): mixed => $this->injector->invoke([$handler, 'handle'], [$message]);
         try {
-            return $this->consumeMiddlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure))->getMessage();
+            return $this->consumeMiddlewareDispatcher->dispatch($request, new ConsumeFinalHandler($closure))->getMessage();
         } catch (Throwable $exception) {
-            $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueue());
+            $request = new FailureHandlingRequest($request->getMessage(), $exception, $queue);
 
             try {
-                $result = $this->failureMiddlewareDispatcher->dispatch($request, $this->createFailureHandler());
+                $result = $this->failureMiddlewareDispatcher->dispatch($request, new FailureFinalHandler());
                 $this->logger->info($exception->getMessage());
 
                 return $result->getMessage();

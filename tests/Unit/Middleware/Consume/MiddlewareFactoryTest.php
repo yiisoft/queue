@@ -6,49 +6,48 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\Consume;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Yiisoft\Queue\Tests\Integration\Support\ConsumeMiddleware;
+use Yiisoft\Queue\Tests\Unit\Middleware\Support\TestCallableMiddleware;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareConsumeInterface;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
+use Yiisoft\Queue\Middleware\Request;
+use Yiisoft\Queue\Middleware\MessageHandlerInterface;
+use Yiisoft\Queue\Middleware\MiddlewareInterface;
+use Yiisoft\Queue\Middleware\MiddlewareFactory;
+use Yiisoft\Queue\Middleware\MiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\InvalidController;
-use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware;
-use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestMiddleware;
+use Yiisoft\Queue\Tests\Unit\Middleware\Support\InvalidController;
 
 final class MiddlewareFactoryTest extends TestCase
 {
     public function testCreateFromClassString(): void
     {
-        $container = $this->getContainer([TestMiddleware::class => new TestMiddleware()]);
-        $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(TestMiddleware::class);
-        self::assertInstanceOf(TestMiddleware::class, $middleware);
+        $container = $this->getContainer([ConsumeMiddleware::class => new ConsumeMiddleware('stage1')]);
+        $middleware = $this->getMiddlewareFactory($container)->createMiddleware(ConsumeMiddleware::class);
+        self::assertInstanceOf(ConsumeMiddleware::class, $middleware);
     }
 
     public function testCreateFromAliasString(): void
     {
-        $container = $this->getContainer(['test' => new TestMiddleware()]);
-        $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware('test');
-        self::assertInstanceOf(TestMiddleware::class, $middleware);
+        $container = $this->getContainer(['test' => new ConsumeMiddleware('stage1')]);
+        $middleware = $this->getMiddlewareFactory($container)->createMiddleware('test');
+        self::assertInstanceOf(ConsumeMiddleware::class, $middleware);
     }
 
     public function testCreateFromArray(): void
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
-        $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
+        $middleware = $this->getMiddlewareFactory($container)->createMiddleware(
             [TestCallableMiddleware::class, 'index']
         );
         self::assertSame(
             'New test data',
-            $middleware->processConsume(
-                $this->getConsumeRequest(),
-                $this->createMock(MessageHandlerConsumeInterface::class)
+            $middleware->process(
+                $this->getRequest(),
+                $this->createMock(MessageHandlerInterface::class)
             )->getMessage()->getData(),
         );
     }
@@ -57,16 +56,16 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
-            fn (): ConsumeRequest => new ConsumeRequest(
+            fn (): Request => new Request(
                 new Message('test data'),
                 $this->createMock(QueueInterface::class),
             )
         );
         self::assertSame(
             'test data',
-            $middleware->processConsume(
-                $this->getConsumeRequest(),
-                $this->createMock(MessageHandlerConsumeInterface::class)
+            $middleware->process(
+                $this->getRequest(),
+                $this->createMock(MessageHandlerInterface::class)
             )->getMessage()->getData()
         );
     }
@@ -74,27 +73,35 @@ final class MiddlewareFactoryTest extends TestCase
     public function testCreateFromClosureMiddleware(): void
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
-        $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
-            static fn (): MiddlewareConsumeInterface => new TestMiddleware()
+        $middleware = $this->getMiddlewareFactory($container)->createMiddleware(
+            static fn (): MiddlewareInterface => new ConsumeMiddleware('stage1')
         );
+
+        $handler = $this->createMock(MessageHandlerInterface::class);
+        $handler->expects($this->once())->method('handle')->willReturnCallback(
+            static fn (Request $request): Request => $request->withMessage(
+                new Message('test', 'New middleware test data')
+            )
+        );
+
         self::assertSame(
             'New middleware test data',
-            $middleware->processConsume(
-                $this->getConsumeRequest(),
-                $this->createMock(MessageHandlerConsumeInterface::class)
+            $middleware->process(
+                $this->getRequest(),
+                $handler
             )->getMessage()->getData()
         );
     }
 
     public function testCreateWithUseParamsMiddleware(): void
     {
-        $container = $this->getContainer([TestMiddleware::class => new TestMiddleware()]);
-        $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(TestMiddleware::class);
+        $container = $this->getContainer([ConsumeMiddleware::class => new ConsumeMiddleware('stage1')]);
+        $middleware = $this->getMiddlewareFactory($container)->createMiddleware(ConsumeMiddleware::class);
 
         self::assertSame(
-            'New middleware test data',
-            $middleware->processConsume(
-                $this->getConsumeRequest(),
+            ['data', 'stage1'],
+            $middleware->process(
+                $this->getRequest(),
                 $this->getRequestHandler()
             )->getMessage()->getData()
         );
@@ -103,14 +110,14 @@ final class MiddlewareFactoryTest extends TestCase
     public function testCreateWithTestCallableMiddleware(): void
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
-        $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
+        $middleware = $this->getMiddlewareFactory($container)->createMiddleware(
             [TestCallableMiddleware::class, 'index']
         );
-        $request = $this->getConsumeRequest();
+        $request = $this->getRequest();
 
         self::assertSame(
             'New test data',
-            $middleware->processConsume(
+            $middleware->process(
                 $request,
                 $this->getRequestHandler()
             )->getMessage()->getData()
@@ -120,14 +127,14 @@ final class MiddlewareFactoryTest extends TestCase
     public function testInvalidMiddlewareWithWrongCallable(): void
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
-        $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
+        $middleware = $this->getMiddlewareFactory($container)->createMiddleware(
             static fn () => 42
         );
 
         $this->expectException(InvalidMiddlewareDefinitionException::class);
-        $middleware->processConsume(
-            $this->getConsumeRequest(),
-            $this->createMock(MessageHandlerConsumeInterface::class)
+        $middleware->process(
+            $this->getRequest(),
+            $this->createMock(MessageHandlerInterface::class)
         );
     }
 
@@ -151,28 +158,28 @@ final class MiddlewareFactoryTest extends TestCase
     public function testInvalidMiddleware(mixed $definition): void
     {
         $this->expectException(InvalidMiddlewareDefinitionException::class);
-        $this->getMiddlewareFactory()->createConsumeMiddleware($definition);
+        $this->getMiddlewareFactory()->createMiddleware($definition);
     }
 
     public function testInvalidMiddlewareWithWrongController(): void
     {
         $container = $this->getContainer([InvalidController::class => new InvalidController()]);
-        $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
+        $middleware = $this->getMiddlewareFactory($container)->createMiddleware(
             [InvalidController::class, 'index']
         );
 
         $this->expectException(InvalidMiddlewareDefinitionException::class);
-        $middleware->processConsume(
-            $this->getConsumeRequest(),
-            $this->createMock(MessageHandlerConsumeInterface::class)
+        $middleware->process(
+            $this->getRequest(),
+            $this->createMock(MessageHandlerInterface::class)
         );
     }
 
-    private function getMiddlewareFactory(ContainerInterface $container = null): MiddlewareFactoryConsumeInterface
+    private function getMiddlewareFactory(ContainerInterface $container = null): MiddlewareFactoryInterface
     {
         $container ??= $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
 
-        return new MiddlewareFactoryConsume($container, new CallableFactory($container));
+        return new MiddlewareFactory($container, new CallableFactory($container));
     }
 
     private function getContainer(array $instances = []): ContainerInterface
@@ -180,19 +187,19 @@ final class MiddlewareFactoryTest extends TestCase
         return new SimpleContainer($instances);
     }
 
-    private function getRequestHandler(): MessageHandlerConsumeInterface
+    private function getRequestHandler(): MessageHandlerInterface
     {
-        return new class () implements MessageHandlerConsumeInterface {
-            public function handleConsume(ConsumeRequest $request): ConsumeRequest
+        return new class () implements MessageHandlerInterface {
+            public function handle(Request $request): Request
             {
                 return $request;
             }
         };
     }
 
-    private function getConsumeRequest(): ConsumeRequest
+    private function getRequest(): Request
     {
-        return new ConsumeRequest(
+        return new Request(
             new Message('data'),
             $this->createMock(QueueInterface::class)
         );

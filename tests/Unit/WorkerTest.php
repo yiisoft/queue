@@ -7,11 +7,14 @@ namespace Yiisoft\Queue\Tests\Unit;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\MiddlewareFactoryInterface;
 use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Exception\JobFailureException;
 use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
@@ -98,7 +101,7 @@ final class WorkerTest extends TestCase
             $logger,
             new Injector($container),
             $container,
-            new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class)),
+            new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class)),
             new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), []),
         );
     }
