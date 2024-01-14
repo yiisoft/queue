@@ -16,6 +16,7 @@ final class FailureFinalHandler implements MessageFailureHandlerInterface
      */
     public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
     {
-        throw $request->getException();
+        // TODO: Add tests
+        throw $request->getException() ?? new \RuntimeException('Message processing failed.');
     }
 }
