@@ -16,7 +16,6 @@ use Yiisoft\Queue\Message\MessageHandlerInterface;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\FailureFinalHandler;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\QueueInterface;
@@ -55,19 +54,29 @@ final class Worker implements WorkerInterface
             throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist', $handlerClass));
         }
 
+        if (!$handler instanceof MessageHandlerInterface) {
+            throw new RuntimeException(sprintf(
+                'Message handler "%s" for "%s" must implement "%s".',
+                $handlerClass,
+                $message::class,
+                MessageHandlerInterface::class,
+            ));
+        }
+
         $request = new Request($message, $queue->getAdapter());
         $closure = fn (MessageInterface $message): mixed => $this->injector->invoke([$handler, 'handle'], [$message]);
         try {
-            return $this->consumeMiddlewareDispatcher->dispatch($request, new ConsumeFinalHandler($closure))->getMessage();
+            $result = $this->consumeMiddlewareDispatcher->dispatch($request, new ConsumeFinalHandler($closure));
+            return $result->getMessage();
         } catch (Throwable $exception) {
             try {
                 $result = $this->failureMiddlewareDispatcher->dispatch($request, new FailureFinalHandler($exception));
-                $this->logger->info($exception->getMessage());
+                $this->logger->info($exception);
 
                 return $result->getMessage();
             } catch (Throwable $exception) {
                 $exception = new JobFailureException($message, $exception);
-                $this->logger->error($exception->getMessage());
+                $this->logger->error($exception);
                 throw $exception;
             }
         }

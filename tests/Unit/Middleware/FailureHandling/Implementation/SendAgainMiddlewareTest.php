@@ -13,6 +13,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\MessageHandlerInterface;
 use Yiisoft\Queue\Middleware\MiddlewareInterface;
+use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\Middleware\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
@@ -161,7 +162,6 @@ class SendAgainMiddlewareTest extends TestCase
                 $metaInitial
             ),
             new Exception('testException'),
-            $queue
         );
         $result = $strategy->process($request, $handler);
 

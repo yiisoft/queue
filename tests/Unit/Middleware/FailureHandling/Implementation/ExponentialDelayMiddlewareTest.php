@@ -162,11 +162,10 @@ class ExponentialDelayMiddlewareTest extends TestCase
         );
         $nextHandler = $this->createMock(MessageHandlerInterface::class);
         $nextHandler->expects(self::never())->method('handle');
-        $request = new FailureHandlingRequest($message, new Exception('test'), $queue);
+        $request = new FailureHandlingRequest($message, new Exception('test'));
         $result = $middleware->process($request, $nextHandler);
 
-        // TODO: fix later
-        //self::assertNotEquals($request, $result);
+        self::assertNotSame($request, $result);
         $message = $result->getMessage();
         self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test', $message->getMetadata());
         self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_DELAY . '-test', $message->getMetadata());
@@ -191,7 +190,7 @@ class ExponentialDelayMiddlewareTest extends TestCase
         $nextHandler = $this->createMock(MessageHandlerInterface::class);
         $exception = new Exception('test');
         $nextHandler->expects(self::once())->method('handle')->willThrowException($exception);
-        $request = new FailureHandlingRequest($message, $exception, $queue);
+        $request = new FailureHandlingRequest($message, $exception);
         $middleware->process($request, $nextHandler);
     }
 }

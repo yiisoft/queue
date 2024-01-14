@@ -19,12 +19,11 @@ final class SendAgainMiddleware implements MiddlewareInterface
     /**
      * @param string $id A unique id to differentiate two and more objects of this class
      * @param int $maxAttempts Maximum attempts count for this strategy with the given $id before it will give up
-     * @param QueueInterface|null $queue
      */
     public function __construct(
         private string $id,
         private int $maxAttempts,
-        private ?QueueInterface $queue = null,
+        private QueueInterface $queue
     ) {
         if ($maxAttempts < 1) {
             throw new InvalidArgumentException("maxAttempts parameter must be a positive integer, $this->maxAttempts given.");
@@ -35,11 +34,10 @@ final class SendAgainMiddleware implements MiddlewareInterface
         $message = $request->getMessage();
         if ($this->suites($message)) {
             $envelope = new FailureEnvelope($message, $this->createMeta($message));
-            $envelope = ($this->queue ?? $request->getQueue())->push($envelope);
+            $envelope = $this->queue->push($envelope);
 
             $request1 = $request->withMessage($envelope);
-            return $request1
-                ->withQueue($this->queue ?? $request->getQueue());
+            return $request1->withQueue($this->queue);
         }
 
         return $handler->handle($request);

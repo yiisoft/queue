@@ -12,8 +12,7 @@ use Yiisoft\Queue\QueueInterface;
 //final class Request
 class Request
 {
-
-    private ?QueueInterface $queue = null;
+    protected ?QueueInterface $queue = null;
     public function __construct(private MessageInterface $message, private ?AdapterInterface $adapter)
     {
     }

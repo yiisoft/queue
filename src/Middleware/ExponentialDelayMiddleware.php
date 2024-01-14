@@ -7,7 +7,6 @@ namespace Yiisoft\Queue\Middleware;
 use InvalidArgumentException;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Message\FailureEnvelope;
 
 /**
@@ -25,7 +24,6 @@ final class ExponentialDelayMiddleware implements MiddlewareInterface
      * @param float $delayInitial The first delay period
      * @param float $delayMaximum The maximum delay period
      * @param float $exponent Message handling delay will be increased by this multiplication each time it fails
-     * @param QueueInterface|null $queue
      */
     public function __construct(
         private string $id,
@@ -34,7 +32,7 @@ final class ExponentialDelayMiddleware implements MiddlewareInterface
         private float $delayMaximum,
         private float $exponent,
         private DelayMiddlewareInterface $delayMiddleware,
-        private ?QueueInterface $queue = null,
+        private QueueInterface $queue,
     ) {
         if ($maxAttempts <= 0) {
             throw new InvalidArgumentException("maxAttempts parameter must be a positive integer, $this->maxAttempts given.");
@@ -60,7 +58,7 @@ final class ExponentialDelayMiddleware implements MiddlewareInterface
         $message = $request->getMessage();
         if ($this->suites($message)) {
             $envelope = new FailureEnvelope($message, $this->createNewMeta($message));
-            $queue = $this->queue ?? $request->getQueue();
+            $queue = $this->queue;
             $middlewareDefinitions = $this->delayMiddleware->withDelay($this->getDelay($envelope));
             $messageNew = $queue->push(
                 $envelope,

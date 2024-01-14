@@ -56,7 +56,6 @@ final class MiddlewareFactoryTest extends TestCase
                 return new FailureHandlingRequest(
                     new Message('test data'),
                     new RuntimeException('test exception'),
-                    $this->createMock(QueueInterface::class),
                 );
             }
         );

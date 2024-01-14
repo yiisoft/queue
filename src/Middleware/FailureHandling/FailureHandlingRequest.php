@@ -11,9 +11,9 @@ use Yiisoft\Queue\QueueInterface;
 
 final class FailureHandlingRequest extends Request
 {
-    public function __construct(private MessageInterface $message, private ?Throwable $exception, private QueueInterface $queue)
+    public function __construct(private MessageInterface $message, private ?Throwable $exception)
     {
-        parent::__construct($message, $queue->getAdapter());
+        parent::__construct($message, null);
     }
 
     public function getException(): ?Throwable
