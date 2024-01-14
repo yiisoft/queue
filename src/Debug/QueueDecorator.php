@@ -64,6 +64,6 @@ final class QueueDecorator implements QueueInterface
 
     public function getAdapter(): ?AdapterInterface
     {
-        // TODO: Implement getAdapter() method.
+        return $this->queue->getAdapter();
     }
 }
