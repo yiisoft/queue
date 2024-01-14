@@ -13,7 +13,6 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\MessageHandlerInterface;
 use Yiisoft\Queue\Middleware\MiddlewareInterface;
-use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\Middleware\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
@@ -181,15 +180,13 @@ class SendAgainMiddlewareTest extends TestCase
                 $this->createMock(DelayMiddlewareInterface::class),
                 $queue,
             ),
-            default => throw new RuntimeException('Unknown strategy'),
+            default => throw new RuntimeException(sprintf('Unknown strategy "%s"', $strategyName)),
         };
     }
 
     private function getHandler(array $metaResult, bool $suites): MessageHandlerInterface
     {
-        $pipelineAssertion = static function (FailureHandlingRequest $request) use (
-            $metaResult
-        ): FailureHandlingRequest {
+        $pipelineAssertion = static function (FailureHandlingRequest $request) use ($metaResult): void {
             Assert::assertEquals($metaResult, $request->getMessage()->getMetadata());
 
             throw $request->getException();

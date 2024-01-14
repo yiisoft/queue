@@ -9,6 +9,7 @@ use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\QueueInterface;
 
+// TODO: remove class
 final class FailureHandlingRequest extends Request
 {
     public function __construct(private MessageInterface $message, private ?Throwable $exception)

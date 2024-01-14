@@ -8,9 +8,9 @@ use Exception;
 use InvalidArgumentException;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\MessageHandlerInterface;
+use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\TestCase;
 
@@ -162,7 +162,7 @@ class ExponentialDelayMiddlewareTest extends TestCase
         );
         $nextHandler = $this->createMock(MessageHandlerInterface::class);
         $nextHandler->expects(self::never())->method('handle');
-        $request = new FailureHandlingRequest($message, new Exception('test'));
+        $request = new Request($message, null);
         $result = $middleware->process($request, $nextHandler);
 
         self::assertNotSame($request, $result);
@@ -173,9 +173,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
 
     public function testPipelineFailure(): void
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('test');
-
         $message = new Message(null, [ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test' => 2]);
         $queue = $this->createMock(QueueInterface::class);
         $middleware = new ExponentialDelayMiddleware(
@@ -190,7 +187,9 @@ class ExponentialDelayMiddlewareTest extends TestCase
         $nextHandler = $this->createMock(MessageHandlerInterface::class);
         $exception = new Exception('test');
         $nextHandler->expects(self::once())->method('handle')->willThrowException($exception);
-        $request = new FailureHandlingRequest($message, $exception);
+        $request = new Request($message, null);
+
+        $this->expectExceptionObject($exception);
         $middleware->process($request, $nextHandler);
     }
 }

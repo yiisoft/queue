@@ -22,7 +22,6 @@ use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
