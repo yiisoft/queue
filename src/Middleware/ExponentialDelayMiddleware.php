@@ -10,7 +10,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
+use Yiisoft\Queue\Message\FailureEnvelope;
 
 /**
  * Failure strategy which resends the given message to a queue with an exponentially increasing delay.

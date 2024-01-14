@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Middleware;
 
 use InvalidArgumentException;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
+use Yiisoft\Queue\Message\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
