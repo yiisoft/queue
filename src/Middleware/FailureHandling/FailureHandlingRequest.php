@@ -10,7 +10,7 @@ use Yiisoft\Queue\QueueInterface;
 
 final class FailureHandlingRequest
 {
-    public function __construct(private MessageInterface $message, private Throwable $exception, private QueueInterface $queue)
+    public function __construct(private MessageInterface $message, private ?Throwable $exception, private QueueInterface $queue)
     {
     }
 

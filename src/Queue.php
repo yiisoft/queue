@@ -10,33 +10,33 @@ use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Push\AdapterPushHandler;
-use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Push\PushRequest;
+use Yiisoft\Queue\Middleware\AdapterHandler;
+use Yiisoft\Queue\Middleware\MessageHandlerInterface;
+use Yiisoft\Queue\Middleware\MiddlewareInterface;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
 final class Queue implements QueueInterface
 {
     /**
-     * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
+     * @var array|array[]|callable[]|MiddlewareInterface[]|string[]
      */
     private array $middlewareDefinitions;
-    private AdapterPushHandler $adapterPushHandler;
+    private AdapterHandler $adapterHandler;
 
     public function __construct(
         private WorkerInterface $worker,
         private LoopInterface $loop,
         private LoggerInterface $logger,
-        private PushMiddlewareDispatcher $pushMiddlewareDispatcher,
+        private MiddlewareDispatcher $pushMiddlewareDispatcher,
         private ?AdapterInterface $adapter = null,
         private string $channelName = QueueFactoryInterface::DEFAULT_CHANNEL_NAME,
-        MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
+        MiddlewareInterface|callable|array|string ...$middlewareDefinitions
     ) {
         $this->middlewareDefinitions = $middlewareDefinitions;
-        $this->adapterPushHandler = new AdapterPushHandler();
+        $this->adapterHandler = new AdapterHandler();
     }
 
     public function getChannelName(): string
@@ -46,21 +46,21 @@ final class Queue implements QueueInterface
 
     public function push(
         MessageInterface $message,
-        MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
+        MiddlewareInterface|callable|array|string ...$middlewareDefinitions
     ): MessageInterface {
         $this->logger->debug(
             'Preparing to push message with handler name "{handlerName}".',
             ['handlerName' => $message->getHandlerName()]
         );
 
-        $request = new PushRequest($message, $this->adapter);
+        $request = new Request($message, $this->adapter);
         $message = $this->pushMiddlewareDispatcher
-            ->dispatch($request, $this->createPushHandler($middlewareDefinitions))
+            ->dispatch($request, $this->createHandler($middlewareDefinitions))
             ->getMessage();
 
         $messageId = $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
         $this->logger->info(
-            'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
+            'ed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
             ['handlerName' => $message->getHandlerName(), 'id' => $messageId]
         );
 
@@ -118,7 +118,12 @@ final class Queue implements QueueInterface
         return $new;
     }
 
-    public function withMiddlewares(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
+    public function getAdapter(): ?AdapterInterface
+    {
+        return $this->adapter;
+    }
+
+    public function withMiddlewares(MiddlewareInterface|callable|array|string ...$middlewareDefinitions): self
     {
         $instance = clone $this;
         $instance->middlewareDefinitions = $middlewareDefinitions;
@@ -126,7 +131,7 @@ final class Queue implements QueueInterface
         return $instance;
     }
 
-    public function withMiddlewaresAdded(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
+    public function withMiddlewaresAdded(MiddlewareInterface|callable|array|string ...$middlewareDefinitions): self
     {
         $instance = clone $this;
         $instance->middlewareDefinitions = [...array_values($instance->middlewareDefinitions), ...array_values($middlewareDefinitions)];
@@ -156,25 +161,25 @@ final class Queue implements QueueInterface
         }
     }
 
-    private function createPushHandler(array $middlewares): MessageHandlerPushInterface
+    private function createHandler(array $middlewares): MessageHandlerInterface
     {
         return new class (
-            $this->adapterPushHandler,
+            $this->adapterHandler,
             $this->pushMiddlewareDispatcher,
             array_merge($this->middlewareDefinitions, $middlewares)
-        ) implements MessageHandlerPushInterface {
+        ) implements MessageHandlerInterface {
             public function __construct(
-                private AdapterPushHandler $adapterPushHandler,
-                private PushMiddlewareDispatcher $dispatcher,
+                private AdapterHandler $adapterHandler,
+                private MiddlewareDispatcher $dispatcher,
                 private array $middlewares,
             ) {
             }
 
-            public function handlePush(PushRequest $request): PushRequest
+            public function handle(Request $request): Request
             {
                 return $this->dispatcher
                     ->withMiddlewares($this->middlewares)
-                    ->dispatch($request, $this->adapterPushHandler);
+                    ->dispatch($request, $this->adapterHandler);
             }
         };
     }

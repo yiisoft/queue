@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Middleware\Consume;
+namespace Yiisoft\Queue\Middleware;
 
+use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\QueueInterface;
 
-final class ConsumeRequest
+final class Request
 {
-    public function __construct(private MessageInterface $message, private QueueInterface $queue)
+    public function __construct(private MessageInterface $message, private ?AdapterInterface $adapter)
     {
     }
 
@@ -18,9 +18,9 @@ final class ConsumeRequest
         return $this->message;
     }
 
-    public function getQueue(): QueueInterface
+    public function getAdapter(): ?AdapterInterface
     {
-        return $this->queue;
+        return $this->adapter;
     }
 
     public function withMessage(MessageInterface $message): self
@@ -31,10 +31,10 @@ final class ConsumeRequest
         return $instance;
     }
 
-    public function withQueue(QueueInterface $queue): self
+    public function withAdapter(AdapterInterface $adapter): self
     {
         $instance = clone $this;
-        $instance->queue = $queue;
+        $instance->adapter = $adapter;
 
         return $instance;
     }

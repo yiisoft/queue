@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Middleware\Consume;
+namespace Yiisoft\Queue\Middleware;
 
 use Closure;
 
 /**
  * @internal
  */
-final class ConsumeFinalHandler implements MessageHandlerConsumeInterface
+final class ConsumeFinalHandler implements MessageHandlerInterface
 {
     public function __construct(private Closure $handler)
     {
     }
 
-    public function handleConsume(ConsumeRequest $request): ConsumeRequest
+    public function handle(Request $request): Request
     {
         $handler = $this->handler;
         $handler($request->getMessage());

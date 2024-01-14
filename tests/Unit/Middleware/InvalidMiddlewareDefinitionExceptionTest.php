@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Tests\Unit\Middleware\Push;
+namespace Yiisoft\Queue\Tests\Unit\Middleware;
 
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
-use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestCallableMiddleware;
+use Yiisoft\Queue\Tests\Unit\Middleware\Support\TestCallableMiddleware;
 
 final class InvalidMiddlewareDefinitionExceptionTest extends TestCase
 {
@@ -20,15 +20,15 @@ final class InvalidMiddlewareDefinitionExceptionTest extends TestCase
             ],
             [
                 new TestCallableMiddleware(),
-                'an instance of "Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestCallableMiddleware"',
+                'an instance of "Yiisoft\Queue\Tests\Unit\Middleware\Support\TestCallableMiddleware"',
             ],
             [
                 [TestCallableMiddleware::class, 'notExistsAction'],
-                '["Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestCallableMiddleware", "notExistsAction"]',
+                '["Yiisoft\Queue\Tests\Unit\Middleware\Support\TestCallableMiddleware", "notExistsAction"]',
             ],
             [
                 ['class' => TestCallableMiddleware::class, 'index'],
-                '["class" => "Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestCallableMiddleware", "index"]',
+                '["class" => "Yiisoft\Queue\Tests\Unit\Middleware\Support\TestCallableMiddleware", "index"]',
             ],
         ];
     }

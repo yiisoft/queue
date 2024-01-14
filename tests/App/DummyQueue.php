@@ -8,7 +8,7 @@ use Exception;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
+use Yiisoft\Queue\Middleware\MiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
 
 final class DummyQueue implements QueueInterface
@@ -19,7 +19,7 @@ final class DummyQueue implements QueueInterface
 
     public function push(
         MessageInterface $message,
-        string|array|callable|MiddlewarePushInterface ...$middlewareDefinitions
+        string|array|callable|MiddlewareInterface ...$middlewareDefinitions
     ): MessageInterface {
         return $message;
     }
@@ -50,5 +50,10 @@ final class DummyQueue implements QueueInterface
     public function withChannelName(string $channel): QueueInterface
     {
         throw new Exception('`withChannelName()` method is not implemented yet.');
+    }
+
+    public function getAdapter(): ?AdapterInterface
+    {
+        return null;
     }
 }

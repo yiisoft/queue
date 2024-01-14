@@ -7,6 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
 use Exception;
 use PHPUnit\Framework\Assert;
 use RuntimeException;
+use Yiisoft\Queue\AMQP\Middleware\DelayMiddleware;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
@@ -14,7 +15,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMidd
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
-use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
+use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\TestCase;
 
