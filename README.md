@@ -68,7 +68,7 @@ $data = [
     'url' => $url,
     'destinationFile' => $filename,
 ];
-$message = new \Yiisoft\Queue\Message\Message('file-download', $data);
+$message = new \Yiisoft\Queue\Message\Message(FileDownloader::class, $data);
 ```
 
 Then you should push it to the queue:
@@ -80,7 +80,10 @@ $queue->push($message);
 Its handler may look like the following:
 
 ```php
-class FileDownloader
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Message\MessageHandlerInterface;
+
+class FileDownloader implements MessageHandlerInterface
 {
     private string $absolutePath;
 
@@ -89,11 +92,13 @@ class FileDownloader
         $this->absolutePath = $absolutePath;
     }
 
-    public function handle(\Yiisoft\Queue\Message\MessageInterface $downloadMessage): void
+    public function handle(\Yiisoft\Queue\Message\MessageInterface $downloadMessage): MessageInterface
     {
-        $fileName = $downloadMessage->getData()['destinationFile'];
+        $fileName = $message->getData()['destinationFile'];
         $path = "$this->absolutePath/$fileName"; 
-        file_put_contents($path, file_get_contents($downloadMessage->getData()['url']));
+        file_put_contents($path, file_get_contents($message->getData()['url']));
+        
+        return $message;
     }
 }
 ```
@@ -101,9 +106,7 @@ class FileDownloader
 The last thing we should do is to create a configuration for the `Yiisoft\Queue\Worker\Worker`:
 
 ```php
-$handlers = ['file-download' => [new FileDownloader('/path/to/save/files'), 'handle']];
 $worker = new \Yiisoft\Queue\Worker\Worker(
-    $handlers, // Here it is
     $logger,
     $injector,
     $container

@@ -9,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Queue\Message\HandlerEnvelope;
+use Yiisoft\Queue\Tests\Support\NullMessageHandler;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
@@ -90,7 +92,7 @@ final class MiddlewareTest extends TestCase
             'common 1',
             'common 2',
         ];
-        $container = new SimpleContainer();
+        $container = new SimpleContainer([NullMessageHandler::class => new NullMessageHandler()]);
         $callableFactory = new CallableFactory($container);
 
         $consumeMiddlewareDispatcher = new ConsumeMiddlewareDispatcher(
@@ -110,7 +112,6 @@ final class MiddlewareTest extends TestCase
         );
 
         $worker = new Worker(
-            ['test' => static fn () => true],
             new SimpleLogger(),
             new Injector($container),
             $container,
@@ -118,7 +119,10 @@ final class MiddlewareTest extends TestCase
             $failureMiddlewareDispatcher,
         );
 
-        $message = new Message('test', ['initial']);
+        $message = new HandlerEnvelope(
+            new Message(NullMessageHandler::class, ['initial']),
+            NullMessageHandler::class)
+        ;
         $messageConsumed = $worker->process($message, $this->createMock(QueueInterface::class));
 
         self::assertEquals($stack, $messageConsumed->getData());
@@ -129,7 +133,10 @@ final class MiddlewareTest extends TestCase
         $exception = new InvalidArgumentException('test');
         $this->expectExceptionObject($exception);
 
-        $message = new Message('simple', null, []);
+        $message = new HandlerEnvelope(
+            new Message(NullMessageHandler::class, null, []),
+            NullMessageHandler::class,
+        );
         $queueCallback = static fn (MessageInterface $message): MessageInterface => $message;
         $queue = $this->createMock(QueueInterface::class);
         $container = new SimpleContainer([SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queue)]);

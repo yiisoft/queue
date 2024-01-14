@@ -77,12 +77,12 @@ final class MiddlewareDispatcherTest extends TestCase
         $request = $this->getFailureHandlingRequest();
 
         $middleware1 = static function (FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest {
-            $request = $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'new test data'));
+            $request = $request->withMessage($request->getMessage()->withData('new test data'));
 
             return $handler->handleFailure($request);
         };
         $middleware2 = static function (FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest {
-            $request = $request->withMessage(new Message('new handler', $request->getMessage()->getData()));
+            $request = $request->withMessage($request->getMessage()->withMetadata(['new' => 'metadata']));
 
             return $handler->handleFailure($request);
         };
@@ -91,7 +91,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('new test data', $request->getMessage()->getData());
-        $this->assertSame('new handler', $request->getMessage()->getHandlerName());
+        $this->assertSame(['new' => 'metadata'], $request->getMessage()->getMetadata());
     }
 
     public function testMiddlewareStackInterrupted(): void
@@ -99,10 +99,10 @@ final class MiddlewareDispatcherTest extends TestCase
         $request = $this->getFailureHandlingRequest();
 
         $middleware1 = static function (FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest {
-            return $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'first'));
+            return $request->withMessage($request->getMessage()->withData('first'));
         };
         $middleware2 = static function (FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest {
-            return $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'second'));
+            return $request->withMessage($request->getMessage()->withData('second'));
         };
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [$middleware1, $middleware2]]);

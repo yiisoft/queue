@@ -6,8 +6,9 @@ namespace Yiisoft\Queue\Tests\App;
 
 use Yiisoft\Queue\Message\MessageInterface;
 use RuntimeException;
+use Yiisoft\Queue\Message\MessageHandlerInterface;
 
-final class FakeHandler
+final class FakeHandler implements MessageHandlerInterface
 {
     public static array $processedMessages = [];
 
@@ -26,13 +27,13 @@ final class FakeHandler
         self::$processedMessages[] = $message;
     }
 
-    public static function staticExecute(MessageInterface $message): void
-    {
-        self::$processedMessages[] = $message;
-    }
-
     public function executeWithException(MessageInterface $message): void
     {
         throw new RuntimeException('Test exception');
+    }
+
+    public function handle(MessageInterface $message): void
+    {
+        self::$processedMessages[] = $message;
     }
 }

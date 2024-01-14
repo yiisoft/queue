@@ -21,9 +21,12 @@ trait EnvelopeTrait
         return $instance;
     }
 
-    public function getHandlerName(): string
+    /**
+     * @return class-string<MessageHandlerInterface>
+     */
+    public function getHandler(): string
     {
-        return $this->message->getHandlerName();
+        return $this->message->getHandler();
     }
 
     public function getData(): mixed
@@ -53,5 +56,21 @@ trait EnvelopeTrait
     public function getEnvelopeMetadata(): array
     {
         return [];
+    }
+
+    public function withData(mixed $data): self
+    {
+        $instance = clone $this;
+        $instance->message = $instance->message->withData($data);
+
+        return $instance;
+    }
+
+    public function withMetadata(array $metadata): self
+    {
+        $instance = clone $this;
+        $instance->message = $instance->message->withMetadata($metadata);
+
+        return $instance;
     }
 }

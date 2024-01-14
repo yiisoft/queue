@@ -8,7 +8,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
-use RuntimeException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
@@ -25,6 +24,8 @@ use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Tests\Support\NullMessageHandler;
+use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 
 /**
  * Base Test Case.
@@ -57,11 +58,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getQueue(): Queue
     {
-        if ($this->queue === null) {
-            $this->queue = $this->createQueue();
-        }
-
-        return $this->queue;
+        return $this->queue ??= $this->createQueue();
     }
 
     /**
@@ -69,38 +66,22 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getAdapter(): AdapterInterface
     {
-        if ($this->adapter === null) {
-            $this->adapter = $this->createAdapter($this->needsRealAdapter());
-        }
-
-        return $this->adapter;
+        return $this->adapter ??= $this->createAdapter($this->needsRealAdapter());
     }
 
     protected function getLoop(): LoopInterface
     {
-        if ($this->loop === null) {
-            $this->loop = $this->createLoop();
-        }
-
-        return $this->loop;
+        return $this->loop ??= $this->createLoop();
     }
 
     protected function getWorker(): WorkerInterface
     {
-        if ($this->worker === null) {
-            $this->worker = $this->createWorker();
-        }
-
-        return $this->worker;
+        return $this->worker ??= $this->createWorker();
     }
 
     protected function getContainer(): ContainerInterface
     {
-        if ($this->container === null) {
-            $this->container = $this->createContainer();
-        }
-
-        return $this->container;
+        return $this->container ??= $this->createContainer();
     }
 
     protected function createQueue(): Queue
@@ -113,7 +94,7 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
-    protected function createAdapter(bool $realAdapter = false): AdapterInterface
+    protected function createAdapter(bool $realAdapter): AdapterInterface
     {
         if ($realAdapter) {
             return new SynchronousAdapter($this->getWorker(), $this->createQueue());
@@ -130,7 +111,6 @@ abstract class TestCase extends BaseTestCase
     protected function createWorker(): WorkerInterface
     {
         return new Worker(
-            $this->getMessageHandlers(),
             new NullLogger(),
             new Injector($this->getContainer()),
             $this->getContainer(),
@@ -146,7 +126,10 @@ abstract class TestCase extends BaseTestCase
 
     protected function getContainerDefinitions(): array
     {
-        return [];
+        return [
+            NullMessageHandler::class => new NullMessageHandler(),
+            StackMessageHandler::class => new StackMessageHandler(),
+        ];
     }
 
     protected function setEventHandlers(callable ...$handlers): void
@@ -157,23 +140,6 @@ abstract class TestCase extends BaseTestCase
     protected function getEventHandlers(): array
     {
         return $this->eventHandlers;
-    }
-
-    protected function getMessageHandlers(): array
-    {
-        return [
-            'simple' => fn () => $this->executionTimes++,
-            'exceptional' => function () {
-                $this->executionTimes++;
-
-                throw new RuntimeException('test');
-            },
-            'retryable' => function () {
-                $this->executionTimes++;
-
-                throw new RuntimeException('test');
-            },
-        ];
     }
 
     protected function needsRealAdapter(): bool
