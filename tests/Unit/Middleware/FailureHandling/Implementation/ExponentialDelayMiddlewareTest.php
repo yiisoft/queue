@@ -148,7 +148,7 @@ class ExponentialDelayMiddlewareTest extends TestCase
 
     public function testPipelineSuccess(): void
     {
-        $message = new Message('test', null);
+        $message = new Message(null);
         $queue = $this->createMock(QueueInterface::class);
         $queue->method('push')->willReturnArgument(0);
         $middleware = new ExponentialDelayMiddleware(
@@ -176,7 +176,7 @@ class ExponentialDelayMiddlewareTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('test');
 
-        $message = new Message('test', null, [ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test' => 2]);
+        $message = new Message(null, [ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test' => 2]);
         $queue = $this->createMock(QueueInterface::class);
         $middleware = new ExponentialDelayMiddleware(
             'test',

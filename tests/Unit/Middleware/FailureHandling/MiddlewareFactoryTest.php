@@ -52,7 +52,7 @@ final class MiddlewareFactoryTest extends TestCase
         $middleware = $this->getMiddlewareFactory($container)->createFailureMiddleware(
             function (): FailureHandlingRequest {
                 return new FailureHandlingRequest(
-                    new Message('test', 'test data'),
+                    new Message('test data'),
                     new RuntimeException('test exception'),
                     $this->createMock(QueueInterface::class),
                 );
@@ -177,7 +177,7 @@ final class MiddlewareFactoryTest extends TestCase
     private function getConsumeRequest(): FailureHandlingRequest
     {
         return new FailureHandlingRequest(
-            new Message('handler', 'data'),
+            new Message('data'),
             new Exception('test exception'),
             $this->createMock(QueueInterface::class)
         );

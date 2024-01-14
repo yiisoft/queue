@@ -25,7 +25,7 @@ final class SynchronousAdapterTest extends TestCase
             ->getQueue()
             ->withAdapter($this->getAdapter());
         $message = new HandlerEnvelope(
-            new Message(NullMessageHandler::class, null),
+            new Message(null),
             NullMessageHandler::class,
         );
         $envelope = $queue->push($message);
@@ -40,7 +40,7 @@ final class SynchronousAdapterTest extends TestCase
     public function testIdSetting(): void
     {
         $message =new HandlerEnvelope(
-            new Message(NullMessageHandler::class, []),
+            new Message([]),
             NullMessageHandler::class,
         );
         $adapter = $this->getAdapter();
@@ -65,7 +65,7 @@ final class SynchronousAdapterTest extends TestCase
     public function testWithAnotherChannel(): void
     {
         $adapter = $this->getAdapter();
-        $adapter->push(new Message('test', null));
+        $adapter->push(new Message(null));
         $adapterNew = $adapter->withChannel('test');
 
         self::assertNotEquals($adapter, $adapterNew);

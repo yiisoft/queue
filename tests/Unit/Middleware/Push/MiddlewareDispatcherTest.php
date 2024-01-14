@@ -27,7 +27,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
                 static fn (PushRequest $request, AdapterInterface $adapter): PushRequest => $request
-                    ->withMessage(new Message('test', 'New closure test data'))
+                    ->withMessage(new Message('New closure test data'))
                     ->withAdapter($adapter->withChannel('closure-channel')),
             ]
         );
@@ -185,6 +185,6 @@ final class MiddlewareDispatcherTest extends TestCase
 
     private function getPushRequest(): PushRequest
     {
-        return new PushRequest(new Message('handler', 'data'), new FakeAdapter());
+        return new PushRequest(new Message('data'), new FakeAdapter());
     }
 }

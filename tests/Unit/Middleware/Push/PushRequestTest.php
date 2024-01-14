@@ -13,7 +13,7 @@ final class PushRequestTest extends TestCase
 {
     public function testImmutable(): void
     {
-        $message = new Message('test', 'test');
+        $message = new Message('test');
         $pushRequest = new PushRequest($message, new FakeAdapter());
 
         $this->assertNotSame($pushRequest, $pushRequest->withAdapter(new FakeAdapter()));

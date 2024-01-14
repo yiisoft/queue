@@ -36,7 +36,7 @@ final class MessageConsumingTest extends TestCase
         foreach ($messages as $message) {
             $worker->process(
                 new HandlerEnvelope(
-                    new Message(StackMessageHandler::class, $message),
+                    new Message($message),
                     StackMessageHandler::class
                 ), $this->getQueue());
         }

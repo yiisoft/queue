@@ -17,6 +17,6 @@ final class TestMiddleware implements MiddlewareFailureInterface
 
     public function processFailure(FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest
     {
-        return $request->withMessage(new Message('test', $this->message));
+        return $request->withMessage(new Message($this->message));
     }
 }

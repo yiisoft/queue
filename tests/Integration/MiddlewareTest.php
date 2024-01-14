@@ -75,7 +75,7 @@ final class MiddlewareTest extends TestCase
             ->withMiddlewares(new TestMiddleware('channel 1'), new TestMiddleware('channel 2'))
             ->withMiddlewaresAdded(new TestMiddleware('channel 3'));
 
-        $message = new Message('test', ['initial']);
+        $message = new Message(['initial']);
         $messagePushed = $queue->push(
             $message,
             new TestMiddleware('message 1'),
@@ -120,7 +120,7 @@ final class MiddlewareTest extends TestCase
         );
 
         $message = new HandlerEnvelope(
-            new Message(NullMessageHandler::class, ['initial']),
+            new Message(['initial']),
             NullMessageHandler::class)
         ;
         $messageConsumed = $worker->process($message, $this->createMock(QueueInterface::class));
@@ -134,7 +134,7 @@ final class MiddlewareTest extends TestCase
         $this->expectExceptionObject($exception);
 
         $message = new HandlerEnvelope(
-            new Message(NullMessageHandler::class, null, []),
+            new Message(null, []),
             NullMessageHandler::class,
         );
         $queueCallback = static fn (MessageInterface $message): MessageInterface => $message;

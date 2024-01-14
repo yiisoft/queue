@@ -157,7 +157,6 @@ class SendAgainMiddlewareTest extends TestCase
         $strategy = $this->getStrategy($strategyName, $queue);
         $request = new FailureHandlingRequest(
             new Message(
-                'test',
                 null,
                 $metaInitial
             ),

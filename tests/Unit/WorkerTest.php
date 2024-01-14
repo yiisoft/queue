@@ -46,7 +46,7 @@ final class WorkerTest extends TestCase
     public function testHandlerIsReplacedWithEnvelopsOne(): void
     {
         $message = new HandlerEnvelope(
-            new Message(ExceptionMessageHandler::class, ['test-data']),
+            new Message(['test-data']),
             StackMessageHandler::class,
         );
 
@@ -65,7 +65,7 @@ final class WorkerTest extends TestCase
     public function testJobFailWithDefinitionHandlerException(): void
     {
         $message = new HandlerEnvelope(
-            new Message(ExceptionMessageHandler::class, ['test-data']),
+            new Message(['test-data']),
             ExceptionMessageHandler::class,
         );
         $logger = new SimpleLogger();

@@ -29,7 +29,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
                 static function (ConsumeRequest $request) use ($queue): ConsumeRequest {
-                    return $request->withMessage(new Message('test', 'New closure test data'))->withQueue($queue);
+                    return $request->withMessage(new Message('New closure test data'))->withQueue($queue);
                 },
             ]
         );
@@ -178,7 +178,7 @@ final class MiddlewareDispatcherTest extends TestCase
     private function getConsumeRequest(): ConsumeRequest
     {
         return new ConsumeRequest(
-            new Message('handler', 'data'),
+            new Message('data'),
             $this->createMock(QueueInterface::class)
         );
     }

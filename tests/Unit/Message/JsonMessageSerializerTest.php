@@ -106,21 +106,21 @@ final class JsonMessageSerializerTest extends TestCase
 
     public function testSerialize(): void
     {
-        $message = new Message('handler', 'test');
+        $message = new Message('test');
 
         $serializer = $this->createSerializer();
 
         $json = $serializer->serialize($message);
 
         $this->assertEquals(
-            '{"name":"handler","data":"test","meta":[]}',
+            '{"data":"test","meta":[]}',
             $json,
         );
     }
 
     public function testSerializeEnvelopeStack(): void
     {
-        $message = new Message('handler', 'test');
+        $message = new Message('test');
         $message = new IdEnvelope($message, 'test-id');
 
         $serializer = $this->createSerializer();
@@ -129,7 +129,7 @@ final class JsonMessageSerializerTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '{"name":"handler","data":"test","meta":{"envelopes":["%s"],"%s":"test-id"}}',
+                '{"data":"test","meta":{"envelopes":["%s"],"%s":"test-id"}}',
                 str_replace('\\', '\\\\', IdEnvelope::class),
                 IdEnvelope::MESSAGE_ID_KEY,
             ),

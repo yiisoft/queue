@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit;
+namespace Yiisoft\Queue\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\EnvelopeInterface;
@@ -13,7 +13,7 @@ final class EnvelopeTest extends TestCase
 {
     public function testEnvelopeStack(): void
     {
-        $message = new Message('handler', 'test');
+        $message = new Message('test');
         $message = new IdEnvelope($message, 'test-id');
 
         $this->assertEquals('test', $message->getMessage()->getData());
@@ -28,7 +28,7 @@ final class EnvelopeTest extends TestCase
 
     public function testEnvelopeDuplicates(): void
     {
-        $message = new Message('handler', 'test');
+        $message = new Message('test');
         $message = new IdEnvelope($message, 'test-id');
         $message = new IdEnvelope($message, 'test-id');
         $message = new IdEnvelope($message, 'test-id');

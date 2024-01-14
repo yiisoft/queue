@@ -30,7 +30,7 @@ final class MiddlewareDispatcherTest extends TestCase
             [
                 FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [
                     static function (FailureHandlingRequest $request): FailureHandlingRequest {
-                        return $request->withMessage(new Message('test', 'New closure test data'));
+                        return $request->withMessage(new Message('New closure test data'));
                     },
                 ],
             ]
@@ -173,7 +173,7 @@ final class MiddlewareDispatcherTest extends TestCase
     private function getFailureHandlingRequest(): FailureHandlingRequest
     {
         return new FailureHandlingRequest(
-            new Message('handler', 'data'),
+            new Message('data'),
             new Exception('Test exception.'),
             $this->createMock(QueueInterface::class)
         );

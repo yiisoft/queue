@@ -48,7 +48,7 @@ final class MiddlewareFactoryTest extends TestCase
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
             static function (): PushRequest {
-                return new PushRequest(new Message('test', 'test data'), new FakeAdapter());
+                return new PushRequest(new Message('test data'), new FakeAdapter());
             }
         );
         self::assertSame(
@@ -167,6 +167,6 @@ final class MiddlewareFactoryTest extends TestCase
 
     private function getPushRequest(): PushRequest
     {
-        return new PushRequest(new Message('handler', 'data'), new FakeAdapter());
+        return new PushRequest(new Message('data'), new FakeAdapter());
     }
 }

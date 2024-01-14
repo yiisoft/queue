@@ -17,6 +17,6 @@ final class TestMiddleware implements MiddlewarePushInterface
 
     public function processPush(PushRequest $request, MessageHandlerPushInterface $handler): PushRequest
     {
-        return $request->withMessage(new Message('test', $this->message));
+        return $request->withMessage(new Message($this->message));
     }
 }

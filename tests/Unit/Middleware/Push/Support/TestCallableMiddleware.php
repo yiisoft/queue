@@ -11,6 +11,6 @@ final class TestCallableMiddleware
 {
     public function index(PushRequest $request): PushRequest
     {
-        return $request->withMessage(new Message('test', 'New test data'));
+        return $request->withMessage(new Message('New test data'));
     }
 }

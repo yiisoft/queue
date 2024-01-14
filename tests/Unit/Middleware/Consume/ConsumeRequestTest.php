@@ -13,7 +13,7 @@ final class ConsumeRequestTest extends TestCase
 {
     public function testImmutable(): void
     {
-        $message = new Message('test', 'test');
+        $message = new Message('test');
         $queue = $this->createMock(QueueInterface::class);
         $consumeRequest = new ConsumeRequest($message, $queue);
 

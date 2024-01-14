@@ -16,7 +16,7 @@ final class FailureHandlingRequestTest extends TestCase
     {
         $queue = $this->createMock(QueueInterface::class);
         $failureHandlingRequest = new FailureHandlingRequest(
-            new Message('test', 'test'),
+            new Message('test'),
             new Exception(),
             $queue
         );

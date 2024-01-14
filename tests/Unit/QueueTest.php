@@ -27,7 +27,7 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($adapter);
-        $message = new Message(NullMessageHandler::class, null);
+        $message = new Message(null);
         $queue->push($message);
 
         self::assertSame([$message], $adapter->pushMessages);
@@ -39,7 +39,7 @@ final class QueueTest extends TestCase
             ->getQueue()
             ->withAdapter($this->getAdapter());
         $message = new HandlerEnvelope(
-            new Message(StackMessageHandler::class, null),
+            new Message(null),
             StackMessageHandler::class,
         );
         $message2 = clone $message;
@@ -54,7 +54,7 @@ final class QueueTest extends TestCase
     public function testRunPartly(): void
     {
         $message = new HandlerEnvelope(
-            new Message(StackMessageHandler::class, null),
+            new Message(null),
             StackMessageHandler::class,
         );
         $queue = $this
@@ -75,7 +75,7 @@ final class QueueTest extends TestCase
             ->getQueue()
             ->withAdapter($this->getAdapter());
         $message = new HandlerEnvelope(
-            new Message(StackMessageHandler::class, null),
+            new Message(null),
             StackMessageHandler::class,
         );
         $message2 = clone $message;
@@ -93,7 +93,7 @@ final class QueueTest extends TestCase
             ->getQueue()
             ->withAdapter($this->getAdapter());
         $message = new HandlerEnvelope(
-            new Message(NullMessageHandler::class, null),
+            new Message(null),
             NullMessageHandler::class,
         );
         $envelope = $queue->push($message);
@@ -116,7 +116,7 @@ final class QueueTest extends TestCase
     {
         try {
             $queue = $this->getQueue();
-            $message = new Message(NullMessageHandler::class, null);
+            $message = new Message(null);
             $envelope = $queue->push($message);
             $queue->status($envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY]);
         } catch (AdapterNotConfiguredException $exception) {
@@ -144,7 +144,7 @@ final class QueueTest extends TestCase
             ->getQueue()
             ->withAdapter($this->getAdapter());
         $message = new HandlerEnvelope(
-            new Message(StackMessageHandler::class, null),
+            new Message(null),
             StackMessageHandler::class,
         );
         $message2 = clone $message;
