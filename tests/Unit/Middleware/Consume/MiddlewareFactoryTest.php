@@ -18,7 +18,6 @@ use Yiisoft\Queue\Middleware\MiddlewareInterface;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
 use Yiisoft\Queue\Middleware\MiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\Support\InvalidController;
 
