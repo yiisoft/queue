@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
+namespace Yiisoft\Queue\Tests\Unit\Middleware;
 
 use Exception;
 use InvalidArgumentException;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
+use Yiisoft\Queue\Middleware\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\TestCase;

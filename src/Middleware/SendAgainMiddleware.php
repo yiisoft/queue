@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Middleware\FailureHandling\Implementation;
+namespace Yiisoft\Queue\Middleware;
 
 use InvalidArgumentException;
 use Yiisoft\Queue\Message\MessageInterface;

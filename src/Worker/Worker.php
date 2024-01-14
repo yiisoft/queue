@@ -15,7 +15,7 @@ use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\MessageHandlerInterface;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\ConsumeFinalHandler;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
+use Yiisoft\Queue\Middleware\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;

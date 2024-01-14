@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Middleware\FailureHandling\Implementation;
+namespace Yiisoft\Queue\Middleware;
 
 use InvalidArgumentException;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;

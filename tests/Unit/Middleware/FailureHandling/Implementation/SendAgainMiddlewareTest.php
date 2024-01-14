@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
+namespace Yiisoft\Queue\Tests\Unit\Middleware;
 
 use Exception;
 use PHPUnit\Framework\Assert;
@@ -10,8 +10,8 @@ use RuntimeException;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
-use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
+use Yiisoft\Queue\Middleware\ExponentialDelayMiddleware;
+use Yiisoft\Queue\Middleware\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
