@@ -14,6 +14,7 @@ use Yiisoft\Queue\Middleware\MiddlewareFactory;
 use Yiisoft\Queue\Middleware\MiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\MiddlewareInterface;
 use Yiisoft\Queue\Middleware\Request;
+use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\Message;
@@ -182,7 +183,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         return new Request(
             new Message('data'),
-            $this->createMock(AdapterInterface::class)
+            $this->createMock(QueueInterface::class)
         );
     }
 }

@@ -12,19 +12,13 @@ use Yiisoft\Queue\QueueInterface;
 //final class Request
 class Request
 {
-    protected ?QueueInterface $queue = null;
-    public function __construct(private MessageInterface $message, private ?AdapterInterface $adapter)
+    public function __construct(private MessageInterface $message, private ?QueueInterface $queue)
     {
     }
 
     public function getMessage(): MessageInterface
     {
         return $this->message;
-    }
-
-    public function getAdapter(): ?AdapterInterface
-    {
-        return $this->adapter;
     }
 
     public function withMessage(MessageInterface $message): self
@@ -35,12 +29,9 @@ class Request
         return $instance;
     }
 
-    public function withAdapter(AdapterInterface $adapter): self
+    public function getQueue(): ?QueueInterface
     {
-        $instance = clone $this;
-        $instance->adapter = $adapter;
-
-        return $instance;
+        return $this->queue;
     }
 
     public function withQueue(QueueInterface $queue): self

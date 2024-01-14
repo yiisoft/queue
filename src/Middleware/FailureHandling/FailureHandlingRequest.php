@@ -21,25 +21,4 @@ final class FailureHandlingRequest extends Request
     {
         return $this->exception;
     }
-
-    public function getQueue(): QueueInterface
-    {
-        return $this->queue;
-    }
-
-    public function withException(Throwable $exception): self
-    {
-        $instance = clone $this;
-        $instance->exception = $exception;
-
-        return $instance;
-    }
-
-    public function withQueue(QueueInterface $queue): self
-    {
-        $instance = clone $this;
-        $instance->queue = $queue;
-
-        return $instance;
-    }
 }

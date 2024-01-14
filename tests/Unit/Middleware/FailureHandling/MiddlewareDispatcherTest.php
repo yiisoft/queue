@@ -168,7 +168,7 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         return new Request(
             new Message('data'),
-            $this->createMock(AdapterInterface::class)
+            $this->createMock(QueueInterface::class)
         );
     }
 }

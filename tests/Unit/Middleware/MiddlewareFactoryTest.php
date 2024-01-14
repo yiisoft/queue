@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\Message;
@@ -46,9 +47,10 @@ final class MiddlewareFactoryTest extends TestCase
     public function testCreateFromClosureResponse(): void
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
+        $queue = $this->createMock(QueueInterface::class);
         $middleware = $this->getMiddlewareFactory($container)->createMiddleware(
-            static function (): Request {
-                return new Request(new Message('test data'), new FakeAdapter());
+            static function () use($queue): Request {
+                return new Request(new Message('test data'), $queue);
             }
         );
         self::assertSame(
@@ -167,6 +169,6 @@ final class MiddlewareFactoryTest extends TestCase
 
     private function getRequest(): Request
     {
-        return new Request(new Message('data'), new FakeAdapter());
+        return new Request(new Message('data'), $this->createMock(QueueInterface::class));
     }
 }

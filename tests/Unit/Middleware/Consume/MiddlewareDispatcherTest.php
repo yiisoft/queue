@@ -25,12 +25,11 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $request = $this->getRequest();
         $queue = $this->createMock(QueueInterface::class);
-        $adapter = $this->createMock(AdapterInterface::class);
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static function (Request $request) use ($adapter): Request {
-                    return $request->withMessage(new Message('New closure test data'))->withAdapter($adapter);
+                static function (Request $request) use ($queue): Request {
+                    return $request->withMessage(new Message('New closure test data'))->withQueue($queue);
                 },
             ]
         );
@@ -180,7 +179,7 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         return new Request(
             new Message('data'),
-            $this->createMock(AdapterInterface::class)
+            $this->createMock(QueueInterface::class)
         );
     }
 }

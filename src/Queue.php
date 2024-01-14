@@ -53,7 +53,7 @@ final class Queue implements QueueInterface
             ['data' => $message->getData(), 'metadata' => $message->getMetadata()]
         );
 
-        $request = new Request($message, $this->adapter);
+        $request = new Request($message, $this);
         $message = $this->pushMiddlewareDispatcher
             ->dispatch($request, $this->createHandler($middlewareDefinitions))
             ->getMessage();

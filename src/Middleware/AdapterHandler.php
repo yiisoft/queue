@@ -13,7 +13,7 @@ final class AdapterHandler implements MessageHandlerInterface
 {
     public function handle(Request $request): Request
     {
-        if (($adapter = $request->getAdapter()) === null) {
+        if (($adapter = $request->getQueue()?->getAdapter()) === null) {
             throw new AdapterNotConfiguredException();
         }
         return $request->withMessage($adapter->push($request->getMessage()));

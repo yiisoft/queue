@@ -36,8 +36,8 @@ final class SendAgainMiddleware implements MiddlewareInterface
             $envelope = new FailureEnvelope($message, $this->createMeta($message));
             $envelope = $this->queue->push($envelope);
 
-            $request1 = $request->withMessage($envelope);
-            return $request1->withQueue($this->queue);
+            $request = $request->withMessage($envelope);
+            return $request->withQueue($this->queue);
         }
 
         return $handler->handle($request);

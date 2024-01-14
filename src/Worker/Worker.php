@@ -63,7 +63,7 @@ final class Worker implements WorkerInterface
             ));
         }
 
-        $request = new Request($message, $queue->getAdapter());
+        $request = new Request($message, $queue);
         $closure = fn (MessageInterface $message): mixed => $this->injector->invoke([$handler, 'handle'], [$message]);
         try {
             $result = $this->consumeMiddlewareDispatcher->dispatch($request, new ConsumeFinalHandler($closure));

@@ -6,6 +6,8 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Tests\App\FakeQueue;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\Message;
@@ -26,9 +28,15 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static fn (Request $request, AdapterInterface $adapter): Request => $request
+                static fn (Request $request): Request => $request
                     ->withMessage(new Message('New closure test data'))
-                    ->withAdapter($adapter->withChannel('closure-channel')),
+                    ->withQueue(
+                        $request->getQueue()->getAdapter() === null
+                            ? $request->getQueue()
+                            : $request->getQueue()->withAdapter(
+                            $request->getQueue()->getAdapter()->withChannel('closure-channel')
+                        )
+                    ),
             ]
         );
 
@@ -38,7 +46,7 @@ final class MiddlewareDispatcherTest extends TestCase
          * @psalm-suppress NoInterfaceProperties
          * @psalm-suppress PossiblyNullPropertyFetch
          */
-        $this->assertSame('closure-channel', $request->getAdapter()->channel);
+        $this->assertSame('closure-channel', $request->getQueue()->getAdapter()->channel);
     }
 
     public function testArrayMiddlewareCallableDefinition(): void
@@ -69,8 +77,6 @@ final class MiddlewareDispatcherTest extends TestCase
 
     public function testMiddlewareFullStackCalled(): void
     {
-        $request = $this->getRequest();
-
         $middleware1 = static function (Request $request, MessageHandlerInterface $handler): Request {
             $request = $request->withMessage($request->getMessage()->withData('new test data'));
 
@@ -82,20 +88,31 @@ final class MiddlewareDispatcherTest extends TestCase
              *
              * @psalm-suppress PossiblyNullReference
              */
-            $request = $request->withAdapter($request->getAdapter()->withChannel('new channel'));
+            $queue = $request->getQueue();
+            if ($queue !== null && $queue->getAdapter() !== null) {
+                $request = $request->withQueue(
+                    $queue->withAdapter(
+                        $queue->getAdapter()->withChannel('new channel')
+                    )
+                );
+            }
 
             return $handler->handle($request);
         };
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
+        $request = $this->getRequest();
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('new test data', $request->getMessage()->getData());
         /**
          * @psalm-suppress NoInterfaceProperties
          * @psalm-suppress PossiblyNullPropertyFetch
          */
-        $this->assertSame('new channel', $request->getAdapter()->channel);
+        $this->assertNotNull($request->getQueue());
+        $this->assertNotNull($request->getQueue()->getAdapter());
+        $this->assertInstanceOf(FakeAdapter::class, $request->getQueue()->getAdapter());
+        $this->assertSame('new channel', $request->getQueue()->getAdapter()->channel);
     }
 
     public function testMiddlewareStackInterrupted(): void
@@ -185,6 +202,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
     private function getRequest(): Request
     {
-        return new Request(new Message('data'), new FakeAdapter());
+        $queue = new FakeQueue('chan1');
+        return new Request(new Message('data'), $queue->withAdapter(new FakeAdapter()));
     }
 }

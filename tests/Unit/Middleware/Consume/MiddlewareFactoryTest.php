@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\Consume;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\Integration\Support\ConsumeMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Support\TestCallableMiddleware;
 use Yiisoft\Test\Support\Container\SimpleContainer;
@@ -58,7 +59,7 @@ final class MiddlewareFactoryTest extends TestCase
         $middleware = $this->getMiddlewareFactory($container)->createMiddleware(
             fn (): Request => new Request(
                 new Message('test data'),
-                $this->createMock(AdapterInterface::class),
+                $this->createMock(QueueInterface::class),
             )
         );
         self::assertSame(
@@ -201,7 +202,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         return new Request(
             new Message(['data']),
-            $this->createMock(AdapterInterface::class)
+            $this->createMock(QueueInterface::class)
         );
     }
 }
