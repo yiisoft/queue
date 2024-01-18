@@ -26,7 +26,7 @@ final class DummyQueue implements QueueInterface
 
     public function run(int $max = 0): int
     {
-        return 0;
+        throw new Exception('`run()` method is not implemented yet.');
     }
 
     public function listen(): void
