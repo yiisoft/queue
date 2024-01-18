@@ -68,10 +68,11 @@ final class ListenAllCommand extends Command
 
             if (!$hasMessages) {
                 $pauseSeconds = (int)$input->getOption('pause');
-                if ($pauseSeconds <= 0) {
+                if ($pauseSeconds < 0) {
                     $pauseSeconds = 1;
                 }
 
+                /** @psalm-var 0|positive-int $pauseSeconds */
                 sleep($pauseSeconds);
             }
         }
