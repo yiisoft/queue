@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\FailureHandling;
+namespace Yiisoft\Queue\Middleware\FailureHandling;
 
 use Closure;
 use Psr\Container\ContainerExceptionInterface;
@@ -12,9 +12,9 @@ use Yiisoft\Definitions\ArrayDefinition;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Definitions\Helpers\DefinitionValidator;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\InvalidCallableConfigurationException;
-use Yiisoft\Yii\Queue\Middleware\InvalidMiddlewareDefinitionException;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
+use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 
 use function is_string;
 
@@ -90,13 +90,11 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
     private function wrapCallable(callable $callback): MiddlewareFailureInterface
     {
         return new class ($callback, $this->container) implements MiddlewareFailureInterface {
-            private ContainerInterface $container;
             private $callback;
 
-            public function __construct(callable $callback, ContainerInterface $container)
+            public function __construct(callable $callback, private ContainerInterface $container)
             {
                 $this->callback = $callback;
-                $this->container = $container;
             }
 
             public function processFailure(FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest

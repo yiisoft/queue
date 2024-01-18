@@ -2,20 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\App;
+namespace Yiisoft\Queue\Tests\App;
 
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
-use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\Message\MessageInterface;
 
 final class FakeAdapter implements AdapterInterface
 {
     public array $pushMessages = [];
     public string $channel = 'default';
 
-    public function push(MessageInterface $message): void
+    public function push(MessageInterface $message): MessageInterface
     {
         $this->pushMessages[] = $message;
+
+        return $message;
     }
 
     public function runExisting(callable $handlerCallback): void
@@ -23,7 +25,7 @@ final class FakeAdapter implements AdapterInterface
         //skip
     }
 
-    public function status(string $id): JobStatus
+    public function status(string|int $id): JobStatus
     {
         //skip
     }

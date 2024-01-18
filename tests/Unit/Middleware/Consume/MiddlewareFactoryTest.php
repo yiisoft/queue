@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume;
+namespace Yiisoft\Queue\Tests\Unit\Middleware\Consume;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
-use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareConsumeInterface;
-use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
-use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
-use Yiisoft\Yii\Queue\Middleware\InvalidMiddlewareDefinitionException;
-use Yiisoft\Yii\Queue\QueueInterface;
-use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\InvalidController;
-use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware;
-use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\TestMiddleware;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
+use Yiisoft\Queue\Middleware\Consume\MiddlewareConsumeInterface;
+use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
+use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\InvalidController;
+use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware;
+use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestMiddleware;
 
 final class MiddlewareFactoryTest extends TestCase
 {
@@ -57,12 +57,10 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
-            function (): ConsumeRequest {
-                return new ConsumeRequest(
-                    new Message('test', 'test data'),
-                    $this->createMock(QueueInterface::class),
-                );
-            }
+            fn (): ConsumeRequest => new ConsumeRequest(
+                new Message('test', 'test data'),
+                $this->createMock(QueueInterface::class),
+            )
         );
         self::assertSame(
             'test data',
@@ -77,9 +75,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
-            static function (): MiddlewareConsumeInterface {
-                return new TestMiddleware();
-            }
+            static fn (): MiddlewareConsumeInterface => new TestMiddleware()
         );
         self::assertSame(
             'New middleware test data',
@@ -125,9 +121,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
-            static function () {
-                return 42;
-            }
+            static fn () => 42
         );
 
         $this->expectException(InvalidMiddlewareDefinitionException::class);
@@ -176,7 +170,7 @@ final class MiddlewareFactoryTest extends TestCase
 
     private function getMiddlewareFactory(ContainerInterface $container = null): MiddlewareFactoryConsumeInterface
     {
-        $container = $container ?? $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
 
         return new MiddlewareFactoryConsume($container, new CallableFactory($container));
     }

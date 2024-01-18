@@ -2,27 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Command;
+namespace Yiisoft\Queue\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Yiisoft\Yii\Console\ExitCode;
-use Yiisoft\Yii\Queue\QueueFactory;
-use Yiisoft\Yii\Queue\QueueFactoryInterface;
+use Yiisoft\Queue\QueueFactory;
+use Yiisoft\Queue\QueueFactoryInterface;
 
 final class ListenCommand extends Command
 {
-    protected static $defaultName = 'queue/listen';
+    protected static $defaultName = 'queue:listen';
     protected static $defaultDescription = 'Listens the queue and executes messages as they come. Needs to be stopped manually.';
 
-    private QueueFactoryInterface $queueFactory;
-
-    public function __construct(QueueFactoryInterface $queueFactory)
+    public function __construct(private QueueFactoryInterface $queueFactory)
     {
         parent::__construct();
-        $this->queueFactory = $queueFactory;
     }
 
     public function configure(): void
@@ -41,6 +37,6 @@ final class ListenCommand extends Command
             ->get($input->getArgument('channel'))
             ->listen();
 
-        return ExitCode::OK;
+        return 0;
     }
 }

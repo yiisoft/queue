@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume;
+namespace Yiisoft\Queue\Tests\Unit\Middleware\Consume;
 
 use PHPUnit\Framework\TestCase;
 use stdClass;
-use Yiisoft\Yii\Queue\Middleware\InvalidMiddlewareDefinitionException;
-use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware;
+use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
+use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware;
 
 final class InvalidMiddlewareDefinitionExceptionTest extends TestCase
 {
@@ -20,24 +20,21 @@ final class InvalidMiddlewareDefinitionExceptionTest extends TestCase
             ],
             [
                 new TestCallableMiddleware(),
-                'an instance of "Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware"',
+                'an instance of "Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware"',
             ],
             [
                 [TestCallableMiddleware::class, 'notExistsAction'],
-                '["Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware", "notExistsAction"]',
+                '["Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware", "notExistsAction"]',
             ],
             [
                 ['class' => TestCallableMiddleware::class, 'index'],
-                '["class" => "Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware", "index"]',
+                '["class" => "Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware", "index"]',
             ],
         ];
     }
 
     /**
      * @dataProvider dataBase
-     *
-     * @param mixed $definition
-     * @param string $expected
      */
     public function testBase(mixed $definition, string $expected): void
     {
@@ -55,8 +52,6 @@ final class InvalidMiddlewareDefinitionExceptionTest extends TestCase
 
     /**
      * @dataProvider dataUnknownDefinition
-     *
-     * @param mixed $definition
      */
     public function testUnknownDefinition(mixed $definition): void
     {

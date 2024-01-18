@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Debug;
+namespace Yiisoft\Queue\Debug;
 
-use Yiisoft\Yii\Queue\QueueFactoryInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Queue\QueueFactoryInterface;
+use Yiisoft\Queue\QueueInterface;
 
 final class QueueFactoryInterfaceProxy implements QueueFactoryInterface
 {

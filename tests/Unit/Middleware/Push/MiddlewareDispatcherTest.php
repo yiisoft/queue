@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Push;
+namespace Yiisoft\Queue\Tests\Unit\Middleware\Push;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\Push\MessageHandlerPushInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
-use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\Push\PushRequest;
-use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Push\Support\TestCallableMiddleware;
-use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Push\Support\TestMiddleware;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
+use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Push\PushRequest;
+use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestCallableMiddleware;
+use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestMiddleware;
 
 final class MiddlewareDispatcherTest extends TestCase
 {
@@ -26,11 +26,9 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static function (PushRequest $request, AdapterInterface $adapter): PushRequest {
-                    return $request
-                        ->withMessage(new Message('test', 'New closure test data'))
-                        ->withAdapter($adapter->withChannel('closure-channel'));
-                },
+                static fn (PushRequest $request, AdapterInterface $adapter): PushRequest => $request
+                    ->withMessage(new Message('test', 'New closure test data'))
+                    ->withAdapter($adapter->withChannel('closure-channel')),
             ]
         );
 
@@ -104,12 +102,8 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $request = $this->getPushRequest();
 
-        $middleware1 = static function (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest {
-            return $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'first'));
-        };
-        $middleware2 = static function (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest {
-            return $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'second'));
-        };
+        $middleware1 = static fn (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest => $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'first'));
+        $middleware2 = static fn (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest => $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'second'));
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
@@ -176,7 +170,7 @@ final class MiddlewareDispatcherTest extends TestCase
     private function createDispatcher(
         ContainerInterface $container = null,
     ): PushMiddlewareDispatcher {
-        $container = $container ?? $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
         $callableFactory = new CallableFactory($container);
 
         return new PushMiddlewareDispatcher(

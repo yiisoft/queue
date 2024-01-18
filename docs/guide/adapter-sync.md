@@ -8,11 +8,11 @@ Configuration example:
 ```php
 $logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
 
-$worker = $DIContainer->get(\Yiisoft\Yii\Queue\Worker\WorkerInterface::class);
-$loop = $DIContainer->get(\Yiisoft\Yii\Queue\Cli\LoopInterface::class);
-$adapter = new Yiisoft\Yii\Queue\Adapter\SynchronousAdapter($loop, $worker);
+$worker = $DIContainer->get(\Yiisoft\Queue\Worker\WorkerInterface::class);
+$loop = $DIContainer->get(\Yiisoft\Queue\Cli\LoopInterface::class);
+$adapter = new Yiisoft\Queue\Adapter\SynchronousAdapter($loop, $worker);
 
-$queue = new Yiisoft\Yii\Queue\Queue(
+$queue = new Yiisoft\Queue\Queue(
     $adapter,
     $worker,
     $loop,

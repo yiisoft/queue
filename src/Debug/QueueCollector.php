@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Debug;
+namespace Yiisoft\Queue\Debug;
 
 use Yiisoft\Yii\Debug\Collector\CollectorTrait;
 use Yiisoft\Yii\Debug\Collector\SummaryCollectorInterface;
-use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\MiddlewarePushInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
+use Yiisoft\Queue\QueueInterface;
 
 final class QueueCollector implements SummaryCollectorInterface
 {
@@ -21,6 +21,10 @@ final class QueueCollector implements SummaryCollectorInterface
 
     public function getCollected(): array
     {
+        if (!$this->isActive()) {
+            return [];
+        }
+
         return [
             'pushes' => $this->pushes,
             'statuses' => $this->statuses,
@@ -77,6 +81,10 @@ final class QueueCollector implements SummaryCollectorInterface
 
     public function getSummary(): array
     {
+        if (!$this->isActive()) {
+            return [];
+        }
+
         $countPushes = array_sum(array_map(fn ($messages) => is_countable($messages) ? count($messages) : 0, $this->pushes));
         $countStatuses = count($this->statuses);
         $countProcessingMessages = array_sum(array_map(fn ($messages) => is_countable($messages) ? count($messages) : 0, $this->processingMessages));

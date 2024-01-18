@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware\Push;
+namespace Yiisoft\Queue\Middleware\Push;
 
 /**
  * Creates a middleware based on the definition provided.

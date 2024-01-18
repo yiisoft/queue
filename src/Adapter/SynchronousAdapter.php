@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Adapter;
+namespace Yiisoft\Queue\Adapter;
 
 use InvalidArgumentException;
-use Yiisoft\Yii\Queue\Enum\JobStatus;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\QueueFactory;
-use Yiisoft\Yii\Queue\QueueInterface;
-use Yiisoft\Yii\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\QueueFactory;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Message\IdEnvelope;
 
 final class SynchronousAdapter implements AdapterInterface
 {
@@ -42,7 +43,7 @@ final class SynchronousAdapter implements AdapterInterface
         }
     }
 
-    public function status(string $id): JobStatus
+    public function status(string|int $id): JobStatus
     {
         $id = (int) $id;
 
@@ -61,12 +62,12 @@ final class SynchronousAdapter implements AdapterInterface
         throw new InvalidArgumentException('There is no message with the given ID.');
     }
 
-    public function push(MessageInterface $message): void
+    public function push(MessageInterface $message): MessageInterface
     {
         $key = count($this->messages) + $this->current;
         $this->messages[] = $message;
 
-        $message->setId((string) $key);
+        return new IdEnvelope($message, $key);
     }
 
     public function subscribe(callable $handlerCallback): void

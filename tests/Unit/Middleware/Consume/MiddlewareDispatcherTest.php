@@ -2,33 +2,34 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume;
+namespace Yiisoft\Queue\Tests\Unit\Middleware\Consume;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
-use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
-use Yiisoft\Yii\Queue\QueueInterface;
-use Yiisoft\Yii\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware;
-use Yiisoft\Yii\Queue\Tests\Unit\Middleware\Consume\Support\TestMiddleware;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
+use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware;
+use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestMiddleware;
 
 final class MiddlewareDispatcherTest extends TestCase
 {
     public function testCallableMiddlewareCalled(): void
     {
         $request = $this->getConsumeRequest();
+        $queue = $this->createMock(QueueInterface::class);
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static function (ConsumeRequest $request): ConsumeRequest {
-                    return $request->withMessage(new Message('test', 'New closure test data'));
+                static function (ConsumeRequest $request) use ($queue): ConsumeRequest {
+                    return $request->withMessage(new Message('test', 'New closure test data'))->withQueue($queue);
                 },
             ]
         );
@@ -161,7 +162,7 @@ final class MiddlewareDispatcherTest extends TestCase
     private function createDispatcher(
         ContainerInterface $container = null,
     ): ConsumeMiddlewareDispatcher {
-        $container = $container ?? $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
         $callableFactory = new CallableFactory($container);
 
         return new ConsumeMiddlewareDispatcher(
