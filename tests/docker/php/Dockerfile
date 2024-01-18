@@ -1,5 +1,7 @@
+# Important! Do not use this image in production!
+
 ARG PHP_VERSION
-FROM php:${PHP_VERSION}-fpm-alpine
+FROM --platform=linux/amd64 php:${PHP_VERSION}-cli-alpine
 
 RUN apk add git autoconf g++ make linux-headers
 

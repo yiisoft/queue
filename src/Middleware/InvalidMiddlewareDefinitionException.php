@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Middleware;
+namespace Yiisoft\Queue\Middleware;
 
 use InvalidArgumentException;
 
 use Throwable;
 
-use function get_class;
 use function is_array;
 use function is_object;
 use function is_string;
@@ -31,14 +30,12 @@ final class InvalidMiddlewareDefinitionException extends InvalidArgumentExceptio
     }
 
     /**
-     * @param mixed $middlewareDefinition
-     *
      * @return string|null
      */
     private function convertDefinitionToString(mixed $middlewareDefinition): ?string
     {
         if (is_object($middlewareDefinition)) {
-            return 'an instance of "' . get_class($middlewareDefinition) . '"';
+            return 'an instance of "' . $middlewareDefinition::class . '"';
         }
 
         if (is_string($middlewareDefinition)) {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Tests\Integration;
+namespace Yiisoft\Queue\Tests\Integration;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -11,27 +11,27 @@ use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
-use Yiisoft\Yii\Queue\Adapter\SynchronousAdapter;
-use Yiisoft\Yii\Queue\Cli\LoopInterface;
-use Yiisoft\Yii\Queue\Message\Message;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\Consume\MiddlewareFactoryConsume;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureFinalHandler;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Yii\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Yii\Queue\Middleware\Push\MiddlewareFactoryPush;
-use Yiisoft\Yii\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Queue;
-use Yiisoft\Yii\Queue\QueueInterface;
-use Yiisoft\Yii\Queue\Tests\Integration\Support\TestMiddleware;
-use Yiisoft\Yii\Queue\Worker\Worker;
-use Yiisoft\Yii\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Adapter\SynchronousAdapter;
+use Yiisoft\Queue\Cli\LoopInterface;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
+use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
+use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
+use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
+use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Tests\Integration\Support\TestMiddleware;
+use Yiisoft\Queue\Worker\Worker;
+use Yiisoft\Queue\Worker\WorkerInterface;
 
 final class MiddlewareTest extends TestCase
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue;
+namespace Yiisoft\Queue;
 
 use Closure;
 use InvalidArgumentException;
@@ -12,11 +12,11 @@ use Yiisoft\Definitions\ArrayDefinition;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Definitions\Helpers\DefinitionValidator;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Yii\Queue\Adapter\AdapterInterface;
-use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
-use Yiisoft\Yii\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
-use Yiisoft\Yii\Queue\Middleware\CallableFactory;
-use Yiisoft\Yii\Queue\Middleware\InvalidCallableConfigurationException;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Exception\AdapterConfiguration\ChannelIncorrectlyConfigured;
+use Yiisoft\Queue\Exception\AdapterConfiguration\ChannelNotConfiguredException;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
 
 final class QueueFactory implements QueueFactoryInterface
 {
@@ -29,9 +29,6 @@ final class QueueFactory implements QueueFactoryInterface
      * "Definition" here is a {@see Factory} definition
      * @param QueueInterface $queue A default queue implementation. `$queue->withAdapter()` will be returned
      * with the `get` method
-     * @param ContainerInterface $container
-     * @param CallableFactory $callableFactory
-     * @param Injector $injector
      * @param bool $enableRuntimeChannelDefinition A flag whether to enable a such behavior when there is no
      * explicit channel adapter definition: `return $this->queue->withAdapter($this->adapter->withChannel($channel)`
      * When this flag is set to false, only explicit definitions from the $definition parameter are used.
@@ -71,10 +68,7 @@ final class QueueFactory implements QueueFactoryInterface
     }
 
     /**
-     * @param string $channel
-     *
      * @throws ChannelIncorrectlyConfigured
-     *
      * @return QueueInterface
      */
     private function create(string $channel): QueueInterface

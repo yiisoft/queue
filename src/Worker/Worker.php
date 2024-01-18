@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Yii\Queue\Worker;
+namespace Yiisoft\Queue\Worker;
 
 use Closure;
 use Psr\Container\ContainerExceptionInterface;
@@ -14,17 +14,18 @@ use ReflectionMethod;
 use RuntimeException;
 use Throwable;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Yii\Queue\Exception\JobFailureException;
-use Yiisoft\Yii\Queue\Message\MessageInterface;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeFinalHandler;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Yii\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureFinalHandler;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Yii\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Yii\Queue\QueueInterface;
+use Yiisoft\Queue\Exception\JobFailureException;
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Message\IdEnvelope;
 
 final class Worker implements WorkerInterface
 {
@@ -41,16 +42,11 @@ final class Worker implements WorkerInterface
     }
 
     /**
-     * @param MessageInterface $message
-     * @param QueueInterface $queue
-     *
      * @throws Throwable
-     *
-     * @return MessageInterface
      */
     public function process(MessageInterface $message, QueueInterface $queue): MessageInterface
     {
-        $this->logger->info('Processing message #{message}.', ['message' => $message->getId()]);
+        $this->logger->info('Processing message #{message}.', ['message' => $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null']);
 
         $name = $message->getHandlerName();
         $handler = $this->getHandler($name);
@@ -94,8 +90,6 @@ final class Worker implements WorkerInterface
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     *
-     * @return callable|null
      */
     private function prepare(callable|object|array|string|null $definition): callable|null
     {
