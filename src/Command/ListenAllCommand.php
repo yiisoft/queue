@@ -9,9 +9,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Yiisoft\Yii\Console\ExitCode;
-use Yiisoft\Yii\Queue\Cli\LoopInterface;
-use Yiisoft\Yii\Queue\QueueFactoryInterface;
+use Yiisoft\Queue\Cli\LoopInterface;
+use Yiisoft\Queue\QueueFactoryInterface;
 
 final class ListenAllCommand extends Command
 {
@@ -78,6 +77,6 @@ final class ListenAllCommand extends Command
             }
         }
 
-        return ExitCode::OK;
+        return 0;
     }
 }
