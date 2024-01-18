@@ -23,15 +23,13 @@ final class ListenAllCommand extends Command
 
     private QueueFactoryInterface $queueFactory;
     private LoopInterface $loop;
-    private array $channels;
 
-    public function __construct(QueueFactoryInterface $queueFactory, LoopInterface $loop, array $channels)
+    public function __construct(QueueFactoryInterface $queueFactory, LoopInterface $loop, private array $channels)
     {
         parent::__construct();
 
         $this->queueFactory = $queueFactory;
         $this->loop = $loop;
-        $this->channels = $channels;
     }
 
     public function configure(): void
