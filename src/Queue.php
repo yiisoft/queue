@@ -39,6 +39,11 @@ final class Queue implements QueueInterface
         $this->adapterHandler = new AdapterHandler();
     }
 
+    public function __destruct()
+    {
+        $this->run(0);
+    }
+
     public function getChannelName(): string
     {
         return $this->channelName;
@@ -50,7 +55,7 @@ final class Queue implements QueueInterface
     ): MessageInterface {
         $this->logger->debug(
             'Preparing to push message with data "{data}" and metadata: "{metadata}.',
-            ['data' => $message->getData(), 'metadata' => $message->getMetadata()]
+            ['data' => $message->getData(), 'metadata' => json_encode($message->getMetadata())]
         );
 
         $request = new Request($message, $this);

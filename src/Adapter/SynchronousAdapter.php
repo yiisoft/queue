@@ -18,25 +18,14 @@ final class SynchronousAdapter implements AdapterInterface
     private int $current = 0;
 
     public function __construct(
-        private WorkerInterface $worker,
-        private QueueInterface $queue,
         private string $channel = QueueFactory::DEFAULT_CHANNEL_NAME,
     ) {
-    }
-
-    public function __destruct()
-    {
-        $this->runExisting(function (MessageInterface $message): bool {
-            $this->worker->process($message, $this->queue);
-
-            return true;
-        });
     }
 
     public function runExisting(callable $handlerCallback): void
     {
         $result = true;
-        while (isset($this->messages[$this->current]) && $result === true) {
+        while ($result === true && isset($this->messages[$this->current])) {
             $result = $handlerCallback($this->messages[$this->current]);
             unset($this->messages[$this->current]);
             $this->current++;

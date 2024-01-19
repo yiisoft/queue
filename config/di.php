@@ -3,20 +3,18 @@
 declare(strict_types=1);
 
 use Psr\Container\ContainerInterface;
+use Yiisoft\Definitions\Reference;
+use Yiisoft\Injector\Injector;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\MessageSerializerInterface;
-use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\MiddlewareFactory;
+use Yiisoft\Queue\Middleware\MiddlewareFactoryInterface;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueFactory;
 use Yiisoft\Queue\QueueFactoryInterface;
@@ -35,22 +33,28 @@ return [
             : SimpleLoop::class
         );
     },
+    'queue.middlewareDispatcher.push' => static function (Injector $injector) use ($params) {
+        return $injector->make(
+            MiddlewareDispatcher::class,
+            ['middlewareDefinitions' => $params['yiisoft/queue']['middlewares-push']]
+        );
+    },
+    Queue::class => [
+        '__construct()' => [
+            'adapter' => Reference::to(AdapterInterface::class),
+            'pushMiddlewareDispatcher' => Reference::to('queue.middlewareDispatcher.push'),
+        ]
+    ],
     QueueFactoryInterface::class => QueueFactory::class,
     QueueFactory::class => [
         '__construct()' => ['channelConfiguration' => $params['yiisoft/queue']['channel-definitions']],
     ],
+    SynchronousAdapter::class => function () {
+        return new SynchronousAdapter();
+    },
+    AdapterInterface::class => SynchronousAdapter::class,
+
     QueueInterface::class => Queue::class,
-    MiddlewareFactoryPushInterface::class => MiddlewareFactoryPush::class,
-    MiddlewareFactoryConsumeInterface::class => MiddlewareFactoryConsume::class,
-    MiddlewareFactoryFailureInterface::class => MiddlewareFactoryFailure::class,
-    PushMiddlewareDispatcher::class => [
-        '__construct()' => ['middlewareDefinitions' => $params['yiisoft/queue']['middlewares-push']],
-    ],
-    ConsumeMiddlewareDispatcher::class => [
-        '__construct()' => ['middlewareDefinitions' => $params['yiisoft/queue']['middlewares-consume']],
-    ],
-    FailureMiddlewareDispatcher::class => [
-        '__construct()' => ['middlewareDefinitions' => $params['yiisoft/queue']['middlewares-fail']],
-    ],
     MessageSerializerInterface::class => JsonMessageSerializer::class,
+    MiddlewareFactoryInterface::class => MiddlewareFactory::class,
 ];
