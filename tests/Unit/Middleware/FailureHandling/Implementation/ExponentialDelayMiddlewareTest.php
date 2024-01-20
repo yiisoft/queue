@@ -19,9 +19,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
 {
     public static function constructorRequirementsProvider(): array
     {
-        $queue = $this->createMock(QueueInterface::class);
-        $middleware = $this->createMock(DelayMiddlewareInterface::class);
-
         return [
             [
                 true,
@@ -31,8 +28,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
                     0.001,
                     1,
                     0.01,
-                    $middleware,
-                    $queue,
                 ],
             ],
             [
@@ -43,8 +38,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
                     PHP_INT_MAX,
                     PHP_INT_MAX,
                     PHP_INT_MAX,
-                    $middleware,
-                    $queue,
                 ],
             ],
             [
@@ -55,8 +48,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
                     0,
                     1,
                     0.01,
-                    $middleware,
-                    $queue,
                 ],
             ],
             [
@@ -67,8 +58,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
                     0,
                     1,
                     0.01,
-                    $middleware,
-                    $queue,
                 ],
             ],
             [
@@ -79,8 +68,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
                     0,
                     0,
                     0.01,
-                    $middleware,
-                    $queue,
                 ],
             ],
             [
@@ -91,8 +78,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
                     0,
                     0.01,
                     0,
-                    $middleware,
-                    $queue,
                 ],
             ],
             [
@@ -103,8 +88,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
                     PHP_INT_MAX,
                     PHP_INT_MAX,
                     PHP_INT_MAX,
-                    $middleware,
-                    $queue,
                 ],
             ],
             [
@@ -115,8 +98,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
                     PHP_INT_MAX,
                     0,
                     PHP_INT_MAX,
-                    $middleware,
-                    $queue,
                 ],
             ],
             [
@@ -127,8 +108,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
                     PHP_INT_MAX,
                     PHP_INT_MAX,
                     0,
-                    $middleware,
-                    $queue,
                 ],
             ],
         ];
@@ -137,6 +116,9 @@ class ExponentialDelayMiddlewareTest extends TestCase
     #[DataProvider('constructorRequirementsProvider')]
     public function testConstructorRequirements(bool $success, array $arguments): void
     {
+        $arguments[] = $this->createMock(DelayMiddlewareInterface::class);
+        $arguments[] = $this->createMock(QueueInterface::class);
+
         if (!$success) {
             $this->expectException(InvalidArgumentException::class);
         }
