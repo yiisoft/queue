@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
 
 use Exception;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
@@ -16,7 +17,7 @@ use Yiisoft\Queue\Tests\TestCase;
 
 class ExponentialDelayMiddlewareTest extends TestCase
 {
-    public function constructorRequirementsProvider(): array
+    public static function constructorRequirementsProvider(): array
     {
         $queue = $this->createMock(QueueInterface::class);
         $middleware = $this->createMock(DelayMiddlewareInterface::class);
@@ -133,9 +134,7 @@ class ExponentialDelayMiddlewareTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider constructorRequirementsProvider
-     */
+    #[DataProvider('constructorRequirementsProvider')]
     public function testConstructorRequirements(bool $success, array $arguments): void
     {
         if (!$success) {
