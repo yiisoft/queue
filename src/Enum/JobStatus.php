@@ -6,15 +6,15 @@ namespace Yiisoft\Queue\Enum;
 
 use Yiisoft\Queue\Exception\InvalidStatusException;
 
-final class JobStatus
+class JobStatus
 {
-    public const WAITING = 1;
-    public const RESERVED = 2;
-    public const DONE = 3;
+    final public const WAITING = 1;
+    final public const RESERVED = 2;
+    final public const DONE = 3;
 
     protected int $status;
 
-    protected function __construct(int $status)
+    final protected function __construct(int $status)
     {
         if (!in_array($status, $this->available(), true)) {
             throw new InvalidStatusException($status);
@@ -30,17 +30,17 @@ final class JobStatus
 
     public static function waiting(): self
     {
-        return new self(self::WAITING);
+        return new static(self::WAITING);
     }
 
     public static function reserved(): self
     {
-        return new self(self::RESERVED);
+        return new static(self::RESERVED);
     }
 
     public static function done(): self
     {
-        return new self(self::DONE);
+        return new static(self::DONE);
     }
 
     public function isWaiting(): bool
