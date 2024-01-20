@@ -23,8 +23,8 @@ class SendAgainMiddlewareTest extends TestCase
     private const EXPONENTIAL_STRATEGY_DELAY_INITIAL = 1;
     private const EXPONENTIAL_STRATEGY_DELAY_MAXIMUM = 5;
     private const EXPONENTIAL_STRATEGY_EXPONENT = 2;
-    public const KEY_EXPONENTIAL_ATTEMPTS = ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test';
-    public const KEY_EXPONENTIAL_DELAY = ExponentialDelayMiddleware::META_KEY_DELAY . '-test';
+    final public const KEY_EXPONENTIAL_ATTEMPTS = ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test';
+    final public const KEY_EXPONENTIAL_DELAY = ExponentialDelayMiddleware::META_KEY_DELAY . '-test';
 
     public function queueSendingStrategyProvider(): array
     {

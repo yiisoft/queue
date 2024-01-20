@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Enum;
 
 use Yiisoft\Queue\Exception\InvalidStatusException;
 
-class JobStatus
+final class JobStatus
 {
     public const WAITING = 1;
     public const RESERVED = 2;
