@@ -14,7 +14,7 @@ final class JobStatus
 
     protected int $status;
 
-    final protected function __construct(int $status)
+    protected function __construct(int $status)
     {
         if (!in_array($status, $this->available(), true)) {
             throw new InvalidStatusException($status);
@@ -30,17 +30,17 @@ final class JobStatus
 
     public static function waiting(): self
     {
-        return new static(self::WAITING);
+        return new self(self::WAITING);
     }
 
     public static function reserved(): self
     {
-        return new static(self::RESERVED);
+        return new self(self::RESERVED);
     }
 
     public static function done(): self
     {
-        return new static(self::DONE);
+        return new self(self::DONE);
     }
 
     public function isWaiting(): bool
