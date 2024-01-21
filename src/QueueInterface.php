@@ -30,8 +30,10 @@ interface QueueInterface
      * Execute all existing jobs and exit
      *
      * @param int $max
+     *
+     * @return int How many messages were processed
      */
-    public function run(int $max = 0): void;
+    public function run(int $max = 0): int;
 
     /**
      * Listen to the queue and execute jobs as they come
