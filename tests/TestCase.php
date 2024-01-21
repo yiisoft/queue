@@ -163,12 +163,12 @@ abstract class TestCase extends BaseTestCase
     {
         return [
             'simple' => fn () => $this->executionTimes++,
-            'exceptional' => function () {
+            'exceptional' => function (): never {
                 $this->executionTimes++;
 
                 throw new RuntimeException('test');
             },
-            'retryable' => function () {
+            'retryable' => function (): never {
                 $this->executionTimes++;
 
                 throw new RuntimeException('test');

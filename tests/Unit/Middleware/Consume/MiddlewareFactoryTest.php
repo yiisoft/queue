@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit\Middleware\Consume;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
@@ -131,7 +132,7 @@ final class MiddlewareFactoryTest extends TestCase
         );
     }
 
-    public function invalidMiddlewareDefinitionProvider(): array
+    public static function invalidMiddlewareDefinitionProvider(): array
     {
         return [
             'wrong string' => ['test'],
@@ -145,9 +146,7 @@ final class MiddlewareFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidMiddlewareDefinitionProvider
-     */
+    #[DataProvider('invalidMiddlewareDefinitionProvider')]
     public function testInvalidMiddleware(mixed $definition): void
     {
         $this->expectException(InvalidMiddlewareDefinitionException::class);
