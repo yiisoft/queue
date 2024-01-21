@@ -10,8 +10,9 @@ interface MessageInterface
      * Returns handler name.
      *
      * @return string
+     * @psalm-return class-string<MessageHandlerInterface>
      */
-    public function getHandlerName(): string;
+    public function getHandler(): string;
 
     /**
      * Returns payload data.

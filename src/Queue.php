@@ -50,7 +50,7 @@ final class Queue implements QueueInterface
     ): MessageInterface {
         $this->logger->debug(
             'Preparing to push message with handler name "{handlerName}".',
-            ['handlerName' => $message->getHandlerName()]
+            ['handlerName' => $message->getHandler()]
         );
 
         $request = new PushRequest($message, $this->adapter);
@@ -61,7 +61,7 @@ final class Queue implements QueueInterface
         $messageId = $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
         $this->logger->info(
             'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
-            ['handlerName' => $message->getHandlerName(), 'id' => $messageId]
+            ['handlerName' => $message->getHandler(), 'id' => $messageId]
         );
 
         return $message;
