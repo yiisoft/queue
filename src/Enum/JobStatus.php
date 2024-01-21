@@ -8,9 +8,9 @@ use Yiisoft\Queue\Exception\InvalidStatusException;
 
 class JobStatus
 {
-    public const WAITING = 1;
-    public const RESERVED = 2;
-    public const DONE = 3;
+    final public const WAITING = 1;
+    final public const RESERVED = 2;
+    final public const DONE = 3;
 
     protected int $status;
 
