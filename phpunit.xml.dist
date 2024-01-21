@@ -1,26 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
-<phpunit
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    colors="true"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
-    stopOnFailure="false"
-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
-    executionOrder="random"
-    verbose="true"
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         cacheDirectory=".phpunit.cache"
+         requireCoverageMetadata="false"
+         beStrictAboutCoverageMetadata="true"
+         beStrictAboutOutputDuringTests="true"
+         executionOrder="random"
+         failOnRisky="true"
+         failOnWarning="true"
+         stopOnFailure="false"
+         colors="true"
 >
-    <coverage>
-        <include>
-            <directory>./src</directory>
-        </include>
-    </coverage>
+    <php>
+        <ini name="error_reporting" value="-1"/>
+    </php>
+
     <testsuites>
-        <testsuite name="Unit">
+        <testsuite name="Yii Queue unit tests">
             <directory>./tests/Unit</directory>
         </testsuite>
-        <testsuite name="Integration">
+        <testsuite name="Yii Queue integration tests">
             <directory>./tests/Integration</directory>
         </testsuite>
     </testsuites>
+
+    <source>
+        <include>
+            <directory suffix=".php">./src</directory>
+            <directory suffix=".php">./config</directory>
+        </include>
+    </source>
 </phpunit>

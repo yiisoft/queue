@@ -97,7 +97,7 @@ final class WorkerTest extends TestCase
         $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
-        $handlers = ['simple' => [FakeHandler::class, 'staticExecute']];
+        $handlers = ['simple' => FakeHandler::staticExecute(...)];
 
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams($handlers, $logger, $container);
