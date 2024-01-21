@@ -35,9 +35,9 @@ final class QueueDecorator implements QueueInterface
         return $message;
     }
 
-    public function run(int $max = 0): void
+    public function run(int $max = 0): int
     {
-        $this->queue->run($max);
+        return $this->queue->run($max);
     }
 
     public function listen(): void

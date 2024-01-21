@@ -101,7 +101,11 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
         $meta = $message->getMetadata();
         $key = self::META_KEY_DELAY . "-$this->id";
 
-        $delayOriginal = (float) ($meta[$key] ?? 0 ?: $this->delayInitial);
+        $delayOriginal = (float) ($meta[$key] ?? 0);
+        if ($delayOriginal <= 0) {
+            $delayOriginal = $this->delayInitial;
+        }
+
         $result = $delayOriginal * $this->exponent;
 
         return min($result, $this->delayMaximum);

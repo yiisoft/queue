@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Exception\InvalidStatusException;
 use Yiisoft\Queue\Tests\TestCase;
@@ -11,7 +12,7 @@ use Yiisoft\Queue\Tests\Unit\Support\TestJobStatus;
 
 final class JobStatusTest extends TestCase
 {
-    public function getStatusPairs(): array
+    public static function getStatusPairs(): array
     {
         return [
             'waiting' => [
@@ -41,9 +42,7 @@ final class JobStatusTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getStatusPairs
-     */
+    #[DataProvider('getStatusPairs')]
     public function testInstanceValue(string $statusName, string $positiveMethod, array $negatives): void
     {
         $status = JobStatus::$statusName();
