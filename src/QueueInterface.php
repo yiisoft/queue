@@ -27,7 +27,6 @@ interface QueueInterface
     /**
      * Execute all existing jobs and exit
      *
-     * @param int $max
      *
      * @return int How many messages were processed
      */
