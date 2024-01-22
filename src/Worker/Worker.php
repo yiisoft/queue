@@ -51,7 +51,7 @@ final class Worker implements WorkerInterface
         $name = $message->getHandlerName();
         $handler = $this->getHandler($name);
         if ($handler === null) {
-            throw new RuntimeException("Queue handler with name $name doesn't exist");
+            throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist', $name));
         }
 
         $request = new ConsumeRequest($message, $queue);

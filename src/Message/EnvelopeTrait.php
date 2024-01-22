@@ -31,8 +31,27 @@ trait EnvelopeTrait
         return $this->message->getData();
     }
 
+    public static function fromMessage(MessageInterface $message): self
+    {
+        return new static($message);
+    }
+
     public function getMetadata(): array
     {
-        return $this->message->getMetadata();
+        return array_merge(
+            $this->message->getMetadata(),
+            [
+                self::ENVELOPE_STACK_KEY => array_merge(
+                    $this->message->getMetadata()[self::ENVELOPE_STACK_KEY] ?? [],
+                    [self::class],
+                ),
+            ],
+            $this->getEnvelopeMetadata(),
+        );
+    }
+
+    public function getEnvelopeMetadata(): array
+    {
+        return [];
     }
 }

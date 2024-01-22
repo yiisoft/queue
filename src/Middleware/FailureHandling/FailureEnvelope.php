@@ -14,7 +14,7 @@ final class FailureEnvelope implements EnvelopeInterface
 
     public function __construct(
         private MessageInterface $message,
-        private array $meta,
+        private array $meta = [],
     ) {
     }
 

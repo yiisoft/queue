@@ -19,17 +19,13 @@ interface QueueInterface
     /**
      * Pushes a message into the queue.
      *
-     * @param MessageInterface $message
      * @param array|callable|MiddlewarePushInterface|string ...$middlewareDefinitions
-     *
      * @return MessageInterface
      */
     public function push(MessageInterface $message, MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): MessageInterface;
 
     /**
      * Execute all existing jobs and exit
-     *
-     * @param int $max
      *
      * @return int How many messages were processed
      */

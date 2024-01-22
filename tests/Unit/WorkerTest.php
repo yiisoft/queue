@@ -108,7 +108,7 @@ final class WorkerTest extends TestCase
 
     public function testJobFailWithDefinitionUndefinedMethodHandler(): void
     {
-        $this->expectExceptionMessage("Queue handler with name simple doesn't exist");
+        $this->expectExceptionMessage('Queue handler with name "simple" does not exist');
 
         $message = new Message('simple', ['test-data']);
         $logger = new SimpleLogger();
@@ -124,7 +124,7 @@ final class WorkerTest extends TestCase
 
     public function testJobFailWithDefinitionUndefinedClassHandler(): void
     {
-        $this->expectExceptionMessage("Queue handler with name simple doesn't exist");
+        $this->expectExceptionMessage('Queue handler with name "simple" does not exist');
 
         $message = new Message('simple', ['test-data']);
         $logger = new SimpleLogger();
@@ -146,7 +146,7 @@ final class WorkerTest extends TestCase
 
     public function testJobFailWithDefinitionClassNotFoundInContainerHandler(): void
     {
-        $this->expectExceptionMessage("Queue handler with name simple doesn't exist");
+        $this->expectExceptionMessage('Queue handler with name "simple" does not exist');
         $message = new Message('simple', ['test-data']);
         $logger = new SimpleLogger();
         $container = new SimpleContainer();
