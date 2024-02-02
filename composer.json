@@ -66,6 +66,8 @@
         },
         "config-plugin": {
             "di": "di.php",
+            "events-web": "events-web.php",
+            "events-console": "events-console.php",
             "params": "params.php"
         }
     },

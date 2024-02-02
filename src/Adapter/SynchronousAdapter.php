@@ -7,9 +7,7 @@ namespace Yiisoft\Queue\Adapter;
 use InvalidArgumentException;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\QueueFactory;
-use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\QueueFactoryInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
 final class SynchronousAdapter implements AdapterInterface
@@ -18,7 +16,7 @@ final class SynchronousAdapter implements AdapterInterface
     private int $current = 0;
 
     public function __construct(
-        private string $channel = QueueFactory::DEFAULT_CHANNEL_NAME,
+        private string $channel = QueueFactoryInterface::DEFAULT_CHANNEL_NAME,
     ) {
     }
 

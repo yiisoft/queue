@@ -39,11 +39,6 @@ final class Queue implements QueueInterface
         $this->adapterHandler = new AdapterHandler();
     }
 
-    public function __destruct()
-    {
-        $this->run(0);
-    }
-
     public function getChannelName(): string
     {
         return $this->channelName;
