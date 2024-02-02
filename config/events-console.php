@@ -15,6 +15,6 @@ return [
             if ($adapter instanceof SynchronousAdapter) {
                 $container->get(QueueInterface::class)->run(0);
             }
-        }
+        },
     ],
 ];
