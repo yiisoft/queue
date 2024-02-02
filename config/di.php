@@ -43,7 +43,7 @@ return [
         '__construct()' => [
             'adapter' => Reference::to(AdapterInterface::class),
             'pushMiddlewareDispatcher' => Reference::to('queue.middlewareDispatcher.push'),
-        ]
+        ],
     ],
     QueueFactoryInterface::class => QueueFactory::class,
     QueueFactory::class => [
