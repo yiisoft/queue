@@ -4,28 +4,24 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Worker;
 
-use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Throwable;
-use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Exception\JobFailureException;
-use Yiisoft\Queue\Message\HandlerEnvelope;
-use Yiisoft\Queue\Message\MessageHandlerInterface;
+use Yiisoft\Queue\Message\EnvelopeInterface;
+use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Message\IdEnvelope;
 
 final class Worker implements WorkerInterface
 {
     public function __construct(
         private LoggerInterface $logger,
-        private Injector $injector,
-        private ContainerInterface $container,
+        private EventDispatcherInterface $eventDispatcher,
         private MiddlewareDispatcher $consumeMiddlewareDispatcher,
         private MiddlewareDispatcher $failureMiddlewareDispatcher,
     ) {
@@ -36,34 +32,18 @@ final class Worker implements WorkerInterface
      */
     public function process(MessageInterface $message, QueueInterface $queue): MessageInterface
     {
-        $this->logger->info('Processing message #{message}.', ['message' => $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null']);
-
-        $handlerClass = $message instanceof HandlerEnvelope ? $message->getHandler() : null;
-
-        if (!is_subclass_of($handlerClass, MessageHandlerInterface::class, true)) {
-            throw new RuntimeException(sprintf(
-                'Message handler "%s" for "%s" must implement "%s".',
-                $handlerClass,
-                $message::class,
-                MessageHandlerInterface::class,
-            ));
-        }
-        $handler = $this->container->get($handlerClass);
-        if ($handler === null) {
-            throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist', $handlerClass));
-        }
-
-        if (!$handler instanceof MessageHandlerInterface) {
-            throw new RuntimeException(sprintf(
-                'Message handler "%s" for "%s" must implement "%s".',
-                $handlerClass,
-                $message::class,
-                MessageHandlerInterface::class,
-            ));
-        }
+        $this->logger->info(
+            'Processing message #{message}.',
+            ['message' => $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null']
+        );
 
         $request = new Request($message, $queue);
-        $closure = fn (MessageInterface $message): mixed => $this->injector->invoke([$handler, 'handle'], [$message]);
+
+        $closure = function (object $message): mixed {
+            $message = $message instanceof EnvelopeInterface ? $message->getMessage() : $message;
+            return $this->eventDispatcher->dispatch($message);
+        };
+
         try {
             $result = $this->consumeMiddlewareDispatcher->dispatch($request, new ConsumeFinalHandler($closure));
             return $result->getMessage();

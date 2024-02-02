@@ -7,21 +7,26 @@ namespace Yiisoft\Queue\Tests;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\NullLogger;
-use Yiisoft\Injector\Injector;
-use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
-use Yiisoft\Test\Support\Container\SimpleContainer;
+use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
+use Yiisoft\EventDispatcher\Provider\ListenerCollection;
+use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SimpleLoop;
+use Yiisoft\Queue\Message\HandlerEnvelope;
+use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
 use Yiisoft\Queue\Queue;
-use Yiisoft\Queue\Worker\Worker;
-use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Tests\Support\NullMessageHandler;
 use Yiisoft\Queue\Tests\Support\StackMessageHandler;
+use Yiisoft\Queue\Worker\Worker;
+use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Test\Support\Container\SimpleContainer;
 
 /**
  * Base Test Case.
@@ -33,6 +38,7 @@ abstract class TestCase extends BaseTestCase
     protected ?AdapterInterface $adapter = null;
     protected ?LoopInterface $loop = null;
     protected ?WorkerInterface $worker = null;
+    protected ?EventDispatcherInterface $eventDispatcher = null;
     protected array $eventHandlers = [];
     protected int $executionTimes;
 
@@ -72,7 +78,31 @@ abstract class TestCase extends BaseTestCase
 
     protected function getWorker(): WorkerInterface
     {
-        return $this->worker ??= $this->createWorker();
+        return $this->worker ??= new Worker(
+            new NullLogger(),
+            $this->createEventDispatcher(),
+            $this->getMiddlewareDispatcher(),
+            $this->getMiddlewareDispatcher(),
+        );
+    }
+
+    protected function createEventDispatcher(): EventDispatcherInterface
+    {
+        $container = $this->getContainer();
+        $listeners = new ListenerCollection();
+        $listeners = $listeners->add(function (Message $message) use ($container) {
+            $handler = HandlerEnvelope::fromMessage($message)->getHandler();
+
+            if ($handler) {
+                return $container->get($handler)->handle($message);
+            }
+            throw new \RuntimeException('Handler not found ' . print_r($message, true));
+        });
+        return $this->eventDispatcher ??= new Dispatcher(
+            new Provider(
+                $listeners
+            )
+        );
     }
 
     protected function getContainer(): ContainerInterface
@@ -93,7 +123,7 @@ abstract class TestCase extends BaseTestCase
     protected function createAdapter(bool $realAdapter): AdapterInterface
     {
         if ($realAdapter) {
-            return new SynchronousAdapter($this->getWorker(), $this->createQueue());
+            return new SynchronousAdapter();
         }
 
         return $this->createMock(AdapterInterface::class);
@@ -102,17 +132,6 @@ abstract class TestCase extends BaseTestCase
     protected function createLoop(): LoopInterface
     {
         return new SimpleLoop();
-    }
-
-    protected function createWorker(): WorkerInterface
-    {
-        return new Worker(
-            new NullLogger(),
-            new Injector($this->getContainer()),
-            $this->getContainer(),
-            $this->getMiddlewareDispatcher(),
-            $this->getMiddlewareDispatcher(),
-        );
     }
 
     protected function createContainer(): ContainerInterface

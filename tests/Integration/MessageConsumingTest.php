@@ -5,27 +5,29 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Integration;
 
 use Psr\Log\NullLogger;
-use Yiisoft\Injector\Injector;
+use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
+use Yiisoft\EventDispatcher\Provider\ListenerCollection;
+use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\MiddlewareFactoryInterface;
+use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Worker\Worker;
-use Yiisoft\Test\Support\Container\SimpleContainer;
 
 final class MessageConsumingTest extends TestCase
 {
     public function testMessagesConsumed(): void
     {
         $stackMessageHandler = new StackMessageHandler();
-        $container = new SimpleContainer([StackMessageHandler::class => $stackMessageHandler]);
+
+        $collection = (new ListenerCollection());
+        $collection = $collection->add(fn (Message $message) => $stackMessageHandler->handle($message));
         $worker = new Worker(
             new NullLogger(),
-            new Injector($container),
-            $container,
+            new Dispatcher(new Provider($collection)),
             new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class)),
             new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class), [])
         );
@@ -41,7 +43,8 @@ final class MessageConsumingTest extends TestCase
             );
         }
 
-        $data = array_map(fn (MessageInterface $message) => $message->getData(), $stackMessageHandler->processedMessages);
+        $data = array_map(fn (MessageInterface $message) => $message->getData(),
+            $stackMessageHandler->processedMessages);
         $this->assertEquals($messages, $data);
     }
 }

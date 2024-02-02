@@ -8,28 +8,30 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Yiisoft\Injector\Injector;
-use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
-use Yiisoft\Queue\Message\HandlerEnvelope;
-use Yiisoft\Queue\Middleware\FailureFinalHandler;
-use Yiisoft\Queue\Middleware\Request;
-use Yiisoft\Queue\Tests\Support\NullMessageHandler;
-use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Test\Support\Log\SimpleLogger;
+use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
+use Yiisoft\EventDispatcher\Provider\ListenerCollection;
+use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
+use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
 use Yiisoft\Queue\Middleware\ExponentialDelayMiddleware;
-use Yiisoft\Queue\Middleware\SendAgainMiddleware;
+use Yiisoft\Queue\Middleware\FailureFinalHandler;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
+use Yiisoft\Queue\Middleware\Request;
+use Yiisoft\Queue\Middleware\SendAgainMiddleware;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\Integration\Support\TestMiddleware;
+use Yiisoft\Queue\Tests\Support\NullMessageHandler;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Test\Support\Container\SimpleContainer;
+use Yiisoft\Test\Support\Log\SimpleLogger;
 
 final class MiddlewareTest extends TestCase
 {
@@ -61,10 +63,7 @@ final class MiddlewareTest extends TestCase
             $this->createMock(LoopInterface::class),
             $this->createMock(LoggerInterface::class),
             $pushMiddlewareDispatcher,
-            new SynchronousAdapter(
-                $this->createMock(WorkerInterface::class),
-                $this->createMock(QueueInterface::class),
-            ),
+            new SynchronousAdapter(),
         );
         $queue = $queue
             ->withMiddlewares(new TestMiddleware('Won\'t be executed'))
@@ -88,7 +87,10 @@ final class MiddlewareTest extends TestCase
             'common 1',
             'common 2',
         ];
-        $container = new SimpleContainer([NullMessageHandler::class => new NullMessageHandler()]);
+        $handler = new NullMessageHandler();
+        $container = new SimpleContainer([]);
+        $listeners = (new ListenerCollection())->add(fn (Message $message) => $handler->handle($message),
+            Message::class);
         $callableFactory = new CallableFactory($container);
 
         $consumeMiddlewareDispatcher = new MiddlewareDispatcher(
@@ -109,8 +111,7 @@ final class MiddlewareTest extends TestCase
 
         $worker = new Worker(
             new SimpleLogger(),
-            new Injector($container),
-            $container,
+            new Dispatcher(new Provider($listeners)),
             $consumeMiddlewareDispatcher,
             $failureMiddlewareDispatcher,
         );
@@ -118,8 +119,7 @@ final class MiddlewareTest extends TestCase
         $message = new HandlerEnvelope(
             new Message(['initial']),
             NullMessageHandler::class
-        )
-        ;
+        );
         $messageConsumed = $worker->process($message, $this->createMock(QueueInterface::class));
 
         self::assertEquals($stack, $messageConsumed->getData());
@@ -133,7 +133,9 @@ final class MiddlewareTest extends TestCase
         );
         $queueCallback = static fn (MessageInterface $message): MessageInterface => $message;
         $queue = $this->createMock(QueueInterface::class);
-        $container = new SimpleContainer([SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queue)]);
+        $container = new SimpleContainer(
+            [SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queue)]
+        );
         $callableFactory = new CallableFactory($container);
 
         $queue->expects(self::exactly(7))->method('push')->willReturnCallback($queueCallback);

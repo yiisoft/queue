@@ -33,7 +33,7 @@ final class QueueFactoryTest extends TestCase
             new CallableFactory($container),
             new Injector($container),
             true,
-            new SynchronousAdapter($worker, $queue)
+            new SynchronousAdapter()
         );
 
         $adapter = $factory->get('test-channel');
@@ -62,7 +62,7 @@ final class QueueFactoryTest extends TestCase
             new CallableFactory($container),
             new Injector($container),
             true,
-            new SynchronousAdapter($worker, $queue)
+            new SynchronousAdapter()
         );
         $queue = $factory->get('test-channel');
 

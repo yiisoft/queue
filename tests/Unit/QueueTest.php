@@ -7,6 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit;
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Queue\Message\HandlerEnvelope;
+use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
@@ -42,6 +43,9 @@ final class QueueTest extends TestCase
             new Message(null),
             StackMessageHandler::class,
         );
+        $serializer = new JsonMessageSerializer();
+        $message = $serializer->unserialize($serializer->serialize($message));
+
         $message2 = clone $message;
         $queue->push($message);
         $queue->push($message2);
@@ -57,6 +61,9 @@ final class QueueTest extends TestCase
             new Message(null),
             StackMessageHandler::class,
         );
+        $serializer = new JsonMessageSerializer();
+        $message = $serializer->unserialize($serializer->serialize($message));
+
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
@@ -78,6 +85,9 @@ final class QueueTest extends TestCase
             new Message(null),
             StackMessageHandler::class,
         );
+        $serializer = new JsonMessageSerializer();
+        $message = $serializer->unserialize($serializer->serialize($message));
+
         $message2 = clone $message;
         $queue->push($message);
         $queue->push($message2);
@@ -96,6 +106,9 @@ final class QueueTest extends TestCase
             new Message(null),
             NullMessageHandler::class,
         );
+        $serializer = new JsonMessageSerializer();
+        $message = $serializer->unserialize($serializer->serialize($message));
+
         $envelope = $queue->push($message);
 
         self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
@@ -147,6 +160,9 @@ final class QueueTest extends TestCase
             new Message(null),
             StackMessageHandler::class,
         );
+        $serializer = new JsonMessageSerializer();
+        $message = $serializer->unserialize($serializer->serialize($message));
+
         $message2 = clone $message;
         $queue->push($message);
         $queue->push($message2);
