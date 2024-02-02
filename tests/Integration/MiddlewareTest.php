@@ -89,8 +89,10 @@ final class MiddlewareTest extends TestCase
         ];
         $handler = new NullMessageHandler();
         $container = new SimpleContainer([]);
-        $listeners = (new ListenerCollection())->add(fn (Message $message) => $handler->handle($message),
-            Message::class);
+        $listeners = (new ListenerCollection())->add(
+            fn (Message $message) => $handler->handle($message),
+            Message::class
+        );
         $callableFactory = new CallableFactory($container);
 
         $consumeMiddlewareDispatcher = new MiddlewareDispatcher(
