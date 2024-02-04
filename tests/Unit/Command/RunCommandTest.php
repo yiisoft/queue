@@ -15,7 +15,7 @@ final class RunCommandTest extends TestCase
 {
     public function testConfigure(): void
     {
-        $command = new RunCommand($this->createMock(QueueFactoryInterface::class));
+        $command = new RunCommand($this->createMock(QueueFactoryInterface::class), []);
         $channelArgument = $command->getNativeDefinition()->getArgument('channel');
         $this->assertEquals('channel', $channelArgument->getName());
     }
@@ -28,7 +28,7 @@ final class RunCommandTest extends TestCase
         $queueFactory->method('get')->willReturn($queue);
         $input = new StringInput('channel');
 
-        $command = new RunCommand($queueFactory);
+        $command = new RunCommand($queueFactory, []);
         $exitCode = $command->run($input, $this->createMock(OutputInterface::class));
 
         $this->assertEquals(0, $exitCode);

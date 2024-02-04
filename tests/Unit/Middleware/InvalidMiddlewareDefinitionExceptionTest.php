@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit\Middleware;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
@@ -11,7 +12,7 @@ use Yiisoft\Queue\Tests\Unit\Middleware\Support\TestCallableMiddleware;
 
 final class InvalidMiddlewareDefinitionExceptionTest extends TestCase
 {
-    public function dataBase(): array
+    public static function dataBase(): array
     {
         return [
             [
@@ -33,16 +34,14 @@ final class InvalidMiddlewareDefinitionExceptionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataBase
-     */
+    #[DataProvider('dataBase')]
     public function testBase(mixed $definition, string $expected): void
     {
         $exception = new InvalidMiddlewareDefinitionException($definition);
         self::assertStringEndsWith('. Got ' . $expected . '.', $exception->getMessage());
     }
 
-    public function dataUnknownDefinition(): array
+    public static function dataUnknownDefinition(): array
     {
         return [
             [42],
@@ -50,9 +49,7 @@ final class InvalidMiddlewareDefinitionExceptionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataUnknownDefinition
-     */
+    #[DataProvider('dataUnknownDefinition')]
     public function testUnknownDefinition(mixed $definition): void
     {
         $exception = new InvalidMiddlewareDefinitionException($definition);

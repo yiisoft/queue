@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit\Middleware;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Queue\Tests\App\FakeQueue;
@@ -127,7 +128,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $this->assertSame('first', $request->getMessage()->getData());
     }
 
-    public function dataHasMiddlewares(): array
+    public static function dataHasMiddlewares(): array
     {
         return [
             [[], false],
@@ -135,9 +136,7 @@ final class MiddlewareDispatcherTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataHasMiddlewares
-     */
+    #[DataProvider('dataHasMiddlewares')]
     public function testHasMiddlewares(array $definitions, bool $expected): void
     {
         self::assertSame(

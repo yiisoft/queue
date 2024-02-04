@@ -19,4 +19,12 @@ final class Message implements MessageInterface
         $this->data = $data;
         $this->metadata = $metadata;
     }
+
+    public function withMetadata(array $metadata): self
+    {
+        $instance = clone $this;
+        $instance->metadata = $metadata;
+
+        return $instance;
+    }
 }

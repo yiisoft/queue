@@ -18,6 +18,8 @@ use Yiisoft\Queue\Message\MessageSerializerInterface;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
 use Yiisoft\Queue\Middleware\MiddlewareFactoryInterface;
+use Yiisoft\Queue\Command\ListenAllCommand;
+use Yiisoft\Queue\Command\RunCommand;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueFactory;
 use Yiisoft\Queue\QueueFactoryInterface;
@@ -72,4 +74,14 @@ return [
 
         return new Dispatcher($provider);
     },
+    RunCommand::class => [
+        '__construct()' => [
+            'channels' => array_keys($params['yiisoft/yii-queue']['channel-definitions']),
+        ],
+    ],
+    ListenAllCommand::class => [
+        '__construct()' => [
+            'channels' => array_keys($params['yiisoft/yii-queue']['channel-definitions']),
+        ],
+    ],
 ];
