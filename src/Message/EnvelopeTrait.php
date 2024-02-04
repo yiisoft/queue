@@ -12,7 +12,11 @@ trait EnvelopeTrait
 
     public function getMessage(): MessageInterface
     {
-        return $this->message;
+        $message = $this->message;
+        while ($message instanceof EnvelopeInterface) {
+            $message = $message->getMessage();
+        }
+        return $message;
     }
 
     public function withMessage(MessageInterface $message): self

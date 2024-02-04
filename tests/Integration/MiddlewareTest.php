@@ -14,6 +14,7 @@ use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Message\HandlerEnvelope;
+use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
@@ -63,7 +64,7 @@ final class MiddlewareTest extends TestCase
             $this->createMock(LoopInterface::class),
             $this->createMock(LoggerInterface::class),
             $pushMiddlewareDispatcher,
-            new SynchronousAdapter(),
+            new SynchronousAdapter(new JsonMessageSerializer()),
         );
         $queue = $queue
             ->withMiddlewares(new TestMiddleware('Won\'t be executed'))

@@ -17,6 +17,7 @@ final class JsonMessageSerializer implements MessageSerializerInterface
         $payload = [
             'data' => $message->getData(),
             'meta' => $message->getMetadata(),
+            'class' => $message instanceof EnvelopeInterface ? $message->getMessage()::class : $message::class,
         ];
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
@@ -37,8 +38,9 @@ final class JsonMessageSerializer implements MessageSerializerInterface
         if (!is_array($meta)) {
             throw new InvalidArgumentException('Metadata must be array. Got ' . get_debug_type($meta) . '.');
         }
+        $class = $payload['class'] ?? Message::class;
 
-        $message = new Message($payload['data'] ?? null, $meta);
+        $message = new $class($payload['data'] ?? null, $meta);
 
         if (isset($meta[EnvelopeInterface::ENVELOPE_STACK_KEY]) && is_array($meta[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
             $message = $message->withMetadata(

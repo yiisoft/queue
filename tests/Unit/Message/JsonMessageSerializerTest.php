@@ -113,7 +113,10 @@ final class JsonMessageSerializerTest extends TestCase
         $json = $serializer->serialize($message);
 
         $this->assertEquals(
-            '{"data":"test","meta":[]}',
+            sprintf(
+                '{"data":"test","meta":[],"class":"%s"}',
+                str_replace('\\', '\\\\', Message::class),
+            ),
             $json,
         );
     }
@@ -129,9 +132,10 @@ final class JsonMessageSerializerTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '{"data":"test","meta":{"envelopes":["%s"],"%s":"test-id"}}',
+                '{"data":"test","meta":{"envelopes":["%s"],"%s":"test-id"},"class":"%s"}',
                 str_replace('\\', '\\\\', IdEnvelope::class),
                 IdEnvelope::MESSAGE_ID_KEY,
+                str_replace('\\', '\\\\', Message::class),
             ),
             $json,
         );
