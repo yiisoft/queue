@@ -26,7 +26,7 @@ final class FakeQueue implements QueueInterface
         return $message;
     }
 
-    public function run(int $max = 0): void
+    public function run(int $max = 0): int
     {
     }
 
