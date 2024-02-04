@@ -50,7 +50,7 @@ final class Queue implements QueueInterface
     ): MessageInterface {
         $this->logger->debug(
             'Preparing to push message with data "{data}" and metadata: "{metadata}.',
-            ['data' => $message->getData(), 'metadata' => json_encode($message->getMetadata())]
+            ['data' => json_encode($message->getData()), 'metadata' => json_encode($message->getMetadata())]
         );
 
         $request = new Request($message, $this);
