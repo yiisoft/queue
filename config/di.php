@@ -65,7 +65,7 @@ return [
     MessageSerializerInterface::class => JsonMessageSerializer::class,
     MiddlewareFactoryInterface::class => MiddlewareFactory::class,
 
-    'queue.dispatcher' => static function (ConfigInterface $config, ListenerCollectionFactory $factory) use ($params) {
+    'queue.dispatcher' => static function (ConfigInterface $config, ListenerCollectionFactory $factory) {
         $listeners = $factory->create($config->get('queue'));
 
         $provider = new Provider($listeners);

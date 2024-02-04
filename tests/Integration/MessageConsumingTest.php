@@ -43,8 +43,10 @@ final class MessageConsumingTest extends TestCase
             );
         }
 
-        $data = array_map(fn (MessageInterface $message) => $message->getData(),
-            $stackMessageHandler->processedMessages);
+        $data = array_map(
+            fn (MessageInterface $message) => $message->getData(),
+            $stackMessageHandler->processedMessages
+        );
         $this->assertEquals($messages, $data);
     }
 }
