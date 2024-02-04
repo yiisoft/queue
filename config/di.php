@@ -59,9 +59,6 @@ return [
     QueueFactory::class => [
         '__construct()' => ['channelConfiguration' => $params['yiisoft/queue']['channel-definitions']],
     ],
-    SynchronousAdapter::class => function () {
-        return new SynchronousAdapter();
-    },
     AdapterInterface::class => SynchronousAdapter::class,
 
     QueueInterface::class => Queue::class,
