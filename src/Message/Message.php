@@ -13,8 +13,8 @@ final class Message implements MessageInterface
      * @param array $metadata Message metadata, encodable by a queue adapter
      */
     public function __construct(
-         mixed $data,
-         array $metadata = [],
+        mixed $data,
+        array $metadata = [],
     ) {
         $this->data = $data;
         $this->metadata = $metadata;
