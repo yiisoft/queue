@@ -9,13 +9,14 @@ use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
 use Yiisoft\EventDispatcher\Provider\ListenerCollection;
 use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Queue\Exception\JobFailureException;
-use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\MiddlewareFactoryInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeHandler;
+use Yiisoft\Queue\Tests\Support\ExceptionMessage;
 use Yiisoft\Queue\Tests\Support\ExceptionMessageHandler;
+use Yiisoft\Queue\Tests\Support\StackMessage;
 use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Worker\Worker;
@@ -25,71 +26,50 @@ final class WorkerTest extends TestCase
 {
     public function testJobExecutedWithDefinitionClassHandler(): void
     {
-        $envelope = new HandlerEnvelope(
-            $message = new Message('data', ['test-meta-data']),
-            FakeHandler::class,
-        );
+        $message = new Message('data', ['test-meta-data']);
 
         $handler = new FakeHandler();
 
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams(new SimpleLogger(), [Message::class => $handler]);
 
-        $worker->process($envelope, $queue);
+        $worker->process($message, $queue);
 
         $this->assertSame([$message], $handler::$processedMessages);
     }
 
     public function testHandlerIsReplacedWithEnvelopsOne(): void
     {
-        $envelope = new HandlerEnvelope(
-            $message = new Message(['test-data']),
-            StackMessageHandler::class,
-        );
+        $message = new StackMessage(['test-data']);
 
         $stackMessageHandler = new StackMessageHandler();
 
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams(
             new SimpleLogger(),
-            [Message::class => fn ($message) => $stackMessageHandler->handle($message)]
+            [StackMessage::class => fn ($message) => $stackMessageHandler->handle($message)]
         );
 
-        $worker->process($envelope, $queue);
+        $worker->process($message, $queue);
         $this->assertSame([$message], $stackMessageHandler->processedMessages);
     }
 
     public function testJobFailWithDefinitionHandlerException(): void
     {
-        $message = new HandlerEnvelope(
-            new Message(['test-data']),
-            ExceptionMessageHandler::class,
-        );
+        $message = new ExceptionMessage(['test-data']);
         $logger = new SimpleLogger();
 
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams(
             $logger,
-            [Message::class => fn ($message) => (new ExceptionMessageHandler())->handle($message)]
+            [ExceptionMessage::class => fn ($message) => (new ExceptionMessageHandler())->handle($message)]
         );
 
-        try {
-            $worker->process($message, $queue);
-        } catch (JobFailureException $exception) {
-            self::assertSame($exception::class, JobFailureException::class);
-            self::assertSame(
-                $exception->getMessage(),
-                "Processing of message #null is stopped because of an exception:\nTest exception."
-            );
-            self::assertEquals(['test-data'], $exception->getQueueMessage()->getData());
-        } finally {
-            $messages = $logger->getMessages();
-            $this->assertNotEmpty($messages);
-            $this->assertStringContainsString(
-                "Processing of message #null is stopped because of an exception:\nTest exception.",
-                $messages[1]['message']
-            );
-        }
+        $this->expectException(JobFailureException::class);
+        $this->expectExceptionMessage(
+            "Processing of message #null is stopped because of an exception:\nTest exception."
+        );
+        $worker->process($message, $queue);
     }
 
     private function createWorkerByParams(

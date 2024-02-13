@@ -16,14 +16,17 @@ use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SimpleLoop;
-use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
 use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\Tests\Support\ExceptionMessage;
+use Yiisoft\Queue\Tests\Support\ExceptionMessageHandler;
+use Yiisoft\Queue\Tests\Support\NullMessage;
 use Yiisoft\Queue\Tests\Support\NullMessageHandler;
+use Yiisoft\Queue\Tests\Support\StackMessage;
 use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -92,14 +95,11 @@ abstract class TestCase extends BaseTestCase
     {
         $container = $this->getContainer();
         $listeners = new ListenerCollection();
-        $listeners = $listeners->add(function (Message $message) use ($container) {
-            $handler = HandlerEnvelope::fromMessage($message)->getHandler();
+        $listeners = $listeners
+            ->add(fn (NullMessage $message) => $container->get(NullMessageHandler::class)->handle($message))
+            ->add(fn (StackMessage $message) => $container->get(StackMessageHandler::class)->handle($message))
+            ->add(fn (ExceptionMessage $message) => $container->get(ExceptionMessageHandler::class)->handle($message));
 
-            if ($handler) {
-                return $container->get($handler)->handle($message);
-            }
-            throw new \RuntimeException('Handler not found ' . print_r($message, true));
-        });
         return $this->eventDispatcher ??= new Dispatcher(
             new Provider(
                 $listeners
@@ -146,6 +146,7 @@ abstract class TestCase extends BaseTestCase
         return [
             NullMessageHandler::class => new NullMessageHandler(),
             StackMessageHandler::class => new StackMessageHandler(),
+            ExceptionMessageHandler::class => new ExceptionMessageHandler(),
             ...$definitions,
         ];
     }

@@ -13,7 +13,6 @@ use Yiisoft\EventDispatcher\Provider\ListenerCollection;
 use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
-use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -120,10 +119,7 @@ final class MiddlewareTest extends TestCase
             $failureMiddlewareDispatcher,
         );
 
-        $message = new HandlerEnvelope(
-            new Message(['initial']),
-            NullMessageHandler::class
-        );
+        $message = new Message(['initial']);
         $messageConsumed = $worker->process($message, $this->createMock(QueueInterface::class));
 
         self::assertEquals($stack, $messageConsumed->getData());
@@ -131,10 +127,7 @@ final class MiddlewareTest extends TestCase
 
     public function testFullStackFailure(): void
     {
-        $message = new HandlerEnvelope(
-            new Message(null, []),
-            NullMessageHandler::class,
-        );
+        $message = new Message(null, []);
         $queueCallback = static fn (MessageInterface $message): MessageInterface => $message;
         $queue = $this->createMock(QueueInterface::class);
         $container = new SimpleContainer(

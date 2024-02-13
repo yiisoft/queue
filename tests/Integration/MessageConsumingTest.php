@@ -8,7 +8,6 @@ use Psr\Log\NullLogger;
 use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
 use Yiisoft\EventDispatcher\Provider\ListenerCollection;
 use Yiisoft\EventDispatcher\Provider\Provider;
-use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
@@ -36,10 +35,7 @@ final class MessageConsumingTest extends TestCase
         $messages = [1, 'foo', 'bar-baz'];
         foreach ($messages as $message) {
             $worker->process(
-                new HandlerEnvelope(
-                    new Message($message),
-                    StackMessageHandler::class
-                ),
+                new Message($message),
                 $this->getQueue()
             );
         }

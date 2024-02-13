@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit;
 
+use Yiisoft\Queue\Tests\Support\StackMessage;
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
-use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\Support\NullMessage;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Tests\Support\NullMessageHandler;
@@ -39,10 +40,7 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new HandlerEnvelope(
-            new Message(null),
-            StackMessageHandler::class,
-        );
+        $message = new StackMessage();
         $serializer = new JsonMessageSerializer();
         $message = $serializer->unserialize($serializer->serialize($message));
 
@@ -57,10 +55,7 @@ final class QueueTest extends TestCase
 
     public function testRunPartly(): void
     {
-        $message = new HandlerEnvelope(
-            new Message(null),
-            StackMessageHandler::class,
-        );
+        $message = new StackMessage(null);
         $serializer = new JsonMessageSerializer();
         $message = $serializer->unserialize($serializer->serialize($message));
 
@@ -81,10 +76,7 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new HandlerEnvelope(
-            new Message(null),
-            StackMessageHandler::class,
-        );
+        $message = new StackMessage(null);
         $serializer = new JsonMessageSerializer();
         $message = $serializer->unserialize($serializer->serialize($message));
 
@@ -102,10 +94,7 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new HandlerEnvelope(
-            new Message(null),
-            NullMessageHandler::class,
-        );
+        $message = new NullMessage(null);
         $serializer = new JsonMessageSerializer();
         $message = $serializer->unserialize($serializer->serialize($message));
 
@@ -156,10 +145,7 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new HandlerEnvelope(
-            new Message(null),
-            StackMessageHandler::class,
-        );
+        $message = new StackMessage(null);
         $serializer = new JsonMessageSerializer();
         $message = $serializer->unserialize($serializer->serialize($message));
 

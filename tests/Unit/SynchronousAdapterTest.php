@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit;
 
 use Yiisoft\Queue\Enum\JobStatus;
-use Yiisoft\Queue\Message\HandlerEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\QueueFactory;
+use Yiisoft\Queue\Tests\Support\NullMessage;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Tests\Support\NullMessageHandler;
@@ -24,10 +24,7 @@ final class SynchronousAdapterTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new HandlerEnvelope(
-            new Message(null),
-            NullMessageHandler::class,
-        );
+        $message = new Message(null);
         $envelope = $queue->push($message);
 
         self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
@@ -39,10 +36,7 @@ final class SynchronousAdapterTest extends TestCase
 
     public function testIdSetting(): void
     {
-        $message = new HandlerEnvelope(
-            new Message([]),
-            NullMessageHandler::class,
-        );
+        $message = new NullMessage();
         $adapter = $this->getAdapter();
 
         $ids = [];
