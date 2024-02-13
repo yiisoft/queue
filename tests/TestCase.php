@@ -82,6 +82,7 @@ abstract class TestCase extends BaseTestCase
         return $this->worker ??= new Worker(
             new NullLogger(),
             $this->createEventDispatcher(),
+            $this->createContainer(),
             $this->getMiddlewareDispatcher(),
             $this->getMiddlewareDispatcher(),
         );
@@ -135,16 +136,17 @@ abstract class TestCase extends BaseTestCase
         return new SimpleLoop();
     }
 
-    protected function createContainer(): ContainerInterface
+    protected function createContainer(array $definitions = []): ContainerInterface
     {
-        return new SimpleContainer($this->getContainerDefinitions());
+        return new SimpleContainer($this->getContainerDefinitions($definitions));
     }
 
-    protected function getContainerDefinitions(): array
+    protected function getContainerDefinitions(array $definitions): array
     {
         return [
             NullMessageHandler::class => new NullMessageHandler(),
             StackMessageHandler::class => new StackMessageHandler(),
+            ...$definitions,
         ];
     }
 

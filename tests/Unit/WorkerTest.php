@@ -26,7 +26,7 @@ final class WorkerTest extends TestCase
     public function testJobExecutedWithDefinitionClassHandler(): void
     {
         $envelope = new HandlerEnvelope(
-            $message = new Message(FakeHandler::class, ['test-data']),
+            $message = new Message('data', ['test-meta-data']),
             FakeHandler::class,
         );
 
@@ -103,6 +103,7 @@ final class WorkerTest extends TestCase
         return new Worker(
             $logger,
             new Dispatcher(new Provider($collection)),
+            $this->createContainer(),
             new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class)),
             new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class)),
         );

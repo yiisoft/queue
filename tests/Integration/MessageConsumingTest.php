@@ -28,6 +28,7 @@ final class MessageConsumingTest extends TestCase
         $worker = new Worker(
             new NullLogger(),
             new Dispatcher(new Provider($collection)),
+            $this->createContainer([StackMessageHandler::class => $stackMessageHandler]),
             new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class)),
             new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class), [])
         );
