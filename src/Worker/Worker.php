@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Worker;
 
+use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -22,6 +23,7 @@ final class Worker implements WorkerInterface
     public function __construct(
         private LoggerInterface $logger,
         private EventDispatcherInterface $eventDispatcher,
+        private ContainerInterface $container,
         private MiddlewareDispatcher $consumeMiddlewareDispatcher,
         private MiddlewareDispatcher $failureMiddlewareDispatcher,
     ) {
@@ -40,7 +42,10 @@ final class Worker implements WorkerInterface
         $request = new Request($message, $queue);
 
         $closure = function (object $message): mixed {
-            $message = $message instanceof EnvelopeInterface ? $message->getMessage() : $message;
+            if ($message instanceof EnvelopeInterface) {
+                $message = $message->getMessage();
+            }
+
             return $this->eventDispatcher->dispatch($message);
         };
 

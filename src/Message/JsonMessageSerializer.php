@@ -44,7 +44,11 @@ final class JsonMessageSerializer implements MessageSerializerInterface
 
         if (isset($meta[EnvelopeInterface::ENVELOPE_STACK_KEY]) && is_array($meta[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
             $message = $message->withMetadata(
-                array_merge($message->getMetadata(), [EnvelopeInterface::ENVELOPE_STACK_KEY => []]),
+                array_merge(
+                    $message->getMetadata(),
+                    $meta,
+                    [EnvelopeInterface::ENVELOPE_STACK_KEY => []],
+                ),
             );
             foreach ($meta[EnvelopeInterface::ENVELOPE_STACK_KEY] as $envelope) {
                 if (is_string($envelope) && class_exists($envelope) && is_subclass_of($envelope, EnvelopeInterface::class)) {

@@ -115,6 +115,7 @@ final class MiddlewareTest extends TestCase
         $worker = new Worker(
             new SimpleLogger(),
             new Dispatcher(new Provider($listeners)),
+            $container,
             $consumeMiddlewareDispatcher,
             $failureMiddlewareDispatcher,
         );

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
-use Yiisoft\Queue\QueueInterface;
-
 trait EnvelopeTrait
 {
     private MessageInterface $message;
@@ -27,20 +25,12 @@ trait EnvelopeTrait
         return $instance;
     }
 
-    /**
-     * @return class-string<MessageHandlerInterface>
-     */
-    public function getHandler(): string
-    {
-        return $this->message->getHandler();
-    }
-
     public function getData(): mixed
     {
         return $this->message->getData();
     }
 
-    public static function fromMessage(MessageInterface $message): self
+    public static function fromMessage(MessageInterface $message): EnvelopeInterface
     {
         return new static($message);
     }
@@ -76,14 +66,6 @@ trait EnvelopeTrait
     {
         $instance = clone $this;
         $instance->message = $instance->message->withMetadata($metadata);
-
-        return $instance;
-    }
-
-    public function withQueue(QueueInterface $queue): self
-    {
-        $instance = clone $this;
-        $instance->message = $instance->message->withQueue($queue);
 
         return $instance;
     }
