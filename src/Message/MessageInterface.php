@@ -23,7 +23,6 @@ interface MessageInterface
     /**
      * Returns a new instance with the specified data.
      *
-     * @param mixed $data
      *
      * @return self
      */
@@ -32,7 +31,6 @@ interface MessageInterface
     /**
      * Returns a new instance with the specified metadata.
      *
-     * @param array $metadata
      *
      * @return self
      */
