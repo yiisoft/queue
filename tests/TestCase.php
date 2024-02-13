@@ -17,7 +17,6 @@ use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
-use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
