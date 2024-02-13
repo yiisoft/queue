@@ -69,7 +69,7 @@ trait EnvelopeTrait
     {
         $stack = $this->stack;
         if (isset($this->stack)) {
-            $stack= $this->stack;
+            $stack = $this->stack;
         }
         if ($this->message instanceof EnvelopeInterface) {
             $stack = $this->message->getStack();
