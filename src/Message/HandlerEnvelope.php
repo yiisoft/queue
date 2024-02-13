@@ -17,6 +17,7 @@ final class HandlerEnvelope implements EnvelopeInterface
         private MessageInterface $message,
         private string $handlerClass = '',
     ) {
+        $this->getStack()->add($this);
     }
 
     public function setHandler(string $handlerClass): void
@@ -24,15 +25,18 @@ final class HandlerEnvelope implements EnvelopeInterface
         $this->handlerClass = $handlerClass;
     }
 
+    /**
+     * @return class-string<MessageHandlerInterface>
+     */
     public function getHandler(): string
     {
         return $this->handlerClass ?: $this->message->getMetadata()[self::HANDLER_CLASS_KEY];
     }
 
-    public function getMetadata(): array
+    public function getEnvelopeMetadata(): array
     {
-        return array_merge($this->message->getMetadata(), [
-            self::HANDLER_CLASS_KEY => $this->getHandler(),
-        ]);
+        return [
+            self::HANDLER_CLASS_KEY => $this->handlerClass,
+        ];
     }
 }

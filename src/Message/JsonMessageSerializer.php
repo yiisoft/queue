@@ -16,7 +16,9 @@ final class JsonMessageSerializer implements MessageSerializerInterface
     {
         $payload = [
             'data' => $message->getData(),
-            'meta' => $message->getMetadata(),
+            'meta' => $message instanceof EnvelopeInterface
+                ? array_merge($message->getMetadata(), $message->getStack()->collectMetadata())
+                : $message->getMetadata(),
             'class' => $message instanceof EnvelopeInterface ? $message->getMessage()::class : $message::class,
         ];
 
@@ -43,12 +45,19 @@ final class JsonMessageSerializer implements MessageSerializerInterface
         $message = new $class($payload['data'] ?? null, $meta);
 
         if (isset($meta[EnvelopeInterface::ENVELOPE_STACK_KEY]) && is_array($meta[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
+            $envelopeStack = new EnvelopeStack();
             $message = $message->withMetadata(
-                array_merge($message->getMetadata(), [EnvelopeInterface::ENVELOPE_STACK_KEY => []]),
+                array_merge(
+                    $message->getMetadata(),
+                    $meta,
+                    [EnvelopeInterface::ENVELOPE_STACK_KEY => []],
+                ),
             );
             foreach ($meta[EnvelopeInterface::ENVELOPE_STACK_KEY] as $envelope) {
                 if (is_string($envelope) && class_exists($envelope) && is_subclass_of($envelope, EnvelopeInterface::class)) {
                     $message = $envelope::fromMessage($message);
+                    $message->withStack($envelopeStack);
+                    $envelopeStack->add($message);
                 }
             }
         }

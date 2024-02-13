@@ -17,6 +17,7 @@ final class IdEnvelope implements EnvelopeInterface
         private MessageInterface $message,
         private string|int|null $id = null,
     ) {
+        $this->getStack()->add($this);
     }
 
     public function setId(string|int|null $id): void
@@ -29,7 +30,7 @@ final class IdEnvelope implements EnvelopeInterface
         return $this->id ?? $this->message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
     }
 
-    private function getEnvelopeMetadata(): array
+    public function getEnvelopeMetadata(): array
     {
         return [self::MESSAGE_ID_KEY => $this->getId()];
     }

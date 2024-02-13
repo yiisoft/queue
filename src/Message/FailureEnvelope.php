@@ -12,6 +12,7 @@ final class FailureEnvelope implements EnvelopeInterface
         private MessageInterface $message,
         private array $meta = [],
     ) {
+        $this->getStack()->add($this);
     }
 
     public function getMetadata(): array

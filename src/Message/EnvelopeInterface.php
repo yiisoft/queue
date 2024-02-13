@@ -16,4 +16,8 @@ interface EnvelopeInterface extends MessageInterface
     public function getMessage(): MessageInterface;
 
     public function withMessage(MessageInterface $message): self;
+
+    public function getStack(): EnvelopeStack;
+
+    public function withStack(EnvelopeStack $stack): void;
 }

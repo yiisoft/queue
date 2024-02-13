@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
-use Yiisoft\Queue\QueueInterface;
-
 trait EnvelopeTrait
 {
     private MessageInterface $message;
+    private ?EnvelopeStack $stack = null;
 
     public function getMessage(): MessageInterface
     {
@@ -27,36 +26,22 @@ trait EnvelopeTrait
         return $instance;
     }
 
-    /**
-     * @return class-string<MessageHandlerInterface>
-     */
-    public function getHandler(): string
-    {
-        return $this->message->getHandler();
-    }
-
     public function getData(): mixed
     {
         return $this->message->getData();
     }
 
-    public static function fromMessage(MessageInterface $message): self
+    public static function fromMessage(MessageInterface $message): EnvelopeInterface
     {
-        return new static($message);
+        $envelope = new static($message);
+        $envelope->getStack()->add($envelope);
+
+        return $envelope;
     }
 
     public function getMetadata(): array
     {
-        return array_merge(
-            $this->message->getMetadata(),
-            [
-                self::ENVELOPE_STACK_KEY => array_merge(
-                    $this->message->getMetadata()[self::ENVELOPE_STACK_KEY] ?? [],
-                    [self::class],
-                ),
-            ],
-            $this->getEnvelopeMetadata(),
-        );
+        return $this->message->getMetadata();
     }
 
     public function getEnvelopeMetadata(): array
@@ -80,11 +65,20 @@ trait EnvelopeTrait
         return $instance;
     }
 
-    public function withQueue(QueueInterface $queue): self
+    public function getStack(): EnvelopeStack
     {
-        $instance = clone $this;
-        $instance->message = $instance->message->withQueue($queue);
+        $stack = $this->stack;
+        if (isset($this->stack)) {
+            $stack= $this->stack;
+        }
+        if ($this->message instanceof EnvelopeInterface) {
+            $stack = $this->message->getStack();
+        }
+        return $this->stack ??= $stack ?? new EnvelopeStack();
+    }
 
-        return $instance;
+    public function withStack(EnvelopeStack $stack): void
+    {
+        $this->stack = $stack;
     }
 }
