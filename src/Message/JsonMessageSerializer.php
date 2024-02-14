@@ -40,6 +40,17 @@ final class JsonMessageSerializer implements MessageSerializerInterface
         }
         $class = $payload['class'] ?? Message::class;
 
+        if (!is_subclass_of($class, MessageInterface::class)) {
+            throw new InvalidArgumentException(sprintf(
+                'Class "%s" must implement "%s" interface.',
+                $class,
+                MessageInterface::class,
+            ));
+        }
+
+        /**
+         * @var MessageInterface $message
+         */
         $message = new $class($payload['data'] ?? null, $meta);
 
         if (isset($meta[EnvelopeInterface::ENVELOPE_STACK_KEY]) && is_array($meta[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
@@ -56,7 +67,6 @@ final class JsonMessageSerializer implements MessageSerializerInterface
                 }
             }
         }
-
 
         return $message;
     }

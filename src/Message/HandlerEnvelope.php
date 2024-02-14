@@ -19,6 +19,9 @@ final class HandlerEnvelope implements EnvelopeInterface
     ) {
     }
 
+    /**
+     * @psalm-param class-string<MessageHandlerInterface> $handlerClass
+     */
     public function setHandler(string $handlerClass): void
     {
         $this->handlerClass = $handlerClass;
@@ -29,6 +32,7 @@ final class HandlerEnvelope implements EnvelopeInterface
      */
     public function getHandler(): string
     {
+        /** @psalm-suppress LessSpecificReturnStatement  */
         return $this->handlerClass ?: $this->message->getMetadata()[self::HANDLER_CLASS_KEY];
     }
 
