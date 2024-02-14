@@ -34,7 +34,10 @@
 /psalm.xml              export-ignore
 /phpunit.xml.dist       export-ignore
 /Makefile               export-ignore
-/tests                  export-ignore
+/tests/App              export-ignore
+/tests/Integration      export-ignore
+/tests/Unit             export-ignore
+/tests/runtime          export-ignore
 /docs                   export-ignore
 
 # Avoid merge conflicts in CHANGELOG

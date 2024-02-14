@@ -51,7 +51,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Yiisoft\\Queue\\": "src"
+            "Yiisoft\\Queue\\": "src",
+            "Yiisoft\\Queue\\Tests\\Shared\\": "tests/Shared"
         }
     },
     "autoload-dev": {
