@@ -23,16 +23,12 @@ interface MessageInterface
     /**
      * Returns a new instance with the specified data.
      *
-     * @param mixed $data
-     *
      * @return self
      */
     public function withData(mixed $data): self;
 
     /**
      * Returns a new instance with the specified metadata.
-     *
-     * @param array $metadata
      *
      * @return self
      */

@@ -10,7 +10,6 @@ use Yiisoft\Queue\QueueFactory;
 use Yiisoft\Queue\Tests\Support\NullMessage;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
-use Yiisoft\Queue\Tests\Support\NullMessageHandler;
 
 final class SynchronousAdapterTest extends TestCase
 {
