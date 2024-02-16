@@ -10,7 +10,6 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 use Yiisoft\Queue\Exception\JobFailureException;
 use Yiisoft\Queue\Message\EnvelopeInterface;
-use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\FailureFinalHandler;
