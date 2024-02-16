@@ -35,6 +35,7 @@
         "yiisoft/event-dispatcher": "^1.1",
         "yiisoft/friendly-exception": "^1.0",
         "yiisoft/injector": "^1.0",
+        "yiisoft/var-dumper": "^1.7",
         "yiisoft/yii-event": "^2.1"
     },
     "require-dev": {

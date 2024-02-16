@@ -17,6 +17,7 @@ use Yiisoft\Queue\Middleware\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Request;
 use Yiisoft\Queue\QueueInterface;
+use Yiisoft\VarDumper\VarDumper;
 
 final class Worker implements WorkerInterface
 {
@@ -36,7 +37,7 @@ final class Worker implements WorkerInterface
     {
         $this->logger->info(
             'Processing message #{message}.',
-            ['message' => $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null']
+            ['message' => VarDumper::create($message)->asJson()]
         );
 
         $request = new Request($message, $queue);
