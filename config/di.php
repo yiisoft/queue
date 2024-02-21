@@ -59,12 +59,12 @@ return [
     MessageSerializerInterface::class => JsonMessageSerializer::class,
     RunCommand::class => [
         '__construct()' => [
-            'channels' => array_keys($params['yiisoft/yii-queue']['channel-definitions']),
+            'channels' => array_keys($params['yiisoft/queue']['channel-definitions']),
         ],
     ],
     ListenAllCommand::class => [
         '__construct()' => [
-            'channels' => array_keys($params['yiisoft/yii-queue']['channel-definitions']),
+            'channels' => array_keys($params['yiisoft/queue']['channel-definitions']),
         ],
     ],
 ];
