@@ -7,24 +7,29 @@ namespace Yiisoft\Queue\Tests;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\NullLogger;
-use RuntimeException;
-use Yiisoft\Injector\Injector;
-use Yiisoft\Test\Support\Container\SimpleContainer;
+use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
+use Yiisoft\EventDispatcher\Provider\ListenerCollection;
+use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SimpleLoop;
+use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\MiddlewareFactory;
 use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\Tests\Support\ExceptionMessage;
+use Yiisoft\Queue\Tests\Support\ExceptionMessageHandler;
+use Yiisoft\Queue\Tests\Support\NullMessage;
+use Yiisoft\Queue\Tests\Support\NullMessageHandler;
+use Yiisoft\Queue\Tests\Support\StackMessage;
+use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Test\Support\Container\SimpleContainer;
 
 /**
  * Base Test Case.
@@ -36,6 +41,7 @@ abstract class TestCase extends BaseTestCase
     protected ?AdapterInterface $adapter = null;
     protected ?LoopInterface $loop = null;
     protected ?WorkerInterface $worker = null;
+    protected ?EventDispatcherInterface $eventDispatcher = null;
     protected array $eventHandlers = [];
     protected int $executionTimes;
 
@@ -57,11 +63,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getQueue(): Queue
     {
-        if ($this->queue === null) {
-            $this->queue = $this->createQueue();
-        }
-
-        return $this->queue;
+        return $this->queue ??= $this->createQueue();
     }
 
     /**
@@ -69,38 +71,44 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getAdapter(): AdapterInterface
     {
-        if ($this->adapter === null) {
-            $this->adapter = $this->createAdapter($this->needsRealAdapter());
-        }
-
-        return $this->adapter;
+        return $this->adapter ??= $this->createAdapter($this->needsRealAdapter());
     }
 
     protected function getLoop(): LoopInterface
     {
-        if ($this->loop === null) {
-            $this->loop = $this->createLoop();
-        }
-
-        return $this->loop;
+        return $this->loop ??= $this->createLoop();
     }
 
     protected function getWorker(): WorkerInterface
     {
-        if ($this->worker === null) {
-            $this->worker = $this->createWorker();
-        }
+        return $this->worker ??= new Worker(
+            new NullLogger(),
+            $this->createEventDispatcher(),
+            $this->createContainer(),
+            $this->getMiddlewareDispatcher(),
+            $this->getMiddlewareDispatcher(),
+        );
+    }
 
-        return $this->worker;
+    protected function createEventDispatcher(): EventDispatcherInterface
+    {
+        $container = $this->getContainer();
+        $listeners = new ListenerCollection();
+        $listeners = $listeners
+            ->add(fn (NullMessage $message) => $container->get(NullMessageHandler::class)->handle($message))
+            ->add(fn (StackMessage $message) => $container->get(StackMessageHandler::class)->handle($message))
+            ->add(fn (ExceptionMessage $message) => $container->get(ExceptionMessageHandler::class)->handle($message));
+
+        return $this->eventDispatcher ??= new Dispatcher(
+            new Provider(
+                $listeners
+            )
+        );
     }
 
     protected function getContainer(): ContainerInterface
     {
-        if ($this->container === null) {
-            $this->container = $this->createContainer();
-        }
-
-        return $this->container;
+        return $this->container ??= $this->createContainer();
     }
 
     protected function createQueue(): Queue
@@ -109,14 +117,14 @@ abstract class TestCase extends BaseTestCase
             $this->getWorker(),
             $this->getLoop(),
             new NullLogger(),
-            $this->getPushMiddlewareDispatcher(),
+            $this->getMiddlewareDispatcher(),
         );
     }
 
-    protected function createAdapter(bool $realAdapter = false): AdapterInterface
+    protected function createAdapter(bool $realAdapter): AdapterInterface
     {
         if ($realAdapter) {
-            return new SynchronousAdapter($this->getWorker(), $this->createQueue());
+            return new SynchronousAdapter(new JsonMessageSerializer());
         }
 
         return $this->createMock(AdapterInterface::class);
@@ -127,26 +135,19 @@ abstract class TestCase extends BaseTestCase
         return new SimpleLoop();
     }
 
-    protected function createWorker(): WorkerInterface
+    protected function createContainer(array $definitions = []): ContainerInterface
     {
-        return new Worker(
-            $this->getMessageHandlers(),
-            new NullLogger(),
-            new Injector($this->getContainer()),
-            $this->getContainer(),
-            $this->getConsumeMiddlewareDispatcher(),
-            $this->getFailureMiddlewareDispatcher(),
-        );
+        return new SimpleContainer($this->getContainerDefinitions($definitions));
     }
 
-    protected function createContainer(): ContainerInterface
+    protected function getContainerDefinitions(array $definitions): array
     {
-        return new SimpleContainer($this->getContainerDefinitions());
-    }
-
-    protected function getContainerDefinitions(): array
-    {
-        return [];
+        return [
+            NullMessageHandler::class => new NullMessageHandler(),
+            StackMessageHandler::class => new StackMessageHandler(),
+            ExceptionMessageHandler::class => new ExceptionMessageHandler(),
+            ...$definitions,
+        ];
     }
 
     protected function setEventHandlers(callable ...$handlers): void
@@ -159,56 +160,18 @@ abstract class TestCase extends BaseTestCase
         return $this->eventHandlers;
     }
 
-    protected function getMessageHandlers(): array
-    {
-        return [
-            'simple' => fn () => $this->executionTimes++,
-            'exceptional' => function (): never {
-                $this->executionTimes++;
-
-                throw new RuntimeException('test');
-            },
-            'retryable' => function (): never {
-                $this->executionTimes++;
-
-                throw new RuntimeException('test');
-            },
-        ];
-    }
-
     protected function needsRealAdapter(): bool
     {
         return false;
     }
 
-    protected function getPushMiddlewareDispatcher(): PushMiddlewareDispatcher
+    protected function getMiddlewareDispatcher(): MiddlewareDispatcher
     {
-        return new PushMiddlewareDispatcher(
-            new MiddlewareFactoryPush(
+        return new MiddlewareDispatcher(
+            new MiddlewareFactory(
                 $this->getContainer(),
                 new CallableFactory($this->getContainer()),
             ),
-        );
-    }
-
-    protected function getConsumeMiddlewareDispatcher(): ConsumeMiddlewareDispatcher
-    {
-        return new ConsumeMiddlewareDispatcher(
-            new MiddlewareFactoryConsume(
-                $this->getContainer(),
-                new CallableFactory($this->getContainer()),
-            ),
-        );
-    }
-
-    protected function getFailureMiddlewareDispatcher(): FailureMiddlewareDispatcher
-    {
-        return new FailureMiddlewareDispatcher(
-            new MiddlewareFactoryFailure(
-                $this->getContainer(),
-                new CallableFactory($this->getContainer()),
-            ),
-            [],
         );
     }
 }

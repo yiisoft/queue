@@ -15,9 +15,9 @@ final class JsonMessageSerializer implements MessageSerializerInterface
     public function serialize(MessageInterface $message): string
     {
         $payload = [
-            'name' => $message->getHandlerName(),
             'data' => $message->getData(),
             'meta' => $message->getMetadata(),
+            'class' => $message instanceof EnvelopeInterface ? $message->getMessage()::class : $message::class,
         ];
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
@@ -38,13 +38,28 @@ final class JsonMessageSerializer implements MessageSerializerInterface
         if (!is_array($meta)) {
             throw new InvalidArgumentException('Metadata must be array. Got ' . get_debug_type($meta) . '.');
         }
+        $class = $payload['class'] ?? Message::class;
 
-        // TODO: will be removed later
-        $message = new Message($payload['name'] ?? '$name', $payload['data'] ?? null, $meta);
+        if (!is_subclass_of($class, MessageInterface::class)) {
+            throw new InvalidArgumentException(sprintf(
+                'Class "%s" must implement "%s" interface.',
+                $class,
+                MessageInterface::class,
+            ));
+        }
+
+        /**
+         * @var MessageInterface $message
+         */
+        $message = new $class($payload['data'] ?? null, $meta);
 
         if (isset($meta[EnvelopeInterface::ENVELOPE_STACK_KEY]) && is_array($meta[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
             $message = $message->withMetadata(
-                array_merge($message->getMetadata(), [EnvelopeInterface::ENVELOPE_STACK_KEY => []]),
+                array_merge(
+                    $message->getMetadata(),
+                    $meta,
+                    [EnvelopeInterface::ENVELOPE_STACK_KEY => []],
+                ),
             );
             foreach ($meta[EnvelopeInterface::ENVELOPE_STACK_KEY] as $envelope) {
                 if (is_string($envelope) && class_exists($envelope) && is_subclass_of($envelope, EnvelopeInterface::class)) {
@@ -52,7 +67,6 @@ final class JsonMessageSerializer implements MessageSerializerInterface
                 }
             }
         }
-
 
         return $message;
     }

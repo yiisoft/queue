@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
+namespace Yiisoft\Queue\Tests\Unit\Middleware;
 
 use Exception;
 use PHPUnit\Framework\Assert;
@@ -11,11 +11,11 @@ use RuntimeException;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
-use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
-use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
+use Yiisoft\Queue\Middleware\ExponentialDelayMiddleware;
+use Yiisoft\Queue\Middleware\MessageHandlerInterface;
+use Yiisoft\Queue\Middleware\MiddlewareInterface;
+use Yiisoft\Queue\Middleware\SendAgainMiddleware;
+use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\TestCase;
 
@@ -156,19 +156,17 @@ class SendAgainMiddlewareTest extends TestCase
         $strategy = $this->getStrategy($strategyName, $queue);
         $request = new FailureHandlingRequest(
             new Message(
-                'test',
                 null,
                 $metaInitial
             ),
             new Exception('testException'),
-            $queue
         );
-        $result = $strategy->processFailure($request, $handler);
+        $result = $strategy->process($request, $handler);
 
         self::assertInstanceOf(FailureHandlingRequest::class, $result);
     }
 
-    private function getStrategy(string $strategyName, QueueInterface $queue): MiddlewareFailureInterface
+    private function getStrategy(string $strategyName, QueueInterface $queue): MiddlewareInterface
     {
         return match ($strategyName) {
             SendAgainMiddleware::class => new SendAgainMiddleware('', 2, $queue),
@@ -181,22 +179,20 @@ class SendAgainMiddlewareTest extends TestCase
                 $this->createMock(DelayMiddlewareInterface::class),
                 $queue,
             ),
-            default => throw new RuntimeException('Unknown strategy'),
+            default => throw new RuntimeException(sprintf('Unknown strategy "%s"', $strategyName)),
         };
     }
 
-    private function getHandler(array $metaResult, bool $suites): MessageFailureHandlerInterface
+    private function getHandler(array $metaResult, bool $suites): MessageHandlerInterface
     {
-        $pipelineAssertion = static function (FailureHandlingRequest $request) use (
-            $metaResult
-        ): FailureHandlingRequest {
+        $pipelineAssertion = static function (FailureHandlingRequest $request) use ($metaResult): void {
             Assert::assertEquals($metaResult, $request->getMessage()->getMetadata());
 
             throw $request->getException();
         };
-        $handler = $this->createMock(MessageFailureHandlerInterface::class);
+        $handler = $this->createMock(MessageHandlerInterface::class);
         $handler->expects($suites ? self::never() : self::once())
-            ->method('handleFailure')
+            ->method('handle')
             ->willReturnCallback($pipelineAssertion);
 
         return $handler;

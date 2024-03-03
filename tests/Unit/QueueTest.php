@@ -4,27 +4,22 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit;
 
+use Yiisoft\Queue\Tests\Support\StackMessage;
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
+use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\Support\NullMessage;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
+use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 
 final class QueueTest extends TestCase
 {
-    private bool $needsRealAdapter = true;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->needsRealAdapter = true;
-    }
-
     protected function needsRealAdapter(): bool
     {
-        return $this->needsRealAdapter;
+        return true;
     }
 
     public function testPushSuccessful(): void
@@ -33,7 +28,7 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($adapter);
-        $message = new Message('simple', null);
+        $message = new Message(null);
         $queue->push($message);
 
         self::assertSame([$message], $adapter->pushMessages);
@@ -44,18 +39,25 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new Message('simple', null);
+        $message = new StackMessage();
+        $serializer = new JsonMessageSerializer();
+        $message = $serializer->unserialize($serializer->serialize($message));
+
         $message2 = clone $message;
         $queue->push($message);
         $queue->push($message2);
         $queue->run();
 
-        self::assertEquals(2, $this->executionTimes);
+        $stackMessageHandler = $this->container->get(StackMessageHandler::class);
+        self::assertCount(2, $stackMessageHandler->processedMessages);
     }
 
     public function testRunPartly(): void
     {
-        $message = new Message('simple', null);
+        $message = new StackMessage(null);
+        $serializer = new JsonMessageSerializer();
+        $message = $serializer->unserialize($serializer->serialize($message));
+
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
@@ -64,7 +66,8 @@ final class QueueTest extends TestCase
         $queue->push($message2);
         $queue->run(1);
 
-        self::assertEquals(1, $this->executionTimes);
+        $stackMessageHandler = $this->container->get(StackMessageHandler::class);
+        self::assertCount(1, $stackMessageHandler->processedMessages);
     }
 
     public function testListen(): void
@@ -72,13 +75,17 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new Message('simple', null);
+        $message = new StackMessage(null);
+        $serializer = new JsonMessageSerializer();
+        $message = $serializer->unserialize($serializer->serialize($message));
+
         $message2 = clone $message;
         $queue->push($message);
         $queue->push($message2);
         $queue->listen();
 
-        self::assertEquals(2, $this->executionTimes);
+        $stackMessageHandler = $this->container->get(StackMessageHandler::class);
+        self::assertCount(2, $stackMessageHandler->processedMessages);
     }
 
     public function testStatus(): void
@@ -86,7 +93,10 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new Message('simple', null);
+        $message = new NullMessage(null);
+        $serializer = new JsonMessageSerializer();
+        $message = $serializer->unserialize($serializer->serialize($message));
+
         $envelope = $queue->push($message);
 
         self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
@@ -107,7 +117,7 @@ final class QueueTest extends TestCase
     {
         try {
             $queue = $this->getQueue();
-            $message = new Message('simple', null);
+            $message = new Message(null);
             $envelope = $queue->push($message);
             $queue->status($envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY]);
         } catch (AdapterNotConfiguredException $exception) {
@@ -134,12 +144,16 @@ final class QueueTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new Message('simple', null);
+        $message = new StackMessage(null);
+        $serializer = new JsonMessageSerializer();
+        $message = $serializer->unserialize($serializer->serialize($message));
+
         $message2 = clone $message;
         $queue->push($message);
         $queue->push($message2);
         $queue->run();
 
-        self::assertEquals(2, $this->executionTimes);
+        $stackMessageHandler = $this->container->get(StackMessageHandler::class);
+        self::assertCount(2, $stackMessageHandler->processedMessages);
     }
 }

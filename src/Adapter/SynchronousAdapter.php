@@ -7,9 +7,8 @@ namespace Yiisoft\Queue\Adapter;
 use InvalidArgumentException;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\QueueFactory;
-use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Message\MessageSerializerInterface;
+use Yiisoft\Queue\QueueFactoryInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
 final class SynchronousAdapter implements AdapterInterface
@@ -18,26 +17,18 @@ final class SynchronousAdapter implements AdapterInterface
     private int $current = 0;
 
     public function __construct(
-        private WorkerInterface $worker,
-        private QueueInterface $queue,
-        private string $channel = QueueFactory::DEFAULT_CHANNEL_NAME,
+        private MessageSerializerInterface $messageSerializer,
+        private string $channel = QueueFactoryInterface::DEFAULT_CHANNEL_NAME,
     ) {
-    }
-
-    public function __destruct()
-    {
-        $this->runExisting(function (MessageInterface $message): bool {
-            $this->worker->process($message, $this->queue);
-
-            return true;
-        });
     }
 
     public function runExisting(callable $handlerCallback): void
     {
         $result = true;
-        while (isset($this->messages[$this->current]) && $result === true) {
-            $result = $handlerCallback($this->messages[$this->current]);
+        while ($result === true && isset($this->messages[$this->current])) {
+            $result = $handlerCallback(
+                $this->messageSerializer->unserialize($this->messages[$this->current])
+            );
             unset($this->messages[$this->current]);
             $this->current++;
         }
@@ -65,9 +56,10 @@ final class SynchronousAdapter implements AdapterInterface
     public function push(MessageInterface $message): MessageInterface
     {
         $key = count($this->messages) + $this->current;
-        $this->messages[] = $message;
+        $newMessage = new IdEnvelope($message, $key);
+        $this->messages[] = $this->messageSerializer->serialize($newMessage);
 
-        return new IdEnvelope($message, $key);
+        return $newMessage;
     }
 
     public function subscribe(callable $handlerCallback): void

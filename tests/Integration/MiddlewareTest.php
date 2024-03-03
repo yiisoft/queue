@@ -8,30 +8,30 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Yiisoft\Injector\Injector;
-use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Test\Support\Log\SimpleLogger;
+use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
+use Yiisoft\EventDispatcher\Provider\ListenerCollection;
+use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
+use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
-use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\DelayMiddlewareInterface;
+use Yiisoft\Queue\Middleware\ExponentialDelayMiddleware;
+use Yiisoft\Queue\Middleware\FailureFinalHandler;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\MiddlewareFactory;
+use Yiisoft\Queue\Middleware\Request;
+use Yiisoft\Queue\Middleware\SendAgainMiddleware;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\Integration\Support\TestMiddleware;
+use Yiisoft\Queue\Tests\Support\NullMessageHandler;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Test\Support\Container\SimpleContainer;
+use Yiisoft\Test\Support\Log\SimpleLogger;
 
 final class MiddlewareTest extends TestCase
 {
@@ -48,8 +48,8 @@ final class MiddlewareTest extends TestCase
             'message 2',
         ];
 
-        $pushMiddlewareDispatcher = new PushMiddlewareDispatcher(
-            new MiddlewareFactoryPush(
+        $pushMiddlewareDispatcher = new MiddlewareDispatcher(
+            new MiddlewareFactory(
                 $this->createMock(ContainerInterface::class),
                 new CallableFactory(
                     $this->createMock(ContainerInterface::class)
@@ -63,17 +63,14 @@ final class MiddlewareTest extends TestCase
             $this->createMock(LoopInterface::class),
             $this->createMock(LoggerInterface::class),
             $pushMiddlewareDispatcher,
-            new SynchronousAdapter(
-                $this->createMock(WorkerInterface::class),
-                $this->createMock(QueueInterface::class),
-            ),
+            new SynchronousAdapter(new JsonMessageSerializer()),
         );
         $queue = $queue
             ->withMiddlewares(new TestMiddleware('Won\'t be executed'))
             ->withMiddlewares(new TestMiddleware('channel 1'), new TestMiddleware('channel 2'))
             ->withMiddlewaresAdded(new TestMiddleware('channel 3'));
 
-        $message = new Message('test', ['initial']);
+        $message = new Message(['initial']);
         $messagePushed = $queue->push(
             $message,
             new TestMiddleware('message 1'),
@@ -90,11 +87,16 @@ final class MiddlewareTest extends TestCase
             'common 1',
             'common 2',
         ];
-        $container = new SimpleContainer();
+        $handler = new NullMessageHandler();
+        $container = new SimpleContainer([]);
+        $listeners = (new ListenerCollection())->add(
+            fn (Message $message) => $handler->handle($message),
+            Message::class
+        );
         $callableFactory = new CallableFactory($container);
 
-        $consumeMiddlewareDispatcher = new ConsumeMiddlewareDispatcher(
-            new MiddlewareFactoryConsume(
+        $consumeMiddlewareDispatcher = new MiddlewareDispatcher(
+            new MiddlewareFactory(
                 $this->createMock(ContainerInterface::class),
                 new CallableFactory(
                     $this->createMock(ContainerInterface::class)
@@ -104,21 +106,20 @@ final class MiddlewareTest extends TestCase
             new TestMiddleware('common 2'),
         );
 
-        $failureMiddlewareDispatcher = new FailureMiddlewareDispatcher(
-            new MiddlewareFactoryFailure($container, $callableFactory),
+        $failureMiddlewareDispatcher = new MiddlewareDispatcher(
+            new MiddlewareFactory($container, $callableFactory),
             [],
         );
 
         $worker = new Worker(
-            ['test' => static fn () => true],
             new SimpleLogger(),
-            new Injector($container),
+            new Dispatcher(new Provider($listeners)),
             $container,
             $consumeMiddlewareDispatcher,
             $failureMiddlewareDispatcher,
         );
 
-        $message = new Message('test', ['initial']);
+        $message = new Message(['initial']);
         $messageConsumed = $worker->process($message, $this->createMock(QueueInterface::class));
 
         self::assertEquals($stack, $messageConsumed->getData());
@@ -126,59 +127,61 @@ final class MiddlewareTest extends TestCase
 
     public function testFullStackFailure(): void
     {
-        $exception = new InvalidArgumentException('test');
-        $this->expectExceptionObject($exception);
-
-        $message = new Message('simple', null, []);
+        $message = new Message(null, []);
         $queueCallback = static fn (MessageInterface $message): MessageInterface => $message;
         $queue = $this->createMock(QueueInterface::class);
-        $container = new SimpleContainer([SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queue)]);
+        $container = new SimpleContainer(
+            [SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queue)]
+        );
         $callableFactory = new CallableFactory($container);
 
         $queue->expects(self::exactly(7))->method('push')->willReturnCallback($queueCallback);
         $queue->method('getChannelName')->willReturn('simple');
 
         $middlewares = [
-            'simple' => [
-                new SendAgainMiddleware('test', 1, $queue),
-                [
-                    'class' => SendAgainMiddleware::class,
-                    '__construct()' => ['test-factory', 1, $queue],
-                ],
-                [
-                    new SendAgainMiddleware('test-callable', 1, $queue),
-                    'processFailure',
-                ],
-                fn (): SendAgainMiddleware => new SendAgainMiddleware('test-callable-2', 1, $queue),
-                SendAgainMiddleware::class,
-                new ExponentialDelayMiddleware(
-                    'test',
-                    2,
-                    1,
-                    5,
-                    2,
-                    $this->createMock(DelayMiddlewareInterface::class),
-                    $queue,
-                ),
+            new SendAgainMiddleware('test', 1, $queue),
+            [
+                'class' => SendAgainMiddleware::class,
+                '__construct()' => ['test-factory', 1, $queue],
             ],
+            [
+                new SendAgainMiddleware('test-callable', 1, $queue),
+                'process',
+            ],
+            fn (): SendAgainMiddleware => new SendAgainMiddleware('test-callable-2', 1, $queue),
+            SendAgainMiddleware::class,
+            new ExponentialDelayMiddleware(
+                'test',
+                2,
+                1,
+                5,
+                2,
+                $this->createMock(DelayMiddlewareInterface::class),
+                $queue,
+            ),
         ];
-        $dispatcher = new FailureMiddlewareDispatcher(
-            new MiddlewareFactoryFailure($container, $callableFactory),
-            $middlewares,
+        $dispatcher = new MiddlewareDispatcher(
+            new MiddlewareFactory($container, $callableFactory),
+            ...$middlewares,
         );
 
         $iteration = 0;
-        $request = new FailureHandlingRequest($message, $exception, $queue);
-        $finalHandler = new FailureFinalHandler();
+        $exception = new InvalidArgumentException('test');
+        $request = new Request($message, $queue->getAdapter());
+        $finalHandler = new FailureFinalHandler($exception);
+
+        $ex = null;
         try {
             do {
                 $request = $dispatcher->dispatch($request, $finalHandler);
                 $iteration++;
             } while (true);
-        } catch (InvalidArgumentException $thrown) {
-            self::assertEquals(7, $iteration);
-
-            throw $thrown;
+        } catch (InvalidArgumentException $e) {
+            $ex = $e;
         }
+
+        self::assertEquals(7, $iteration);
+        $this->assertNotNull($ex);
+        self::assertSame($exception, $ex);
     }
 }

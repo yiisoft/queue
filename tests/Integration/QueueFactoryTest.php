@@ -10,9 +10,10 @@ use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
+use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\MiddlewareFactoryInterface;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueFactory;
 use Yiisoft\Queue\QueueFactoryInterface;
@@ -33,7 +34,7 @@ final class QueueFactoryTest extends TestCase
             new CallableFactory($container),
             new Injector($container),
             true,
-            new SynchronousAdapter($worker, $queue)
+            new SynchronousAdapter(new JsonMessageSerializer())
         );
 
         $adapter = $factory->get('test-channel');
@@ -62,7 +63,7 @@ final class QueueFactoryTest extends TestCase
             new CallableFactory($container),
             new Injector($container),
             true,
-            new SynchronousAdapter($worker, $queue)
+            new SynchronousAdapter(new JsonMessageSerializer())
         );
         $queue = $factory->get('test-channel');
 
@@ -76,7 +77,7 @@ final class QueueFactoryTest extends TestCase
             $worker,
             $this->createMock(LoopInterface::class),
             $this->createMock(LoggerInterface::class),
-            new PushMiddlewareDispatcher($this->createMock(MiddlewareFactoryPushInterface::class)),
+            new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class)),
         );
     }
 }
