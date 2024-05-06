@@ -6,10 +6,6 @@
     <br>
 </p>
 
-An extension for running tasks asynchronously via queues.
-
-Documentation is at [docs/guide/README.md](docs/guide/README.md).
-
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/queue/v/stable.svg)](https://packagist.org/packages/yiisoft/queue)
 [![Total Downloads](https://poser.pugx.org/yiisoft/queue/downloads.svg)](https://packagist.org/packages/yiisoft/queue)
 [![Build status](https://github.com/yiisoft/queue/workflows/build/badge.svg)](https://github.com/yiisoft/queue/actions)
@@ -19,23 +15,19 @@ Documentation is at [docs/guide/README.md](docs/guide/README.md).
 [![static analysis](https://github.com/yiisoft/queue/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/queue/actions?query=workflow%3A%22static+analysis%22)
 [![type-coverage](https://shepherd.dev/github/yiisoft/queue/coverage.svg)](https://shepherd.dev/github/yiisoft/queue)
 
+An extension for running tasks asynchronously via queues.
+
+## Requirements
+
+- PHP 8.0 or higher.
+
 ## Installation
 
-The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
-
-Either run
+The package could be installed with [Composer](https://getcomposer.org):
 
 ```shell
 composer require yiisoft/queue
 ```
-
-or add
-
-```
-"yiisoft/queue": "~3.0"
-```
-
-to the `require` section of your `composer.json` file.
 
 ## Ready for yiisoft/config
 
@@ -53,7 +45,7 @@ change to start working with the queue:
 If you have experience with `yiisoft/yii2-queue`, you will find out that this package is similar.
 Though, there are some key differences which are described in the "[migrating from yii2-queue](docs/guide/migrating-from-yii2-queue.md)" article.
 
-## Basic Usage
+## General usage
 
 Each queue task consists of two parts:
 
@@ -283,31 +275,20 @@ You can declare error handling middleware pipeline in the `FailureMiddlewareDisp
 
 See [error handling docs](docs/guide/error-handling.md) for details.
 
-## Extra
+## Documentation
 
-### Unit testing
+- Guide: [English](docs/guide/en/README.md), [Português - Brasil](docs/guide/pt-BR/README.md)
+- [Internals](docs/internals.md)
 
-The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
+If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
+You may also check out other [Yii Community Resources](https://www.yiiframework.com/community).
 
-```shell
-./vendor/bin/phpunit
-```
+## License
 
-### Mutation testing
+The Yii Queue Extension is free software. It is released under the terms of the BSD License.
+Please see [`LICENSE`](./LICENSE.md) for more information.
 
-The package tests are checked with [Infection](https://infection.github.io/) mutation framework. To run it:
-
-```shell
-./vendor/bin/infection
-```
-
-### Static analysis
-
-The code is statically analyzed with [Psalm](https://psalm.dev/). To run static analysis:
-
-```shell
-./vendor/bin/psalm
-```
+Maintained by [Yii Software](https://www.yiiframework.com/).
 
 ### Support the project
 
@@ -320,10 +301,3 @@ The code is statically analyzed with [Psalm](https://psalm.dev/). To run static 
 [![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=flat&logo=telegram)](https://t.me/yii3en)
 [![Facebook](https://img.shields.io/badge/facebook-join-1DA1F2?style=flat&logo=facebook&logoColor=ffffff)](https://www.facebook.com/groups/yiitalk)
 [![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/go/slack)
-
-## License
-
-The Yii Queue Extension is free software. It is released under the terms of the BSD License.
-Please see [`LICENSE`](./LICENSE.md) for more information.
-
-Maintained by [Yii Software](https://www.yiiframework.com/).
