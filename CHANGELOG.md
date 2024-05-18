@@ -1,4 +1,4 @@
-# Yii Queue Extension Change Log
+# Yii Queue Change Log
 
 ## 1.0.0 under development
 

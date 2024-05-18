@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://github.com/yiisoft" target="_blank">
-        <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
+        <img src="https://yiisoft.github.io/docs/images/yii_logo.svg" height="100px" alt="Yii">
     </a>
     <h1 align="center">Yii Queue Extension</h1>
     <br>
@@ -19,7 +19,7 @@ An extension for running tasks asynchronously via queues.
 
 ## Requirements
 
-- PHP 8.0 or higher.
+- PHP 8.1 or higher.
 
 ## Installation
 
@@ -34,6 +34,7 @@ composer require yiisoft/queue
 If you are using [yiisoft/config](https://github.com/yiisoft/config), you'll find out this package has some defaults
 in the [`common`](config/di.php) and [`params`](config/params.php) configurations saving your time. Things you should
 change to start working with the queue:
+
 - Optionally: define default `\Yiisoft\Queue\Adapter\AdapterInterface` implementation.
 - And/or define channel-specific `AdapterInterface` implementations in the `channel-definitions` params key to be used
   with the [queue factory](#different-queue-channels).
@@ -207,6 +208,7 @@ twice for a queue message. That means you can add extra functionality on message
 of the two classes: `PushMiddlewareDispatcher` and `ConsumeMiddlewareDispatcher` respectively.
 
 You can use any of these formats to define a middleware:
+
 - A ready-to-use middleware object: `new FooMiddleware()`. It must implement `MiddlewarePushInterface`,
  `MiddlewareConsumeInterface` or `MiddlewareFailureInterface` depending on the place you use it.
 - An array in the format of [yiisoft/definitions](https://github.com/yiisoft/definitions).
@@ -217,6 +219,7 @@ You can use any of these formats to define a middleware:
 
 Middleware will be executed forwards in the same order they are defined. If you define it like the following:
 `[$middleware1, $midleware2]`, the execution will look like this:
+
 ```mermaid
 graph LR
     StartPush((Start)) --> PushMiddleware1[$middleware1] --> PushMiddleware2[$middleware2] --> Push(Push to a queue)
@@ -230,7 +233,8 @@ graph LR
 ```
 
 ### Push pipeline
-When you push a message, you can use middlewares to modify both message and queue adapter. 
+
+When you push a message, you can use middlewares to modify both message and queue adapter.
 With message modification you can add extra data, obfuscate data, collect metrics, etc.  
 With queue adapter modification you can redirect message to another queue, delay message consuming, and so on.
 
@@ -248,17 +252,17 @@ in the `PushRequest` object. You will get a `AdapterNotConfiguredException`, if 
 You have three places to define push middlewares:
 
 1. `PushMiddlewareDispatcher`. You can pass it either to the constructor, or to the `withMiddlewares()` method, which  
-creates a completely new dispatcher object with only those middlewares, which are passed as arguments. 
-If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-push` key of the 
+creates a completely new dispatcher object with only those middlewares, which are passed as arguments.
+If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-push` key of the
 `yiisoft/queue` array in the `params`.
-2. Pass middlewares to either `Queue::withMiddlewares()` or `Queue::withMiddlewaresAdded()` methods. The difference is 
-that the former will completely replace an existing middleware stack, while the latter will add passed middlewares to 
-the end of the existing stack. These middlewares will be executed after the common ones, passed directly to the 
-`PushMiddlewareDispatcher`. It's useful when defining a queue channel. Both methods return a new instance of the `Queue` 
+2. Pass middlewares to either `Queue::withMiddlewares()` or `Queue::withMiddlewaresAdded()` methods. The difference is
+that the former will completely replace an existing middleware stack, while the latter will add passed middlewares to
+the end of the existing stack. These middlewares will be executed after the common ones, passed directly to the
+`PushMiddlewareDispatcher`. It's useful when defining a queue channel. Both methods return a new instance of the `Queue`
 class.
 3. Put middlewares into the `Queue::push()` method like this: `$queue->push($message, ...$middlewares)`. These
-middlewares have the lowest priority and will be executed after those which are in the `PushMiddlewareDispatcher` and 
-the ones passed to the `Queue::withMiddlewares()` and `Queue::withMiddlewaresAdded()` and only for the message passed 
+middlewares have the lowest priority and will be executed after those which are in the `PushMiddlewareDispatcher` and
+the ones passed to the `Queue::withMiddlewares()` and `Queue::withMiddlewaresAdded()` and only for the message passed
 along with them.
 
 ### Consume pipeline
@@ -268,6 +272,7 @@ You can set a middleware pipeline for a message when it will be consumed from a 
 ### Error handling pipeline
 
 Often when some job is failing, we want to retry its execution a couple more times or redirect it to another queue channel. This can be done in `yiisoft/queue` with Failure middleware pipeline. They are triggered each time message processing via the Consume middleware pipeline is interrupted with any `Throwable`. The key differences from the previous two pipelines:
+
 - You should set up the middleware pipeline separately for each queue channel. That means, the format should be `['channel-name' => [FooMiddleware::class]]` instead of `[FooMiddleware::class]`, like for the other two pipelines. There is also a default key, which will be used for those channels without their own one: `FailureMiddlewareDispatcher::DEFAULT_PIPELINE`.
 - The last middleware will throw the exception, which will come with the `FailureHandlingRequest` object. If you don't want the exception to be thrown, your middlewares should `return` a request without calling `$handler->handleFailure()`.
 
@@ -285,7 +290,7 @@ You may also check out other [Yii Community Resources](https://www.yiiframework.
 
 ## License
 
-The Yii Queue Extension is free software. It is released under the terms of the BSD License.
+The Yii Queue is free software. It is released under the terms of the BSD License.
 Please see [`LICENSE`](./LICENSE.md) for more information.
 
 Maintained by [Yii Software](https://www.yiiframework.com/).
