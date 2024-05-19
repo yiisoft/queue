@@ -1,11 +1,11 @@
 # Yii Queue extension
 
-An extension for running tasks asynchronously via queues.
+Uma extensão para executar tarefas de forma assíncrona por meio de queues.
 
-## Guides and concept explanations
+## Guias e explicações de conceitos
 
-* [Usage basics](usage.md)
-* [Migrating from `yii2-queue`](migrating-from-yii2-queue.md)
-* [Errors and retryable jobs](error-handling.md)
-* [Workers](worker.md)
-* [Adapter list](adapter-list.md)
+- [Noções básicas de uso](usage.md)
+- [Migrando de `yii2-queue`](migrating-from-yii2-queue.md)
+- [Erros e trabalhos repetíveis](error-handling.md)
+- [Trabalhadores](worker.md)
+- [Lista de adaptadores](adapter-list.md)
