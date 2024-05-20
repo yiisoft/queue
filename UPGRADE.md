@@ -1,3 +1,3 @@
-# Yii Queue Extension Upgrading Instructions
+# Yii Queue Upgrading Instructions
 
 ## Changes summary

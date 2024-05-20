@@ -1,4 +1,4 @@
-# Yii Queue extension
+# Yii Queue
 
 An extension for running tasks asynchronously via queues.
 
