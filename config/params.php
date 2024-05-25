@@ -21,7 +21,6 @@ return [
         ],
     ],
     'yiisoft/queue' => [
-        'handlers' => [],
         'channel-definitions' => [
             QueueFactoryInterface::DEFAULT_CHANNEL_NAME => AdapterInterface::class,
         ],

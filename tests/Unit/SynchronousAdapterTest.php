@@ -7,6 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\QueueFactory;
+use Yiisoft\Queue\Tests\Support\NullMessage;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
 
@@ -22,7 +23,7 @@ final class SynchronousAdapterTest extends TestCase
         $queue = $this
             ->getQueue()
             ->withAdapter($this->getAdapter());
-        $message = new Message('simple', null);
+        $message = new Message(null);
         $envelope = $queue->push($message);
 
         self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
@@ -34,7 +35,7 @@ final class SynchronousAdapterTest extends TestCase
 
     public function testIdSetting(): void
     {
-        $message = new Message('simple', []);
+        $message = new NullMessage();
         $adapter = $this->getAdapter();
 
         $ids = [];
@@ -57,7 +58,7 @@ final class SynchronousAdapterTest extends TestCase
     public function testWithAnotherChannel(): void
     {
         $adapter = $this->getAdapter();
-        $adapter->push(new Message('test', null));
+        $adapter->push(new Message(null));
         $adapterNew = $adapter->withChannel('test');
 
         self::assertNotEquals($adapter, $adapterNew);

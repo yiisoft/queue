@@ -7,13 +7,6 @@ namespace Yiisoft\Queue\Message;
 interface MessageInterface
 {
     /**
-     * Returns handler name.
-     *
-     * @return string
-     */
-    public function getHandlerName(): string;
-
-    /**
      * Returns payload data.
      *
      * @return mixed
@@ -26,4 +19,18 @@ interface MessageInterface
      * @return array
      */
     public function getMetadata(): array;
+
+    /**
+     * Returns a new instance with the specified data.
+     *
+     * @return self
+     */
+    public function withData(mixed $data): self;
+
+    /**
+     * Returns a new instance with the specified metadata.
+     *
+     * @return self
+     */
+    public function withMetadata(array $metadata): self;
 }

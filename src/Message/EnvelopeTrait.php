@@ -10,7 +10,11 @@ trait EnvelopeTrait
 
     public function getMessage(): MessageInterface
     {
-        return $this->message;
+        $message = $this->message;
+        while ($message instanceof EnvelopeInterface) {
+            $message = $message->getMessage();
+        }
+        return $message;
     }
 
     public function withMessage(MessageInterface $message): self
@@ -21,17 +25,12 @@ trait EnvelopeTrait
         return $instance;
     }
 
-    public function getHandlerName(): string
-    {
-        return $this->message->getHandlerName();
-    }
-
     public function getData(): mixed
     {
         return $this->message->getData();
     }
 
-    public static function fromMessage(MessageInterface $message): self
+    public static function fromMessage(MessageInterface $message): EnvelopeInterface
     {
         return new static($message);
     }
@@ -53,5 +52,21 @@ trait EnvelopeTrait
     public function getEnvelopeMetadata(): array
     {
         return [];
+    }
+
+    public function withData(mixed $data): self
+    {
+        $instance = clone $this;
+        $instance->message = $instance->message->withData($data);
+
+        return $instance;
+    }
+
+    public function withMetadata(array $metadata): self
+    {
+        $instance = clone $this;
+        $instance->message = $instance->message->withMetadata($metadata);
+
+        return $instance;
     }
 }

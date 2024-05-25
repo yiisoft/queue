@@ -4,41 +4,46 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Integration;
 
-use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
-use Yiisoft\Injector\Injector;
+use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
+use Yiisoft\EventDispatcher\Provider\ListenerCollection;
+use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
+use Yiisoft\Queue\Middleware\MiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\MiddlewareFactoryInterface;
+use Yiisoft\Queue\Tests\Support\StackMessageHandler;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Worker\Worker;
 
 final class MessageConsumingTest extends TestCase
 {
-    private array $messagesProcessed;
-
     public function testMessagesConsumed(): void
     {
-        $this->messagesProcessed = [];
+        $stackMessageHandler = new StackMessageHandler();
 
-        $container = $this->createMock(ContainerInterface::class);
+        $collection = (new ListenerCollection());
+        $collection = $collection->add(fn (Message $message) => $stackMessageHandler->handle($message));
         $worker = new Worker(
-            ['test' => fn (MessageInterface $message): mixed => $this->messagesProcessed[] = $message->getData()],
             new NullLogger(),
-            new Injector($container),
-            $container,
-            new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class)),
-            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), [])
+            new Dispatcher(new Provider($collection)),
+            $this->createContainer([StackMessageHandler::class => $stackMessageHandler]),
+            new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class)),
+            new MiddlewareDispatcher($this->createMock(MiddlewareFactoryInterface::class), [])
         );
 
         $messages = [1, 'foo', 'bar-baz'];
         foreach ($messages as $message) {
-            $worker->process(new Message('test', $message), $this->getQueue());
+            $worker->process(
+                new Message($message),
+                $this->getQueue()
+            );
         }
 
-        $this->assertEquals($messages, $this->messagesProcessed);
+        $data = array_map(
+            fn (MessageInterface $message) => $message->getData(),
+            $stackMessageHandler->processedMessages
+        );
+        $this->assertEquals($messages, $data);
     }
 }
