@@ -76,7 +76,7 @@ final class QueueFactory implements QueueFactoryInterface
         if (isset($this->channelConfiguration[$channel])) {
             $definition = $this->channelConfiguration[$channel];
             $this->checkDefinitionType($channel, $definition);
-            $adapter = $this->createFromDefinition($channel, $definition);
+            $adapter = $this->createFromDefinition($channel, $definition)->withChannel($channel);
 
             return $this->queue->withChannelName($channel)->withAdapter($adapter);
         }
