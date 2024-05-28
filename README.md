@@ -198,7 +198,7 @@ See the documentation for more details about adapter specific console commands a
 
 The component also has the ability to track the status of a job which was pushed into queue.
 
-For more details see [the guide](docs/guide/README.md).
+For more details see [the guide](docs/guide/en/README.md).
 
 ## Middleware pipelines
 
