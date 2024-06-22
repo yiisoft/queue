@@ -8,3 +8,4 @@ Queue Adapters
 There are other queue adapters contributed and maintained by the community and available on GitHub, such as:
 * [NATS](https://github.com/g41797/queue-nats) - [NATS](https://nats.io/) JetStream adapter
 * [Pulsar](https://github.com/g41797/queue-pulsar) - [Apache Pulsar](https://pulsar.apache.org/) adapter
+* [SQS](https://github.com/g41797/queue-sqs) - [Amazon SQS](https://aws.amazon.com/sqs/) adapter
