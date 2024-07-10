@@ -9,3 +9,4 @@ There are other queue adapters contributed and maintained by the community and a
 * [NATS](https://github.com/g41797/queue-nats) - [NATS](https://nats.io/) JetStream adapter
 * [Pulsar](https://github.com/g41797/queue-pulsar) - [Apache Pulsar](https://pulsar.apache.org/) adapter
 * [SQS](https://github.com/g41797/queue-sqs) - [Amazon SQS](https://aws.amazon.com/sqs/) adapter
+* [Kafka](https://github.com/g41797/queue-kafka) - [Apache Kafka](https://kafka.apache.org/) adapter
