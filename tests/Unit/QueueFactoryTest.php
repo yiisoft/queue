@@ -112,7 +112,10 @@ class QueueFactoryTest extends TestCase
     public function testSuccessfulDefinitionWithDefaultAdapter(): void
     {
         $adapterDefault = $this->createMock(AdapterInterface::class);
+        $adapterDefault->method('withChannel')->willReturn($adapterDefault);
+
         $adapterNew = $this->createMock(AdapterInterface::class);
+        $adapterNew->method('withChannel')->willReturn($adapterNew);
 
         $queue = $this->createMock(QueueInterface::class);
         $queue
@@ -142,6 +145,7 @@ class QueueFactoryTest extends TestCase
     public function testSuccessfulDefinitionWithoutDefaultAdapter(): void
     {
         $adapterNew = $this->createMock(AdapterInterface::class);
+        $adapterNew->method('withChannel')->willReturn($adapterNew);
 
         $queue = $this->createMock(QueueInterface::class);
         $queue
