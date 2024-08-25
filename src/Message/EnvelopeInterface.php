@@ -9,6 +9,7 @@ namespace Yiisoft\Queue\Message;
  */
 interface EnvelopeInterface extends MessageInterface
 {
+    /** @psalm-suppress MissingClassConstType */
     public const ENVELOPE_STACK_KEY = 'envelopes';
 
     public static function fromMessage(MessageInterface $message): self;

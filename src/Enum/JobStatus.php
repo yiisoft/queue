@@ -8,8 +8,11 @@ use Yiisoft\Queue\Exception\InvalidStatusException;
 
 class JobStatus
 {
+    /** @psalm-suppress MissingClassConstType */
     final public const WAITING = 1;
+    /** @psalm-suppress MissingClassConstType */
     final public const RESERVED = 2;
+    /** @psalm-suppress MissingClassConstType */
     final public const DONE = 3;
 
     protected int $status;
