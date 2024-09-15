@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
@@ -149,6 +150,9 @@ class SendAgainMiddlewareTest extends TestCase
         if (!$suites) {
             $this->expectExceptionMessage('testException');
         }
+
+        $metaInitial = [FailureEnvelope::FAILURE_META_KEY => $metaInitial];
+        $metaResult = [FailureEnvelope::FAILURE_META_KEY => $metaResult];
 
         $handler = $this->getHandler($metaResult, $suites);
         $queue = $this->getPreparedQueue($metaResult, $suites);

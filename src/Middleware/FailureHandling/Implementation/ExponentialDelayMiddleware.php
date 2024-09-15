@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Middleware\FailureHandling\Implementation;
 
 use InvalidArgumentException;
-use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
@@ -24,7 +23,7 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
     public const META_KEY_DELAY = 'failure-strategy-exponential-delay-delay';
 
     /**
-     * @param string $id A unique id to differentiate two and more objects of this class
+     * @param string $id A unique id to differentiate two and more instances of this class
      * @param int $maxAttempts Maximum attempts count for this strategy with the given $id before it will give up
      * @param float $delayInitial The first delay period
      * @param float $delayMaximum The maximum delay period
@@ -84,21 +83,20 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
 
     private function createNewMeta(MessageInterface $message): array
     {
-        $meta = $message->getMetadata();
-        $meta[self::META_KEY_DELAY . "-$this->id"] = $this->getDelay($message);
-        $meta[self::META_KEY_ATTEMPTS . "-$this->id"] = $this->getAttempts($message) + 1;
-
-        return $meta;
+        return [
+            self::META_KEY_DELAY . "-$this->id" => $this->getDelay($message),
+            self::META_KEY_ATTEMPTS . "-$this->id" => $this->getAttempts($message) + 1,
+        ];
     }
 
     private function getAttempts(MessageInterface $message): int
     {
-        return $message->getMetadata()[self::META_KEY_ATTEMPTS . "-$this->id"] ?? 0;
+        return $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY][self::META_KEY_ATTEMPTS . "-$this->id"] ?? 0;
     }
 
     private function getDelay(MessageInterface $message): float
     {
-        $meta = $message->getMetadata();
+        $meta = $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY] ?? [];
         $key = self::META_KEY_DELAY . "-$this->id";
 
         $delayOriginal = (float) ($meta[$key] ?? 0);

@@ -12,14 +12,24 @@ final class FailureEnvelope implements EnvelopeInterface
 {
     use EnvelopeTrait;
 
+    public const FAILURE_META_KEY = 'failure-meta';
+
     public function __construct(
         private MessageInterface $message,
         private array $meta = [],
     ) {
     }
 
+    public static function fromMessage(MessageInterface $message): self
+    {
+        return new self($message, $message->getMetadata()[self::FAILURE_META_KEY] ?? []);
+    }
+
     public function getMetadata(): array
     {
-        return array_merge($this->message->getMetadata(), $this->meta);
+        $meta = $this->message->getMetadata();
+        $meta[self::FAILURE_META_KEY] = array_merge($meta[self::FAILURE_META_KEY] ?? [], $this->meta);
+
+        return $meta;
     }
 }
