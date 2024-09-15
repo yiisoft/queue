@@ -18,7 +18,7 @@ final class JsonMessageSerializer implements MessageSerializerInterface
             'name' => $message->getHandlerName(),
             'data' => $message->getData(),
             'meta' => $message->getMetadata(),
-            'class' => $message instanceof EnvelopeInterface ? get_class($message->getMessage()) : get_class($message),
+            'class' => $message instanceof EnvelopeInterface ? $message->getMessage()::class : $message::class,
         ];
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
