@@ -9,7 +9,7 @@ use Throwable;
 
 final class NotEnvelopInterfaceException extends InvalidArgumentException
 {
-    public function __construct(string $className = "", int $code = 0, ?Throwable $previous = null)
+    public function __construct(string $className = '', int $code = 0, ?Throwable $previous = null)
     {
         $message = sprintf(
             'The given class "%s" does not implement "%s".',

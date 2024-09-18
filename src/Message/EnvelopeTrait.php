@@ -61,7 +61,7 @@ trait EnvelopeTrait
             throw new NotEnvelopInterfaceException($className);
         }
 
-        if (get_class($this) === $className) {
+        if (static::class === $className) {
             return $this;
         }
 

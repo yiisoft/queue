@@ -29,5 +29,5 @@ interface EnvelopeInterface extends MessageInterface
      *
      * @psalm-return T
      */
-    public function getEnvelopeFromStack(string $className): EnvelopeInterface;
+    public function getEnvelopeFromStack(string $className): self;
 }
