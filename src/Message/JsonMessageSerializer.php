@@ -18,8 +18,12 @@ final class JsonMessageSerializer implements MessageSerializerInterface
             'name' => $message->getHandlerName(),
             'data' => $message->getData(),
             'meta' => $message->getMetadata(),
-            'class' => $message instanceof EnvelopeInterface ? $message->getMessage()::class : $message::class,
         ];
+        if (!isset($payload['meta']['message-class'])) {
+            $payload['meta']['message-class'] = $message instanceof EnvelopeInterface
+                ? $message->getMessage()::class
+                : $message::class;
+        }
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }
@@ -37,12 +41,12 @@ final class JsonMessageSerializer implements MessageSerializerInterface
 
         $name = $payload['name'] ?? null;
         if (!isset($name) || !is_string($name)) {
-            throw new InvalidArgumentException('Handler name must be string. Got ' . get_debug_type($name) . '.');
+            throw new InvalidArgumentException('Handler name must be a string. Got ' . get_debug_type($name) . '.');
         }
 
         $meta = $payload['meta'] ?? [];
         if (!is_array($meta)) {
-            throw new InvalidArgumentException('Metadata must be array. Got ' . get_debug_type($meta) . '.');
+            throw new InvalidArgumentException('Metadata must be an array. Got ' . get_debug_type($meta) . '.');
         }
 
         $envelopes = [];
@@ -51,7 +55,7 @@ final class JsonMessageSerializer implements MessageSerializerInterface
         }
         $meta[EnvelopeInterface::ENVELOPE_STACK_KEY] = [];
 
-        $class = $payload['class'] ?? Message::class;
+        $class = $payload['meta']['message-class'] ?? Message::class;
         if (!is_subclass_of($class, MessageInterface::class)) {
             $class = Message::class;
         }

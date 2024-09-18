@@ -46,7 +46,7 @@ final class JsonMessageSerializerTest extends TestCase
         $payload = ['name' => 'handler', 'data' => 'test', 'meta' => $meta];
         $serializer = $this->createSerializer();
 
-        $this->expectExceptionMessage(sprintf('Metadata must be array. Got %s.', get_debug_type($meta)));
+        $this->expectExceptionMessage(sprintf('Metadata must be an array. Got %s.', get_debug_type($meta)));
         $this->expectException(InvalidArgumentException::class);
         $serializer->unserialize(json_encode($payload));
     }
@@ -115,7 +115,7 @@ final class JsonMessageSerializerTest extends TestCase
         $json = $serializer->serialize($message);
 
         $this->assertEquals(
-            '{"name":"handler","data":"test","meta":[],"class":"Yiisoft\\\\Queue\\\\Message\\\\Message"}',
+            '{"name":"handler","data":"test","meta":{"message-class":"Yiisoft\\\\Queue\\\\Message\\\\Message"}}',
             $json,
         );
     }
@@ -131,7 +131,7 @@ final class JsonMessageSerializerTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '{"name":"handler","data":"test","meta":{"envelopes":["%s"],"%s":"test-id"},"class":"%s"}',
+                '{"name":"handler","data":"test","meta":{"envelopes":["%s"],"%s":"test-id","message-class":"%s"}}',
                 str_replace('\\', '\\\\', IdEnvelope::class),
                 IdEnvelope::MESSAGE_ID_KEY,
                 str_replace('\\', '\\\\', Message::class),
@@ -148,11 +148,13 @@ final class JsonMessageSerializerTest extends TestCase
                 IdEnvelope::class,
             ],
             IdEnvelope::MESSAGE_ID_KEY => 'test-id',
+            "message-class" => Message::class,
         ], $message->getMetadata());
 
         $this->assertEquals([
             EnvelopeInterface::ENVELOPE_STACK_KEY => [],
             IdEnvelope::MESSAGE_ID_KEY => 'test-id',
+            "message-class" => Message::class,
         ], $message->getMessage()->getMetadata());
     }
 
