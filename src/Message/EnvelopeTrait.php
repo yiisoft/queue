@@ -48,9 +48,9 @@ trait EnvelopeTrait
     /**
      * Finds an envelope in the current envelope stack or creates a new one from the message.
      *
-     * @template T
+     * @template T of EnvelopeInterface
      *
-     * @psalm-param T<class-string<EnvelopeInterface>> $className
+     * @psalm-param class-string<T> $className
      * @throws NotEnvelopInterfaceException is thrown if the given class does not implement {@see EnvelopeInterface}.
      *
      * @psalm-return T
