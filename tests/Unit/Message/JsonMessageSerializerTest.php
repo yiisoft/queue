@@ -148,13 +148,13 @@ final class JsonMessageSerializerTest extends TestCase
                 IdEnvelope::class,
             ],
             IdEnvelope::MESSAGE_ID_KEY => 'test-id',
-            "message-class" => Message::class,
+            'message-class' => Message::class,
         ], $message->getMetadata());
 
         $this->assertEquals([
             EnvelopeInterface::ENVELOPE_STACK_KEY => [],
             IdEnvelope::MESSAGE_ID_KEY => 'test-id',
-            "message-class" => Message::class,
+            'message-class' => Message::class,
         ], $message->getMessage()->getMetadata());
     }
 
