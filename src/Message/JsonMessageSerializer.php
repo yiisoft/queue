@@ -50,9 +50,9 @@ final class JsonMessageSerializer implements MessageSerializerInterface
 
         foreach ($envelopes as $envelope) {
             if (is_string($envelope) && class_exists($envelope) && is_subclass_of(
-                    $envelope,
-                    EnvelopeInterface::class
-                )) {
+                $envelope,
+                EnvelopeInterface::class
+            )) {
                 $message = $envelope::fromMessage($message);
             }
         }
