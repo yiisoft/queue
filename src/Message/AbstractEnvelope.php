@@ -13,16 +13,21 @@ abstract class AbstractEnvelope implements EnvelopeInterface
 
     public function __construct(MessageInterface $message)
     {
-        $this->message = $message instanceof EnvelopeInterface ? $message->getMessage() : $message;
         $this->metadata = $message->getMetadata();
+        $envelopes = [static::class];
+        while ($message instanceof EnvelopeInterface) {
+            if ($message::class !== static::class) {
+                $envelopes = [$message::class];
+            }
+
+            $message = $message->getMessage();
+        }
+        $this->message = $message;
 
         if (is_array($this->metadata[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
             $this->metadata[EnvelopeInterface::ENVELOPE_STACK_KEY] = array_merge(
                 [static::class],
-                array_filter(
-                    $this->metadata[EnvelopeInterface::ENVELOPE_STACK_KEY],
-                    static fn(string $class) => $class !== static::class,
-                )
+                $envelopes,
             );
         } else {
             $this->metadata[EnvelopeInterface::ENVELOPE_STACK_KEY] = [static::class];

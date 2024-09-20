@@ -39,20 +39,23 @@ final class JsonMessageSerializer implements MessageSerializerInterface
             throw new InvalidArgumentException('Metadata must be array. Got ' . get_debug_type($meta) . '.');
         }
 
+        $envelopes = [];
+        if (isset($meta[EnvelopeInterface::ENVELOPE_STACK_KEY]) && is_array($meta[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
+            $envelopes = $meta[EnvelopeInterface::ENVELOPE_STACK_KEY];
+        }
+        $meta[EnvelopeInterface::ENVELOPE_STACK_KEY] = [];
+
         // TODO: will be removed later
         $message = new Message($payload['name'] ?? '$name', $payload['data'] ?? null, $meta);
 
-        if (isset($meta[EnvelopeInterface::ENVELOPE_STACK_KEY]) && is_array($meta[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
-            $message = $message->withMetadata(
-                array_merge($message->getMetadata(), [EnvelopeInterface::ENVELOPE_STACK_KEY => []]),
-            );
-            foreach ($meta[EnvelopeInterface::ENVELOPE_STACK_KEY] as $envelope) {
-                if (is_string($envelope) && class_exists($envelope) && is_subclass_of($envelope, EnvelopeInterface::class)) {
-                    $message = $envelope::fromMessage($message);
-                }
+        foreach ($envelopes as $envelope) {
+            if (is_string($envelope) && class_exists($envelope) && is_subclass_of(
+                    $envelope,
+                    EnvelopeInterface::class
+                )) {
+                $message = $envelope::fromMessage($message);
             }
         }
-
 
         return $message;
     }
