@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Middleware\FailureHandling;
 
 use Yiisoft\Arrays\ArrayHelper;
-use Yiisoft\Queue\Message\EnvelopeInterface;
 use Yiisoft\Queue\Message\AbstractEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
 
