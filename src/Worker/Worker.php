@@ -15,6 +15,7 @@ use RuntimeException;
 use Throwable;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Exception\JobFailureException;
+use Yiisoft\Queue\Message\MessageHandlerInterface;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
@@ -77,6 +78,18 @@ final class Worker implements WorkerInterface
     private function getHandler(string $name): ?callable
     {
         if (!array_key_exists($name, $this->handlersCached)) {
+            $definition = $this->handlers[$name] ?? null;
+            if ($definition === null && $this->container->has($name)) {
+                $handler = $this->container->get($name);
+                if ($handler instanceof MessageHandlerInterface) {
+                    $this->handlersCached[$name] = [$handler, 'handle'];
+
+                    return $this->handlersCached[$name];
+                }
+
+                return null;
+            }
+
             $this->handlersCached[$name] = $this->prepare($this->handlers[$name] ?? null);
         }
 
