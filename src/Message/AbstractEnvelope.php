@@ -26,8 +26,11 @@ abstract class AbstractEnvelope implements EnvelopeInterface
 
         if (is_array($this->metadata[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
             $this->metadata[EnvelopeInterface::ENVELOPE_STACK_KEY] = array_merge(
-                [static::class],
                 $envelopes,
+                array_filter(
+                    $this->metadata[EnvelopeInterface::ENVELOPE_STACK_KEY],
+                    static fn (string $envelope): bool => !in_array($envelope, $envelopes),
+                ),
             );
         } else {
             $this->metadata[EnvelopeInterface::ENVELOPE_STACK_KEY] = [static::class];
