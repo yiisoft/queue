@@ -82,7 +82,7 @@ final class Worker implements WorkerInterface
             if ($definition === null && $this->container->has($name)) {
                 $handler = $this->container->get($name);
                 if ($handler instanceof MessageHandlerInterface) {
-                    $this->handlersCached[$name] = [$handler, 'handle'];
+                    $this->handlersCached[$name] = $handler->handle(...);
 
                     return $this->handlersCached[$name];
                 }
