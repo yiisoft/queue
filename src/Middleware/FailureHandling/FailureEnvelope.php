@@ -26,6 +26,6 @@ final class FailureEnvelope extends AbstractEnvelope
 
     protected function getEnvelopeMetadata(): array
     {
-        return [self::FAILURE_META_KEY => ArrayHelper::merge($this->metadata[self::FAILURE_META_KEY], $this->failureMeta)];
+        return [self::FAILURE_META_KEY => ArrayHelper::merge($this->metadata[self::FAILURE_META_KEY] ?? [], $this->failureMeta)];
     }
 }

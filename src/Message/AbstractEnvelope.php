@@ -24,7 +24,7 @@ abstract class AbstractEnvelope implements EnvelopeInterface
         }
         $this->message = $message;
 
-        if (is_array($this->metadata[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
+        if (isset($this->metadata[EnvelopeInterface::ENVELOPE_STACK_KEY]) && is_array($this->metadata[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
             $this->metadata[EnvelopeInterface::ENVELOPE_STACK_KEY] = array_merge(
                 $envelopes,
                 array_filter(
