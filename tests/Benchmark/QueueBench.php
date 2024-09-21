@@ -6,7 +6,6 @@ namespace Yiisoft\Queue\Tests\Benchmark;
 
 use Generator;
 use PhpBench\Attributes\ParamProviders;
-use PhpBench\Attributes\Skip;
 use PhpBench\Model\Tag;
 use Psr\Log\NullLogger;
 use Yiisoft\Injector\Injector;
@@ -30,9 +29,9 @@ use Yiisoft\Test\Support\Container\SimpleContainer;
 
 final class QueueBench
 {
-    readonly private QueueInterface $queue;
-    readonly private JsonMessageSerializer $serializer;
-    readonly private VoidAdapter $adapter;
+    private readonly QueueInterface $queue;
+    private readonly JsonMessageSerializer $serializer;
+    private readonly VoidAdapter $adapter;
 
     public function __construct()
     {
