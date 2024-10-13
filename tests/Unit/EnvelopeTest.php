@@ -39,11 +39,7 @@ final class EnvelopeTest extends TestCase
 
         $stack = $message->getMetadata()[EnvelopeInterface::ENVELOPE_STACK_KEY];
         $this->assertIsArray($stack);
-        $this->assertEquals([
-            IdEnvelope::class,
-            IdEnvelope::class,
-            IdEnvelope::class,
-        ], $stack);
+        $this->assertEquals([IdEnvelope::class], $stack);
 
         $this->assertEquals('test-id-3', $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY]);
     }
