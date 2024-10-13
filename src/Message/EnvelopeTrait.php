@@ -8,6 +8,18 @@ trait EnvelopeTrait
 {
     private MessageInterface $message;
 
+    /**
+     * A mirror of {@see MessageInterface::fromData()}
+     */
+    abstract public static function fromMessage(MessageInterface $message): self;
+
+    public static function fromData(string $handlerName, mixed $data, array $metadata = []): MessageInterface
+    {
+        $message = new Message($handlerName, $data, $metadata);
+
+        return self::fromMessage($message);
+    }
+
     public function getMessage(): MessageInterface
     {
         return $this->message;
