@@ -20,14 +20,15 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
     public const META_KEY_RESEND = 'failure-strategy-resend-attempts';
 
     /**
-     * @param string $id A unique id to differentiate two and more objects of this class
+     * @param string $id A unique id to differentiate two and more instances of this class
      * @param int $maxAttempts Maximum attempts count for this strategy with the given $id before it will give up
-     * @param QueueInterface|null $queue
+     * @param QueueInterface|null $targetQueue Messages will be sent to this queue if set.
+     *        They will be resent to an original queue otherwise.
      */
     public function __construct(
         private string $id,
         private int $maxAttempts,
-        private ?QueueInterface $queue = null,
+        private ?QueueInterface $targetQueue = null,
     ) {
         if ($maxAttempts < 1) {
             throw new InvalidArgumentException("maxAttempts parameter must be a positive integer, $this->maxAttempts given.");
@@ -41,10 +42,10 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
         $message = $request->getMessage();
         if ($this->suites($message)) {
             $envelope = new FailureEnvelope($message, $this->createMeta($message));
-            $envelope = ($this->queue ?? $request->getQueue())->push($envelope);
+            $envelope = ($this->targetQueue ?? $request->getQueue())->push($envelope);
 
             return $request->withMessage($envelope)
-                ->withQueue($this->queue ?? $request->getQueue());
+                ->withQueue($this->targetQueue ?? $request->getQueue());
         }
 
         return $handler->handleFailure($request);
@@ -57,15 +58,12 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
 
     private function createMeta(MessageInterface $message): array
     {
-        $metadata = $message->getMetadata();
-        $metadata[$this->getMetaKey()] = $this->getAttempts($message) + 1;
-
-        return $metadata;
+        return [$this->getMetaKey() => $this->getAttempts($message) + 1];
     }
 
     private function getAttempts(MessageInterface $message): int
     {
-        $result = $message->getMetadata()[$this->getMetaKey()] ?? 0;
+        $result = $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY][$this->getMetaKey()] ?? 0;
         if ($result < 0) {
             $result = 0;
         }

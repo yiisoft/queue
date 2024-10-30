@@ -19,6 +19,11 @@ final class IdEnvelope implements EnvelopeInterface
     ) {
     }
 
+    public static function fromMessage(MessageInterface $message): self
+    {
+        return new self($message, $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null);
+    }
+
     public function setId(string|int|null $id): void
     {
         $this->id = $id;
@@ -29,10 +34,8 @@ final class IdEnvelope implements EnvelopeInterface
         return $this->id ?? $this->message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
     }
 
-    public function getMetadata(): array
+    private function getEnvelopeMetadata(): array
     {
-        return array_merge($this->message->getMetadata(), [
-            self::MESSAGE_ID_KEY => $this->getId(),
-        ]);
+        return [self::MESSAGE_ID_KEY => $this->getId()];
     }
 }

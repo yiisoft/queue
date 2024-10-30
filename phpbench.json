@@ -1,0 +1,8 @@
+{
+    "$schema":"./vendor/phpbench/phpbench/phpbench.schema.json",
+    "runner.bootstrap": "vendor/autoload.php",
+    "runner.path": "tests/Benchmark",
+    "runner.revs": 100000,
+    "runner.iterations": 5,
+    "runner.warmup": 5
+}

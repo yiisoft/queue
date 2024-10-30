@@ -8,6 +8,7 @@ use Yiisoft\Definitions\Exception\InvalidConfigException;
 
 interface QueueFactoryInterface
 {
+    /** @psalm-suppress MissingClassConstType */
     public const DEFAULT_CHANNEL_NAME = 'yii-queue';
 
     /**

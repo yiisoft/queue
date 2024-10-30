@@ -8,6 +8,7 @@ use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
@@ -148,8 +149,11 @@ class ExponentialDelayMiddlewareTest extends TestCase
 
         self::assertNotEquals($request, $result);
         $message = $result->getMessage();
-        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test', $message->getMetadata());
-        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_DELAY . '-test', $message->getMetadata());
+        self::assertArrayHasKey(FailureEnvelope::FAILURE_META_KEY, $message->getMetadata());
+
+        $meta = $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY];
+        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test', $meta);
+        self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_DELAY . '-test', $meta);
     }
 
     public function testPipelineFailure(): void
@@ -157,7 +161,11 @@ class ExponentialDelayMiddlewareTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('test');
 
-        $message = new Message('test', null, [ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test' => 2]);
+        $message = new Message(
+            'test',
+            null,
+            [FailureEnvelope::FAILURE_META_KEY => [ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test' => 2]]
+        );
         $queue = $this->createMock(QueueInterface::class);
         $middleware = new ExponentialDelayMiddleware(
             'test',
