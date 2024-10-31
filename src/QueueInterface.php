@@ -10,10 +10,6 @@ use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 
-/**
- * @internal Please don't use this interface. It is only used here to make tests simpler and will be removed
- * after tests refactoring. Use the {@see Queue} class directly instead.
- */
 interface QueueInterface
 {
     /**
