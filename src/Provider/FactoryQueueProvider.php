@@ -24,7 +24,7 @@ final class FactoryQueueProvider implements QueueProviderInterface
      * @throws InvalidConfigException
      */
     public function __construct(
-        private readonly array $definitions = [],
+        array $definitions = [],
         ?ContainerInterface $container = null,
         bool $validate = true,
     ) {
@@ -42,7 +42,7 @@ final class FactoryQueueProvider implements QueueProviderInterface
 
     public function has(string $channel): bool
     {
-        return array_key_exists($channel, $this->definitions);
+        return $this->factory->has($channel);
     }
 
     /**
