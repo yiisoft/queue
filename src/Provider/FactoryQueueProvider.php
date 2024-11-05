@@ -21,14 +21,18 @@ final class FactoryQueueProvider implements QueueProviderInterface
     private readonly StrictFactory $factory;
 
     /**
-     * @throws InvalidConfigException
+     * @throws InvalidQueueConfigException
      */
     public function __construct(
         array $definitions = [],
         ?ContainerInterface $container = null,
         bool $validate = true,
     ) {
-        $this->factory = new StrictFactory($definitions, $container, $validate);
+        try {
+            $this->factory = new StrictFactory($definitions, $container, $validate);
+        } catch (InvalidConfigException $exception) {
+            throw new InvalidQueueConfigException($exception->getMessage(), previous: $exception);
+        }
     }
 
     public function get(string $channel): QueueInterface
@@ -45,9 +49,6 @@ final class FactoryQueueProvider implements QueueProviderInterface
         return $this->factory->has($channel);
     }
 
-    /**
-     * @throws InvalidQueueConfigException
-     */
     private function getOrTryCreate(string $channel): QueueInterface|null
     {
         if (array_key_exists($channel, $this->queues)) {
@@ -55,11 +56,7 @@ final class FactoryQueueProvider implements QueueProviderInterface
         }
 
         if ($this->factory->has($channel)) {
-            try {
-                $this->queues[$channel] = $this->factory->create($channel);
-            } catch (InvalidConfigException $exception) {
-                throw new InvalidQueueConfigException($exception->getMessage(), previous: $exception);
-            }
+            $this->queues[$channel] = $this->factory->create($channel);
         } else {
             $this->queues[$channel] = null;
         }
