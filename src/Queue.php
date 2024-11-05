@@ -20,6 +20,9 @@ use Yiisoft\Queue\Message\IdEnvelope;
 
 final class Queue implements QueueInterface
 {
+    /** @psalm-suppress MissingClassConstType */
+    public const DEFAULT_CHANNEL_NAME = 'yii-queue';
+
     /**
      * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
      */
@@ -32,7 +35,7 @@ final class Queue implements QueueInterface
         private LoggerInterface $logger,
         private PushMiddlewareDispatcher $pushMiddlewareDispatcher,
         private ?AdapterInterface $adapter = null,
-        private string $channelName = QueueFactoryInterface::DEFAULT_CHANNEL_NAME,
+        private string $channelName = Queue::DEFAULT_CHANNEL_NAME,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
     ) {
         $this->middlewareDefinitions = $middlewareDefinitions;
