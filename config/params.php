@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Command\ListenAllCommand;
 use Yiisoft\Queue\Command\ListenCommand;
 use Yiisoft\Queue\Command\RunCommand;
 use Yiisoft\Queue\Debug\QueueCollector;
-use Yiisoft\Queue\Debug\QueueFactoryInterfaceProxy;
+use Yiisoft\Queue\Debug\QueueProviderInterfaceProxy;
 use Yiisoft\Queue\Debug\QueueWorkerInterfaceProxy;
-use Yiisoft\Queue\QueueFactoryInterface;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
 return [
@@ -22,9 +21,7 @@ return [
     ],
     'yiisoft/queue' => [
         'handlers' => [],
-        'channel-definitions' => [
-            QueueFactoryInterface::DEFAULT_CHANNEL_NAME => AdapterInterface::class,
-        ],
+        'channel-definitions' => [],
         'middlewares-push' => [],
         'middlewares-consume' => [],
         'middlewares-fail' => [],
@@ -34,7 +31,7 @@ return [
             QueueCollector::class,
         ],
         'trackedServices' => [
-            QueueFactoryInterface::class => [QueueFactoryInterfaceProxy::class, QueueCollector::class],
+            QueueProviderInterface::class => [QueueProviderInterfaceProxy::class, QueueCollector::class],
             WorkerInterface::class => [QueueWorkerInterfaceProxy::class, QueueCollector::class],
         ],
     ],
