@@ -35,7 +35,7 @@ final class Queue implements QueueInterface
         private LoggerInterface $logger,
         private PushMiddlewareDispatcher $pushMiddlewareDispatcher,
         private ?AdapterInterface $adapter = null,
-        private string $channelName = Queue::DEFAULT_CHANNEL_NAME,
+        private string $channelName = self::DEFAULT_CHANNEL_NAME,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
     ) {
         $this->middlewareDefinitions = $middlewareDefinitions;
