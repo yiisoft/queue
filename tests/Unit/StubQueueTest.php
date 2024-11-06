@@ -21,14 +21,18 @@ final class StubQueueTest extends TestCase
         $this->assertSame(0, $queue->run());
         $this->assertTrue($queue->status('test')->isDone());
         $this->assertSame(Queue::DEFAULT_CHANNEL_NAME, $queue->getChannelName());
+        $this->assertNull($queue->getAdapter());
         $queue->listen();
     }
 
     public function testWithAdapter(): void
     {
-        $queue = new StubQueue();
+        $sourceQueue = new StubQueue();
 
-        $this->assertNotSame($queue, $queue->withAdapter(new StubAdapter()));
+        $queue = $sourceQueue->withAdapter(new StubAdapter());
+
+        $this->assertNotSame($queue, $sourceQueue);
+        $this->assertInstanceOf(StubAdapter::class, $queue->getAdapter());
     }
 
     public function testWithChannelName(): void
