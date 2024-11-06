@@ -10,8 +10,9 @@ use Yiisoft\Factory\StrictFactory;
 use Yiisoft\Queue\QueueInterface;
 
 use function array_key_exists;
+use function sprintf;
 
-final class FactoryQueueProvider implements QueueProviderInterface
+final class QueueFactoryQueueProvider implements QueueProviderInterface
 {
     /**
      * @psalm-var array<string, QueueInterface|null>
@@ -21,10 +22,11 @@ final class FactoryQueueProvider implements QueueProviderInterface
     private readonly StrictFactory $factory;
 
     /**
+     * @psalm-param array<string, mixed> $definitions
      * @throws InvalidQueueConfigException
      */
     public function __construct(
-        array $definitions = [],
+        array $definitions,
         ?ContainerInterface $container = null,
         bool $validate = true,
     ) {
@@ -49,6 +51,9 @@ final class FactoryQueueProvider implements QueueProviderInterface
         return $this->factory->has($channel);
     }
 
+    /**
+     * @throws InvalidQueueConfigException
+     */
     private function getOrTryCreate(string $channel): QueueInterface|null
     {
         if (array_key_exists($channel, $this->queues)) {
@@ -56,7 +61,18 @@ final class FactoryQueueProvider implements QueueProviderInterface
         }
 
         if ($this->factory->has($channel)) {
-            $this->queues[$channel] = $this->factory->create($channel);
+            $queue = $this->factory->create($channel);
+            if (!$queue instanceof QueueInterface) {
+                throw new InvalidQueueConfigException(
+                    sprintf(
+                        'Queue must implement "%s". For channel "%s" got "%s" instead.',
+                        QueueInterface::class,
+                        $channel,
+                        get_debug_type($queue),
+                    ),
+                );
+            }
+            $this->queues[$channel] = $queue->withChannelName($channel);
         } else {
             $this->queues[$channel] = null;
         }

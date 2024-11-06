@@ -19,7 +19,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Queue\Provider\FactoryQueueProvider;
+use Yiisoft\Queue\Provider\QueueFactoryQueueProvider;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueInterface;
@@ -30,7 +30,7 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 
 return [
     QueueProviderInterface::class => [
-        'class' => FactoryQueueProvider::class,
+        'class' => QueueFactoryQueueProvider::class,
         '__construct()' => [
             'definitions' => $params['yiisoft/queue']['channel-definitions'],
         ],

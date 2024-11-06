@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Provider;
 
 use Yiisoft\Queue\Provider\ChannelNotFoundException;
 use Yiisoft\Queue\Provider\CompositeQueueProvider;
-use Yiisoft\Queue\Provider\FactoryQueueProvider;
+use Yiisoft\Queue\Provider\QueueFactoryQueueProvider;
 use Yiisoft\Queue\StubQueue;
 use Yiisoft\Queue\Tests\TestCase;
 
@@ -15,10 +15,10 @@ final class CompositeQueueProviderTest extends TestCase
     public function testBase(): void
     {
         $provider = new CompositeQueueProvider(
-            new FactoryQueueProvider([
+            new QueueFactoryQueueProvider([
                 'channel1' => new StubQueue('channel1'),
             ]),
-            new FactoryQueueProvider([
+            new QueueFactoryQueueProvider([
                 'channel2' => new StubQueue('channel2'),
             ]),
         );
@@ -34,7 +34,7 @@ final class CompositeQueueProviderTest extends TestCase
     public function testNotFound(): void
     {
         $provider = new CompositeQueueProvider(
-            new FactoryQueueProvider([
+            new QueueFactoryQueueProvider([
                 'channel1' => new StubQueue(),
             ]),
         );

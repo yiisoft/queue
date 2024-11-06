@@ -5,23 +5,20 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Provider;
 
 use PHPUnit\Framework\TestCase;
+use Yiisoft\Queue\Cli\StubLoop;
 use Yiisoft\Queue\Provider\ChannelNotFoundException;
-use Yiisoft\Queue\Provider\FactoryQueueProvider;
+use Yiisoft\Queue\Provider\QueueFactoryQueueProvider;
 use Yiisoft\Queue\Provider\InvalidQueueConfigException;
+use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\StubQueue;
 
-final class FactoryQueueProviderTest extends TestCase
+final class QueueFactoryQueueProviderTest extends TestCase
 {
     public function testBase(): void
     {
-        $provider = new FactoryQueueProvider(
+        $provider = new QueueFactoryQueueProvider(
             [
-                'channel1' => [
-                    'class' => StubQueue::class,
-                    '__construct()' => [
-                        'channelName' => 'channel1',
-                    ],
-                ],
+                'channel1' => StubQueue::class,
             ],
         );
 
@@ -35,14 +32,9 @@ final class FactoryQueueProviderTest extends TestCase
 
     public function testGetTwice(): void
     {
-        $provider = new FactoryQueueProvider(
+        $provider = new QueueFactoryQueueProvider(
             [
-                'channel1' => [
-                    'class' => StubQueue::class,
-                    '__construct()' => [
-                        'channelName' => 'channel1',
-                    ],
-                ],
+                'channel1' => StubQueue::class,
             ],
         );
 
@@ -54,7 +46,7 @@ final class FactoryQueueProviderTest extends TestCase
 
     public function testGetNotExistChannel()
     {
-        $provider = new FactoryQueueProvider(
+        $provider = new QueueFactoryQueueProvider(
             [
                 'channel1' => StubQueue::class,
             ],
@@ -78,6 +70,23 @@ final class FactoryQueueProviderTest extends TestCase
         $this->expectExceptionMessage(
             'Invalid definition: incorrect constructor arguments. Expected array, got string.'
         );
-        new FactoryQueueProvider($definitions);
+        new QueueFactoryQueueProvider($definitions);
+    }
+
+    public function testInvalidQueueConfigOnGet(): void
+    {
+        $provider = new QueueFactoryQueueProvider([
+            'channel1' => StubLoop::class,
+        ]);
+
+        $this->expectException(InvalidQueueConfigException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'Queue must implement "%s". For channel "channel1" got "%s" instead.',
+                QueueInterface::class,
+                StubLoop::class,
+            )
+        );
+        $provider->get('channel1');
     }
 }
