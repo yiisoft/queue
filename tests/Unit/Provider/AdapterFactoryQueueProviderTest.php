@@ -2,25 +2,27 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Tests\Unit\Provider;
+namespace Provider;
 
 use PHPUnit\Framework\TestCase;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Adapter\StubAdapter;
 use Yiisoft\Queue\Cli\StubLoop;
+use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
 use Yiisoft\Queue\Provider\ChannelNotFoundException;
-use Yiisoft\Queue\Provider\QueueFactoryQueueProvider;
 use Yiisoft\Queue\Provider\InvalidQueueConfigException;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\StubQueue;
 
 use function sprintf;
 
-final class QueueFactoryQueueProviderTest extends TestCase
+final class AdapterFactoryQueueProviderTest extends TestCase
 {
     public function testBase(): void
     {
-        $provider = new QueueFactoryQueueProvider(
+        $provider = new AdapterFactoryQueueProvider(
+            new StubQueue(),
             [
-                'channel1' => StubQueue::class,
+                'channel1' => StubAdapter::class,
             ],
         );
 
@@ -28,15 +30,17 @@ final class QueueFactoryQueueProviderTest extends TestCase
 
         $this->assertInstanceOf(StubQueue::class, $queue);
         $this->assertSame('channel1', $queue->getChannelName());
+        $this->assertInstanceOf(StubAdapter::class, $queue->getAdapter());
         $this->assertTrue($provider->has('channel1'));
         $this->assertFalse($provider->has('not-exist-channel'));
     }
 
     public function testGetTwice(): void
     {
-        $provider = new QueueFactoryQueueProvider(
+        $provider = new AdapterFactoryQueueProvider(
+            new StubQueue(),
             [
-                'channel1' => StubQueue::class,
+                'channel1' => StubAdapter::class,
             ],
         );
 
@@ -48,9 +52,10 @@ final class QueueFactoryQueueProviderTest extends TestCase
 
     public function testGetNotExistChannel(): void
     {
-        $provider = new QueueFactoryQueueProvider(
+        $provider = new AdapterFactoryQueueProvider(
+            new StubQueue(),
             [
-                'channel1' => StubQueue::class,
+                'channel1' => StubAdapter::class,
             ],
         );
 
@@ -61,9 +66,10 @@ final class QueueFactoryQueueProviderTest extends TestCase
 
     public function testInvalidQueueConfig(): void
     {
+        $baseQueue = new StubQueue();
         $definitions = [
             'channel1' => [
-                'class' => StubQueue::class,
+                'class' => StubAdapter::class,
                 '__construct()' => 'hello',
             ],
         ];
@@ -72,20 +78,23 @@ final class QueueFactoryQueueProviderTest extends TestCase
         $this->expectExceptionMessage(
             'Invalid definition: incorrect constructor arguments. Expected array, got string.'
         );
-        new QueueFactoryQueueProvider($definitions);
+        new AdapterFactoryQueueProvider($baseQueue, $definitions);
     }
 
     public function testInvalidQueueConfigOnGet(): void
     {
-        $provider = new QueueFactoryQueueProvider([
-            'channel1' => StubLoop::class,
-        ]);
+        $provider = new AdapterFactoryQueueProvider(
+            new StubQueue(),
+            [
+                'channel1' => StubLoop::class,
+            ]
+        );
 
         $this->expectException(InvalidQueueConfigException::class);
         $this->expectExceptionMessage(
             sprintf(
-                'Queue must implement "%s". For channel "channel1" got "%s" instead.',
-                QueueInterface::class,
+                'Adapter must implement "%s". For channel "channel1" got "%s" instead.',
+                AdapterInterface::class,
                 StubLoop::class,
             )
         );

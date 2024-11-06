@@ -13,6 +13,7 @@ final class StubQueue implements QueueInterface
 {
     public function __construct(
         private string $channelName = Queue::DEFAULT_CHANNEL_NAME,
+        private ?AdapterInterface $adapter = null,
     ) {
     }
 
@@ -37,9 +38,16 @@ final class StubQueue implements QueueInterface
         return JobStatus::done();
     }
 
+    public function getAdapter(): ?AdapterInterface
+    {
+        return $this->adapter;
+    }
+
     public function withAdapter(AdapterInterface $adapter): QueueInterface
     {
-        return clone $this;
+        $new = clone $this;
+        $new->adapter = $adapter;
+        return $new;
     }
 
     public function getChannelName(): string
@@ -51,6 +59,9 @@ final class StubQueue implements QueueInterface
     {
         $new = clone $this;
         $new->channelName = $channel;
+        if ($new->adapter !== null) {
+            $new->adapter = $new->adapter->withChannel($channel);
+        }
         return $new;
     }
 }

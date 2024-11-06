@@ -1,0 +1,84 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Yiisoft\Queue\Provider;
+
+use Psr\Container\ContainerInterface;
+use Yiisoft\Definitions\Exception\InvalidConfigException;
+use Yiisoft\Factory\StrictFactory;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\QueueInterface;
+
+use function array_key_exists;
+use function sprintf;
+
+final class AdapterFactoryQueueProvider implements QueueProviderInterface
+{
+    /**
+     * @psalm-var array<string, QueueInterface|null>
+     */
+    private array $queues = [];
+
+    private readonly StrictFactory $factory;
+
+    /**
+     * @psalm-param array<string, mixed> $definitions
+     * @throws InvalidQueueConfigException
+     */
+    public function __construct(
+        private readonly QueueInterface $baseQueue,
+        array $definitions,
+        ?ContainerInterface $container = null,
+        bool $validate = true,
+    ) {
+        try {
+            $this->factory = new StrictFactory($definitions, $container, $validate);
+        } catch (InvalidConfigException $exception) {
+            throw new InvalidQueueConfigException($exception->getMessage(), previous: $exception);
+        }
+    }
+
+    public function get(string $channel): QueueInterface
+    {
+        $queue = $this->getOrTryCreate($channel);
+        if ($queue === null) {
+            throw new ChannelNotFoundException($channel);
+        }
+        return $queue;
+    }
+
+    public function has(string $channel): bool
+    {
+        return $this->factory->has($channel);
+    }
+
+    /**
+     * @throws InvalidQueueConfigException
+     */
+    private function getOrTryCreate(string $channel): QueueInterface|null
+    {
+        if (array_key_exists($channel, $this->queues)) {
+            return $this->queues[$channel];
+        }
+
+        if ($this->factory->has($channel)) {
+            $adapter = $this->factory->create($channel);
+            if (!$adapter instanceof AdapterInterface) {
+                throw new InvalidQueueConfigException(
+                    sprintf(
+                        'Adapter must implement "%s". For channel "%s" got "%s" instead.',
+                        AdapterInterface::class,
+                        $channel,
+                        get_debug_type($adapter),
+                    ),
+                );
+            }
+            $this->queues[$channel] = $this->baseQueue->withAdapter($adapter)->withChannelName($channel);
+        } else {
+            $this->queues[$channel] = null;
+        }
+
+        return $this->queues[$channel];
+    }
+}
