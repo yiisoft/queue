@@ -21,7 +21,7 @@ return [
     ],
     'yiisoft/queue' => [
         'handlers' => [],
-        'channel-definitions' => [],
+        'channels' => [],
         'middlewares-push' => [],
         'middlewares-consume' => [],
         'middlewares-fail' => [],

@@ -32,7 +32,7 @@ return [
     QueueProviderInterface::class => [
         'class' => QueueFactoryQueueProvider::class,
         '__construct()' => [
-            'definitions' => $params['yiisoft/queue']['channel-definitions'],
+            'definitions' => $params['yiisoft/queue']['channels'],
         ],
     ],
     QueueWorker::class => [
@@ -61,12 +61,12 @@ return [
     MessageSerializerInterface::class => JsonMessageSerializer::class,
     RunCommand::class => [
         '__construct()' => [
-            'channels' => array_keys($params['yiisoft/queue']['channel-definitions']),
+            'channels' => array_keys($params['yiisoft/queue']['channels']),
         ],
     ],
     ListenAllCommand::class => [
         '__construct()' => [
-            'channels' => array_keys($params['yiisoft/queue']['channel-definitions']),
+            'channels' => array_keys($params['yiisoft/queue']['channels']),
         ],
     ],
 ];
