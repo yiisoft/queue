@@ -9,6 +9,9 @@ use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 
+/**
+ * Stub queue that does nothing. Job status is always "done".
+ */
 final class StubQueue implements QueueInterface
 {
     public function __construct(

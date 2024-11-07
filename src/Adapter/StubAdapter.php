@@ -7,6 +7,9 @@ namespace Yiisoft\Queue\Adapter;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 
+/**
+ * Stub adapter that does nothing. Job status is always "done".
+ */
 final class StubAdapter implements AdapterInterface
 {
     public function runExisting(callable $handlerCallback): void

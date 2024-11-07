@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Cli;
 
+/**
+ * Stub loop.
+ */
 final class StubLoop implements LoopInterface
 {
     public function __construct(
