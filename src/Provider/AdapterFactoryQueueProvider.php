@@ -13,6 +13,12 @@ use Yiisoft\Queue\QueueInterface;
 use function array_key_exists;
 use function sprintf;
 
+/**
+ * Queue provider based on adapter definitions.
+ *
+ * @see https://github.com/yiisoft/definitions/
+ * @see https://github.com/yiisoft/factory/
+ */
 final class AdapterFactoryQueueProvider implements QueueProviderInterface
 {
     /**
@@ -23,6 +29,11 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
     private readonly StrictFactory $factory;
 
     /**
+     * @param QueueInterface $baseQueue Base queue to use for creating queues.
+     * @param array $definitions Definitions to create adapters with indexed by channel names.
+     * @param ContainerInterface|null $container Container to use for resolving dependencies.
+     * @param bool $validate If definitions should be validated when set.
+     *
      * @psalm-param array<string, mixed> $definitions
      * @throws InvalidQueueConfigException
      */

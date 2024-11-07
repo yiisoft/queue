@@ -9,6 +9,9 @@ use Throwable;
 
 use function sprintf;
 
+/**
+ * Thrown when channel is not found.
+ */
 final class ChannelNotFoundException extends LogicException implements QueueProviderException
 {
     public function __construct(string $channel, int $code = 0, ?Throwable $previous = null)
