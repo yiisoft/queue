@@ -16,11 +16,10 @@ interface QueueProviderInterface
      *
      * @param string $channel Channel name.
      *
-     * @return QueueInterface Queue instance.
-     *
      * @throws InvalidQueueConfigException If the queue configuration is invalid.
      * @throws ChannelNotFoundException If the channel is not found.
      * @throws QueueProviderException If the queue provider fails to provide a queue.
+     * @return QueueInterface Queue instance.
      */
     public function get(string $channel): QueueInterface;
 
