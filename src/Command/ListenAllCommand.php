@@ -48,7 +48,7 @@ final class ListenAllCommand extends Command
                 'm',
                 InputOption::VALUE_REQUIRED,
                 'Maximum number of messages to process in each channel before switching to another channel. ' .
-                'Default is 0 (no limits).',
+                    'Default is 0 (no limits).',
                 0,
             );
 
