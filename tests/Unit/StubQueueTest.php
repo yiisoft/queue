@@ -7,7 +7,6 @@ namespace Yiisoft\Queue\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Adapter\StubAdapter;
 use Yiisoft\Queue\Message\Message;
-use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\StubQueue;
 
