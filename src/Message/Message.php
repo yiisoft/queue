@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Message;
 final class Message implements MessageInterface
 {
     /**
-     * @param string $handlerName A name of a handler which should handle this message
+     * @param string $handlerName A name of a handler which should handle this message.
      * @param mixed $data Message data, encodable by a queue adapter
      * @param array $metadata Message metadata, encodable by a queue adapter
      */
