@@ -7,6 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
 
@@ -51,7 +52,7 @@ final class SynchronousAdapterTest extends TestCase
     public function testWithSameChannel(): void
     {
         $adapter = $this->getAdapter();
-        self::assertEquals($adapter, $adapter->withChannel(Queue::DEFAULT_CHANNEL_NAME));
+        self::assertEquals($adapter, $adapter->withChannel(QueueInterface::DEFAULT_CHANNEL_NAME));
     }
 
     public function testWithAnotherChannel(): void

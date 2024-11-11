@@ -20,7 +20,7 @@ final class SynchronousAdapter implements AdapterInterface
     public function __construct(
         private WorkerInterface $worker,
         private QueueInterface $queue,
-        private string $channel = Queue::DEFAULT_CHANNEL_NAME,
+        private string $channel = QueueInterface::DEFAULT_CHANNEL_NAME,
     ) {
     }
 

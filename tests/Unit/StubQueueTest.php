@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Adapter\StubAdapter;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\StubQueue;
 
 final class StubQueueTest extends TestCase
@@ -20,7 +21,7 @@ final class StubQueueTest extends TestCase
         $this->assertSame($message, $queue->push($message));
         $this->assertSame(0, $queue->run());
         $this->assertTrue($queue->status('test')->isDone());
-        $this->assertSame(Queue::DEFAULT_CHANNEL_NAME, $queue->getChannelName());
+        $this->assertSame(QueueInterface::DEFAULT_CHANNEL_NAME, $queue->getChannelName());
         $this->assertNull($queue->getAdapter());
         $queue->listen();
     }
@@ -42,7 +43,7 @@ final class StubQueueTest extends TestCase
         $queue = $sourceQueue->withChannelName('test');
 
         $this->assertNotSame($queue, $sourceQueue);
-        $this->assertSame(Queue::DEFAULT_CHANNEL_NAME, $sourceQueue->getChannelName());
+        $this->assertSame(QueueInterface::DEFAULT_CHANNEL_NAME, $sourceQueue->getChannelName());
         $this->assertSame('test', $queue->getChannelName());
     }
 }

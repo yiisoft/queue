@@ -11,6 +11,7 @@ use Yiisoft\Queue\Debug\QueueProviderInterfaceProxy;
 use Yiisoft\Queue\Debug\QueueWorkerInterfaceProxy;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
 return [
@@ -24,7 +25,7 @@ return [
     'yiisoft/queue' => [
         'handlers' => [],
         'channels' => [
-            Queue::DEFAULT_CHANNEL_NAME => AdapterInterface::class,
+            QueueInterface::DEFAULT_CHANNEL_NAME => AdapterInterface::class,
         ],
         'middlewares-push' => [],
         'middlewares-consume' => [],

@@ -15,7 +15,7 @@ use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 final class StubQueue implements QueueInterface
 {
     public function __construct(
-        private string $channelName = Queue::DEFAULT_CHANNEL_NAME,
+        private string $channelName = QueueInterface::DEFAULT_CHANNEL_NAME,
         private ?AdapterInterface $adapter = null,
     ) {
     }
