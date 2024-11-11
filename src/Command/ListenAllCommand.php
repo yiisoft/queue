@@ -23,7 +23,7 @@ final class ListenAllCommand extends Command
     public function __construct(
         private readonly QueueProviderInterface $queueProvider,
         private readonly LoopInterface $loop,
-        private readonly array $channels
+        private readonly array $channels,
     ) {
         parent::__construct();
     }
