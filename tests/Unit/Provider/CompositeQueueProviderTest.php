@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit\Provider;
 use Yiisoft\Queue\Provider\ChannelNotFoundException;
 use Yiisoft\Queue\Provider\CompositeQueueProvider;
 use Yiisoft\Queue\Provider\QueueFactoryQueueProvider;
-use Yiisoft\Queue\StubQueue;
+use Yiisoft\Queue\Stubs\StubQueue;
 use Yiisoft\Queue\Tests\TestCase;
 
 final class CompositeQueueProviderTest extends TestCase

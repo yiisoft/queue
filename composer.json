@@ -61,7 +61,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Yiisoft\\Queue\\": "src"
+            "Yiisoft\\Queue\\": "src",
+            "Yiisoft\\Queue\\Stubs\\": "stubs"
         }
     },
     "autoload-dev": {

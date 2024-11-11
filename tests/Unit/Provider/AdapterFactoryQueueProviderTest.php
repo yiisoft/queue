@@ -6,12 +6,12 @@ namespace Provider;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Adapter\StubAdapter;
-use Yiisoft\Queue\Cli\StubLoop;
+use Yiisoft\Queue\Stubs\StubLoop;
 use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
 use Yiisoft\Queue\Provider\ChannelNotFoundException;
 use Yiisoft\Queue\Provider\InvalidQueueConfigException;
-use Yiisoft\Queue\StubQueue;
+use Yiisoft\Queue\Stubs\StubQueue;
+use Yiisoft\Queue\Stubs\StubAdapter;
 
 use function sprintf;
 

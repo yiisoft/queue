@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Tests\Unit\Adapter;
+namespace Yiisoft\Queue\Tests\Unit\Stubs;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Queue\Adapter\StubAdapter;
 use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Stubs\StubAdapter;
 
 final class StubAdapterTest extends TestCase
 {

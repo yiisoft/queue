@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Cli;
+namespace Yiisoft\Queue\Tests\Unit\Stubs;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use Yiisoft\Queue\Cli\StubLoop;
+use Yiisoft\Queue\Stubs\StubLoop;
 use Yiisoft\Queue\Tests\TestCase;
 
 final class StubLoopTest extends TestCase

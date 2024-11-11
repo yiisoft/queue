@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Provider;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Provider\PrototypeQueueProvider;
-use Yiisoft\Queue\StubQueue;
+use Yiisoft\Queue\Stubs\StubQueue;
 
 final class PrototypeQueueProviderTest extends TestCase
 {

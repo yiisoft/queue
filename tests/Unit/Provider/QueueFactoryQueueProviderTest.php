@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Queue\Cli\StubLoop;
+use Yiisoft\Queue\Stubs\StubLoop;
 use Yiisoft\Queue\Provider\ChannelNotFoundException;
 use Yiisoft\Queue\Provider\QueueFactoryQueueProvider;
 use Yiisoft\Queue\Provider\InvalidQueueConfigException;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\StubQueue;
+use Yiisoft\Queue\Stubs\StubQueue;
 
 use function sprintf;
 

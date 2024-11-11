@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Cli;
+namespace Yiisoft\Queue\Stubs;
+
+use Yiisoft\Queue\Cli\LoopInterface;
 
 /**
  * Stub loop.

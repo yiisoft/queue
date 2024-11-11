@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue;
+namespace Yiisoft\Queue\Stubs;
 
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
+use Yiisoft\Queue\QueueInterface;
 
 /**
  * Stub queue that does nothing. Job status is always "done".

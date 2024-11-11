@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Worker;
+namespace Yiisoft\Queue\Tests\Unit\Stubs;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Worker\StubWorker;
+use Yiisoft\Queue\Stubs\StubWorker;
 
 final class StubWorkerTest extends TestCase
 {
