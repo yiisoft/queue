@@ -25,7 +25,7 @@ name: bechmark
 
 jobs:
   phpbench:
-    uses: yiisoft/actions/.github/workflows/phpbench.yml
+    uses: yiisoft/actions/.github/workflows/phpbench.yml@master
     with:
       os: >-
         ['ubuntu-latest', 'windows-latest']
