@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Exception\AdapterConfiguration;
 
 use RuntimeException;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\Queue;
 
 class AdapterNotConfiguredException extends RuntimeException implements FriendlyExceptionInterface
