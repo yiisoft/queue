@@ -20,6 +20,7 @@ class AdapterNotConfiguredException extends RuntimeException implements Friendly
     public function getSolution(): ?string
     {
         $queueClass = Queue::class;
+        $queueProviderInterface = QueueProviderInterface::class;
 
         return <<<SOLUTION
             Adapter property must be set in the Queue object before you can use it.
@@ -30,6 +31,7 @@ class AdapterNotConfiguredException extends RuntimeException implements Friendly
             References:
             - $queueClass::\$adapter
             - $queueClass::withAdapter()
+            - $queueProviderInterface
             SOLUTION;
     }
 }
