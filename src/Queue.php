@@ -140,7 +140,7 @@ final class Queue implements QueueInterface
     {
         $instance = clone $this;
         $instance->channelName = $channel;
-
+        $instance->adapter = $this->adapter?->withChannel($channel);
         return $instance;
     }
 
