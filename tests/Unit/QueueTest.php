@@ -130,6 +130,10 @@ final class QueueTest extends TestCase
 
     public function testRunWithSignalLoop(): void
     {
+        if (!extension_loaded('pcntl')) {
+            self::markTestSkipped('PCNTL support required');
+        }
+
         $this->loop = new SignalLoop();
         $queue = $this
             ->getQueue()

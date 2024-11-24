@@ -4,5 +4,6 @@
     "runner.path": "tests/Benchmark",
     "runner.revs": 100000,
     "runner.iterations": 5,
-    "runner.warmup": 5
+    "runner.warmup": 5,
+    "runner.retry_threshold": 5
 }
