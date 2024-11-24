@@ -18,6 +18,11 @@ final class Message implements MessageInterface
     ) {
     }
 
+    public static function fromData(string $handlerName, mixed $data, array $metadata = []): MessageInterface
+    {
+        return new self($handlerName, $data, $metadata);
+    }
+
     public function getHandlerName(): string
     {
         return $this->handlerName;

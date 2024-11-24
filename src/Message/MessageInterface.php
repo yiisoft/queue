@@ -6,6 +6,8 @@ namespace Yiisoft\Queue\Message;
 
 interface MessageInterface
 {
+    public static function fromData(string $handlerName, mixed $data, array $metadata = []): self;
+
     /**
      * Returns handler name.
      */
