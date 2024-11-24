@@ -19,6 +19,11 @@ final class JsonMessageSerializer implements MessageSerializerInterface
             'data' => $message->getData(),
             'meta' => $message->getMetadata(),
         ];
+        if (!isset($payload['meta']['message-class'])) {
+            $payload['meta']['message-class'] = $message instanceof EnvelopeInterface
+                ? $message->getMessage()::class
+                : $message::class;
+        }
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }
@@ -34,25 +39,38 @@ final class JsonMessageSerializer implements MessageSerializerInterface
             throw new InvalidArgumentException('Payload must be array. Got ' . get_debug_type($payload) . '.');
         }
 
+        $name = $payload['name'] ?? null;
+        if (!isset($name) || !is_string($name)) {
+            throw new InvalidArgumentException('Handler name must be a string. Got ' . get_debug_type($name) . '.');
+        }
+
         $meta = $payload['meta'] ?? [];
         if (!is_array($meta)) {
-            throw new InvalidArgumentException('Metadata must be array. Got ' . get_debug_type($meta) . '.');
+            throw new InvalidArgumentException('Metadata must be an array. Got ' . get_debug_type($meta) . '.');
         }
 
-        // TODO: will be removed later
-        $message = new Message($payload['name'] ?? '$name', $payload['data'] ?? null, $meta);
-
+        $envelopes = [];
         if (isset($meta[EnvelopeInterface::ENVELOPE_STACK_KEY]) && is_array($meta[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
-            $message = $message->withMetadata(
-                array_merge($message->getMetadata(), [EnvelopeInterface::ENVELOPE_STACK_KEY => []]),
-            );
-            foreach ($meta[EnvelopeInterface::ENVELOPE_STACK_KEY] as $envelope) {
-                if (is_string($envelope) && class_exists($envelope) && is_subclass_of($envelope, EnvelopeInterface::class)) {
-                    $message = $envelope::fromMessage($message);
-                }
+            $envelopes = $meta[EnvelopeInterface::ENVELOPE_STACK_KEY];
+        }
+        $meta[EnvelopeInterface::ENVELOPE_STACK_KEY] = [];
+
+        $class = $payload['meta']['message-class'] ?? Message::class;
+        // Don't check subclasses when it's a default class: that's faster
+        if ($class !== Message::class && !is_subclass_of($class, MessageInterface::class)) {
+            $class = Message::class;
+        }
+
+        /**
+         * @var class-string<MessageInterface> $class
+         */
+        $message = $class::fromData($name, $payload['data'] ?? null, $meta);
+
+        foreach ($envelopes as $envelope) {
+            if (is_string($envelope) && class_exists($envelope) && is_subclass_of($envelope, EnvelopeInterface::class)) {
+                $message = $envelope::fromMessage($message);
             }
         }
-
 
         return $message;
     }
