@@ -56,7 +56,8 @@ final class JsonMessageSerializer implements MessageSerializerInterface
         $meta[EnvelopeInterface::ENVELOPE_STACK_KEY] = [];
 
         $class = $payload['meta']['message-class'] ?? Message::class;
-        if (!is_subclass_of($class, MessageInterface::class)) {
+        // Don't check subclasses when it's a default class: that's faster
+        if ($class !== Message::class && !is_subclass_of($class, MessageInterface::class)) {
             $class = Message::class;
         }
 
