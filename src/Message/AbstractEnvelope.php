@@ -60,6 +60,11 @@ abstract class AbstractEnvelope implements EnvelopeInterface
         );
     }
 
+    public static function fromData(string $handlerName, mixed $data, array $metadata = []): MessageInterface
+    {
+        return static::fromMessage(Message::fromData($handlerName, $data, $metadata));
+    }
+
     /**
      * Metadata of the envelope
      *
