@@ -15,9 +15,7 @@ trait EnvelopeTrait
 
     public static function fromData(string $handlerName, mixed $data, array $metadata = []): MessageInterface
     {
-        $message = new Message($handlerName, $data, $metadata);
-
-        return self::fromMessage($message);
+        return self::fromMessage(Message::fromData($handlerName, $data, $metadata));
     }
 
     public function getMessage(): MessageInterface
