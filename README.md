@@ -53,14 +53,16 @@ Each queue task consists of two parts:
    `Yiisoft\Queue\Message\Message`. For more complex cases you should implement the interface by your own.
 2. A message handler is a callable called by a `Yiisoft\Queue\Worker\Worker`. The handler handles each queue message.
 
-For example, if you need to download and save a file, your message may look like the following:
+For example, if you need to download and save a file, your message creation may look like the following:
+- Message handler as the first parameter
+- Message data as the second parameter
 
 ```php
 $data = [
     'url' => $url,
     'destinationFile' => $filename,
 ];
-$message = new \Yiisoft\Queue\Message\Message('file-download', $data);
+$message = new \Yiisoft\Queue\Message\Message(FileDownloader::class, $data);
 ```
 
 Then you should push it to the queue:
@@ -93,9 +95,8 @@ class FileDownloader
 The last thing we should do is to create a configuration for the `Yiisoft\Queue\Worker\Worker`:
 
 ```php
-$handlers = ['file-download' => [new FileDownloader('/path/to/save/files'), 'handle']];
 $worker = new \Yiisoft\Queue\Worker\Worker(
-    $handlers, // Here it is
+    [],
     $logger,
     $injector,
     $container
@@ -132,6 +133,28 @@ $status->isReserved();
 
 // Check whether a worker has executed the job.
 $status->isDone();
+```
+
+## Custom handler names
+### Custom handler names
+
+By default, when you push a message to the queue, the message handler name is the fully qualified class name of the handler.
+This can be useful for most cases, but sometimes you may want to use a shorter name or arbitrary string as the handler name.
+This can be useful when you want to reduce the amount of data being passed or when you communicate with external systems.
+
+To use a custom handler name before message push, you can pass it as the first argument `Message` when creating it:
+```php
+new Message('handler-name', $data);
+```
+
+To use a custom handler name on message consume, you should configure handler mapping for the `Worker` class:
+```php
+$worker = new \Yiisoft\Queue\Worker\Worker(
+    ['handler-name' => FooHandler::class],
+    $logger,
+    $injector,
+    $container
+);
 ```
 
 ## Different queue channels
