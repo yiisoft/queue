@@ -37,7 +37,7 @@ interface QueueInterface
     public function listen(): void;
 
     /**
-     * @param string|int $id A message id
+     * @param int|string $id A message id
      *
      * @throws InvalidArgumentException when there is no such id in the adapter
      *
