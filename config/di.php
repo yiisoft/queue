@@ -29,12 +29,12 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 /* @var array $params */
 
 return [
-    QueueProviderInterface::class => [
-        'class' => AdapterFactoryQueueProvider::class,
+    AdapterFactoryQueueProvider::class => [
         '__construct()' => [
             'definitions' => $params['yiisoft/queue']['channels'],
         ],
     ],
+    QueueProviderInterface::class => AdapterFactoryQueueProvider::class,
     QueueWorker::class => [
         'class' => QueueWorker::class,
         '__construct()' => [$params['yiisoft/queue']['handlers']],
