@@ -37,7 +37,7 @@ interface QueueInterface
     public function listen(): void;
 
     /**
-     * @param string $id A message id
+     * @param string|int $id A message id
      *
      * @throws InvalidArgumentException when there is no such id in the adapter
      *
@@ -47,7 +47,5 @@ interface QueueInterface
 
     public function withAdapter(AdapterInterface $adapter): self;
 
-    public function getChannelName(): string;
-
-    public function withChannelName(string $channel): self;
+    public function getChannelName(): ?string;
 }

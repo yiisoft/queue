@@ -41,4 +41,6 @@ interface AdapterInterface
     public function subscribe(callable $handlerCallback): void;
 
     public function withChannel(string $channel): self;
+
+    public function getChannelName(): string;
 }

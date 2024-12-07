@@ -78,7 +78,7 @@ final class QueueFactory implements QueueFactoryInterface
             $this->checkDefinitionType($channel, $definition);
             $adapter = $this->createFromDefinition($channel, $definition)->withChannel($channel);
 
-            return $this->queue->withChannelName($channel)->withAdapter($adapter);
+            return $this->queue->withAdapter($adapter);
         }
 
         if ($this->enableRuntimeChannelDefinition === false) {
@@ -86,7 +86,7 @@ final class QueueFactory implements QueueFactoryInterface
         }
 
         /** @psalm-suppress PossiblyNullReference */
-        return $this->queue->withChannelName($channel)->withAdapter($this->defaultAdapter->withChannel($channel));
+        return $this->queue->withAdapter($this->defaultAdapter->withChannel($channel));
     }
 
     private function checkDefinitionType(string $channel, mixed $definition): void

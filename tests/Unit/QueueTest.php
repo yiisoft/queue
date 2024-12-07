@@ -130,6 +130,10 @@ final class QueueTest extends TestCase
 
     public function testRunWithSignalLoop(): void
     {
+        if (!extension_loaded('pcntl')) {
+            self::markTestSkipped('pcntl is not installed');
+        }
+
         $this->loop = new SignalLoop();
         $queue = $this
             ->getQueue()

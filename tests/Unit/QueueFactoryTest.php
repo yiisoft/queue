@@ -26,10 +26,6 @@ class QueueFactoryTest extends TestCase
             ->expects(self::once())
             ->method('withAdapter')
             ->willReturn($queue);
-        $queue
-            ->expects(self::once())
-            ->method('withChannelName')
-            ->willReturn($queue);
 
         $adapter = $this->createMock(AdapterInterface::class);
         $adapter
@@ -123,11 +119,6 @@ class QueueFactoryTest extends TestCase
             ->method('withAdapter')
             ->with($adapterNew)
             ->willReturn($queue);
-        $queue
-            ->expects(self::once())
-            ->method('withChannelName')
-            ->with('test')
-            ->willReturn($queue);
 
         $factory = new QueueFactory(
             ['test' => $adapterNew],
@@ -152,11 +143,6 @@ class QueueFactoryTest extends TestCase
             ->expects(self::once())
             ->method('withAdapter')
             ->with($adapterNew)
-            ->willReturn($queue);
-        $queue
-            ->expects(self::once())
-            ->method('withChannelName')
-            ->with('test')
             ->willReturn($queue);
 
         $factory = new QueueFactory(

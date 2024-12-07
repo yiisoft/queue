@@ -32,16 +32,15 @@ final class Queue implements QueueInterface
         private LoggerInterface $logger,
         private PushMiddlewareDispatcher $pushMiddlewareDispatcher,
         private ?AdapterInterface $adapter = null,
-        private string $channelName = QueueFactoryInterface::DEFAULT_CHANNEL_NAME,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
     ) {
         $this->middlewareDefinitions = $middlewareDefinitions;
         $this->adapterPushHandler = new AdapterPushHandler();
     }
 
-    public function getChannelName(): string
+    public function getChannelName(): ?string
     {
-        return $this->channelName;
+        return $this->adapter?->getChannelName();
     }
 
     public function push(
@@ -132,14 +131,6 @@ final class Queue implements QueueInterface
     {
         $instance = clone $this;
         $instance->middlewareDefinitions = [...array_values($instance->middlewareDefinitions), ...array_values($middlewareDefinitions)];
-
-        return $instance;
-    }
-
-    public function withChannelName(string $channel): self
-    {
-        $instance = clone $this;
-        $instance->channelName = $channel;
 
         return $instance;
     }

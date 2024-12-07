@@ -49,4 +49,9 @@ final class VoidAdapter implements AdapterInterface
     {
         throw new RuntimeException('Method is not implemented');
     }
+
+    public function getChannelName(): string
+    {
+        throw new RuntimeException('Method is not implemented');
+    }
 }
