@@ -32,7 +32,7 @@ final class Queue implements QueueInterface
         private LoggerInterface $logger,
         private PushMiddlewareDispatcher $pushMiddlewareDispatcher,
         private ?AdapterInterface $adapter = null,
-        private string $channelName = QueueFactoryInterface::DEFAULT_CHANNEL_NAME,
+        private string $channelName = QueueInterface::DEFAULT_CHANNEL_NAME,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
     ) {
         $this->middlewareDefinitions = $middlewareDefinitions;
@@ -140,7 +140,7 @@ final class Queue implements QueueInterface
     {
         $instance = clone $this;
         $instance->channelName = $channel;
-
+        $instance->adapter = $this->adapter?->withChannel($channel);
         return $instance;
     }
 
