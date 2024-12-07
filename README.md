@@ -28,15 +28,15 @@ The package could be installed with [Composer](https://getcomposer.org):
 composer require yiisoft/queue
 ```
 
-## Ready for yiisoft/config
+## Ready for Yii Config
 
 If you are using [yiisoft/config](https://github.com/yiisoft/config), you'll find out this package has some defaults
 in the [`common`](config/di.php) and [`params`](config/params.php) configurations saving your time. Things you should
 change to start working with the queue:
 
 - Optionally: define default `\Yiisoft\Queue\Adapter\AdapterInterface` implementation.
-- And/or define channel-specific `AdapterInterface` implementations in the `channel-definitions` params key to be used
-  with the [queue factory](#different-queue-channels).
+- And/or define channel-specific `AdapterInterface` implementations in the `channel` params key to be used
+  with the [queue provider](#different-queue-channels).
 - Define [message handlers](docs/guide/worker.md#handler-format) in the `handlers` params key to be used with the `QueueWorker`.
 - Resolve other `\Yiisoft\Queue\Queue` dependencies (psr-compliant event dispatcher).
 
@@ -53,14 +53,16 @@ Each queue task consists of two parts:
    `Yiisoft\Queue\Message\Message`. For more complex cases you should implement the interface by your own.
 2. A message handler is a callable called by a `Yiisoft\Queue\Worker\Worker`. The handler handles each queue message.
 
-For example, if you need to download and save a file, your message may look like the following:
+For example, if you need to download and save a file, your message creation may look like the following:
+- Message handler as the first parameter
+- Message data as the second parameter
 
 ```php
 $data = [
     'url' => $url,
     'destinationFile' => $filename,
 ];
-$message = new \Yiisoft\Queue\Message\Message('file-download', $data);
+$message = new \Yiisoft\Queue\Message\Message(FileDownloader::class, $data);
 ```
 
 Then you should push it to the queue:
@@ -93,9 +95,8 @@ class FileDownloader
 The last thing we should do is to create a configuration for the `Yiisoft\Queue\Worker\Worker`:
 
 ```php
-$handlers = ['file-download' => [new FileDownloader('/path/to/save/files'), 'handle']];
 $worker = new \Yiisoft\Queue\Worker\Worker(
-    $handlers, // Here it is
+    [],
     $logger,
     $injector,
     $container
@@ -134,17 +135,47 @@ $status->isReserved();
 $status->isDone();
 ```
 
-## Different queue channels
+## Custom handler names
+### Custom handler names
 
-Often we need to push to different queue channels with an only application. There is the `QueueFactory` class to make
-different `Queue` objects creation for different channels. With this factory channel-specific `Queue` creation is as
-simple as
+By default, when you push a message to the queue, the message handler name is the fully qualified class name of the handler.
+This can be useful for most cases, but sometimes you may want to use a shorter name or arbitrary string as the handler name.
+This can be useful when you want to reduce the amount of data being passed or when you communicate with external systems.
 
+To use a custom handler name before message push, you can pass it as the first argument `Message` when creating it:
 ```php
-$queue = $factory->get('channel-name');
+new Message('handler-name', $data);
 ```
 
-The main usage strategy is with explicit definition of channel-specific adapters. Definitions are passed in
+To use a custom handler name on message consume, you should configure handler mapping for the `Worker` class:
+```php
+$worker = new \Yiisoft\Queue\Worker\Worker(
+    ['handler-name' => FooHandler::class],
+    $logger,
+    $injector,
+    $container
+);
+```
+
+## Different queue channels
+
+Often we need to push to different queue channels with an only application. There is the `QueueProviderInterface`
+interface that provides different `Queue` objects creation for different channels. With implementation of this interface
+channel-specific `Queue` creation is as simple as
+
+```php
+$queue = $provider->get('channel-name');
+```
+
+Out of the box, there are four implementations of the `QueueProviderInterface`:
+
+- `AdapterFactoryQueueProvider`
+- `PrototypeQueueProvider`
+- `CompositeQueueProvider`
+
+### `AdapterFactoryQueueProvider`
+
+Provider based on definition of channel-specific adapters. Definitions are passed in
 the `$definitions` constructor parameter of the factory, where keys are channel names and values are definitions
 for the [`Yiisoft\Factory\Factory`](https://github.com/yiisoft/factory). Below are some examples:
 
@@ -163,18 +194,18 @@ use Yiisoft\Queue\Adapter\SynchronousAdapter;
 
 For more information about a definition formats available see the [factory](https://github.com/yiisoft/factory) documentation.
 
-Another queue factory usage strategy is implicit adapter creation via `withChannel()` method call. To use this approach
-you should pass some specific constructor parameters:
+### `PrototypeQueueProvider`
 
-- `true` to the `$enableRuntimeChannelDefinition`
-- a default `AdapterInterface` implementation to the `$defaultAdapter`.
-
-In this case `$factory->get('channel-name')` call will be converted
-to `$this->queue->withAdapter($this->defaultAdapter->withChannel($channel))`, when there is no explicit adapter definition
-in the `$definitions`.
+Queue provider that only changes the channel name of the base queue. It can be useful when your queues used the same
+adapter.
 
 > Warning: This strategy is not recommended as it does not give you any protection against typos and mistakes
 > in channel names.
+
+### `CompositeQueueProvider`
+
+This provider allows you to combine multiple providers into one. It will try to get a queue from each provider in the
+order they are passed to the constructor. The first queue found will be returned.
 
 ## Console execution
 

@@ -13,6 +13,7 @@ use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
+use Yiisoft\Queue\Tests\Integration\Support\TestHandler;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Worker\Worker;
 
@@ -47,5 +48,28 @@ final class MessageConsumingTest extends TestCase
 
         $this->assertEquals($messages, $this->messagesProcessed);
         $this->assertEquals($messages, $this->messagesProcessedSecond);
+    }
+
+    public function testMessagesConsumedByHandlerClass(): void
+    {
+        $handler = new TestHandler();
+        $container = $this->createMock(ContainerInterface::class);
+        $container->method('get')->with(TestHandler::class)->willReturn($handler);
+        $container->method('has')->with(TestHandler::class)->willReturn(true);
+        $worker = new Worker(
+            [],
+            new NullLogger(),
+            new Injector($container),
+            $container,
+            new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class)),
+            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), [])
+        );
+
+        $messages = [1, 'foo', 'bar-baz'];
+        foreach ($messages as $message) {
+            $worker->process(new Message(TestHandler::class, $message), $this->getQueue());
+        }
+
+        $this->assertEquals($messages, $handler->messagesProcessed);
     }
 }

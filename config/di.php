@@ -19,9 +19,9 @@ use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\Queue;
-use Yiisoft\Queue\QueueFactory;
-use Yiisoft\Queue\QueueFactoryInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Worker\Worker as QueueWorker;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -29,6 +29,12 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 /* @var array $params */
 
 return [
+    AdapterFactoryQueueProvider::class => [
+        '__construct()' => [
+            'definitions' => $params['yiisoft/queue']['channels'],
+        ],
+    ],
+    QueueProviderInterface::class => AdapterFactoryQueueProvider::class,
     QueueWorker::class => [
         'class' => QueueWorker::class,
         '__construct()' => [$params['yiisoft/queue']['handlers']],
@@ -39,10 +45,6 @@ return [
             ? $container->get(SignalLoop::class)
             : $container->get(SimpleLoop::class);
     },
-    QueueFactoryInterface::class => QueueFactory::class,
-    QueueFactory::class => [
-        '__construct()' => ['channelConfiguration' => $params['yiisoft/queue']['channel-definitions']],
-    ],
     QueueInterface::class => Queue::class,
     MiddlewareFactoryPushInterface::class => MiddlewareFactoryPush::class,
     MiddlewareFactoryConsumeInterface::class => MiddlewareFactoryConsume::class,
@@ -59,12 +61,12 @@ return [
     MessageSerializerInterface::class => JsonMessageSerializer::class,
     RunCommand::class => [
         '__construct()' => [
-            'channels' => array_keys($params['yiisoft/queue']['channel-definitions']),
+            'channels' => array_keys($params['yiisoft/queue']['channels']),
         ],
     ],
     ListenAllCommand::class => [
         '__construct()' => [
-            'channels' => array_keys($params['yiisoft/queue']['channel-definitions']),
+            'channels' => array_keys($params['yiisoft/queue']['channels']),
         ],
     ],
 ];
