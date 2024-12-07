@@ -14,7 +14,7 @@ use function array_key_exists;
 use function sprintf;
 
 /**
- * Queue provider based on adapter definitions.
+ * This queue provider create new queue objects based on adapter definitions.
  *
  * @see https://github.com/yiisoft/definitions/
  * @see https://github.com/yiisoft/factory/
@@ -29,9 +29,9 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
     private readonly StrictFactory $factory;
 
     /**
-     * @param QueueInterface $baseQueue Base queue to use for creating queues.
-     * @param array $definitions Definitions to create adapters with indexed by channel names.
-     * @param ContainerInterface|null $container Container to use for resolving dependencies.
+     * @param QueueInterface $baseQueue Base queue for queues creation.
+     * @param array $definitions Adapter definitions indexed by channel names.
+     * @param ContainerInterface|null $container Container to use for dependencies resolving.
      * @param bool $validate If definitions should be validated when set.
      *
      * @psalm-param array<string, mixed> $definitions
@@ -52,7 +52,7 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
 
     public function get(string $channel): QueueInterface
     {
-        $queue = $this->getOrTryCreate($channel);
+        $queue = $this->getOrTryToCreate($channel);
         if ($queue === null) {
             throw new ChannelNotFoundException($channel);
         }
@@ -67,7 +67,7 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
     /**
      * @throws InvalidQueueConfigException
      */
-    private function getOrTryCreate(string $channel): QueueInterface|null
+    private function getOrTryToCreate(string $channel): QueueInterface|null
     {
         if (array_key_exists($channel, $this->queues)) {
             return $this->queues[$channel];
