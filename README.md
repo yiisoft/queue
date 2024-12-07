@@ -170,7 +170,6 @@ $queue = $provider->get('channel-name');
 Out of the box, there are four implementations of the `QueueProviderInterface`:
 
 - `AdapterFactoryQueueProvider`
-- `QueueFactoryQueueProvider`
 - `PrototypeQueueProvider`
 - `CompositeQueueProvider`
 
@@ -194,10 +193,6 @@ use Yiisoft\Queue\Adapter\SynchronousAdapter;
 ```
 
 For more information about a definition formats available see the [factory](https://github.com/yiisoft/factory) documentation.
-
-### `QueueFactoryQueueProvider`
-
-Provider is similar to `AdapterFactoryQueueProvider`, but it uses definitions of channel-specific queues.
 
 ### `PrototypeQueueProvider`
 
