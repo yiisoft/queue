@@ -19,14 +19,19 @@ use Yiisoft\Queue\Worker\Worker;
 final class MessageConsumingTest extends TestCase
 {
     private array $messagesProcessed;
+    private array $messagesProcessedSecond;
 
     public function testMessagesConsumed(): void
     {
         $this->messagesProcessed = [];
+        $this->messagesProcessedSecond = [];
 
         $container = $this->createMock(ContainerInterface::class);
         $worker = new Worker(
-            ['test' => fn (MessageInterface $message): mixed => $this->messagesProcessed[] = $message->getData()],
+            [
+                'test' => fn (MessageInterface $message): mixed => $this->messagesProcessed[] = $message->getData(),
+                'test2' => fn (MessageInterface $message): mixed => $this->messagesProcessedSecond[] = $message->getData(),
+            ],
             new NullLogger(),
             new Injector($container),
             $container,
@@ -37,8 +42,10 @@ final class MessageConsumingTest extends TestCase
         $messages = [1, 'foo', 'bar-baz'];
         foreach ($messages as $message) {
             $worker->process(new Message('test', $message), $this->getQueue());
+            $worker->process(new Message('test2', $message), $this->getQueue());
         }
 
         $this->assertEquals($messages, $this->messagesProcessed);
+        $this->assertEquals($messages, $this->messagesProcessedSecond);
     }
 }
