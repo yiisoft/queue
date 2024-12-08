@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Provider;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Provider\PrototypeQueueProvider;
+use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Queue\Stubs\StubQueue;
 
 final class PrototypeQueueProviderTest extends TestCase
@@ -14,6 +15,7 @@ final class PrototypeQueueProviderTest extends TestCase
     {
         $provider = new PrototypeQueueProvider(
             new StubQueue(),
+            new StubAdapter(),
         );
 
         $queue = $provider->get('test-channel');

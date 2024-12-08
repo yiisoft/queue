@@ -37,6 +37,7 @@ final class FailureMiddlewareDispatcher
         FailureHandlingRequest $request,
         MessageFailureHandlerInterface $finishHandler
     ): FailureHandlingRequest {
+        /** @var string $channelName It is always string in this context */
         $channelName = $request->getQueue()->getChannelName();
         if (!isset($this->middlewareDefinitions[$channelName]) || $this->middlewareDefinitions[$channelName] === []) {
             $channelName = self::DEFAULT_PIPELINE;

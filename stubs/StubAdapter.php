@@ -14,6 +14,10 @@ use Yiisoft\Queue\QueueInterface;
  */
 final class StubAdapter implements AdapterInterface
 {
+    public function __construct(private string $channelName = QueueInterface::DEFAULT_CHANNEL_NAME)
+    {
+    }
+
     public function runExisting(callable $handlerCallback): void
     {
     }
@@ -34,11 +38,14 @@ final class StubAdapter implements AdapterInterface
 
     public function withChannel(string $channel): AdapterInterface
     {
-        return clone $this;
+        $new = clone $this;
+        $new->channelName = $channel;
+
+        return $new;
     }
 
     public function getChannelName(): string
     {
-        return QueueInterface::DEFAULT_CHANNEL_NAME;
+        return $this->channelName;
     }
 }

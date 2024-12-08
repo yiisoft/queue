@@ -85,7 +85,7 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
                     ),
                 );
             }
-            $this->queues[$channel] = $this->baseQueue->withAdapter($adapter)->withChannelName($channel);
+            $this->queues[$channel] = $this->baseQueue->withAdapter($adapter->withChannel($channel));
         } else {
             $this->queues[$channel] = null;
         }

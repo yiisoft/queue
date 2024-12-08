@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Provider;
 
+use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\QueueInterface;
 
 /**
@@ -17,12 +18,13 @@ final class PrototypeQueueProvider implements QueueProviderInterface
      */
     public function __construct(
         private readonly QueueInterface $baseQueue,
+        private readonly AdapterInterface $baseAdapter,
     ) {
     }
 
     public function get(string $channel): QueueInterface
     {
-        return $this->baseQueue->withChannelName($channel);
+        return $this->baseQueue->withAdapter($this->baseAdapter->withChannel($channel));
     }
 
     public function has(string $channel): bool
