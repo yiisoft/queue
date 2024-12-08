@@ -20,7 +20,7 @@ interface AdapterInterface
     /**
      * Returns status code of a message with the given id.
      *
-     * @param string $id ID of a job message.
+     * @param string|int $id ID of a job message.
      *
      * @throws InvalidArgumentException When there is no such id in the adapter.
      *
