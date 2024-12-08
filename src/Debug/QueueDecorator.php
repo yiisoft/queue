@@ -21,7 +21,7 @@ final class QueueDecorator implements QueueInterface
     public function status(string|int $id): JobStatus
     {
         $result = $this->queue->status($id);
-        $this->collector->collectStatus($id, $result);
+        $this->collector->collectStatus((string) $id, $result);
 
         return $result;
     }
@@ -50,15 +50,8 @@ final class QueueDecorator implements QueueInterface
         return new self($this->queue->withAdapter($adapter), $this->collector);
     }
 
-    public function getChannelName(): string
+    public function getChannelName(): ?string
     {
         return $this->queue->getChannelName();
-    }
-
-    public function withChannelName(string $channel): QueueInterface
-    {
-        $new = clone $this;
-        $new->queue = $this->queue->withChannelName($channel);
-        return $new;
     }
 }

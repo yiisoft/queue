@@ -15,10 +15,8 @@ use Yiisoft\Queue\QueueInterface;
  */
 final class StubQueue implements QueueInterface
 {
-    public function __construct(
-        private string $channelName = QueueInterface::DEFAULT_CHANNEL_NAME,
-        private ?AdapterInterface $adapter = null,
-    ) {
+    public function __construct(private ?AdapterInterface $adapter = null)
+    {
     }
 
     public function push(
@@ -51,21 +49,12 @@ final class StubQueue implements QueueInterface
     {
         $new = clone $this;
         $new->adapter = $adapter;
+
         return $new;
     }
 
-    public function getChannelName(): string
+    public function getChannelName(): ?string
     {
-        return $this->channelName;
-    }
-
-    public function withChannelName(string $channel): QueueInterface
-    {
-        $new = clone $this;
-        $new->channelName = $channel;
-        if ($new->adapter !== null) {
-            $new->adapter = $new->adapter->withChannel($channel);
-        }
-        return $new;
+        return $this->adapter?->getChannelName();
     }
 }

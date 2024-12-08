@@ -15,7 +15,7 @@ final class CompositeQueueProviderTest extends TestCase
 {
     public function testBase(): void
     {
-        $queue = new StubQueue('channel');
+        $queue = new StubQueue(new StubAdapter());
         $provider = new CompositeQueueProvider(
             new AdapterFactoryQueueProvider(
                 $queue,
@@ -38,7 +38,10 @@ final class CompositeQueueProviderTest extends TestCase
     public function testNotFound(): void
     {
         $provider = new CompositeQueueProvider(
-            new AdapterFactoryQueueProvider(new StubQueue('channel'), ['channel1' => new StubAdapter()]),
+            new AdapterFactoryQueueProvider(
+                new StubQueue(new StubAdapter()),
+                ['channel1' => new StubAdapter()]
+            ),
         );
 
         $this->expectException(ChannelNotFoundException::class);

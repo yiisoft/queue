@@ -20,7 +20,7 @@ interface AdapterInterface
     /**
      * Returns status code of a message with the given id.
      *
-     * @param string $id ID of a job message.
+     * @param int|string $id ID of a job message.
      *
      * @throws InvalidArgumentException When there is no such id in the adapter.
      *
@@ -41,4 +41,6 @@ interface AdapterInterface
     public function subscribe(callable $handlerCallback): void;
 
     public function withChannel(string $channel): self;
+
+    public function getChannelName(): string;
 }

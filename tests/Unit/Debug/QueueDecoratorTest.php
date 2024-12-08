@@ -99,19 +99,6 @@ class QueueDecoratorTest extends TestCase
         $this->assertEquals('getChannelName', $decorator->getChannelName());
     }
 
-    public function testWithChannelName(): void
-    {
-        $queue = $this->createMock(QueueInterface::class);
-        $queue->expects($this->once())->method('withChannelName')->willReturn($queue);
-        $collector = new QueueCollector();
-        $decorator = new QueueDecorator(
-            $queue,
-            $collector,
-        );
-
-        $this->assertInstanceOf(QueueInterface::class, $decorator->withChannelName('test'));
-    }
-
     public function testImmutable(): void
     {
         $queueDecorator = new QueueDecorator(
@@ -119,6 +106,5 @@ class QueueDecoratorTest extends TestCase
             new QueueCollector()
         );
         $this->assertNotSame($queueDecorator, $queueDecorator->withAdapter(new FakeAdapter()));
-        $this->assertNotSame($queueDecorator, $queueDecorator->withChannelName('test'));
     }
 }

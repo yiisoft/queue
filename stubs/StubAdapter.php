@@ -7,12 +7,17 @@ namespace Yiisoft\Queue\Stubs;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\QueueInterface;
 
 /**
  * Stub adapter that does nothing. Job status is always "done".
  */
 final class StubAdapter implements AdapterInterface
 {
+    public function __construct(private string $channelName = QueueInterface::DEFAULT_CHANNEL_NAME)
+    {
+    }
+
     public function runExisting(callable $handlerCallback): void
     {
     }
@@ -33,6 +38,14 @@ final class StubAdapter implements AdapterInterface
 
     public function withChannel(string $channel): AdapterInterface
     {
-        return clone $this;
+        $new = clone $this;
+        $new->channelName = $channel;
+
+        return $new;
+    }
+
+    public function getChannelName(): string
+    {
+        return $this->channelName;
     }
 }

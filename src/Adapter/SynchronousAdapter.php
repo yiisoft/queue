@@ -86,4 +86,9 @@ final class SynchronousAdapter implements AdapterInterface
 
         return $new;
     }
+
+    public function getChannelName(): string
+    {
+        return $this->channel;
+    }
 }
