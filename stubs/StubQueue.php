@@ -15,7 +15,8 @@ use Yiisoft\Queue\QueueInterface;
  */
 final class StubQueue implements QueueInterface
 {
-    public function __construct(private ?AdapterInterface $adapter = null) {
+    public function __construct(private ?AdapterInterface $adapter = null)
+    {
     }
 
     public function push(
