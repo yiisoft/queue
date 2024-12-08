@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Yiisoft\Queue\QueueFactoryInterface;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 
 final class RunCommand extends Command
 {
@@ -17,8 +17,10 @@ final class RunCommand extends Command
     protected static $defaultDescription = 'Runs all the existing messages in the given queues. ' .
         'Exits once messages are over.';
 
-    public function __construct(private QueueFactoryInterface $queueFactory, private array $channels)
-    {
+    public function __construct(
+        private readonly QueueProviderInterface $queueProvider,
+        private readonly array $channels,
+    ) {
         parent::__construct();
     }
 
@@ -45,7 +47,7 @@ final class RunCommand extends Command
         /** @var string $channel */
         foreach ($input->getArgument('channel') as $channel) {
             $output->write("Processing channel $channel... ");
-            $count = $this->queueFactory
+            $count = $this->queueProvider
                 ->get($channel)
                 ->run((int)$input->getOption('maximum'));
 

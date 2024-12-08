@@ -9,11 +9,11 @@ use Closure;
 final class ConsumeMiddlewareDispatcher
 {
     /**
-     * Contains a middleware pipeline handler.
+     * Contains a middleware pipeline handlers.
      *
-     * @var MiddlewareConsumeStack|null The middleware stack.
+     * @var MiddlewareConsumeStack[] The middleware stack divided by message types.
      */
-    private ?MiddlewareConsumeStack $stack = null;
+    private array $stack = [];
 
     /**
      * @var array[]|callable[]|MiddlewareConsumeInterface[]|string[]
@@ -37,11 +37,12 @@ final class ConsumeMiddlewareDispatcher
         ConsumeRequest $request,
         MessageHandlerConsumeInterface $finishHandler
     ): ConsumeRequest {
-        if ($this->stack === null) {
-            $this->stack = new MiddlewareConsumeStack($this->buildMiddlewares(), $finishHandler);
+        $handlerName = $request->getMessage()->getHandlerName();
+        if (!array_key_exists($handlerName, $this->stack)) {
+            $this->stack[$handlerName] = new MiddlewareConsumeStack($this->buildMiddlewares(), $finishHandler);
         }
 
-        return $this->stack->handleConsume($request);
+        return $this->stack[$handlerName]->handleConsume($request);
     }
 
     /**
@@ -68,7 +69,7 @@ final class ConsumeMiddlewareDispatcher
 
         // Fixes a memory leak.
         unset($instance->stack);
-        $instance->stack = null;
+        $instance->stack = [];
 
         return $instance;
     }

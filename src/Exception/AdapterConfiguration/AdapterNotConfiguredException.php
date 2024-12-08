@@ -6,8 +6,8 @@ namespace Yiisoft\Queue\Exception\AdapterConfiguration;
 
 use RuntimeException;
 use Yiisoft\FriendlyException\FriendlyExceptionInterface;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\Queue;
-use Yiisoft\Queue\QueueFactory;
 
 class AdapterNotConfiguredException extends RuntimeException implements FriendlyExceptionInterface
 {
@@ -21,7 +21,7 @@ class AdapterNotConfiguredException extends RuntimeException implements Friendly
     public function getSolution(): ?string
     {
         $queueClass = Queue::class;
-        $factoryClass = QueueFactory::class;
+        $queueProviderInterface = QueueProviderInterface::class;
 
         return <<<SOLUTION
             Adapter property must be set in the Queue object before you can use it.
@@ -32,7 +32,7 @@ class AdapterNotConfiguredException extends RuntimeException implements Friendly
             References:
             - $queueClass::\$adapter
             - $queueClass::withAdapter()
-            - $factoryClass::get()
+            - $queueProviderInterface
             SOLUTION;
     }
 }

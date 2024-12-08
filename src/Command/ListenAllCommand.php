@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
-use Yiisoft\Queue\QueueFactoryInterface;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 
 final class ListenAllCommand extends Command
 {
@@ -20,8 +20,11 @@ final class ListenAllCommand extends Command
     'Listens all configured queues by default in case you\'re using yiisoft/config. ' .
     'Needs to be stopped manually.';
 
-    public function __construct(private QueueFactoryInterface $queueFactory, private LoopInterface $loop, private array $channels)
-    {
+    public function __construct(
+        private readonly QueueProviderInterface $queueProvider,
+        private readonly LoopInterface $loop,
+        private readonly array $channels,
+    ) {
         parent::__construct();
     }
 
@@ -45,7 +48,7 @@ final class ListenAllCommand extends Command
                 'm',
                 InputOption::VALUE_REQUIRED,
                 'Maximum number of messages to process in each channel before switching to another channel. ' .
-                   'Default is 0 (no limits).',
+                    'Default is 0 (no limits).',
                 0,
             );
 
@@ -57,17 +60,17 @@ final class ListenAllCommand extends Command
         $queues = [];
         /** @var string $channel */
         foreach ($input->getArgument('channel') as $channel) {
-            $queues[] = $this->queueFactory->get($channel);
+            $queues[] = $this->queueProvider->get($channel);
         }
 
         while ($this->loop->canContinue()) {
             $hasMessages = false;
             foreach ($queues as $queue) {
-                $hasMessages = $queue->run((int)$input->getOption('maximum')) > 0 || $hasMessages;
+                $hasMessages = $queue->run((int) $input->getOption('maximum')) > 0 || $hasMessages;
             }
 
             if (!$hasMessages) {
-                $pauseSeconds = (int)$input->getOption('pause');
+                $pauseSeconds = (int) $input->getOption('pause');
                 if ($pauseSeconds < 0) {
                     $pauseSeconds = 1;
                 }

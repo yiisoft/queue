@@ -8,14 +8,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Command\RunCommand;
-use Yiisoft\Queue\QueueFactoryInterface;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\QueueInterface;
 
 final class RunCommandTest extends TestCase
 {
     public function testConfigure(): void
     {
-        $command = new RunCommand($this->createMock(QueueFactoryInterface::class), []);
+        $command = new RunCommand($this->createMock(QueueProviderInterface::class), []);
         $channelArgument = $command->getNativeDefinition()->getArgument('channel');
         $this->assertEquals('channel', $channelArgument->getName());
     }
@@ -24,11 +24,11 @@ final class RunCommandTest extends TestCase
     {
         $queue = $this->createMock(QueueInterface::class);
         $queue->expects($this->once())->method('run');
-        $queueFactory = $this->createMock(QueueFactoryInterface::class);
-        $queueFactory->method('get')->willReturn($queue);
+        $queueProvider = $this->createMock(QueueProviderInterface::class);
+        $queueProvider->method('get')->willReturn($queue);
         $input = new StringInput('channel');
 
-        $command = new RunCommand($queueFactory, []);
+        $command = new RunCommand($queueProvider, []);
         $exitCode = $command->run($input, $this->createMock(OutputInterface::class));
 
         $this->assertEquals(0, $exitCode);
