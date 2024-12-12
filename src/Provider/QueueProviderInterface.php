@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Provider;
 
+use BackedEnum;
 use Yiisoft\Queue\QueueInterface;
 
 /**
@@ -14,21 +15,21 @@ interface QueueProviderInterface
     /**
      * Find a queue by channel name and returns it.
      *
-     * @param string $channel Channel name.
+     * @param string|BackedEnum $channel Channel name.
      *
      * @throws InvalidQueueConfigException If the queue configuration is invalid.
      * @throws ChannelNotFoundException If the channel is not found.
      * @throws QueueProviderException If the queue provider fails to provide a queue.
      * @return QueueInterface Queue instance.
      */
-    public function get(string $channel): QueueInterface;
+    public function get(string|BackedEnum $channel): QueueInterface;
 
     /**
      * Check if a queue with the specified channel name exists.
      *
-     * @param string $channel Channel name.
+     * @param string|BackedEnum $channel Channel name.
      *
      * @return bool Whether the queue exists.
      */
-    public function has(string $channel): bool;
+    public function has(string|BackedEnum $channel): bool;
 }

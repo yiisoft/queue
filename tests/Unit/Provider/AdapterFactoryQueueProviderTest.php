@@ -12,6 +12,7 @@ use Yiisoft\Queue\Provider\ChannelNotFoundException;
 use Yiisoft\Queue\Provider\InvalidQueueConfigException;
 use Yiisoft\Queue\Stubs\StubQueue;
 use Yiisoft\Queue\Stubs\StubAdapter;
+use Yiisoft\Queue\Tests\Unit\Support\StringEnum;
 
 use function sprintf;
 
@@ -99,5 +100,21 @@ final class AdapterFactoryQueueProviderTest extends TestCase
             )
         );
         $provider->get('channel1');
+    }
+
+    public function testGetHasByStringEnum(): void
+    {
+        $provider = new AdapterFactoryQueueProvider(
+            new StubQueue(),
+            [
+                'red' => StubAdapter::class,
+            ],
+        );
+
+        $queue = $provider->get(StringEnum::RED);
+
+        $this->assertSame('red', $queue->getChannelName());
+        $this->assertTrue($provider->has(StringEnum::RED));
+        $this->assertFalse($provider->has(StringEnum::GREEN));
     }
 }
