@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Tests\App;
 
 use BackedEnum;
 use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\ChannelNormalizer;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 
@@ -40,7 +41,7 @@ final class FakeAdapter implements AdapterInterface
     {
         $instance = clone $this;
         $instance->pushMessages = [];
-        $instance->channel = $channel instanceof BackedEnum ? (string) $channel->value : $channel;
+        $instance->channel = ChannelNormalizer::normalize($channel);
         return $instance;
     }
 
