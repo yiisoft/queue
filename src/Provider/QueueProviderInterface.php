@@ -15,7 +15,7 @@ interface QueueProviderInterface
     /**
      * Find a queue by channel name and returns it.
      *
-     * @param string|BackedEnum $channel Channel name.
+     * @param BackedEnum|string $channel Channel name.
      *
      * @throws InvalidQueueConfigException If the queue configuration is invalid.
      * @throws ChannelNotFoundException If the channel is not found.
@@ -27,7 +27,7 @@ interface QueueProviderInterface
     /**
      * Check if a queue with the specified channel name exists.
      *
-     * @param string|BackedEnum $channel Channel name.
+     * @param BackedEnum|string $channel Channel name.
      *
      * @return bool Whether the queue exists.
      */
