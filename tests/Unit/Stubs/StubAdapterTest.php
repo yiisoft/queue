@@ -25,17 +25,25 @@ final class StubAdapterTest extends TestCase
         $adapter->subscribe(static fn() => null);
     }
 
-    public static function dataWithChannel(): iterable
+    public static function dataChannels(): iterable
     {
         yield 'string' => ['test', 'test'];
         yield 'string-enum' => ['red', StringEnum::RED];
         yield 'integer-enum' => ['1', IntEnum::ONE];
     }
 
-    #[DataProvider('dataWithChannel')]
+    #[DataProvider('dataChannels')]
     public function testWithChannel(string $expected, mixed $channel): void
     {
         $adapter = (new StubAdapter())->withChannel($channel);
+
+        $this->assertSame($expected, $adapter->getChannelName());
+    }
+
+    #[DataProvider('dataChannels')]
+    public function testChannelInConstructor(string $expected, mixed $channel): void
+    {
+        $adapter = new StubAdapter($channel);
 
         $this->assertSame($expected, $adapter->getChannelName());
     }
