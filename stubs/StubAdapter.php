@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Stubs;
 
+use BackedEnum;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -36,11 +37,10 @@ final class StubAdapter implements AdapterInterface
     {
     }
 
-    public function withChannel(string $channel): AdapterInterface
+    public function withChannel(string|BackedEnum $channel): AdapterInterface
     {
         $new = clone $this;
-        $new->channelName = $channel;
-
+        $new->channelName = $channel instanceof BackedEnum ? (string) $channel->value : $channel;
         return $new;
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Adapter;
 
+use BackedEnum;
 use InvalidArgumentException;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -74,8 +75,10 @@ final class SynchronousAdapter implements AdapterInterface
         $this->runExisting($handlerCallback);
     }
 
-    public function withChannel(string $channel): self
+    public function withChannel(string|BackedEnum $channel): self
     {
+        $channel = $channel instanceof BackedEnum ? (string) $channel->value : $channel;
+
         if ($channel === $this->channel) {
             return $this;
         }
