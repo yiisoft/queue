@@ -4,31 +4,20 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
-trait EnvelopeTrait
+abstract class Envelope implements EnvelopeInterface
 {
-    private MessageInterface $message;
-
-    /**
-     * A mirror of {@see MessageInterface::fromData()}
-     */
-    abstract public static function fromMessage(MessageInterface $message): self;
+    public function __construct(protected MessageInterface $message)
+    {
+    }
 
     public static function fromData(string $handlerName, mixed $data, array $metadata = []): MessageInterface
     {
-        return self::fromMessage(Message::fromData($handlerName, $data, $metadata));
+        return static::fromMessage(Message::fromData($handlerName, $data, $metadata));
     }
 
     public function getMessage(): MessageInterface
     {
         return $this->message;
-    }
-
-    public function withMessage(MessageInterface $message): self
-    {
-        $instance = clone $this;
-        $instance->message = $message;
-
-        return $instance;
     }
 
     public function getHandlerName(): string
@@ -48,15 +37,12 @@ trait EnvelopeTrait
             [
                 self::ENVELOPE_STACK_KEY => array_merge(
                     $this->message->getMetadata()[self::ENVELOPE_STACK_KEY] ?? [],
-                    [self::class],
+                    [static::class],
                 ),
             ],
             $this->getEnvelopeMetadata(),
         );
     }
 
-    public function getEnvelopeMetadata(): array
-    {
-        return [];
-    }
+    abstract protected function getEnvelopeMetadata(): array;
 }

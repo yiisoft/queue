@@ -169,7 +169,7 @@ final class JsonMessageSerializerTest extends TestCase
 
     public function testRestoreOriginalMessageClassWithEnvelope(): void
     {
-        $message = new IdEnvelope(new TestMessage());
+        $message = new IdEnvelope(new TestMessage(), 1);
         $serializer = $this->createSerializer();
         $serializer->unserialize($serializer->serialize($message));
 
