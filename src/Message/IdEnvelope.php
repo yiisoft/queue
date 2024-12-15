@@ -7,16 +7,15 @@ namespace Yiisoft\Queue\Message;
 /**
  * ID envelope allows to identify a message.
  */
-final class IdEnvelope implements EnvelopeInterface
+final class IdEnvelope extends Envelope
 {
-    use EnvelopeTrait;
-
     public const MESSAGE_ID_KEY = 'yii-message-id';
 
     public function __construct(
-        private MessageInterface $message,
-        private string|int|null $id = null,
+        MessageInterface $message,
+        private readonly string|int|null $id,
     ) {
+        parent::__construct($message);
     }
 
     public static function fromMessage(MessageInterface $message): self
@@ -24,17 +23,12 @@ final class IdEnvelope implements EnvelopeInterface
         return new self($message, $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null);
     }
 
-    public function setId(string|int|null $id): void
-    {
-        $this->id = $id;
-    }
-
     public function getId(): string|int|null
     {
         return $this->id ?? $this->message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
     }
 
-    private function getEnvelopeMetadata(): array
+    protected function getEnvelopeMetadata(): array
     {
         return [self::MESSAGE_ID_KEY => $this->getId()];
     }

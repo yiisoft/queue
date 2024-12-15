@@ -15,6 +15,4 @@ interface EnvelopeInterface extends MessageInterface
     public static function fromMessage(MessageInterface $message): self;
 
     public function getMessage(): MessageInterface;
-
-    public function withMessage(MessageInterface $message): self;
 }
