@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Provider;
 
+use BackedEnum;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\QueueInterface;
 
@@ -22,12 +23,12 @@ final class PrototypeQueueProvider implements QueueProviderInterface
     ) {
     }
 
-    public function get(string $channel): QueueInterface
+    public function get(string|BackedEnum $channel): QueueInterface
     {
         return $this->baseQueue->withAdapter($this->baseAdapter->withChannel($channel));
     }
 
-    public function has(string $channel): bool
+    public function has(string|BackedEnum $channel): bool
     {
         return true;
     }

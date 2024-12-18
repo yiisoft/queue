@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Adapter;
 
+use BackedEnum;
 use InvalidArgumentException;
+use Yiisoft\Queue\ChannelNormalizer;
 use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueInterface;
@@ -15,12 +17,14 @@ final class SynchronousAdapter implements AdapterInterface
 {
     private array $messages = [];
     private int $current = 0;
+    private string $channel;
 
     public function __construct(
         private WorkerInterface $worker,
         private QueueInterface $queue,
-        private string $channel = QueueInterface::DEFAULT_CHANNEL_NAME,
+        string|BackedEnum $channel = QueueInterface::DEFAULT_CHANNEL_NAME,
     ) {
+        $this->channel = ChannelNormalizer::normalize($channel);
     }
 
     public function __destruct()
@@ -74,8 +78,10 @@ final class SynchronousAdapter implements AdapterInterface
         $this->runExisting($handlerCallback);
     }
 
-    public function withChannel(string $channel): self
+    public function withChannel(string|BackedEnum $channel): self
     {
+        $channel = ChannelNormalizer::normalize($channel);
+
         if ($channel === $this->channel) {
             return $this;
         }
