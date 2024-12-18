@@ -19,7 +19,7 @@ final class StubQueueTest extends TestCase
         $this->assertSame($message, $queue->push($message));
         $this->assertSame(0, $queue->run());
         $this->assertTrue($queue->status('test')->isDone());
-        $this->assertNull($queue->getChannelName());
+        $this->assertNull($queue->getChannel());
         $this->assertNull($queue->getAdapter());
         $queue->listen();
     }

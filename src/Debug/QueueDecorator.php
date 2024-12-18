@@ -31,7 +31,7 @@ final class QueueDecorator implements QueueInterface
         string|array|callable|MiddlewarePushInterface ...$middlewareDefinitions
     ): MessageInterface {
         $message = $this->queue->push($message, ...$middlewareDefinitions);
-        $this->collector->collectPush($this->queue->getChannelName(), $message, ...$middlewareDefinitions);
+        $this->collector->collectPush($this->queue->getChannel(), $message, ...$middlewareDefinitions);
         return $message;
     }
 
@@ -50,8 +50,8 @@ final class QueueDecorator implements QueueInterface
         return new self($this->queue->withAdapter($adapter), $this->collector);
     }
 
-    public function getChannelName(): ?string
+    public function getChannel(): ?string
     {
-        return $this->queue->getChannelName();
+        return $this->queue->getChannel();
     }
 }

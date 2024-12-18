@@ -37,18 +37,18 @@ final class FailureMiddlewareDispatcher
         FailureHandlingRequest $request,
         MessageFailureHandlerInterface $finishHandler
     ): FailureHandlingRequest {
-        /** @var string $channelName It is always string in this context */
-        $channelName = $request->getQueue()->getChannelName();
-        if (!isset($this->middlewareDefinitions[$channelName]) || $this->middlewareDefinitions[$channelName] === []) {
-            $channelName = self::DEFAULT_PIPELINE;
+        /** @var string $channel It is always string in this context */
+        $channel = $request->getQueue()->getChannel();
+        if (!isset($this->middlewareDefinitions[$channel]) || $this->middlewareDefinitions[$channel] === []) {
+            $channel = self::DEFAULT_PIPELINE;
         }
-        $definitions = array_reverse($this->middlewareDefinitions[$channelName]);
+        $definitions = array_reverse($this->middlewareDefinitions[$channel]);
 
-        if (!isset($this->stack[$channelName])) {
-            $this->stack[$channelName] = new MiddlewareFailureStack($this->buildMiddlewares(...$definitions), $finishHandler);
+        if (!isset($this->stack[$channel])) {
+            $this->stack[$channel] = new MiddlewareFailureStack($this->buildMiddlewares(...$definitions), $finishHandler);
         }
 
-        return $this->stack[$channelName]->handleFailure($request);
+        return $this->stack[$channel]->handleFailure($request);
     }
 
     /**

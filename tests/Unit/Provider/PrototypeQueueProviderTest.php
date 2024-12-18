@@ -21,7 +21,7 @@ final class PrototypeQueueProviderTest extends TestCase
         $queue = $provider->get('test-channel');
 
         $this->assertInstanceOf(StubQueue::class, $queue);
-        $this->assertSame('test-channel', $queue->getChannelName());
+        $this->assertSame('test-channel', $queue->getChannel());
         $this->assertTrue($provider->has('test-channel'));
         $this->assertTrue($provider->has('yet-another-channel'));
     }

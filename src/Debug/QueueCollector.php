@@ -73,7 +73,7 @@ final class QueueCollector implements SummaryCollectorInterface
         if (!$this->isActive()) {
             return;
         }
-        $this->processingMessages[$queue->getChannelName() ?? 'null'][] = $message;
+        $this->processingMessages[$queue->getChannel() ?? 'null'][] = $message;
     }
 
     private function reset(): void

@@ -37,7 +37,7 @@ final class StubAdapterTest extends TestCase
     {
         $adapter = (new StubAdapter())->withChannel($channel);
 
-        $this->assertSame($expected, $adapter->getChannelName());
+        $this->assertSame($expected, $adapter->getChannel());
     }
 
     #[DataProvider('dataChannels')]
@@ -45,6 +45,6 @@ final class StubAdapterTest extends TestCase
     {
         $adapter = new StubAdapter($channel);
 
-        $this->assertSame($expected, $adapter->getChannelName());
+        $this->assertSame($expected, $adapter->getChannel());
     }
 }

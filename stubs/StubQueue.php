@@ -53,8 +53,8 @@ final class StubQueue implements QueueInterface
         return $new;
     }
 
-    public function getChannelName(): ?string
+    public function getChannel(): ?string
     {
-        return $this->adapter?->getChannelName();
+        return $this->adapter?->getChannel();
     }
 }

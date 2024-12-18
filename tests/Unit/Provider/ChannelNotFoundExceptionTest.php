@@ -18,12 +18,12 @@ final class ChannelNotFoundExceptionTest extends TestCase
     }
 
     #[DataProvider('dataBase')]
-    public function testBase(string $expectedChannelName, mixed $channel): void
+    public function testBase(string $expectedChannel, mixed $channel): void
     {
         $exception = new ChannelNotFoundException($channel);
 
         $this->assertSame(
-            'Channel "' . $expectedChannelName . '" not found.',
+            'Channel "' . $expectedChannel . '" not found.',
             $exception->getMessage(),
         );
     }

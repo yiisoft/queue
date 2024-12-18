@@ -43,5 +43,5 @@ interface AdapterInterface
 
     public function withChannel(string|BackedEnum $channel): self;
 
-    public function getChannelName(): string;
+    public function getChannel(): string;
 }
