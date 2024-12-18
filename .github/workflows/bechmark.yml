@@ -11,6 +11,7 @@ on:
       - 'tests/**'
 
   push:
+    branches: ['master']
     paths-ignore:
       - 'docs/**'
       - 'README.md'
