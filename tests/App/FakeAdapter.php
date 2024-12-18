@@ -45,7 +45,7 @@ final class FakeAdapter implements AdapterInterface
         return $instance;
     }
 
-    public function getChannelName(): string
+    public function getChannel(): string
     {
         return $this->channel;
     }

@@ -38,9 +38,9 @@ final class Queue implements QueueInterface
         $this->adapterPushHandler = new AdapterPushHandler();
     }
 
-    public function getChannelName(): ?string
+    public function getChannel(): ?string
     {
-        return $this->adapter?->getChannelName();
+        return $this->adapter?->getChannel();
     }
 
     public function push(

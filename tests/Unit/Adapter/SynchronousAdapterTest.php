@@ -57,7 +57,7 @@ final class SynchronousAdapterTest extends TestCase
     public function testWithSameChannel(): void
     {
         $adapter = $this->getAdapter();
-        self::assertEquals($adapter, $adapter->withChannel(QueueInterface::DEFAULT_CHANNEL_NAME));
+        self::assertEquals($adapter, $adapter->withChannel(QueueInterface::DEFAULT_CHANNEL));
     }
 
     public function testWithAnotherChannel(): void
@@ -111,7 +111,7 @@ final class SynchronousAdapterTest extends TestCase
     {
         $adapter = (new SynchronousAdapter(new StubWorker(), new StubQueue()))->withChannel($channel);
 
-        $this->assertSame($expected, $adapter->getChannelName());
+        $this->assertSame($expected, $adapter->getChannel());
     }
 
     #[DataProvider('dataChannels')]
@@ -119,6 +119,6 @@ final class SynchronousAdapterTest extends TestCase
     {
         $adapter = new SynchronousAdapter(new StubWorker(), new StubQueue(), $channel);
 
-        $this->assertSame($expected, $adapter->getChannelName());
+        $this->assertSame($expected, $adapter->getChannel());
     }
 }

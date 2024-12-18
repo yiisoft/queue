@@ -30,7 +30,7 @@ final class AdapterFactoryQueueProviderTest extends TestCase
         $queue = $provider->get('channel1');
 
         $this->assertInstanceOf(StubQueue::class, $queue);
-        $this->assertSame('channel1', $queue->getChannelName());
+        $this->assertSame('channel1', $queue->getChannel());
         $this->assertInstanceOf(StubAdapter::class, $queue->getAdapter());
         $this->assertTrue($provider->has('channel1'));
         $this->assertFalse($provider->has('not-exist-channel'));
@@ -113,7 +113,7 @@ final class AdapterFactoryQueueProviderTest extends TestCase
 
         $queue = $provider->get(StringEnum::RED);
 
-        $this->assertSame('red', $queue->getChannelName());
+        $this->assertSame('red', $queue->getChannel());
         $this->assertTrue($provider->has(StringEnum::RED));
         $this->assertFalse($provider->has(StringEnum::GREEN));
     }
