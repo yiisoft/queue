@@ -28,7 +28,7 @@ final class ListenCommand extends Command
             'channel',
             InputArgument::OPTIONAL,
             'Queue channel name to connect to',
-            QueueInterface::DEFAULT_CHANNEL_NAME,
+            QueueInterface::DEFAULT_CHANNEL,
         );
     }
 

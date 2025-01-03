@@ -16,12 +16,12 @@ use Yiisoft\Queue\QueueInterface;
  */
 final class StubAdapter implements AdapterInterface
 {
-    private string $channelName;
+    private string $channel;
 
     public function __construct(
-        string|BackedEnum $channelName = QueueInterface::DEFAULT_CHANNEL_NAME
+        string|BackedEnum $channel = QueueInterface::DEFAULT_CHANNEL
     ) {
-        $this->channelName = ChannelNormalizer::normalize($channelName);
+        $this->channel = ChannelNormalizer::normalize($channel);
     }
 
     public function runExisting(callable $handlerCallback): void
@@ -45,12 +45,12 @@ final class StubAdapter implements AdapterInterface
     public function withChannel(string|BackedEnum $channel): AdapterInterface
     {
         $new = clone $this;
-        $new->channelName = ChannelNormalizer::normalize($channel);
+        $new->channel = ChannelNormalizer::normalize($channel);
         return $new;
     }
 
-    public function getChannelName(): string
+    public function getChannel(): string
     {
-        return $this->channelName;
+        return $this->channel;
     }
 }

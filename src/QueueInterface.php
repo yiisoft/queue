@@ -13,7 +13,7 @@ use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 interface QueueInterface
 {
     /** @psalm-suppress MissingClassConstType */
-    public const DEFAULT_CHANNEL_NAME = 'yii-queue';
+    public const DEFAULT_CHANNEL = 'yii-queue';
 
     /**
      * Pushes a message into the queue.
@@ -46,5 +46,5 @@ interface QueueInterface
 
     public function withAdapter(AdapterInterface $adapter): self;
 
-    public function getChannelName(): ?string;
+    public function getChannel(): ?string;
 }

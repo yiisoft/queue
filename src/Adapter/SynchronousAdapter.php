@@ -22,7 +22,7 @@ final class SynchronousAdapter implements AdapterInterface
     public function __construct(
         private WorkerInterface $worker,
         private QueueInterface $queue,
-        string|BackedEnum $channel = QueueInterface::DEFAULT_CHANNEL_NAME,
+        string|BackedEnum $channel = QueueInterface::DEFAULT_CHANNEL,
     ) {
         $this->channel = ChannelNormalizer::normalize($channel);
     }
@@ -93,7 +93,7 @@ final class SynchronousAdapter implements AdapterInterface
         return $new;
     }
 
-    public function getChannelName(): string
+    public function getChannel(): string
     {
         return $this->channel;
     }
