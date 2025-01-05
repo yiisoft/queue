@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Adapter;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
-use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\QueueInterface;
@@ -35,7 +35,7 @@ final class SynchronousAdapterTest extends TestCase
         $id = $envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY];
 
         $wrongId = "$id ";
-        self::assertEquals(JobStatus::waiting(), $queue->status($wrongId));
+        self::assertSame(JobStatus::WAITING, $queue->status($wrongId));
     }
 
     public function testIdSetting(): void

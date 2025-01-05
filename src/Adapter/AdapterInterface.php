@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Adapter;
 
 use BackedEnum;
 use InvalidArgumentException;
-use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 
 interface AdapterInterface
@@ -24,8 +24,6 @@ interface AdapterInterface
      * @param int|string $id ID of a job message.
      *
      * @throws InvalidArgumentException When there is no such id in the adapter.
-     *
-     * @return JobStatus
      */
     public function status(string|int $id): JobStatus;
 

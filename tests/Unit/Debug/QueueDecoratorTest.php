@@ -8,10 +8,10 @@ use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Debug\QueueCollector;
 use Yiisoft\Queue\Debug\QueueDecorator;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Queue\Tests\Unit\Support\TestJobStatus;
 
 class QueueDecoratorTest extends TestCase
 {
@@ -34,7 +34,7 @@ class QueueDecoratorTest extends TestCase
     public function testStatus(): void
     {
         $queue = $this->createMock(QueueInterface::class);
-        $jobStatus = TestJobStatus::withStatus(1);
+        $jobStatus = JobStatus::WAITING;
         $queue->expects($this->once())->method('status')->willReturn($jobStatus);
         $collector = new QueueCollector();
         $decorator = new QueueDecorator(

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Stubs;
 
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
@@ -37,7 +37,7 @@ final class StubQueue implements QueueInterface
 
     public function status(int|string $id): JobStatus
     {
-        return JobStatus::done();
+        return JobStatus::DONE;
     }
 
     public function getAdapter(): ?AdapterInterface

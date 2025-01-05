@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Stubs;
 use BackedEnum;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\ChannelNormalizer;
-use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueInterface;
 
@@ -30,7 +30,7 @@ final class StubAdapter implements AdapterInterface
 
     public function status(int|string $id): JobStatus
     {
-        return JobStatus::done();
+        return JobStatus::DONE;
     }
 
     public function push(MessageInterface $message): MessageInterface
