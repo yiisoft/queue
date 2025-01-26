@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit\Debug;
 
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Yii\Debug\Collector\CollectorInterface;
 use Yiisoft\Yii\Debug\Tests\Shared\AbstractCollectorTestCase;
 use Yiisoft\Queue\Debug\QueueCollector;
-use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Tests\App\DummyQueue;
 
@@ -26,7 +26,7 @@ final class QueueCollectorTest extends AbstractCollectorTestCase
      */
     protected function collectTestData(CollectorInterface $collector): void
     {
-        $collector->collectStatus('12345', JobStatus::done());
+        $collector->collectStatus('12345', JobStatus::DONE);
         $collector->collectPush('chan1', $this->pushMessage);
         $collector->collectPush('chan2', $this->pushMessage);
         $collector->collectWorkerProcessing(

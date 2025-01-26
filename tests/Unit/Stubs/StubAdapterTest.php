@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Stubs;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Queue\Tests\Unit\Support\IntEnum;
@@ -19,7 +20,7 @@ final class StubAdapterTest extends TestCase
         $adapter = new StubAdapter();
 
         $this->assertSame($message, $adapter->push($message));
-        $this->assertTrue($adapter->status('test')->isDone());
+        $this->assertSame(JobStatus::DONE, $adapter->status('test'));
         $this->assertNotSame($adapter, $adapter->withChannel('test'));
         $adapter->runExisting(static fn() => null);
         $adapter->subscribe(static fn() => null);

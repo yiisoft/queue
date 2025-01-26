@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Adapter;
 use BackedEnum;
 use InvalidArgumentException;
 use Yiisoft\Queue\ChannelNormalizer;
-use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -55,11 +55,11 @@ final class SynchronousAdapter implements AdapterInterface
         }
 
         if ($id < $this->current) {
-            return JobStatus::done();
+            return JobStatus::DONE;
         }
 
         if (isset($this->messages[$id])) {
-            return JobStatus::waiting();
+            return JobStatus::WAITING;
         }
 
         throw new InvalidArgumentException('There is no message with the given ID.');

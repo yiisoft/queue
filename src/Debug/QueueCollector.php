@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Debug;
 
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Yii\Debug\Collector\CollectorTrait;
 use Yiisoft\Yii\Debug\Collector\SummaryCollectorInterface;
-use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
@@ -38,15 +38,9 @@ final class QueueCollector implements SummaryCollectorInterface
             return;
         }
 
-        $statusText = match (true) {
-            $status->isDone() => 'done',
-            $status->isReserved() => 'reserved',
-            $status->isWaiting() => 'waiting',
-            default => 'unknown'
-        };
         $this->statuses[] = [
             'id' => $id,
-            'status' => $statusText,
+            'status' => $status->key(),
         ];
     }
 
