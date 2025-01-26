@@ -68,7 +68,6 @@ final class ListenAllCommand extends Command
             $queues[] = $this->queueProvider->get($channel);
         }
 
-        /** @psalm-var 0|positive-int $pauseSeconds */
         $pauseSeconds = (int) $input->getOption('pause');
         if ($pauseSeconds < 0) {
             $pauseSeconds = 1;
@@ -81,6 +80,7 @@ final class ListenAllCommand extends Command
             }
 
             if (!$hasMessages) {
+                /** @psalm-var 0|positive-int $pauseSeconds */
                 sleep($pauseSeconds);
             }
         }
