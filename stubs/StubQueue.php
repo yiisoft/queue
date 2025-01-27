@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Stubs;
 
+use LogicException;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -53,8 +54,12 @@ final class StubQueue implements QueueInterface
         return $new;
     }
 
-    public function getChannel(): ?string
+    public function getChannel(): string
     {
+        if ($this->adapter === null) {
+            throw new LogicException('Adapter is not set.');
+        }
+
         return $this->adapter?->getChannel();
     }
 }

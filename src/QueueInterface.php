@@ -45,5 +45,5 @@ interface QueueInterface
 
     public function withAdapter(AdapterInterface $adapter): self;
 
-    public function getChannel(): ?string;
+    public function getChannel(): string;
 }
