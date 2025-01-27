@@ -9,6 +9,7 @@ use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
@@ -147,6 +148,15 @@ final class QueueTest extends TestCase
         $queue->run();
 
         self::assertEquals(2, $this->executionTimes);
+    }
+
+    public function testGetChannel(): void
+    {
+        $queue = $this
+            ->getQueue()
+            ->withAdapter(new StubAdapter('test-channel'));
+
+        $this->assertSame('test-channel', $queue->getChannel());
     }
 
     public function testGetChannelWithoutAdapter(): void
