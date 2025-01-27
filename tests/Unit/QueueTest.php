@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit;
 
+use LogicException;
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Queue\JobStatus;
@@ -146,5 +147,14 @@ final class QueueTest extends TestCase
         $queue->run();
 
         self::assertEquals(2, $this->executionTimes);
+    }
+
+    public function testGetChannelWithoutAdapter(): void
+    {
+        $queue = $this->getQueue();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Adapter is not set.');
+        $queue->getChannel();
     }
 }
