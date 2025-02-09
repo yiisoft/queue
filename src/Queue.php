@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue;
 
+use LogicException;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
@@ -37,9 +38,13 @@ final class Queue implements QueueInterface
         $this->adapterPushHandler = new AdapterPushHandler();
     }
 
-    public function getChannel(): ?string
+    public function getChannel(): string
     {
-        return $this->adapter?->getChannel();
+        if ($this->adapter === null) {
+            throw new LogicException('Adapter is not set.');
+        }
+
+        return $this->adapter->getChannel();
     }
 
     public function push(

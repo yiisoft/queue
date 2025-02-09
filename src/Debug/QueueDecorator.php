@@ -50,7 +50,7 @@ final class QueueDecorator implements QueueInterface
         return new self($this->queue->withAdapter($adapter), $this->collector);
     }
 
-    public function getChannel(): ?string
+    public function getChannel(): string
     {
         return $this->queue->getChannel();
     }
