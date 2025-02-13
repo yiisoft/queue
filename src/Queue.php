@@ -54,7 +54,7 @@ final class Queue implements QueueInterface
 
         $request = new PushRequest($message, $this->adapter);
         $message = $this->pushMiddlewareDispatcher
-            ->dispatch($request, $this->createPushHandler($middlewareDefinitions))
+            ->dispatch($request, $this->createPushHandler(...$middlewareDefinitions))
             ->getMessage();
 
         /** @var string $messageId */
