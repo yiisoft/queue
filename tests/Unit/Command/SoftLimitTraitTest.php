@@ -11,7 +11,7 @@ final class SoftLimitTraitTest extends TestCase
 {
     public function testMemoryLimitNotReachedWhenLimitIsZero(): void
     {
-        $instance = new class() {
+        $instance = new class () {
             use SoftLimitTrait {
                 memoryLimitReached as public;
             }
@@ -28,7 +28,7 @@ final class SoftLimitTraitTest extends TestCase
     public function testMemoryLimitNotReachedWhenUsageIsLower(): void
     {
         $currentMemoryUsage = memory_get_usage(true);
-        $instance = new class($currentMemoryUsage + 1024 * 1024) { // 1MB higher than current usage
+        $instance = new class ($currentMemoryUsage + 1024 * 1024) { // 1MB higher than current usage
             use SoftLimitTrait {
                 memoryLimitReached as public;
             }
@@ -52,7 +52,7 @@ final class SoftLimitTraitTest extends TestCase
     public function testMemoryLimitReachedWhenUsageIsHigher(): void
     {
         $currentMemoryUsage = memory_get_usage(true);
-        $instance = new class($currentMemoryUsage - 1024) { // 1KB lower than current usage
+        $instance = new class ($currentMemoryUsage - 1024) { // 1KB lower than current usage
             use SoftLimitTrait {
                 memoryLimitReached as public;
             }
@@ -76,7 +76,7 @@ final class SoftLimitTraitTest extends TestCase
     public function testMemoryLimitExceededWhenUsageIncreases(): void
     {
         $currentMemoryUsage = memory_get_usage(true);
-        $instance = new class($currentMemoryUsage + 5 * 1024 * 1024) { // Set limit 5MB higher than current usage
+        $instance = new class ($currentMemoryUsage + 5 * 1024 * 1024) { // Set limit 5MB higher than current usage
             use SoftLimitTrait {
                 memoryLimitReached as public;
             }

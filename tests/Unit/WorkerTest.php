@@ -221,7 +221,7 @@ final class WorkerTest extends TestCase
         $message = new Message('invalid', ['test-data']);
         $logger = new SimpleLogger();
         $container = new SimpleContainer([
-            'invalid' => new class() {
+            'invalid' => new class () {
                 public function handle(): void
                 {
                 }
@@ -254,4 +254,3 @@ final class WorkerTest extends TestCase
         $this->assertTrue(StaticMessageHandler::$wasHandled);
     }
 }
-

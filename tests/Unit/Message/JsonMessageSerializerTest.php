@@ -48,8 +48,8 @@ final class JsonMessageSerializerTest extends TestCase
             'name' => 'handler',
             'data' => 'test',
             'meta' => [
-                'message-class' => 'NonExistentClass'
-            ]
+                'message-class' => 'NonExistentClass',
+            ],
         ];
 
         $message = $serializer->unserialize(json_encode($payload));
@@ -62,7 +62,7 @@ final class JsonMessageSerializerTest extends TestCase
         $payload = [
             'name' => 'handler',
             'data' => 'test',
-            'meta' => []
+            'meta' => [],
         ];
         $message = $serializer->unserialize(json_encode($payload));
         $this->assertInstanceOf(Message::class, $message);
