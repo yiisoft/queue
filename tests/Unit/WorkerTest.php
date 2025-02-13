@@ -243,7 +243,7 @@ final class WorkerTest extends TestCase
         $logger = new SimpleLogger();
         $container = new SimpleContainer();
         $handlers = [
-            'static-handler' => [StaticMessageHandler::class, 'handle'],
+            'static-handler' => StaticMessageHandler::handle(...),
         ];
 
         $queue = $this->createMock(QueueInterface::class);

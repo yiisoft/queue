@@ -33,11 +33,8 @@ final class SoftLimitTraitTest extends TestCase
                 memoryLimitReached as public;
             }
 
-            private int $limit;
-
-            public function __construct(int $limit)
+            public function __construct(private int $limit)
             {
-                $this->limit = $limit;
             }
 
             protected function getMemoryLimit(): int
@@ -57,11 +54,8 @@ final class SoftLimitTraitTest extends TestCase
                 memoryLimitReached as public;
             }
 
-            private int $limit;
-
-            public function __construct(int $limit)
+            public function __construct(private int $limit)
             {
-                $this->limit = $limit;
             }
 
             protected function getMemoryLimit(): int
@@ -81,11 +75,8 @@ final class SoftLimitTraitTest extends TestCase
                 memoryLimitReached as public;
             }
 
-            private int $limit;
-
-            public function __construct(int $limit)
+            public function __construct(private int $limit)
             {
-                $this->limit = $limit;
             }
 
             protected function getMemoryLimit(): int
