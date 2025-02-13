@@ -18,6 +18,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeHandler;
+use Yiisoft\Queue\Tests\App\StaticMessageHandler;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Worker\Worker;
 
@@ -199,4 +200,58 @@ final class WorkerTest extends TestCase
             new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), []),
         );
     }
+
+    public function testHandlerNotFoundInContainer(): void
+    {
+        $message = new Message('nonexistent', ['test-data']);
+        $logger = new SimpleLogger();
+        $container = new SimpleContainer();
+        $handlers = [];
+
+        $queue = $this->createMock(QueueInterface::class);
+        $worker = $this->createWorkerByParams($handlers, $logger, $container);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Queue handler with name "nonexistent" does not exist');
+        $worker->process($message, $queue);
+    }
+
+    public function testHandlerInContainerNotImplementingInterface(): void
+    {
+        $message = new Message('invalid', ['test-data']);
+        $logger = new SimpleLogger();
+        $container = new SimpleContainer([
+            'invalid' => new class() {
+                public function handle(): void
+                {
+                }
+            },
+        ]);
+        $handlers = [];
+
+        $queue = $this->createMock(QueueInterface::class);
+        $worker = $this->createWorkerByParams($handlers, $logger, $container);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Queue handler with name "invalid" does not exist');
+        $worker->process($message, $queue);
+    }
+
+    public function testStaticMethodHandler(): void
+    {
+        $message = new Message('static-handler', ['test-data']);
+        $logger = new SimpleLogger();
+        $container = new SimpleContainer();
+        $handlers = [
+            'static-handler' => [StaticMessageHandler::class, 'handle'],
+        ];
+
+        $queue = $this->createMock(QueueInterface::class);
+        $worker = $this->createWorkerByParams($handlers, $logger, $container);
+
+        StaticMessageHandler::$wasHandled = false;
+        $worker->process($message, $queue);
+        $this->assertTrue(StaticMessageHandler::$wasHandled);
+    }
 }
+

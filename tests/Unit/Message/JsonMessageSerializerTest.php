@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Message;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\EnvelopeInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
@@ -18,6 +19,55 @@ use Yiisoft\Queue\Tests\Unit\Support\TestMessage;
  */
 final class JsonMessageSerializerTest extends TestCase
 {
+    /**
+     * @dataProvider dataUnsupportedHandlerNameFormat
+     */
+    #[DataProvider('dataUnsupportedHandlerNameFormat')]
+    public function testHandlerNameFormat(mixed $name): void
+    {
+        $payload = ['name' => $name, 'data' => 'test'];
+        $serializer = $this->createSerializer();
+
+        $this->expectExceptionMessage(sprintf('Handler name must be a string. Got %s.', get_debug_type($name)));
+        $this->expectException(InvalidArgumentException::class);
+        $serializer->unserialize(json_encode($payload));
+    }
+
+    public static function dataUnsupportedHandlerNameFormat(): iterable
+    {
+        yield 'number' => [1];
+        yield 'boolean' => [true];
+        yield 'null' => [null];
+        yield 'array' => [[]];
+    }
+
+    public function testDefaultMessageClassFallbackWrongClass(): void
+    {
+        $serializer = $this->createSerializer();
+        $payload = [
+            'name' => 'handler',
+            'data' => 'test',
+            'meta' => [
+                'message-class' => 'NonExistentClass'
+            ]
+        ];
+
+        $message = $serializer->unserialize(json_encode($payload));
+        $this->assertInstanceOf(Message::class, $message);
+    }
+
+    public function testDefaultMessageClassFallbackClassNotSet(): void
+    {
+        $serializer = $this->createSerializer();
+        $payload = [
+            'name' => 'handler',
+            'data' => 'test',
+            'meta' => []
+        ];
+        $message = $serializer->unserialize(json_encode($payload));
+        $this->assertInstanceOf(Message::class, $message);
+    }
+
     /**
      * @dataProvider dataUnsupportedPayloadFormat
      */
