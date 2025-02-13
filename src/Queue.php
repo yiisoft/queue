@@ -46,6 +46,7 @@ final class Queue implements QueueInterface
         MessageInterface $message,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
     ): MessageInterface {
+        $this->checkAdapter();
         $this->logger->debug(
             'Preparing to push message with handler name "{handlerName}".',
             ['handlerName' => $message->getHandlerName()]
