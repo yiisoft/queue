@@ -15,7 +15,7 @@ trait EnvelopeTrait
 
     public static function fromData(string $handlerName, mixed $data, array $metadata = []): MessageInterface
     {
-        return self::fromMessage(Message::fromData($handlerName, $data, $metadata));
+        return static::fromMessage(Message::fromData($handlerName, $data, $metadata));
     }
 
     public function getMessage(): MessageInterface
@@ -46,8 +46,8 @@ trait EnvelopeTrait
         return array_merge(
             $this->message->getMetadata(),
             [
-                self::ENVELOPE_STACK_KEY => array_merge(
-                    $this->message->getMetadata()[self::ENVELOPE_STACK_KEY] ?? [],
+                EnvelopeInterface::ENVELOPE_STACK_KEY => array_merge(
+                    $this->message->getMetadata()[EnvelopeInterface::ENVELOPE_STACK_KEY] ?? [],
                     [self::class],
                 ),
             ],
