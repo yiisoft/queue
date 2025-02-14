@@ -6,14 +6,14 @@ namespace Yiisoft\Queue\Tests\App;
 
 use Exception;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
 
 final class DummyQueue implements QueueInterface
 {
-    public function __construct(private string $channelName)
+    public function __construct(private string $channel)
     {
     }
 
@@ -43,8 +43,8 @@ final class DummyQueue implements QueueInterface
         throw new Exception('`withAdapter()` method is not implemented yet.');
     }
 
-    public function getChannelName(): string
+    public function getChannel(): string
     {
-        return $this->channelName;
+        return $this->channel;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,14 +13,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
 
+#[AsCommand(
+    'queue:listen-all',
+    'Listens the all the given queues and executes messages as they come. '
+        . 'Meant to be used in development environment only. '
+        . 'Listens all configured queues by default in case you\'re using yiisoft/config. '
+        . 'Needs to be stopped manually.'
+)]
 final class ListenAllCommand extends Command
 {
-    protected static $defaultName = 'queue:listen-all';
-    protected static $defaultDescription = 'Listens the all the given queues and executes messages as they come. ' .
-    'Meant to be used in development environment only. ' .
-    'Listens all configured queues by default in case you\'re using yiisoft/config. ' .
-    'Needs to be stopped manually.';
-
     public function __construct(
         private readonly QueueProviderInterface $queueProvider,
         private readonly LoopInterface $loop,
@@ -28,6 +30,9 @@ final class ListenAllCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function configure(): void
     {
         $this->addArgument(
@@ -63,6 +68,11 @@ final class ListenAllCommand extends Command
             $queues[] = $this->queueProvider->get($channel);
         }
 
+        $pauseSeconds = (int) $input->getOption('pause');
+        if ($pauseSeconds < 0) {
+            $pauseSeconds = 1;
+        }
+
         while ($this->loop->canContinue()) {
             $hasMessages = false;
             foreach ($queues as $queue) {
@@ -70,11 +80,6 @@ final class ListenAllCommand extends Command
             }
 
             if (!$hasMessages) {
-                $pauseSeconds = (int) $input->getOption('pause');
-                if ($pauseSeconds < 0) {
-                    $pauseSeconds = 1;
-                }
-
                 /** @psalm-var 0|positive-int $pauseSeconds */
                 sleep($pauseSeconds);
             }

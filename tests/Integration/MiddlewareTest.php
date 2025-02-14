@@ -136,7 +136,7 @@ final class MiddlewareTest extends TestCase
         $callableFactory = new CallableFactory($container);
 
         $queue->expects(self::exactly(7))->method('push')->willReturnCallback($queueCallback);
-        $queue->method('getChannelName')->willReturn('simple');
+        $queue->method('getChannel')->willReturn('simple');
 
         $middlewares = [
             'simple' => [

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Debug;
 
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
@@ -31,7 +31,7 @@ final class QueueDecorator implements QueueInterface
         string|array|callable|MiddlewarePushInterface ...$middlewareDefinitions
     ): MessageInterface {
         $message = $this->queue->push($message, ...$middlewareDefinitions);
-        $this->collector->collectPush($this->queue->getChannelName(), $message, ...$middlewareDefinitions);
+        $this->collector->collectPush($this->queue->getChannel(), $message, ...$middlewareDefinitions);
         return $message;
     }
 
@@ -50,8 +50,8 @@ final class QueueDecorator implements QueueInterface
         return new self($this->queue->withAdapter($adapter), $this->collector);
     }
 
-    public function getChannelName(): ?string
+    public function getChannel(): ?string
     {
-        return $this->queue->getChannelName();
+        return $this->queue->getChannel();
     }
 }

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Adapter;
 
+use BackedEnum;
 use InvalidArgumentException;
-use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 
 interface AdapterInterface
@@ -23,8 +24,6 @@ interface AdapterInterface
      * @param int|string $id ID of a job message.
      *
      * @throws InvalidArgumentException When there is no such id in the adapter.
-     *
-     * @return JobStatus
      */
     public function status(string|int $id): JobStatus;
 
@@ -40,7 +39,7 @@ interface AdapterInterface
      */
     public function subscribe(callable $handlerCallback): void;
 
-    public function withChannel(string $channel): self;
+    public function withChannel(string|BackedEnum $channel): self;
 
-    public function getChannelName(): string;
+    public function getChannel(): string;
 }

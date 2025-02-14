@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Provider;
 
+use BackedEnum;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Factory\StrictFactory;
 use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\ChannelNormalizer;
 use Yiisoft\Queue\QueueInterface;
 
 use function array_key_exists;
@@ -50,17 +52,21 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
         }
     }
 
-    public function get(string $channel): QueueInterface
+    public function get(string|BackedEnum $channel): QueueInterface
     {
+        $channel = ChannelNormalizer::normalize($channel);
+
         $queue = $this->getOrTryToCreate($channel);
         if ($queue === null) {
             throw new ChannelNotFoundException($channel);
         }
+
         return $queue;
     }
 
-    public function has(string $channel): bool
+    public function has(string|BackedEnum $channel): bool
     {
+        $channel = ChannelNormalizer::normalize($channel);
         return $this->factory->has($channel);
     }
 

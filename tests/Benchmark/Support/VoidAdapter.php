@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Benchmark\Support;
 
+use BackedEnum;
 use InvalidArgumentException;
 use RuntimeException;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Message\MessageSerializerInterface;
@@ -45,12 +46,12 @@ final class VoidAdapter implements AdapterInterface
         throw new RuntimeException('Method is not implemented');
     }
 
-    public function withChannel(string $channel): AdapterInterface
+    public function withChannel(string|BackedEnum $channel): AdapterInterface
     {
         throw new RuntimeException('Method is not implemented');
     }
 
-    public function getChannelName(): string
+    public function getChannel(): string
     {
         throw new RuntimeException('Method is not implemented');
     }

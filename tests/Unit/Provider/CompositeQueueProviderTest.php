@@ -31,8 +31,8 @@ final class CompositeQueueProviderTest extends TestCase
         $this->assertTrue($provider->has('channel2'));
         $this->assertFalse($provider->has('channel3'));
 
-        $this->assertSame('channel1', $provider->get('channel1')->getChannelName());
-        $this->assertSame('channel2', $provider->get('channel2')->getChannelName());
+        $this->assertSame('channel1', $provider->get('channel1')->getChannel());
+        $this->assertSame('channel2', $provider->get('channel2')->getChannel());
     }
 
     public function testNotFound(): void

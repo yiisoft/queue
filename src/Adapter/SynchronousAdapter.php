@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Adapter;
 
+use BackedEnum;
 use InvalidArgumentException;
-use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\ChannelNormalizer;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -15,12 +17,14 @@ final class SynchronousAdapter implements AdapterInterface
 {
     private array $messages = [];
     private int $current = 0;
+    private string $channel;
 
     public function __construct(
         private WorkerInterface $worker,
         private QueueInterface $queue,
-        private string $channel = QueueInterface::DEFAULT_CHANNEL_NAME,
+        string|BackedEnum $channel = QueueInterface::DEFAULT_CHANNEL,
     ) {
+        $this->channel = ChannelNormalizer::normalize($channel);
     }
 
     public function __destruct()
@@ -51,11 +55,11 @@ final class SynchronousAdapter implements AdapterInterface
         }
 
         if ($id < $this->current) {
-            return JobStatus::done();
+            return JobStatus::DONE;
         }
 
         if (isset($this->messages[$id])) {
-            return JobStatus::waiting();
+            return JobStatus::WAITING;
         }
 
         throw new InvalidArgumentException('There is no message with the given ID.');
@@ -74,8 +78,10 @@ final class SynchronousAdapter implements AdapterInterface
         $this->runExisting($handlerCallback);
     }
 
-    public function withChannel(string $channel): self
+    public function withChannel(string|BackedEnum $channel): self
     {
+        $channel = ChannelNormalizer::normalize($channel);
+
         if ($channel === $this->channel) {
             return $this;
         }
@@ -87,7 +93,7 @@ final class SynchronousAdapter implements AdapterInterface
         return $new;
     }
 
-    public function getChannelName(): string
+    public function getChannel(): string
     {
         return $this->channel;
     }

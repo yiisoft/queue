@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\App;
 
+use BackedEnum;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Enum\JobStatus;
+use Yiisoft\Queue\ChannelNormalizer;
+use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 
 final class FakeAdapter implements AdapterInterface
@@ -35,16 +37,15 @@ final class FakeAdapter implements AdapterInterface
         //skip
     }
 
-    public function withChannel(string $channel): AdapterInterface
+    public function withChannel(string|BackedEnum $channel): AdapterInterface
     {
         $instance = clone $this;
         $instance->pushMessages = [];
-        $instance->channel = $channel;
-
+        $instance->channel = ChannelNormalizer::normalize($channel);
         return $instance;
     }
 
-    public function getChannelName(): string
+    public function getChannel(): string
     {
         return $this->channel;
     }

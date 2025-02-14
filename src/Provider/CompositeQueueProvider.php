@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Provider;
 
+use BackedEnum;
 use Yiisoft\Queue\QueueInterface;
 
 /**
@@ -25,7 +26,7 @@ final class CompositeQueueProvider implements QueueProviderInterface
         $this->providers = $providers;
     }
 
-    public function get(string $channel): QueueInterface
+    public function get(string|BackedEnum $channel): QueueInterface
     {
         foreach ($this->providers as $provider) {
             if ($provider->has($channel)) {
@@ -35,7 +36,7 @@ final class CompositeQueueProvider implements QueueProviderInterface
         throw new ChannelNotFoundException($channel);
     }
 
-    public function has(string $channel): bool
+    public function has(string|BackedEnum $channel): bool
     {
         foreach ($this->providers as $provider) {
             if ($provider->has($channel)) {

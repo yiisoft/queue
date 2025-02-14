@@ -6,14 +6,13 @@ namespace Yiisoft\Queue;
 
 use InvalidArgumentException;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Enum\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 
 interface QueueInterface
 {
     /** @psalm-suppress MissingClassConstType */
-    public const DEFAULT_CHANNEL_NAME = 'yii-queue';
+    public const DEFAULT_CHANNEL = 'yii-queue';
 
     /**
      * Pushes a message into the queue.
@@ -46,5 +45,5 @@ interface QueueInterface
 
     public function withAdapter(AdapterInterface $adapter): self;
 
-    public function getChannelName(): ?string;
+    public function getChannel(): ?string;
 }

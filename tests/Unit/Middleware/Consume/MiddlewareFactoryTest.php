@@ -167,7 +167,7 @@ final class MiddlewareFactoryTest extends TestCase
         );
     }
 
-    private function getMiddlewareFactory(ContainerInterface $container = null): MiddlewareFactoryConsumeInterface
+    private function getMiddlewareFactory(?ContainerInterface $container = null): MiddlewareFactoryConsumeInterface
     {
         $container ??= $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
 
