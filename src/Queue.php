@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue;
 
-use LogicException;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
