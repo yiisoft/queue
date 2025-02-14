@@ -35,8 +35,8 @@ abstract class Envelope implements EnvelopeInterface
         return array_merge(
             $this->message->getMetadata(),
             [
-                self::ENVELOPE_STACK_KEY => array_merge(
-                    $this->message->getMetadata()[self::ENVELOPE_STACK_KEY] ?? [],
+                EnvelopeInterface::ENVELOPE_STACK_KEY => array_merge(
+                    $this->message->getMetadata()[EnvelopeInterface::ENVELOPE_STACK_KEY] ?? [],
                     [static::class],
                 ),
             ],

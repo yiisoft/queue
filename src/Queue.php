@@ -37,9 +37,10 @@ final class Queue implements QueueInterface
         $this->adapterPushHandler = new AdapterPushHandler();
     }
 
-    public function getChannel(): ?string
+    public function getChannel(): string
     {
-        return $this->adapter?->getChannel();
+        $this->checkAdapter();
+        return $this->adapter->getChannel();
     }
 
     public function push(
@@ -83,7 +84,6 @@ final class Queue implements QueueInterface
             return true;
         };
 
-        /** @psalm-suppress PossiblyNullReference */
         $this->adapter->runExisting($handlerCallback);
 
         $this->logger->info(
@@ -99,7 +99,6 @@ final class Queue implements QueueInterface
         $this->checkAdapter();
 
         $this->logger->info('Start listening to the queue.');
-        /** @psalm-suppress PossiblyNullReference */
         $this->adapter->subscribe(fn (MessageInterface $message) => $this->handle($message));
         $this->logger->info('Finish listening to the queue.');
     }
@@ -107,8 +106,6 @@ final class Queue implements QueueInterface
     public function status(string|int $id): JobStatus
     {
         $this->checkAdapter();
-
-        /** @psalm-suppress PossiblyNullReference */
         return $this->adapter->status($id);
     }
 
@@ -143,6 +140,9 @@ final class Queue implements QueueInterface
         return $this->loop->canContinue();
     }
 
+    /**
+     * @psalm-assert AdapterInterface $this->adapter
+     */
     private function checkAdapter(): void
     {
         if ($this->adapter === null) {
