@@ -47,6 +47,7 @@ final class Queue implements QueueInterface
         MessageInterface $message,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
     ): MessageInterface {
+        $this->checkAdapter();
         $this->logger->debug(
             'Preparing to push message with handler name "{handlerName}".',
             ['handlerName' => $message->getHandlerName()]
@@ -54,9 +55,10 @@ final class Queue implements QueueInterface
 
         $request = new PushRequest($message, $this->adapter);
         $message = $this->pushMiddlewareDispatcher
-            ->dispatch($request, $this->createPushHandler($middlewareDefinitions))
+            ->dispatch($request, $this->createPushHandler(...$middlewareDefinitions))
             ->getMessage();
 
+        /** @var string $messageId */
         $messageId = $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
         $this->logger->info(
             'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
@@ -148,7 +150,7 @@ final class Queue implements QueueInterface
         }
     }
 
-    private function createPushHandler(array $middlewares): MessageHandlerPushInterface
+    private function createPushHandler(MiddlewarePushInterface|callable|array|string ...$middlewares): MessageHandlerPushInterface
     {
         return new class (
             $this->adapterPushHandler,
@@ -158,6 +160,9 @@ final class Queue implements QueueInterface
             public function __construct(
                 private AdapterPushHandler $adapterPushHandler,
                 private PushMiddlewareDispatcher $dispatcher,
+                /**
+                 * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
+                 */
                 private array $middlewares,
             ) {
             }
