@@ -9,7 +9,7 @@ use Yiisoft\FriendlyException\FriendlyExceptionInterface;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\Queue;
 
-class AdapterNotConfiguredException extends RuntimeException implements FriendlyExceptionInterface
+final class AdapterNotConfiguredException extends RuntimeException implements FriendlyExceptionInterface
 {
     protected $message = 'Queue adapter is not configured';
 
