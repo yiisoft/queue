@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Middleware;
 
 use InvalidArgumentException;
-
 use Throwable;
 
 use function is_array;
