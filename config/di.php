@@ -6,6 +6,7 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Cli\SimpleLoop;
+use Yiisoft\Queue\Command\ListenCommand;
 use Yiisoft\Queue\Command\ListenAllCommand;
 use Yiisoft\Queue\Command\RunCommand;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
@@ -68,5 +69,8 @@ return [
         '__construct()' => [
             'channels' => array_keys($params['yiisoft/queue']['channels']),
         ],
+    ],
+    ListenCommand::class => [
+        'class' => ListenCommand::class,
     ],
 ];
