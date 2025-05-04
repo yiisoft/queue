@@ -14,7 +14,7 @@ final class FailureEnvelope extends Envelope
 
     public function __construct(
         MessageInterface $message,
-        private readonly array $failureMeta = [],
+        private readonly array $metadata = [],
     ) {
         parent::__construct($message);
     }
@@ -26,6 +26,6 @@ final class FailureEnvelope extends Envelope
 
     protected function getEnvelopeMetadata(): array
     {
-        return [self::FAILURE_META_KEY => ArrayHelper::merge($this->message->getMetadata()[self::FAILURE_META_KEY] ?? [], $this->failureMeta)];
+        return [self::FAILURE_META_KEY => ArrayHelper::merge($this->message->getMetadata()[self::FAILURE_META_KEY] ?? [], $this->metadata)];
     }
 }
