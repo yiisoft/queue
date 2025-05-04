@@ -23,7 +23,7 @@ final class IdEnvelope extends Envelope
         /** @var mixed $rawId */
         $rawId = $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
 
-        /** @var string|int|null $id */
+        /** @var int|string|null $id */
         $id = match (true) {
             $rawId === null => null,
             is_string($rawId) => $rawId,

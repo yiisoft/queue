@@ -14,7 +14,8 @@ final class DummyEnvelope extends Envelope
         return new self($message);
     }
 
-    protected function getEnvelopeMetadata(): array {
+    protected function getEnvelopeMetadata(): array
+    {
         return [];
     }
 }

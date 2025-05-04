@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Message;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Tests\App\DummyEnvelope;
 
 final class EnvelopeTraitTest extends TestCase
