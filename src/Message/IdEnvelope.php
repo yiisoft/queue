@@ -20,12 +20,24 @@ final class IdEnvelope extends Envelope
 
     public static function fromMessage(MessageInterface $message): self
     {
-        return new self($message, $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null);
+        /** @var mixed $rawId */
+        $rawId = $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
+
+        /** @var string|int|null $id */
+        $id = match (true) {
+            $rawId === null => null,
+            is_string($rawId) => $rawId,
+            is_int($rawId) => $rawId,
+            is_object($rawId) && method_exists($rawId, '__toString') => (string)$rawId,
+            default => throw new \InvalidArgumentException(sprintf('Message ID must be string|int|null, %s given.', get_debug_type($rawId))),
+        };
+
+        return new self($message, $id);
     }
 
     public function getId(): string|int|null
     {
-        return $this->id ?? $this->message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
+        return $this->id;
     }
 
     protected function getEnvelopeMetadata(): array

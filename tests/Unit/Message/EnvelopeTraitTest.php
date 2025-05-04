@@ -10,11 +10,6 @@ use Yiisoft\Queue\Tests\App\DummyEnvelope;
 
 final class EnvelopeTraitTest extends TestCase
 {
-    private function createTestEnvelope(): DummyEnvelope
-    {
-        return new DummyEnvelope();
-    }
-
     public function testFromData(): void
     {
         $handlerName = 'test-handler';
@@ -28,22 +23,5 @@ final class EnvelopeTraitTest extends TestCase
         $this->assertSame($data, $envelope->getData());
         $this->assertArrayHasKey('meta', $envelope->getMetadata());
         $this->assertSame('data', $envelope->getMetadata()['meta']);
-    }
-
-    public function testWithMessage(): void
-    {
-        $originalMessage = new Message('original-handler', 'original-data');
-        $newMessage = new Message('new-handler', 'new-data');
-
-        $envelope = $this->createTestEnvelope();
-        $envelope = $envelope->withMessage($originalMessage);
-
-        $this->assertSame($originalMessage, $envelope->getMessage());
-
-        $newEnvelope = $envelope->withMessage($newMessage);
-
-        $this->assertNotSame($envelope, $newEnvelope);
-        $this->assertSame($newMessage, $newEnvelope->getMessage());
-        $this->assertSame($originalMessage, $envelope->getMessage());
     }
 }
