@@ -21,11 +21,17 @@ final class FailureEnvelope extends Envelope
 
     public static function fromMessage(MessageInterface $message): self
     {
-        return new self($message, $message->getMetadata()[self::FAILURE_META_KEY] ?? []);
+        /** @var array $metadata */
+        $metadata = $message->getMetadata()[self::FAILURE_META_KEY] ?? [];
+
+        return new self($message, $metadata);
     }
 
     protected function getEnvelopeMetadata(): array
     {
-        return [self::FAILURE_META_KEY => ArrayHelper::merge($this->message->getMetadata()[self::FAILURE_META_KEY] ?? [], $this->metadata)];
+        /** @var array $metadata */
+        $metadata = $this->message->getMetadata()[self::FAILURE_META_KEY] ?? [];
+
+        return [self::FAILURE_META_KEY => ArrayHelper::merge($metadata, $this->metadata)];
     }
 }
