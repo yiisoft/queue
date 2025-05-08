@@ -18,7 +18,7 @@ final class IdEnvelope extends Envelope
         parent::__construct($message);
     }
 
-    public static function fromMessage(MessageInterface $message): self
+    public static function fromMessage(MessageInterface $message): static
     {
         /** @var mixed $rawId */
         $rawId = $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;

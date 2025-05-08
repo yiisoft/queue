@@ -19,12 +19,12 @@ final class FailureEnvelope extends Envelope
         parent::__construct($message);
     }
 
-    public static function fromMessage(MessageInterface $message): self
+    public static function fromMessage(MessageInterface $message): static
     {
         /** @var array $metadata */
         $metadata = $message->getMetadata()[self::FAILURE_META_KEY] ?? [];
 
-        return new self($message, $metadata);
+        return new static($message, $metadata);
     }
 
     protected function getEnvelopeMetadata(): array

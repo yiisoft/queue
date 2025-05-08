@@ -9,9 +9,9 @@ use Yiisoft\Queue\Message\MessageInterface;
 
 final class DummyEnvelope extends Envelope
 {
-    public static function fromMessage(MessageInterface $message): self
+    public static function fromMessage(MessageInterface $message): static
     {
-        return new self($message);
+        return new static($message);
     }
 
     protected function getEnvelopeMetadata(): array
