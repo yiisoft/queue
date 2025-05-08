@@ -60,9 +60,7 @@ final class IdEnvelopeTest extends TestCase
                 return 'object-id';
             }
         };
-
         $message = $this->createMessage([IdEnvelope::MESSAGE_ID_KEY => $stringableObject]);
-
         $envelope = IdEnvelope::fromMessage($message);
 
         $this->assertSame('object-id', $envelope->getId());
