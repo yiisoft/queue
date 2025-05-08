@@ -11,7 +11,7 @@ final class DummyEnvelope extends Envelope
 {
     public static function fromMessage(MessageInterface $message): static
     {
-        return new static($message);
+        return new self($message);
     }
 
     protected function getEnvelopeMetadata(): array

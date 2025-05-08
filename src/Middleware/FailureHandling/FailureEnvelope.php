@@ -24,7 +24,7 @@ final class FailureEnvelope extends Envelope
         /** @var array $metadata */
         $metadata = $message->getMetadata()[self::FAILURE_META_KEY] ?? [];
 
-        return new static($message, $metadata);
+        return new self($message, $metadata);
     }
 
     protected function getEnvelopeMetadata(): array
