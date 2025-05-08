@@ -54,7 +54,7 @@ final class IdEnvelopeTest extends TestCase
 
     public function testFromMessageWithObjectHavingToString(): void
     {
-        $stringableObject = new class() {
+        $stringableObject = new class () {
             public function __toString(): string
             {
                 return 'object-id';
