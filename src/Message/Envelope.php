@@ -10,8 +10,10 @@ abstract class Envelope implements EnvelopeInterface
     {
     }
 
+    /** @psalm-suppress MoreSpecificReturnType */
     public static function fromData(string $handlerName, mixed $data, array $metadata = []): static
     {
+        /** @psalm-suppress LessSpecificReturnStatement */
         return static::fromMessage(Message::fromData($handlerName, $data, $metadata));
     }
 
