@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Cli;
 
-class SignalLoop implements LoopInterface
+final class SignalLoop implements LoopInterface
 {
     use SoftLimitTrait;
 

@@ -9,7 +9,7 @@ use Throwable;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
-class JobFailureException extends RuntimeException
+final class JobFailureException extends RuntimeException
 {
     public function __construct(private MessageInterface $queueMessage, Throwable $previous)
     {
