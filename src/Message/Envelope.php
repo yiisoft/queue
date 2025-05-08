@@ -10,7 +10,7 @@ abstract class Envelope implements EnvelopeInterface
     {
     }
 
-    public static function fromData(string $handlerName, mixed $data, array $metadata = []): MessageInterface
+    public static function fromData(string $handlerName, mixed $data, array $metadata = []): static
     {
         return static::fromMessage(Message::fromData($handlerName, $data, $metadata));
     }
