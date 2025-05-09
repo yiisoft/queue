@@ -6,6 +6,8 @@ namespace Yiisoft\Queue\Message;
 
 abstract class Envelope implements EnvelopeInterface
 {
+    private ?array $metadata = null;
+
     public function __construct(protected MessageInterface $message)
     {
     }
@@ -34,16 +36,20 @@ abstract class Envelope implements EnvelopeInterface
 
     public function getMetadata(): array
     {
-        return array_merge(
-            $this->message->getMetadata(),
-            [
-                EnvelopeInterface::ENVELOPE_STACK_KEY => array_merge(
-                    $this->message->getMetadata()[EnvelopeInterface::ENVELOPE_STACK_KEY] ?? [],
-                    [static::class],
-                ),
-            ],
-            $this->getEnvelopeMetadata(),
-        );
+        if ($this->metadata === null) {
+            $this->metadata = array_merge(
+                $this->message->getMetadata(),
+                [
+                    EnvelopeInterface::ENVELOPE_STACK_KEY => array_merge(
+                        $this->message->getMetadata()[EnvelopeInterface::ENVELOPE_STACK_KEY] ?? [],
+                        [static::class],
+                    ),
+                ],
+                $this->getEnvelopeMetadata(),
+            );
+        }
+
+        return $this->metadata;
     }
 
     abstract protected function getEnvelopeMetadata(): array;
