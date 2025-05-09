@@ -7,34 +7,40 @@ namespace Yiisoft\Queue\Message;
 /**
  * ID envelope allows to identify a message.
  */
-final class IdEnvelope implements EnvelopeInterface
+final class IdEnvelope extends Envelope
 {
-    use EnvelopeTrait;
-
     public const MESSAGE_ID_KEY = 'yii-message-id';
 
     public function __construct(
-        private MessageInterface $message,
-        private string|int|null $id = null,
+        MessageInterface $message,
+        private readonly string|int|null $id,
     ) {
+        parent::__construct($message);
     }
 
-    public static function fromMessage(MessageInterface $message): self
+    public static function fromMessage(MessageInterface $message): static
     {
-        return new self($message, $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null);
-    }
+        /** @var mixed $rawId */
+        $rawId = $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
 
-    public function setId(string|int|null $id): void
-    {
-        $this->id = $id;
+        /** @var int|string|null $id */
+        $id = match (true) {
+            $rawId === null => null,
+            is_string($rawId) => $rawId,
+            is_int($rawId) => $rawId,
+            is_object($rawId) && method_exists($rawId, '__toString') => (string)$rawId,
+            default => throw new \InvalidArgumentException(sprintf('Message ID must be string|int|null, %s given.', get_debug_type($rawId))),
+        };
+
+        return new self($message, $id);
     }
 
     public function getId(): string|int|null
     {
-        return $this->id ?? $this->message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
+        return $this->id;
     }
 
-    private function getEnvelopeMetadata(): array
+    protected function getEnvelopeMetadata(): array
     {
         return [self::MESSAGE_ID_KEY => $this->getId()];
     }
