@@ -26,10 +26,10 @@ final class Queue implements QueueInterface
     private AdapterPushHandler $adapterPushHandler;
 
     public function __construct(
-        private WorkerInterface $worker,
-        private LoopInterface $loop,
-        private LoggerInterface $logger,
-        private PushMiddlewareDispatcher $pushMiddlewareDispatcher,
+        private readonly WorkerInterface $worker,
+        private readonly LoopInterface $loop,
+        private readonly LoggerInterface $logger,
+        private readonly PushMiddlewareDispatcher $pushMiddlewareDispatcher,
         private ?AdapterInterface $adapter = null,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
     ) {
@@ -158,12 +158,12 @@ final class Queue implements QueueInterface
             array_merge($this->middlewareDefinitions, $middlewares)
         ) implements MessageHandlerPushInterface {
             public function __construct(
-                private AdapterPushHandler $adapterPushHandler,
-                private PushMiddlewareDispatcher $dispatcher,
+                private readonly AdapterPushHandler $adapterPushHandler,
+                private readonly PushMiddlewareDispatcher $dispatcher,
                 /**
                  * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
                  */
-                private array $middlewares,
+                private readonly array $middlewares,
             ) {
             }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit\Adapter;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\JobStatus;
@@ -86,7 +87,7 @@ final class SynchronousAdapterTest extends TestCase
     public function testStatusIdLessZero(): void
     {
         $adapter = $this->getAdapter();
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('This adapter IDs start with 0.');
         $adapter->status('-1');
     }
@@ -94,7 +95,7 @@ final class SynchronousAdapterTest extends TestCase
     public function testStatusNotMessage(): void
     {
         $adapter = $this->getAdapter();
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('There is no message with the given ID.');
         $adapter->status('1');
     }

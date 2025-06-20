@@ -12,7 +12,7 @@ use Yiisoft\Queue\ChannelNormalizer;
 use function sprintf;
 
 /**
- * Thrown when channel is not found.
+ * Thrown when the channel is not found.
  */
 final class ChannelNotFoundException extends LogicException implements QueueProviderException
 {

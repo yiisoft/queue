@@ -33,12 +33,12 @@ final class Worker implements WorkerInterface
     private array $handlersCached = [];
 
     public function __construct(
-        private array $handlers,
-        private LoggerInterface $logger,
-        private Injector $injector,
-        private ContainerInterface $container,
-        private ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher,
-        private FailureMiddlewareDispatcher $failureMiddlewareDispatcher,
+        private readonly array $handlers,
+        private readonly LoggerInterface $logger,
+        private readonly Injector $injector,
+        private readonly ContainerInterface $container,
+        private readonly ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher,
+        private readonly FailureMiddlewareDispatcher $failureMiddlewareDispatcher,
     ) {
     }
 
@@ -101,6 +101,7 @@ final class Worker implements WorkerInterface
      *
      * @param array|callable|object|string|null $definition
      *
+     * @return callable|null
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */

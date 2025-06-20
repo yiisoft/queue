@@ -16,7 +16,7 @@ final class FakeHandler
         self::$processedMessages = [];
     }
 
-    public function __invoke(MessageInterface $message)
+    public function __invoke(MessageInterface $message): void
     {
         self::$processedMessages[] = $message;
     }

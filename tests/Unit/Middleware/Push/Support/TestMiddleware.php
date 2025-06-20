@@ -11,7 +11,7 @@ use Yiisoft\Queue\Middleware\Push\PushRequest;
 
 final class TestMiddleware implements MiddlewarePushInterface
 {
-    public function __construct(private string $message = 'New middleware test data')
+    public function __construct(private readonly string $message = 'New middleware test data')
     {
     }
 

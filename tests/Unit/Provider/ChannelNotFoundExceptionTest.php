@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Provider;
+namespace Yiisoft\Queue\Tests\Unit\Provider;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Yiisoft\Queue\Provider\ChannelNotFoundException;

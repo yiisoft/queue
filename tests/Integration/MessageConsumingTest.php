@@ -17,7 +17,7 @@ use Yiisoft\Queue\Tests\Integration\Support\TestHandler;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Worker\Worker;
 
-final class MessageConsumingTest extends TestCase
+final class                                  MessageConsumingTest extends TestCase
 {
     private array $messagesProcessed;
     private array $messagesProcessedSecond;

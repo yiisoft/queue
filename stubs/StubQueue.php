@@ -60,6 +60,6 @@ final class StubQueue implements QueueInterface
             throw new LogicException('Adapter is not set.');
         }
 
-        return $this->adapter?->getChannel();
+        return $this->adapter->getChannel();
     }
 }

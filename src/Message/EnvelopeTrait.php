@@ -11,7 +11,7 @@ trait EnvelopeTrait
     /**
      * A mirror of {@see MessageInterface::fromData()}
      */
-    abstract public static function fromMessage(MessageInterface $message): self;
+    abstract public static function fromMessage(MessageInterface $message): MessageInterface;
 
     public static function fromData(string $handlerName, mixed $data, array $metadata = []): MessageInterface
     {

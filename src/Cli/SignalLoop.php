@@ -28,7 +28,7 @@ final class SignalLoop implements LoopInterface
 
     /**
      * @param int $memorySoftLimit Soft RAM limit in bytes. The loop won't let you continue to execute the program if
-     *     soft limit is reached. Zero means no limit.
+     * soft limit is reached. Zero means no limit.
      */
     public function __construct(protected int $memorySoftLimit = 0)
     {
@@ -61,7 +61,7 @@ final class SignalLoop implements LoopInterface
     {
         pcntl_signal_dispatch();
 
-        // Wait for resume signal until loop is suspended
+        // Wait for resume signal until the loop is suspended
         while ($this->pause && !$this->exit) {
             usleep(10000);
             pcntl_signal_dispatch();
