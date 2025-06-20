@@ -25,14 +25,14 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
      * @param ContainerInterface $container Container to use for resolving definitions.
      */
     public function __construct(
-        private ContainerInterface $container,
-        private CallableFactory $callableFactory,
+        private readonly ContainerInterface $container,
+        private readonly CallableFactory $callableFactory,
     ) {
     }
 
     /**
-     * @param array|callable|MiddlewarePushInterface|string $middlewareDefinition Middleware definition in one of the
-     *     following formats:
+     * @param array|callable|MiddlewarePushInterface|string $middlewareDefinition Middleware definition in one of
+     * the following formats:
      *
      * - A middleware object.
      * - A name of a middleware class. The middleware instance will be obtained from container and executed.
@@ -89,8 +89,10 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
         return new class ($callback, $this->container) implements MiddlewarePushInterface {
             private $callback;
 
-            public function __construct(callable $callback, private ContainerInterface $container)
-            {
+            public function __construct(
+                callable $callback,
+                private readonly ContainerInterface $container
+            ) {
                 $this->callback = $callback;
             }
 

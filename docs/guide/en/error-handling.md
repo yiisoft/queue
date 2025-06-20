@@ -4,7 +4,7 @@ Often when some message handling is failing, we want to retry its execution a co
 
 ## Configuration
 
-Here below is configuration via `yiisoft/config`. If you don't use it - you should add middleware definition list (in the `middlewares-fail` key here) to the `FailureMiddlewareDispatcher` by your own.
+Here below is configuration via `yiisoft/config`. If you don't use it, you should add a middleware definition list (in the `middlewares-fail` key here) to the `FailureMiddlewareDispatcher` by your own.
 
 Configuration should be passed to the `yiisoft/queue.fail-strategy-pipelines` key of the `params` config to work with the `yiisoft/config`. You can define different failure handling pipelines for each queue channel. Let's see and describe an example:
 
@@ -39,10 +39,10 @@ Configuration should be passed to the `yiisoft/queue.fail-strategy-pipelines` ke
 ]
 ```
 
-Keys here except `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` are queue channel names, and values are lists of `FailureMiddlewareInterface` definitions. `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` defines a default pipeline to apply to channels without explicitly defined failure strategy pipeline. Each middleware definition must be one of:
+Keys here except `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` are queue channel names, and values are lists of `FailureMiddlewareInterface` definitions. `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` defines a default pipeline to apply to channels without an explicitly defined failure strategy pipeline. Each middleware definition must be one of:
 - A ready-to-use `MiddlewareFailureInterface` object like `new FooMiddleware()`.
 - A valid definition for the [yiisoft/definitions](https://github.com/yiisoft/definitions). It must describe an object, implementing the `MiddlewareFailureInterface`.
-- A callable: `fn() => // do stuff`, `$object->foo(...)`, etc. It will be executed through the `yiisoft/injector`, so all the dependencies of your callable will be resolved. You can also define a "callable-looking" array, where object will be instantiated with a DI container: `[FooMiddleware::class, 'handle']`.
+- A callable: `fn() => // do stuff`, `$object->foo(...)`, etc. It will be executed through the `yiisoft/injector`, so all the dependencies of your callable will be resolved. You can also define a "callable-looking" array, where an object will be instantiated with a DI container: `[FooMiddleware::class, 'handle']`.
 - A string for your DI container to resolve the middleware, e.g. `FooMiddleware::class`.
 
 In the example above failures will be handled this way (look the concrete middleware description below):

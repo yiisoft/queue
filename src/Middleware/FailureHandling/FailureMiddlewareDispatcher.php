@@ -21,7 +21,7 @@ final class FailureMiddlewareDispatcher
      * @param array[][]|callable[][]|MiddlewareFailureInterface[][]|string[][] $middlewareDefinitions
      */
     public function __construct(
-        private MiddlewareFactoryFailureInterface $middlewareFactory,
+        private readonly MiddlewareFactoryFailureInterface $middlewareFactory,
         private array $middlewareDefinitions,
     ) {
         $this->init();
@@ -31,7 +31,7 @@ final class FailureMiddlewareDispatcher
      * Dispatch request through middleware to get response.
      *
      * @param FailureHandlingRequest $request Request to pass to middleware.
-     * @param MessageFailureHandlerInterface $finishHandler Handler to use in case no middleware produced response.
+     * @param MessageFailureHandlerInterface $finishHandler Handler to use in case no middleware produced a response.
      */
     public function dispatch(
         FailureHandlingRequest $request,
@@ -53,7 +53,7 @@ final class FailureMiddlewareDispatcher
 
     /**
      * Returns new instance with middleware handlers replaced with the ones provided.
-     * Last specified handler will be executed first.
+     * The last specified handler will be executed first.
      *
      * @param array[][]|callable[][]|MiddlewareFailureInterface[][]|string[][] $middlewareDefinitions Each array element is:
      *

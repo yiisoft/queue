@@ -21,7 +21,7 @@ final class ConsumeMiddlewareDispatcher
     private array $middlewareDefinitions;
 
     public function __construct(
-        private MiddlewareFactoryConsumeInterface $middlewareFactory,
+        private readonly MiddlewareFactoryConsumeInterface $middlewareFactory,
         array|callable|string|MiddlewareConsumeInterface ...$middlewareDefinitions,
     ) {
         $this->middlewareDefinitions = array_reverse($middlewareDefinitions);
@@ -31,7 +31,7 @@ final class ConsumeMiddlewareDispatcher
      * Dispatch request through middleware to get response.
      *
      * @param ConsumeRequest $request Request to pass to middleware.
-     * @param MessageHandlerConsumeInterface $finishHandler Handler to use in case no middleware produced response.
+     * @param MessageHandlerConsumeInterface $finishHandler Handler to use in case no middleware produced a response.
      */
     public function dispatch(
         ConsumeRequest $request,
@@ -47,7 +47,7 @@ final class ConsumeMiddlewareDispatcher
 
     /**
      * Returns new instance with middleware handlers replaced with the ones provided.
-     * Last specified handler will be executed first.
+     * The last specified handler will be executed first.
      *
      * @param array[]|callable[]|MiddlewareConsumeInterface[]|string[] $middlewareDefinitions Each array element is:
      *
@@ -56,7 +56,7 @@ final class ConsumeMiddlewareDispatcher
      *     ResponseInterface` signature.
      * - A "callable-like" array in format `[FooMiddleware::class, 'index']`. `FooMiddleware` instance will
      *   be created and `index()` method will be executed.
-     * - A function returning a middleware. The middleware returned will be executed.
+     * - A function returning middleware. The middleware returned will be executed.
      *
      * For callables typed parameters are automatically injected using dependency injection container.
      *

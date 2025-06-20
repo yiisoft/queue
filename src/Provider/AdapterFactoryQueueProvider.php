@@ -16,7 +16,7 @@ use function array_key_exists;
 use function sprintf;
 
 /**
- * This queue provider create new queue objects based on adapter definitions.
+ * This queue provider creates new queue objects based on adapter definitions.
  *
  * @see https://github.com/yiisoft/definitions/
  * @see https://github.com/yiisoft/factory/

@@ -27,14 +27,14 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
      * @param ContainerInterface $container Container to use for resolving definitions.
      */
     public function __construct(
-        private ContainerInterface $container,
-        private CallableFactory $callableFactory,
+        private readonly ContainerInterface $container,
+        private readonly CallableFactory $callableFactory,
     ) {
     }
 
     /**
-     * @param array|callable|MiddlewareFailureInterface|string $middlewareDefinition Middleware definition in one of the
-     *     following formats:
+     * @param array|callable|MiddlewareFailureInterface|string $middlewareDefinition Middleware definition in one of
+     * the following formats:
      *
      * - A middleware object.
      * - A name of a middleware class. The middleware instance will be obtained from container and executed.
@@ -92,8 +92,10 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
         return new class ($callback, $this->container) implements MiddlewareFailureInterface {
             private $callback;
 
-            public function __construct(callable $callback, private ContainerInterface $container)
-            {
+            public function __construct(
+                callable $callback,
+                private readonly ContainerInterface $container
+            ) {
                 $this->callback = $callback;
             }
 

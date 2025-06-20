@@ -15,9 +15,10 @@ final class FailureEnvelope implements EnvelopeInterface
     public const FAILURE_META_KEY = 'failure-meta';
 
     public function __construct(
-        private MessageInterface $message,
-        private array $meta = [],
+        MessageInterface $message,
+        private readonly array $meta = [],
     ) {
+        $this->message = $message;
     }
 
     public static function fromMessage(MessageInterface $message): self

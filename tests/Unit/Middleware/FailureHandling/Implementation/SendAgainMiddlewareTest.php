@@ -85,7 +85,7 @@ class SendAgainMiddlewareTest extends TestCase
                     self::KEY_EXPONENTIAL_ATTEMPTS => 1,
                 ],
                 [
-                    self::KEY_EXPONENTIAL_DELAY => 1 * self::EXPONENTIAL_STRATEGY_EXPONENT,
+                    self::KEY_EXPONENTIAL_DELAY => self::EXPONENTIAL_STRATEGY_EXPONENT,
                     self::KEY_EXPONENTIAL_ATTEMPTS => 2,
                 ],
             ],

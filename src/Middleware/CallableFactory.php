@@ -19,12 +19,13 @@ use function is_string;
  */
 final class CallableFactory
 {
-    public function __construct(private ContainerInterface $container)
-    {
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {
     }
 
     /**
-     * Create real callable listener from definition.
+     * Create a real callable listener from definition.
      *
      * @param mixed $definition Definition to create listener from.
      *

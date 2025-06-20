@@ -25,7 +25,7 @@ interface QueueInterface
     /**
      * Execute all existing jobs and exit
      *
-     * @return int How many messages were processed
+     * @return int Number of messages processed.
      */
     public function run(int $max = 0): int;
 

@@ -22,8 +22,8 @@ final class MiddlewareFailureStack implements MessageFailureHandlerInterface
      * events.
      */
     public function __construct(
-        private array $middlewares,
-        private MessageFailureHandlerInterface $finishHandler,
+        private readonly array $middlewares,
+        private readonly MessageFailureHandlerInterface $finishHandler,
     ) {
     }
 
@@ -57,8 +57,8 @@ final class MiddlewareFailureStack implements MessageFailureHandlerInterface
             private ?MiddlewareFailureInterface $middleware = null;
 
             public function __construct(
-                private Closure $middlewareFactory,
-                private MessageFailureHandlerInterface $handler,
+                private readonly Closure $middlewareFactory,
+                private readonly MessageFailureHandlerInterface $handler,
             ) {
             }
 

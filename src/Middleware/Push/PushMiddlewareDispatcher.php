@@ -20,7 +20,7 @@ final class PushMiddlewareDispatcher
     private array $middlewareDefinitions;
 
     public function __construct(
-        private MiddlewareFactoryPushInterface $middlewareFactory,
+        private readonly MiddlewareFactoryPushInterface $middlewareFactory,
         array|callable|string|MiddlewarePushInterface ...$middlewareDefinitions,
     ) {
         $this->middlewareDefinitions = array_reverse($middlewareDefinitions);
@@ -30,7 +30,7 @@ final class PushMiddlewareDispatcher
      * Dispatch request through middleware to get response.
      *
      * @param PushRequest $request Request to pass to middleware.
-     * @param MessageHandlerPushInterface $finishHandler Handler to use in case no middleware produced response.
+     * @param MessageHandlerPushInterface $finishHandler Handler to use in case no middleware produced a response.
      */
     public function dispatch(
         PushRequest $request,
@@ -45,7 +45,7 @@ final class PushMiddlewareDispatcher
 
     /**
      * Returns new instance with middleware handlers replaced with the ones provided.
-     * Last specified handler will be executed first.
+     * The last specified handler will be executed first.
      *
      * @param array[]|callable[]|MiddlewarePushInterface[]|string[] $middlewareDefinitions Each array element is:
      *

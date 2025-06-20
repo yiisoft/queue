@@ -20,8 +20,8 @@ final class SynchronousAdapter implements AdapterInterface
     private string $channel;
 
     public function __construct(
-        private WorkerInterface $worker,
-        private QueueInterface $queue,
+        private readonly WorkerInterface $worker,
+        private readonly QueueInterface $queue,
         string|BackedEnum $channel = QueueInterface::DEFAULT_CHANNEL,
     ) {
         $this->channel = ChannelNormalizer::normalize($channel);

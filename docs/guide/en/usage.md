@@ -26,7 +26,7 @@ See also the documentation for concrete adapters ([synchronous adapter](adapter-
 ## Usage
 
 Each job sent to the queue should be defined as a separate class.
-For example, if you need to download and save a file the class may look like the following:
+For example, if you need to download and save a file, the class may look like the following:
 
 ```php
 $data = [
@@ -54,7 +54,7 @@ To push a job into the queue that should run after 5 minutes:
 ## Queue handling
 
 The exact way how a job is executed depends on the adapter used. Most adapters can be run using
-console commands, which the component registers in your application. For more details check the respective
+console commands, which the component registers in your application. For more details, check the respective
 adapter documentation.
 
 
@@ -79,7 +79,7 @@ $status->isDone($id);
 
 ## Limitations
 
-When using queues it is important to remember that tasks are put into and obtained from the queue in separate
+When using queues, it is important to remember that tasks are put into and obtained from the queue in separate
 processes. Therefore, avoid external dependencies when executing a task if you're not sure if they are available in
 the environment where the worker does its job.
 

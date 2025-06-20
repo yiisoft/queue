@@ -29,6 +29,7 @@ final class InvalidMiddlewareDefinitionException extends InvalidArgumentExceptio
     }
 
     /**
+     * @param mixed $middlewareDefinition Middleware definition.
      * @return string|null
      */
     private function convertDefinitionToString(mixed $middlewareDefinition): ?string

@@ -9,11 +9,10 @@ final class Message implements MessageInterface
     /**
      * @param mixed $data Message data, encodable by a queue adapter
      * @param array $metadata Message metadata, encodable by a queue adapter
-     * @param string|null $id Message id
      */
     public function __construct(
-        private string $handlerName,
-        private mixed $data,
+        private readonly string $handlerName,
+        private readonly mixed $data,
         private array $metadata = [],
     ) {
     }
