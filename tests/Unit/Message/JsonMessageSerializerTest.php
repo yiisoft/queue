@@ -11,7 +11,6 @@ use Yiisoft\Queue\Message\EnvelopeInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\Message;
-use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Tests\Unit\Support\TestMessage;
 
 /**

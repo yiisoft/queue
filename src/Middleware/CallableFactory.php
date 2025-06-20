@@ -21,8 +21,7 @@ final class CallableFactory
 {
     public function __construct(
         private readonly ContainerInterface $container
-    )
-    {
+    ) {
     }
 
     /**

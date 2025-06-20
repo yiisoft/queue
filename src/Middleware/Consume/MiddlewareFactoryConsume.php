@@ -92,8 +92,7 @@ final class MiddlewareFactoryConsume implements MiddlewareFactoryConsumeInterfac
             public function __construct(
                 callable $callback,
                 private readonly ContainerInterface $container
-            )
-            {
+            ) {
                 $this->callback = $callback;
             }
 

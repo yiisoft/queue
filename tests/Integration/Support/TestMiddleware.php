@@ -12,7 +12,7 @@ use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\Middleware\Push\PushRequest;
 
-final class  TestMiddleware implements MiddlewarePushInterface, MiddlewareConsumeInterface
+final class TestMiddleware implements MiddlewarePushInterface, MiddlewareConsumeInterface
 {
     public function __construct(private readonly string $stage)
     {

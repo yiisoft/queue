@@ -14,8 +14,7 @@ final class JobFailureException extends RuntimeException
     public function __construct(
         private readonly MessageInterface $queueMessage,
         Throwable $previous
-    )
-    {
+    ) {
         $error = $previous->getMessage();
         $messageId = $queueMessage->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
         $messageText = "Processing of message #$messageId is stopped because of an exception:\n$error.";

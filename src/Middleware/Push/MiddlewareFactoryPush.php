@@ -92,8 +92,7 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
             public function __construct(
                 callable $callback,
                 private readonly ContainerInterface $container
-            )
-            {
+            ) {
                 $this->callback = $callback;
             }
 

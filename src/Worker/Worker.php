@@ -101,9 +101,9 @@ final class Worker implements WorkerInterface
      *
      * @param array|callable|object|string|null $definition
      *
-     * @return callable|null
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @return callable|null
      */
     private function prepare(callable|object|array|string|null $definition): callable|null
     {
