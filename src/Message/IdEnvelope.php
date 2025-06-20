@@ -14,9 +14,10 @@ final class IdEnvelope implements EnvelopeInterface
     public const MESSAGE_ID_KEY = 'yii-message-id';
 
     public function __construct(
-        private readonly MessageInterface $message,
-        private string|int|null $id = null,
+        MessageInterface $message,
+        private readonly string|int|null $id = null,
     ) {
+        $this->message = $message;
     }
 
     public static function fromMessage(MessageInterface $message): self
