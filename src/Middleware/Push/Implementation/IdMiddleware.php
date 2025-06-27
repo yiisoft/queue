@@ -10,7 +10,7 @@ use Yiisoft\Queue\Middleware\Push\PushRequest;
 use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
 
 /**
- * A middleware interface for message ID setting. It must be implemented in an adapter package or in a project.
+ * A middleware for message ID setting.
  */
 final class IdMiddleware implements MiddlewarePushInterface
 {
