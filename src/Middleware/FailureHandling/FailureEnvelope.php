@@ -13,10 +13,9 @@ final class FailureEnvelope extends Envelope
     public const FAILURE_META_KEY = 'failure-meta';
 
     public function __construct(
-        MessageInterface $message,
+        protected MessageInterface $message,
         private readonly array $metadata = [],
     ) {
-        parent::__construct($message);
     }
 
     public static function fromMessage(MessageInterface $message): static
