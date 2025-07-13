@@ -37,11 +37,18 @@ abstract class Envelope implements EnvelopeInterface
     public function getMetadata(): array
     {
         if ($this->metadata === null) {
+            $messageMeta = $this->message->getMetadata();
+
+            $stack = $messageMeta[EnvelopeInterface::ENVELOPE_STACK_KEY] ?? [];
+            if (!is_array($stack)) {
+                $stack = [];
+            }
+
             $this->metadata = array_merge(
-                $this->message->getMetadata(),
+                $messageMeta,
                 [
                     EnvelopeInterface::ENVELOPE_STACK_KEY => array_merge(
-                        $this->message->getMetadata()[EnvelopeInterface::ENVELOPE_STACK_KEY] ?? [],
+                        $stack,
                         [static::class],
                     ),
                 ],
