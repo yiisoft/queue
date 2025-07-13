@@ -98,7 +98,7 @@ final class QueueCollectorTest extends AbstractCollectorTestCase
             'countPushes' => $countPushes,
             'countStatuses' => $countStatuses,
             'countProcessingMessages' => $countProcessingMessages,
-        ] = $data['queue'];
+        ] = $data;
 
         $this->assertEquals(2, $countPushes);
         $this->assertEquals(1, $countStatuses);
