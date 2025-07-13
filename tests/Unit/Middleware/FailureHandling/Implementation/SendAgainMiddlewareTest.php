@@ -151,9 +151,6 @@ class SendAgainMiddlewareTest extends TestCase
             $this->expectExceptionMessage('testException');
         }
 
-        $metaInitial = [FailureEnvelope::FAILURE_META_KEY => $metaInitial];
-        $metaResult = [FailureEnvelope::FAILURE_META_KEY => $metaResult];
-
         $handler = $this->getHandler($metaResult, $suites);
         $queue = $this->getPreparedQueue($metaResult, $suites);
 
@@ -162,7 +159,7 @@ class SendAgainMiddlewareTest extends TestCase
             new Message(
                 'test',
                 null,
-                $metaInitial
+                [FailureEnvelope::FAILURE_META_KEY => $metaInitial]
             ),
             new Exception('testException'),
             $queue
@@ -194,7 +191,7 @@ class SendAgainMiddlewareTest extends TestCase
         $pipelineAssertion = static function (FailureHandlingRequest $request) use (
             $metaResult
         ): FailureHandlingRequest {
-            Assert::assertEquals($metaResult, $request->getMessage()->getMetadata());
+            Assert::assertEquals($metaResult, $request->getMessage()->getMetadata()[FailureEnvelope::FAILURE_META_KEY] ?? []);
 
             throw $request->getException();
         };
@@ -209,7 +206,7 @@ class SendAgainMiddlewareTest extends TestCase
     private function getPreparedQueue(array $metaResult, bool $suites): QueueInterface
     {
         $queueAssertion = static function (MessageInterface $message) use ($metaResult): MessageInterface {
-            Assert::assertEquals($metaResult, $message->getMetadata());
+            Assert::assertEquals($metaResult, $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY] ?? []);
 
             return $message;
         };
