@@ -25,11 +25,6 @@ final class IdEnvelope implements EnvelopeInterface
         return new self($message, $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null);
     }
 
-    public function setId(string|int|null $id): void
-    {
-        $this->id = $id;
-    }
-
     public function getId(): string|int|null
     {
         return $this->id ?? $this->message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
