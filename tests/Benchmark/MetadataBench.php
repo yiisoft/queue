@@ -46,7 +46,7 @@ final class MetadataBench
 
     public function provideEnvelopeStack(): Generator
     {
-        $config = [1 => 'one', 5 => 'three', 15 => 'fifteen'];
+        $config = [1 => 'one', 5 => 'five', 15 => 'fifteen'];
         $message = new IdEnvelope(new Message('foo', 'bar'), 1);
 
         for ($i = 1; $i <= max(...array_keys($config)); $i++) {
