@@ -13,8 +13,8 @@ use Yiisoft\Queue\QueueInterface;
 final class QueueDecorator implements QueueInterface
 {
     public function __construct(
-        private QueueInterface $queue,
-        private QueueCollector $collector,
+        private readonly QueueInterface $queue,
+        private readonly QueueCollector $collector,
     ) {
     }
 

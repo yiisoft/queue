@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit;
+namespace Yiisoft\Queue\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\EnvelopeInterface;

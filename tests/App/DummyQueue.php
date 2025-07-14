@@ -13,8 +13,9 @@ use Yiisoft\Queue\QueueInterface;
 
 final class DummyQueue implements QueueInterface
 {
-    public function __construct(private string $channel)
-    {
+    public function __construct(
+        private readonly string $channel
+    ) {
     }
 
     public function push(

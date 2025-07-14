@@ -22,8 +22,8 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
      * events.
      */
     public function __construct(
-        private array $middlewares,
-        private MessageHandlerPushInterface $finishHandler,
+        private readonly array $middlewares,
+        private readonly MessageHandlerPushInterface $finishHandler,
     ) {
     }
 
@@ -57,8 +57,8 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
             private ?MiddlewarePushInterface $middleware = null;
 
             public function __construct(
-                private Closure $middlewareFactory,
-                private MessageHandlerPushInterface $handler,
+                private readonly Closure $middlewareFactory,
+                private readonly MessageHandlerPushInterface $handler,
             ) {
             }
 

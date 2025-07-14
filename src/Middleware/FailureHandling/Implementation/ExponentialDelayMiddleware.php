@@ -28,16 +28,17 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
      * @param float $delayInitial The first delay period
      * @param float $delayMaximum The maximum delay period
      * @param float $exponent Message handling delay will be increased by this multiplication each time it fails
+     * @param DelayMiddlewareInterface $delayMiddleware A middleware for message delaying.
      * @param QueueInterface|null $queue
      */
     public function __construct(
-        private string $id,
-        private int $maxAttempts,
-        private float $delayInitial,
-        private float $delayMaximum,
-        private float $exponent,
-        private DelayMiddlewareInterface $delayMiddleware,
-        private ?QueueInterface $queue = null,
+        private readonly string $id,
+        private readonly int $maxAttempts,
+        private readonly float $delayInitial,
+        private readonly float $delayMaximum,
+        private readonly float $exponent,
+        private readonly DelayMiddlewareInterface $delayMiddleware,
+        private readonly ?QueueInterface $queue = null,
     ) {
         if ($maxAttempts <= 0) {
             throw new InvalidArgumentException("maxAttempts parameter must be a positive integer, $this->maxAttempts given.");

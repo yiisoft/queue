@@ -22,8 +22,8 @@ final class MiddlewareConsumeStack implements MessageHandlerConsumeInterface
      * events.
      */
     public function __construct(
-        private array $middlewares,
-        private MessageHandlerConsumeInterface $finishHandler,
+        private readonly array $middlewares,
+        private readonly MessageHandlerConsumeInterface $finishHandler,
     ) {
     }
 
@@ -57,8 +57,8 @@ final class MiddlewareConsumeStack implements MessageHandlerConsumeInterface
             private ?MiddlewareConsumeInterface $middleware = null;
 
             public function __construct(
-                private Closure $middlewareFactory,
-                private MessageHandlerConsumeInterface $handler,
+                private readonly Closure $middlewareFactory,
+                private readonly MessageHandlerConsumeInterface $handler,
             ) {
             }
 

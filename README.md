@@ -43,14 +43,15 @@ change to start working with the queue:
 ## Differences to yii2-queue
 
 If you have experience with `yiisoft/yii2-queue`, you will find out that this package is similar.
-Though, there are some key differences which are described in the "[migrating from yii2-queue](docs/guide/migrating-from-yii2-queue.md)" article.
+Though, there are some key differences that are described in the "[migrating from yii2-queue](docs/guide/migrating-from-yii2-queue.md)"
+article.
 
 ## General usage
 
 Each queue task consists of two parts:
 
 1. A message is a class implementing `MessageInterface`. For simple cases you can use the default implementation,
-   `Yiisoft\Queue\Message\Message`. For more complex cases you should implement the interface by your own.
+   `Yiisoft\Queue\Message\Message`. For more complex cases, you should implement the interface by your own.
 2. A message handler is a callable called by a `Yiisoft\Queue\Worker\Worker`. The handler handles each queue message.
 
 For example, if you need to download and save a file, your message creation may look like the following:
@@ -103,7 +104,7 @@ $worker = new \Yiisoft\Queue\Worker\Worker(
 );
 ```
 
-There is the way to run all the messages that are already in the queue, and then exit:
+There is a way to run all the messages that are already in the queue, and then exit:
 
 ```php
 $queue->run(); // this will execute all the existing messages
@@ -147,7 +148,7 @@ To use a custom handler name before message push, you can pass it as the first a
 new Message('handler-name', $data);
 ```
 
-To use a custom handler name on message consume, you should configure handler mapping for the `Worker` class:
+To use a custom handler name on message consumption, you should configure handler mapping for the `Worker` class:
 ```php
 $worker = new \Yiisoft\Queue\Worker\Worker(
     ['handler-name' => FooHandler::class],
@@ -175,7 +176,7 @@ Out of the box, there are four implementations of the `QueueProviderInterface`:
 
 ### `AdapterFactoryQueueProvider`
 
-Provider based on definition of channel-specific adapters. Definitions are passed in
+Provider based on the definition of channel-specific adapters. Definitions are passed in
 the `$definitions` constructor parameter of the factory, where keys are channel names and values are definitions
 for the [`Yiisoft\Factory\Factory`](https://github.com/yiisoft/factory). Below are some examples:
 
@@ -192,7 +193,7 @@ use Yiisoft\Queue\Adapter\SynchronousAdapter;
 ]
 ```
 
-For more information about a definition formats available see the [factory](https://github.com/yiisoft/factory) documentation.
+For more information about the definition formats available, see the [factory](https://github.com/yiisoft/factory) documentation.
 
 ### `PrototypeQueueProvider`
 
@@ -226,14 +227,14 @@ yii queue:listen
 
 See the documentation for more details about adapter specific console commands and their options.
 
-The component also has the ability to track the status of a job which was pushed into queue.
+The component can also track the status of a job which was pushed into queue.
 
-For more details see [the guide](docs/guide/en/README.md).
+For more details, see [the guide](docs/guide/en/README.md).
 
 ## Middleware pipelines
 
 Any message pushed to a queue or consumed from it passes through two different middleware pipelines: one pipeline
-on message push and another - on message consume. The process is the same as for the HTTP request, but it is executed
+on message push and another - on a message consume. The process is the same as for the HTTP request, but it is executed
 twice for a queue message. That means you can add extra functionality on message pushing and consuming with configuration
 of the two classes: `PushMiddlewareDispatcher` and `ConsumeMiddlewareDispatcher` respectively.
 
@@ -262,13 +263,13 @@ graph LR
     ConsumeMiddleware1[$middleware1] -.-> EndConsume((End))
 ```
 
-### Push pipeline
+### Push a pipeline
 
 When you push a message, you can use middlewares to modify both message and queue adapter.
 With message modification you can add extra data, obfuscate data, collect metrics, etc.  
-With queue adapter modification you can redirect message to another queue, delay message consuming, and so on.
+With queue adapter modification you can redirect the message to another queue, delay message consuming, and so on.
 
-To use this feature you have to create a middleware class, which implements `MiddlewarePushInterface`, and
+To use this feature, you have to create a middleware class, which implements `MiddlewarePushInterface`, and
 return a modified `PushRequest` object from the `processPush` method:
 
 ```php
@@ -297,16 +298,16 @@ along with them.
 
 ### Consume pipeline
 
-You can set a middleware pipeline for a message when it will be consumed from a queue server. This is useful to collect metrics, modify message data, etc. In pair with a Push middleware you can deduplicate messages in the queue, calculate time from push to consume, handle errors (push to a queue again, redirect failed message to another queue, send a notification, etc.). Unless Push pipeline, you have only one place to define the middleware stack: in the `ConsumeMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-consume` key of the `yiisoft/queue` array in the `params`.
+You can set a middleware pipeline for a message when it will be consumed from a queue server. This is useful to collect metrics, modify message data, etc. In a pair with a Push middleware you can deduplicate messages in the queue, calculate time from push to consume, handle errors (push to a queue again, redirect failed message to another queue, send a notification, etc.). Except push pipeline, you have only one place to define the middleware stack: in the `ConsumeMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-consume` key of the `yiisoft/queue` array in the `params`.
 
 ### Error handling pipeline
 
-Often when some job is failing, we want to retry its execution a couple more times or redirect it to another queue channel. This can be done in `yiisoft/queue` with Failure middleware pipeline. They are triggered each time message processing via the Consume middleware pipeline is interrupted with any `Throwable`. The key differences from the previous two pipelines:
+Often when some job is failing, we want to retry its execution a couple more times or redirect it to another queue channel. This can be done in `yiisoft/queue` with a Failure middleware pipeline. They are triggered each time message processing via the Consume middleware pipeline is interrupted with any `Throwable`. The key differences from the previous two pipelines:
 
 - You should set up the middleware pipeline separately for each queue channel. That means, the format should be `['channel-name' => [FooMiddleware::class]]` instead of `[FooMiddleware::class]`, like for the other two pipelines. There is also a default key, which will be used for those channels without their own one: `FailureMiddlewareDispatcher::DEFAULT_PIPELINE`.
 - The last middleware will throw the exception, which will come with the `FailureHandlingRequest` object. If you don't want the exception to be thrown, your middlewares should `return` a request without calling `$handler->handleFailure()`.
 
-You can declare error handling middleware pipeline in the `FailureMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-fail` key of the `yiisoft/queue` array in the `params`.
+You can declare error handling a middleware pipeline in the `FailureMiddlewareDispatcher`, either in the constructor, or in the `withMiddlewares()` method. If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-fail` key of the `yiisoft/queue` array in the `params`.
 
 See [error handling docs](docs/guide/error-handling.md) for details.
 

@@ -11,8 +11,8 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 final class QueueWorkerInterfaceProxy implements WorkerInterface
 {
     public function __construct(
-        private WorkerInterface $worker,
-        private QueueCollector $collector,
+        private readonly WorkerInterface $worker,
+        private readonly QueueCollector $collector,
     ) {
     }
 

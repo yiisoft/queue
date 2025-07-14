@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
@@ -211,7 +212,7 @@ final class WorkerTest extends TestCase
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams($handlers, $logger, $container);
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Queue handler with name "nonexistent" does not exist');
         $worker->process($message, $queue);
     }
@@ -232,7 +233,7 @@ final class WorkerTest extends TestCase
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams($handlers, $logger, $container);
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Queue handler with name "invalid" does not exist');
         $worker->process($message, $queue);
     }
