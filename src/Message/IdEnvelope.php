@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
-use Stringable;
-
 /**
  * ID envelope allows to identify a message.
  */
