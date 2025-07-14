@@ -10,7 +10,9 @@ use Yiisoft\Queue\Message\MessageInterface;
 
 final class FailureEnvelope implements EnvelopeInterface
 {
-    use EnvelopeTrait;
+    use EnvelopeTrait {
+        getMetadata as getMetadataParent;
+    }
 
     public const FAILURE_META_KEY = 'failure-meta';
 
@@ -28,7 +30,7 @@ final class FailureEnvelope implements EnvelopeInterface
 
     public function getMetadata(): array
     {
-        $meta = $this->message->getMetadata();
+        $meta = $this->getMetadataParent();
         $meta[self::FAILURE_META_KEY] = array_merge($meta[self::FAILURE_META_KEY] ?? [], $this->meta);
 
         return $meta;
