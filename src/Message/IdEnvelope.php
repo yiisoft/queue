@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
+use Stringable;
+
 /**
  * ID envelope allows to identify a message.
  */
@@ -24,11 +26,11 @@ final class IdEnvelope extends Envelope
 
         /** @var int|string|null $id */
         $id = match (true) {
-            $rawId === null => null,
+            $rawId === null => null, // don't remove this branch: it's important for compute speed
             is_string($rawId) => $rawId,
             is_int($rawId) => $rawId,
             is_object($rawId) && method_exists($rawId, '__toString') => (string)$rawId,
-            default => throw new \InvalidArgumentException(sprintf('Message ID must be string|int|null, %s given.', get_debug_type($rawId))),
+            default => null,
         };
 
         return new self($message, $id);

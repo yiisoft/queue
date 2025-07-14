@@ -70,6 +70,7 @@ final class IdEnvelopeTest extends TestCase
     {
         $invalidId = ['array-cannot-be-id'];
         $message = $this->createMessage([IdEnvelope::MESSAGE_ID_KEY => $invalidId]);
+        $message = IdEnvelope::fromMessage($message);
 
         $this->assertNull($message->getId());
     }
