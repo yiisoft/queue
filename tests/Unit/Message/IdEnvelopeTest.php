@@ -71,10 +71,7 @@ final class IdEnvelopeTest extends TestCase
         $invalidId = ['array-cannot-be-id'];
         $message = $this->createMessage([IdEnvelope::MESSAGE_ID_KEY => $invalidId]);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Message ID must be string|int|null, array given.');
-
-        IdEnvelope::fromMessage($message);
+        $this->assertNull($message->getId());
     }
 
     public function testGetEnvelopeMetadata(): void

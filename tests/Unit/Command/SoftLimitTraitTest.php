@@ -33,7 +33,7 @@ final class SoftLimitTraitTest extends TestCase
                 memoryLimitReached as public;
             }
 
-            public function __construct(private int $limit)
+            public function __construct(private readonly int $limit)
             {
             }
 
@@ -54,7 +54,7 @@ final class SoftLimitTraitTest extends TestCase
                 memoryLimitReached as public;
             }
 
-            public function __construct(private int $limit)
+            public function __construct(private readonly int $limit)
             {
             }
 
@@ -75,7 +75,7 @@ final class SoftLimitTraitTest extends TestCase
                 memoryLimitReached as public;
             }
 
-            public function __construct(private int $limit)
+            public function __construct(private readonly int $limit)
             {
             }
 
@@ -91,7 +91,7 @@ final class SoftLimitTraitTest extends TestCase
         // Create a large string to increase memory usage
         $largeString = str_repeat('x', 5 * 1024 * 1024 + 1); // 5MB and 1 byte string
 
-        // Now memory limit should be exceeded
+        // Now the memory limit should be exceeded
         $this->assertTrue($instance->memoryLimitReached());
 
         // Clean up to free memory

@@ -26,9 +26,9 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
      *        They will be resent to an original queue otherwise.
      */
     public function __construct(
-        private string $id,
-        private int $maxAttempts,
-        private ?QueueInterface $targetQueue = null,
+        private readonly string $id,
+        private readonly int $maxAttempts,
+        private readonly ?QueueInterface $targetQueue = null,
     ) {
         if ($maxAttempts < 1) {
             throw new InvalidArgumentException("maxAttempts parameter must be a positive integer, $this->maxAttempts given.");

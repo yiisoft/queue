@@ -15,7 +15,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 final class MetadataBench
 {
     /**
-     * Create metadata as array and read its value from array
+     * Create metadata as an array and read its value from an array.
      */
     #[Tag('metadata_read')]
     public function benchArrayRead(): void
@@ -25,7 +25,7 @@ final class MetadataBench
     }
 
     /**
-     * Create metadata as object and read its value immediately
+     * Create metadata as an object and read its value immediately.
      */
     #[Tag('metadata_read')]
     public function benchEnvelopeRead(): void
@@ -35,7 +35,7 @@ final class MetadataBench
     }
 
     /**
-     * Create metadata as array and read its value from an envelope object
+     * Create metadata as an array and read its value from an envelope object.
      */
     #[Tag('metadata_read')]
     public function benchEnvelopeReadRestored(): void
@@ -50,10 +50,10 @@ final class MetadataBench
         $message = new IdEnvelope(new Message('foo', 'bar'), 1);
 
         for ($i = 1; $i <= max(...array_keys($config)); $i++) {
-            $message = new FailureEnvelope($message, ["fail$i" => "fail$i"]);
             if (isset($config[$i])) {
                 yield $config[$i] => ['message' => $message];
             }
+            $message = new FailureEnvelope($message, ["fail$i" => "fail$i"]);
         }
     }
 
@@ -92,7 +92,7 @@ final class MetadataBench
     }
 
     /**
-     * Create metadata array with the given elements count
+     * Create a metadata array with the given elements count
      *
      * @psalm-param array{0: int} $params
      */

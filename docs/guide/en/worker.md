@@ -1,7 +1,7 @@
 # Configuration
 
-To use a worker, you should resolve its dependencies (e.g. through DI container) and define handlers for each message
-which will be consumed by this worker;
+To use a worker, you should resolve its dependencies (e.g., through DI container) and define handlers for each message
+that will be consumed by this worker;
 
 Handlers are callables indexed by payload names. When a message is consumed from the queue, a callable associated with
 its payload name is called.
@@ -10,7 +10,7 @@ its payload name is called.
 
 Handler can be any callable with a couple of additions:
 
-- If handler is provided as an array of two strings, it will be treated as a DI container service id and its method.
+- If a handler is provided as an array of two strings, it will be treated as a DI container service id and its method.
   E.g. `[ClassName::class, 'handle']` will be resolved to:
   ```php 
   $container
@@ -69,7 +69,7 @@ stdout_logfile=/var/www/my_project/log/yii-queue-worker.log
 In this case Supervisor should start 4 `queue:listen` workers. The worker output will be written
 to the specified log file.
 
-For more info about Supervisor's configuration and usage see its [documentation](http://supervisord.org).
+For more info about Supervisor's configuration and usage, see its [documentation](http://supervisord.org).
 
 ### Systemd
 
@@ -96,7 +96,7 @@ Restart=on-failure
 WantedBy=multi-user.target
 ```
 
-You need to reload systemd in order to re-read its configuration:
+You need to reload systemd to re-read its configuration:
 
 ```shell
 systemctl daemon-reload
@@ -133,4 +133,4 @@ Config example:
 * * * * * /usr/bin/php /var/www/my_project/yii queue:run
 ```
 
-In this case cron will run the command every minute.
+In this case, cron will run the command every minute.

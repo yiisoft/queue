@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Provider;
+namespace Yiisoft\Queue\Tests\Unit\Provider;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Adapter\AdapterInterface;

@@ -12,8 +12,8 @@ final class Message implements MessageInterface
      * @param array $metadata Message metadata, encodable by a queue adapter
      */
     public function __construct(
-        private string $handlerName,
-        private mixed $data,
+        private readonly string $handlerName,
+        private readonly mixed $data,
         private array $metadata = [],
     ) {
     }
