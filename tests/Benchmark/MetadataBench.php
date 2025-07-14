@@ -50,10 +50,10 @@ final class MetadataBench
         $message = new IdEnvelope(new Message('foo', 'bar'), 1);
 
         for ($i = 1; $i <= max(...array_keys($config)); $i++) {
-            $message = new FailureEnvelope($message, ["fail$i" => "fail$i"]);
             if (isset($config[$i])) {
                 yield $config[$i] => ['message' => $message];
             }
+            $message = new FailureEnvelope($message, ["fail$i" => "fail$i"]);
         }
     }
 
