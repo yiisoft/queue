@@ -5,49 +5,42 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Message;
 
 /**
- * ID envelope allows identifying a message.
+ * ID envelope allows to identify a message.
  */
-final class IdEnvelope implements EnvelopeInterface
+final class IdEnvelope extends Envelope
 {
-    use EnvelopeTrait;
-
     public const MESSAGE_ID_KEY = 'yii-message-id';
 
     public function __construct(
-        MessageInterface $message,
-        private readonly string|int|null $id = null,
+        protected MessageInterface $message,
+        private readonly string|int|null $id,
     ) {
-        $this->message = $message;
     }
 
-    public static function fromMessage(MessageInterface $message): self
+    public static function fromMessage(MessageInterface $message): static
     {
-        return new self($message, self::getIdFromMessage($message));
+        /** @var mixed $rawId */
+        $rawId = $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
+
+        /** @var int|string|null $id */
+        $id = match (true) {
+            $rawId === null => null, // don't remove this branch: it's important for compute speed
+            is_string($rawId) => $rawId,
+            is_int($rawId) => $rawId,
+            is_object($rawId) && method_exists($rawId, '__toString') => (string)$rawId,
+            default => null,
+        };
+
+        return new self($message, $id);
     }
 
     public function getId(): string|int|null
     {
-        return $this->id ?? self::getIdFromMessage($this->message);
+        return $this->id;
     }
 
-    private function getEnvelopeMetadata(): array
+    protected function getEnvelopeMetadata(): array
     {
         return [self::MESSAGE_ID_KEY => $this->getId()];
-    }
-
-    private static function getIdFromMessage(MessageInterface $message): string|int|null
-    {
-        $id = $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
-        if ($id instanceof \Stringable) {
-            $id = (string) $id;
-        }
-
-        // We don't throw an error as this value could come from external sources,
-        // and we should process the message either way
-        if (!is_string($id) && !is_int($id)) {
-            return null;
-        }
-
-        return $id;
     }
 }

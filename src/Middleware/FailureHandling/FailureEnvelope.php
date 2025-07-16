@@ -4,35 +4,33 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Middleware\FailureHandling;
 
-use Yiisoft\Queue\Message\EnvelopeInterface;
-use Yiisoft\Queue\Message\EnvelopeTrait;
+use Yiisoft\Arrays\ArrayHelper;
+use Yiisoft\Queue\Message\Envelope;
 use Yiisoft\Queue\Message\MessageInterface;
 
-final class FailureEnvelope implements EnvelopeInterface
+final class FailureEnvelope extends Envelope
 {
-    use EnvelopeTrait {
-        getMetadata as getMetadataParent;
-    }
-
     public const FAILURE_META_KEY = 'failure-meta';
 
     public function __construct(
-        MessageInterface $message,
-        private readonly array $meta = [],
+        protected MessageInterface $message,
+        private readonly array $metadata = [],
     ) {
-        $this->message = $message;
     }
 
-    public static function fromMessage(MessageInterface $message): self
+    public static function fromMessage(MessageInterface $message): static
     {
-        return new self($message, $message->getMetadata()[self::FAILURE_META_KEY] ?? []);
+        /** @var array $metadata */
+        $metadata = $message->getMetadata()[self::FAILURE_META_KEY] ?? [];
+
+        return new self($message, $metadata);
     }
 
-    public function getMetadata(): array
+    protected function getEnvelopeMetadata(): array
     {
-        $meta = $this->getMetadataParent();
-        $meta[self::FAILURE_META_KEY] = array_merge($meta[self::FAILURE_META_KEY] ?? [], $this->meta);
+        /** @var array $metadata */
+        $metadata = $this->message->getMetadata()[self::FAILURE_META_KEY] ?? [];
 
-        return $meta;
+        return [self::FAILURE_META_KEY => ArrayHelper::merge($metadata, $this->metadata)];
     }
 }

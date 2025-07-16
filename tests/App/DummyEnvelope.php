@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\App;
 
-use Yiisoft\Queue\Message\EnvelopeInterface;
-use Yiisoft\Queue\Message\EnvelopeTrait;
+use Yiisoft\Queue\Message\Envelope;
 use Yiisoft\Queue\Message\MessageInterface;
 
-final class DummyEnvelope implements EnvelopeInterface
+final class DummyEnvelope extends Envelope
 {
-    use EnvelopeTrait;
-
-    public static function fromMessage(MessageInterface $message): self
+    public static function fromMessage(MessageInterface $message): static
     {
-        $instance = new self();
-        $instance->message = $message;
+        return new self($message);
+    }
 
-        return $instance;
+    protected function getEnvelopeMetadata(): array
+    {
+        return [];
     }
 }

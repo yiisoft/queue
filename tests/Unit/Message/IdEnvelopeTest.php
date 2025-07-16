@@ -92,9 +92,6 @@ final class IdEnvelopeTest extends TestCase
         $data = ['key' => 'value'];
         $metadata = ['meta' => 'data', IdEnvelope::MESSAGE_ID_KEY => 'test-id'];
 
-        /**
-         * @var IdEnvelope $envelope
-         */
         $envelope = IdEnvelope::fromData($handlerName, $data, $metadata);
 
         $this->assertInstanceOf(IdEnvelope::class, $envelope);
