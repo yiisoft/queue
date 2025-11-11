@@ -109,7 +109,7 @@ final class Queue implements QueueInterface
         return $this->adapter->status($id);
     }
 
-    public function withAdapter(AdapterInterface $adapter): self
+    public function withAdapter(AdapterInterface $adapter): static
     {
         $new = clone $this;
         $new->adapter = $adapter;

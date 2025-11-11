@@ -45,7 +45,7 @@ final class QueueDecorator implements QueueInterface
         $this->queue->listen();
     }
 
-    public function withAdapter(AdapterInterface $adapter): QueueInterface
+    public function withAdapter(AdapterInterface $adapter): static
     {
         return new self($this->queue->withAdapter($adapter), $this->collector);
     }
