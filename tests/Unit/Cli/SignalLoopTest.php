@@ -6,34 +6,32 @@ namespace Yiisoft\Queue\Tests\Unit\Cli;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Yiisoft\Queue\Cli\SignalLoop;
 
+#[RequiresPhpExtension('pcntl')]
 final class SignalLoopTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+        pcntl_async_signals(true);
+    }
+
     public function testMemoryLimitReached(): void
     {
-        if (!extension_loaded('pcntl')) {
-            $this->markTestSkipped('This rest requires PCNTL extension');
-        }
-
         $loop = new SignalLoop(1);
         self::assertFalse($loop->canContinue());
     }
 
     public function testSuspendAndResume(): void
     {
-        if (!function_exists('pcntl_signal')) {
-            $this->markTestSkipped('pcntl not available');
-        }
-
-        pcntl_async_signals(true);
-
         $loop = new SignalLoop(0);
-        pcntl_signal(SIGALRM, static function (): void {
-            posix_kill(getmypid(), SIGCONT);
+        pcntl_signal(\SIGALRM, static function (): void {
+            posix_kill(getmypid(), \SIGCONT);
         });
 
-        posix_kill(getmypid(), SIGTSTP);
+        posix_kill(getmypid(), \SIGTSTP);
         pcntl_alarm(1);
 
         $start = microtime(true);
@@ -47,11 +45,6 @@ final class SignalLoopTest extends TestCase
     #[DataProvider('exitSignalProvider')]
     public function testExitSignals(int $signal): void
     {
-        if (!extension_loaded('pcntl')) {
-            $this->markTestSkipped('PCNTL extension not available');
-        }
-        pcntl_async_signals(true);
-
         $loop = new SignalLoop(0);
 
         self::assertTrue($loop->canContinue(), 'Loop should continue');
@@ -62,25 +55,20 @@ final class SignalLoopTest extends TestCase
 
     public static function exitSignalProvider(): iterable
     {
-        yield 'SIGHUP' => [SIGHUP];
-        yield 'SIGINT' => [SIGINT];
-        yield 'SIGTERM' => [SIGTERM];
+        yield 'SIGHUP' => [\SIGHUP];
+        yield 'SIGINT' => [\SIGINT];
+        yield 'SIGTERM' => [\SIGTERM];
     }
 
     public function testResumeSignal(): void
     {
-        if (!extension_loaded('pcntl')) {
-            $this->markTestSkipped('PCNTL extension not available');
-        }
-        pcntl_async_signals(true);
-
         $loop = new SignalLoop(0);
 
         // First suspend the loop
-        posix_kill(getmypid(), SIGTSTP);
+        posix_kill(getmypid(), \SIGTSTP);
 
         // Then immediately resume
-        posix_kill(getmypid(), SIGCONT);
+        posix_kill(getmypid(), \SIGCONT);
 
         $start = microtime(true);
         $result = $loop->canContinue();
@@ -92,16 +80,11 @@ final class SignalLoopTest extends TestCase
 
     public function testMultipleExitSignals(): void
     {
-        if (!extension_loaded('pcntl')) {
-            $this->markTestSkipped('PCNTL extension not available');
-        }
-        pcntl_async_signals(true);
-
         $loop = new SignalLoop(0);
 
         // Send multiple exit signals
-        posix_kill(getmypid(), SIGINT);
-        posix_kill(getmypid(), SIGTERM);
+        posix_kill(getmypid(), \SIGINT);
+        posix_kill(getmypid(), \SIGTERM);
 
         $result = $loop->canContinue();
 
@@ -110,21 +93,16 @@ final class SignalLoopTest extends TestCase
 
     public function testSuspendOverridesResume(): void
     {
-        if (!extension_loaded('pcntl')) {
-            $this->markTestSkipped('PCNTL extension not available');
-        }
-        pcntl_async_signals(true);
-
         $loop = new SignalLoop(0);
 
         // Resume first
-        posix_kill(getmypid(), SIGCONT);
+        posix_kill(getmypid(), \SIGCONT);
         // Then suspend
-        posix_kill(getmypid(), SIGTSTP);
+        posix_kill(getmypid(), \SIGTSTP);
 
         // Set up alarm to resume after 1 second
-        pcntl_signal(SIGALRM, static function (): void {
-            posix_kill(getmypid(), SIGCONT);
+        pcntl_signal(\SIGALRM, static function (): void {
+            posix_kill(getmypid(), \SIGCONT);
         });
         pcntl_alarm(1);
 
