@@ -7,7 +7,6 @@ namespace Yiisoft\Queue\Tests\Unit\Message;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Tests\App\DummyEnvelope;
 use Yiisoft\Queue\Message\EnvelopeInterface;
-use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Message;
 
 final class EnvelopeTest extends TestCase
