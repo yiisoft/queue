@@ -15,12 +15,23 @@ final class FailureHandlingRequestTest extends TestCase
     public function testImmutable(): void
     {
         $queue = $this->createMock(QueueInterface::class);
-        $failureHandlingRequest = new FailureHandlingRequest(
-            new Message('test', 'test'),
-            new Exception(),
+        $request1 = new FailureHandlingRequest(
+            new Message('test', null),
+            new Exception('exception 1'),
             $queue
         );
+        $request2 = $request1->withQueue($queue);
+        $request3 = $request1->withException(new Exception('exception 2'));
+        $request4 = $request1->withMessage(new Message('test2', null));
 
-        $this->assertNotSame($failureHandlingRequest, $failureHandlingRequest->withQueue($queue));
+        $this->assertNotSame($request1, $request2);
+
+        $this->assertNotSame($request1, $request3);
+        $this->assertEquals($request1->getException()->getMessage(), 'exception 1');
+        $this->assertEquals($request3->getException()->getMessage(), 'exception 2');
+
+        $this->assertNotSame($request1, $request4);
+        $this->assertEquals($request1->getMessage()->getHandlerName(), 'test');
+        $this->assertEquals($request4->getMessage()->getHandlerName(), 'test2');
     }
 }
