@@ -47,10 +47,14 @@ final class CallableFactoryTest extends TestCase
         self::assertIsCallable($callable);
         self::assertSame('pong', $callable());
     }
+
     public function testCreateFromContainerObjectMethod(): void
     {
         $service = new class () {
-            public function go(): string { return 'ok'; }
+            public function go(): string
+            {
+                return 'ok';
+            }
         };
         $className = $service::class;
         $container = new SimpleContainer([
