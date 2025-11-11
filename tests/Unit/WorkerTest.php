@@ -69,7 +69,7 @@ final class WorkerTest extends TestCase
             ['not-found-class-name' => new FakeHandler()],
         ];
         yield 'static-definition' => [
-            [FakeHandler::class, 'staticExecute'],
+            FakeHandler::staticExecute(...),
             [FakeHandler::class => new FakeHandler()],
         ];
         yield 'callable' => [
