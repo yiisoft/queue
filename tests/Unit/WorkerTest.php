@@ -166,9 +166,9 @@ final class WorkerTest extends TestCase
         ContainerInterface $container,
         ?LoggerInterface $logger = null,
     ): Worker {
-        /** @var \PHPUnit\Framework\MockObject\MockObject&MiddlewareFactoryConsumeInterface $consumeMiddlewareFactory */
+        /** @var MiddlewareFactoryConsumeInterface&\PHPUnit\Framework\MockObject\MockObject $consumeMiddlewareFactory */
         $consumeMiddlewareFactory = $this->createMock(MiddlewareFactoryConsumeInterface::class);
-        /** @var \PHPUnit\Framework\MockObject\MockObject&MiddlewareFactoryFailureInterface $failureMiddlewareFactory */
+        /** @var MiddlewareFactoryFailureInterface&\PHPUnit\Framework\MockObject\MockObject $failureMiddlewareFactory */
         $failureMiddlewareFactory = $this->createMock(MiddlewareFactoryFailureInterface::class);
 
         return new Worker(
@@ -225,21 +225,21 @@ final class WorkerTest extends TestCase
         $queue->method('getChannel')->willReturn('test-channel');
 
         $originalException = new RuntimeException('Consume failed');
-        /** @var \PHPUnit\Framework\MockObject\MockObject&MiddlewareConsumeInterface $consumeMiddleware */
+        /** @var MiddlewareConsumeInterface&\PHPUnit\Framework\MockObject\MockObject $consumeMiddleware */
         $consumeMiddleware = $this->createMock(MiddlewareConsumeInterface::class);
         $consumeMiddleware->method('processConsume')->willThrowException($originalException);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject&MiddlewareFactoryConsumeInterface $consumeMiddlewareFactory */
+        /** @var MiddlewareFactoryConsumeInterface&\PHPUnit\Framework\MockObject\MockObject $consumeMiddlewareFactory */
         $consumeMiddlewareFactory = $this->createMock(MiddlewareFactoryConsumeInterface::class);
         $consumeMiddlewareFactory->method('createConsumeMiddleware')->willReturn($consumeMiddleware);
         $consumeDispatcher = new ConsumeMiddlewareDispatcher($consumeMiddlewareFactory, 'simple');
 
         $finalMessage = new Message('final', null);
-        /** @var \PHPUnit\Framework\MockObject\MockObject&MiddlewareFailureInterface $failureMiddleware */
+        /** @var MiddlewareFailureInterface&\PHPUnit\Framework\MockObject\MockObject $failureMiddleware */
         $failureMiddleware = $this->createMock(MiddlewareFailureInterface::class);
         $failureMiddleware->method('processFailure')->willReturn(new FailureHandlingRequest($finalMessage, $originalException, $queue));
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject&MiddlewareFactoryFailureInterface $failureMiddlewareFactory */
+        /** @var MiddlewareFactoryFailureInterface&\PHPUnit\Framework\MockObject\MockObject $failureMiddlewareFactory */
         $failureMiddlewareFactory = $this->createMock(MiddlewareFactoryFailureInterface::class);
         $failureMiddlewareFactory->method('createFailureMiddleware')->willReturn($failureMiddleware);
         $failureDispatcher = new FailureMiddlewareDispatcher($failureMiddlewareFactory, ['test-channel' => ['simple']]);
