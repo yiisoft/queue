@@ -19,6 +19,7 @@ An extension for running tasks asynchronously via queues.
 ## Requirements
 
 - PHP 8.1 or higher.
+- PCNTL extension for signal handling _(optional, recommended for production use)_
 
 ## Installation
 
@@ -28,23 +29,109 @@ The package could be installed with [Composer](https://getcomposer.org):
 composer require yiisoft/queue
 ```
 
-## Ready for Yii Config
+## Quick Start
 
-If you are using [yiisoft/config](https://github.com/yiisoft/config), you'll find out this package has some defaults
-in the [`common`](config/di.php) and [`params`](config/params.php) configurations saving your time. Things you should
-change to start working with the queue:
+### 1. Install an adapter
 
-- Optionally: define default `\Yiisoft\Queue\Adapter\AdapterInterface` implementation.
-- And/or define channel-specific `AdapterInterface` implementations in the `channel` params key to be used
-  with the [queue provider](#different-queue-channels).
-- Define [message handlers](docs/guide/worker.md#handler-format) in the `handlers` params key to be used with the `QueueWorker`.
-- Resolve other `\Yiisoft\Queue\Queue` dependencies (psr-compliant event dispatcher).
+For production use, you should install an adapter package that matches your message broker ([AMQP](https://github.com/yiisoft/queue-amqp), [Kafka](https://github.com/g41797/queue-kafka), [NATS](https://github.com/g41797/queue-nats), and [others](docs/guide/en/adapter-list.md)).
+See the [adapter list](docs/guide/en/adapter-list.md) and follow the adapter-specific documentation.
+
+For development and testing, you can start without an external broker using the built-in [`SynchronousAdapter`](docs/guide/en/adapter-sync.md).
+This adapter processes messages immediately in the same process, so it won't provide true async execution,
+but it's useful for getting started and writing tests.
+
+### 2. Configure the queue
+
+#### Configuration with yiisoft/config
+
+**If you use `yiisoft/app` or `yiisoft/app-api`**
+
+Add queue configuration to your application `$params` config. In `yiisoft/app`/`yiisoft/app-api` templates it's typically the `config/params.php` file.  
+_If your project structure differs, put it into any params config file that is loaded by `yiisoft/config`._
+
+Minimal configuration example:
+
+```php
+return [
+    'yiisoft/queue' => [
+        'handlers' => [
+            'handler-name' => [FooHandler::class, 'handle'],
+        ],
+    ],
+];
+```
+
+[Advanced configuration with yiisoft/config](docs/guide/en/configuration-with-config.md)
+
+#### Manual configuration
+
+For setting up all classes manually, see the [Manual configuration](docs/guide/en/configuration-manual.md) guide.
+
+### 3. Prepare a handler
+
+You need to create a handler class that will process the queue messages. The most simple way is to implement the `HandleInterface`. Let's create an example for remote file processing:
+
+```php
+use Yiisoft\Queue\Handler\HandleInterface;
+use Yiisoft\Queue\Message\MessageInterface;
+
+final readonly class RemoteFileHandler implements HandleInterface
+{
+    private string $absolutePath;
+
+    // These dependencies will be resolved on handler creation by the DI container
+    public function __construct(
+        private FileDownloader $downloader,
+        private FileProcessor $processor,
+    ) {}
+
+    // Every received message will be processed by this method
+    public function handle(MessageInterface $downloadMessage): void
+    {
+        $fileName = $downloadMessage->getData()['destinationFile'];
+        $localPath = $this->downloader->download($fileName);
+        $this->processor->process($localPath);
+    }
+}
+```
+
+### 4. Send (produce/push) a message to a queue
+
+To send a message to the queue, you need to get the queue instance and call the `push()` method. Typically with Yii Framework you'll get a `Queue` instance as a dependency of a service.
+
+```php
+
+final readonly class Foo {
+    public function __construct(private QueueInterface $queue) {}
+    
+    public function bar(): void
+    {
+        $this->queue->push(new Message(
+            // The first parameter is the handler name that will process this concrete message
+            RemoteFileHandler::class,
+            // The second parameter is the data that will be passed to the handler.
+            // It should be serializable to JSON format
+            ['destinationFile' => 'https://example.com/file-path.csv'],
+        ));
+    }
+}
+```
+
+### 5. Handle queue messages
+
+By default Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/yii-console) to run CLI commands. If you installed [yiisoft/app](https://github.com/yiisoft/app) or [yiisoft/app-api](https://github.com/yiisoft/app-api), you can run the queue worker with on of these two commands:
+
+```bash
+./yii queue:run # Handle all existing messages in the queue
+./yii queue:listen # Start a daemon listening for new messages permanently
+```
+
+> In case you're using the SynchronosAdapter for development purposes, you should not use these commands, as you have no asynchronous processing available. The messages are processed immediately when pushed.
 
 ## Differences to yii2-queue
 
 If you have experience with `yiisoft/yii2-queue`, you will find out that this package is similar.
-Though, there are some key differences that are described in the "[migrating from yii2-queue](docs/guide/migrating-from-yii2-queue.md)"
-article.
+Though, there are some key differences that are described in the [Migrating from yii2-queue](docs/guide/migrating-from-yii2-queue.md) article.
 
 ## General usage
 
@@ -54,7 +141,7 @@ Each queue task consists of two parts:
    `Yiisoft\Queue\Message\Message`. For more complex cases, you should implement the interface by your own.
 2. A message handler is a callable called by a `Yiisoft\Queue\Worker\Worker`. The handler handles each queue message.
 
-For example, if you need to download and save a file, your message creation may look like the following:
+For example, if you're going to download and save a file in a queue task, your message creation may look like the following:
 - Message handler as the first parameter
 - Message data as the second parameter
 
@@ -96,12 +183,8 @@ class FileDownloader
 The last thing we should do is to create a configuration for the `Yiisoft\Queue\Worker\Worker`:
 
 ```php
-$worker = new \Yiisoft\Queue\Worker\Worker(
-    [],
-    $logger,
-    $injector,
-    $container
-);
+$worker = $container->get(\Yiisoft\Queue\Worker\WorkerInterface::class);
+$queue = $container->get(\Yiisoft\Queue\Provider\QueueProviderInterface::class)->get('channel-name');
 ```
 
 There is a way to run all the messages that are already in the queue, and then exit:
@@ -120,42 +203,40 @@ $queue->listen();
 You can also check the status of a pushed message (the queue adapter you are using must support this feature):
 
 ```php
-$queue->push($message);
-$id = $message->getId();
+$message = $queue->push($message);
+$id = $message->getMetadata()[\Yiisoft\Queue\Message\IdEnvelope::MESSAGE_ID_KEY];
 
 // Get status of the job
 $status = $queue->status($id);
 
 // Check whether the job is waiting for execution.
-$status->isWaiting();
+$status === \Yiisoft\Queue\JobStatus::WAITING;
 
 // Check whether a worker got the job from the queue and executes it.
-$status->isReserved();
+$status === \Yiisoft\Queue\JobStatus::RESERVED;
 
 // Check whether a worker has executed the job.
-$status->isDone();
+$status === \Yiisoft\Queue\JobStatus::DONE;
 ```
 
 ## Custom handler names
-### Custom handler names
 
 By default, when you push a message to the queue, the message handler name is the fully qualified class name of the handler.
 This can be useful for most cases, but sometimes you may want to use a shorter name or arbitrary string as the handler name.
 This can be useful when you want to reduce the amount of data being passed or when you communicate with external systems.
 
 To use a custom handler name before message push, you can pass it as the first argument `Message` when creating it:
+
 ```php
 new Message('handler-name', $data);
 ```
 
 To use a custom handler name on message consumption, you should configure handler mapping for the `Worker` class:
+
 ```php
-$worker = new \Yiisoft\Queue\Worker\Worker(
-    ['handler-name' => FooHandler::class],
-    $logger,
-    $injector,
-    $container
-);
+$params['yiisoft/queue']['handlers'] = [
+    'handler-name' => FooHandler::class,
+];
 ```
 
 ## Different queue channels
@@ -168,7 +249,17 @@ channel-specific `Queue` creation is as simple as
 $queue = $provider->get('channel-name');
 ```
 
-Out of the box, there are four implementations of the `QueueProviderInterface`:
+You can also check if a channel exists before trying to get it:
+
+```php
+if ($provider->has('channel-name')) {
+    $queue = $provider->get('channel-name');
+}
+```
+
+`QueueProviderInterface::get()` may throw `ChannelNotFoundException`, `InvalidQueueConfigException` or `QueueProviderException`.
+
+Out of the box, there are three implementations of the `QueueProviderInterface`:
 
 - `AdapterFactoryQueueProvider`
 - `PrototypeQueueProvider`
@@ -210,26 +301,44 @@ order they are passed to the constructor. The first queue found will be returned
 
 ## Console execution
 
-The exact way of task execution depends on the adapter used. Most adapters can be run using
-console commands, which the component automatically registers in your application.
+This package provides queue abstractions and includes a `SynchronousAdapter` for development and test environments.
+To run a real queue backend, install one of the adapter packages listed in the [guide](docs/guide/en/adapter-list.md).
+
+The exact way of task execution depends on the adapter used. Most adapters can be run using console commands.
+If you are using `yiisoft/config` with `yiisoft/yii-console`, the component automatically registers the commands.
 
 The following command obtains and executes tasks in a loop until the queue is empty:
 
 ```sh
-yii queue:run
+yii queue:run [channel1 [channel2 [...]]] --maximum=100
 ```
 
 The following command launches a daemon which infinitely queries the queue:
 
 ```sh
-yii queue:listen
+yii queue:listen [channel]
 ```
+
+The following command iterates through multiple channels and is meant to be used in development environment only:
+
+```sh
+yii queue:listen:all [channel1 [channel2 [...]]] --pause=1 --maximum=0
+```
+
+For long-running processes, graceful shutdown is controlled by `LoopInterface`. When `ext-pcntl` is available,
+the default `SignalLoop` handles signals such as `SIGTERM`/`SIGINT`.
 
 See the documentation for more details about adapter specific console commands and their options.
 
 The component can also track the status of a job which was pushed into queue.
 
 For more details, see [the guide](docs/guide/en/README.md).
+
+## Debugging
+
+If you use [yiisoft/yii-debug](https://github.com/yiisoft/yii-debug), the package provides a `QueueCollector` that can
+collect message pushes, `status()` calls and message processing by the worker. The defaults are already present in
+[`config/params.php`](config/params.php).
 
 ## Middleware pipelines
 
@@ -284,7 +393,7 @@ You have three places to define push middlewares:
 
 1. `PushMiddlewareDispatcher`. You can pass it either to the constructor, or to the `withMiddlewares()` method, which  
 creates a completely new dispatcher object with only those middlewares, which are passed as arguments.
-If you use [yiisoft/config](yiisoft/config), you can add middleware to the `middlewares-push` key of the
+If you use [yiisoft/config](https://github.com/yiisoft/config), you can add middleware to the `middlewares-push` key of the
 `yiisoft/queue` array in the `params`.
 2. Pass middlewares to either `Queue::withMiddlewares()` or `Queue::withMiddlewaresAdded()` methods. The difference is
 that the former will completely replace an existing middleware stack, while the latter will add passed middlewares to

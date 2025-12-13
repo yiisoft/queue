@@ -60,6 +60,10 @@ final class WorkerTest extends TestCase
             FakeHandler::class,
             [FakeHandler::class => new FakeHandler()],
         ];
+        yield 'definition-object' => [
+            [new FakeHandler(), 'execute'],
+            [],
+        ];
         yield 'definition-class' => [
             [FakeHandler::class, 'execute'],
             [FakeHandler::class => new FakeHandler()],
