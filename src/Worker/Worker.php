@@ -110,7 +110,7 @@ final class Worker implements WorkerInterface
             return null;
         }
 
-        if ($definition instanceof \Closure) {
+        if ($definition instanceof Closure) {
             return $definition;
         }
 
