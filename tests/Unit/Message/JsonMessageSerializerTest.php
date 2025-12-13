@@ -67,9 +67,7 @@ final class JsonMessageSerializerTest extends TestCase
         $this->assertInstanceOf(Message::class, $message);
     }
 
-    /**
-     * @dataProvider dataUnsupportedPayloadFormat
-     */
+    #[DataProvider('dataUnsupportedPayloadFormat')]
     public function testPayloadFormat(mixed $payload): void
     {
         $serializer = $this->createSerializer();
@@ -87,9 +85,7 @@ final class JsonMessageSerializerTest extends TestCase
         yield 'null' => [null];
     }
 
-    /**
-     * @dataProvider dataUnsupportedMetadataFormat
-     */
+    #[DataProvider('dataUnsupportedMetadataFormat')]
     public function testMetadataFormat(mixed $meta): void
     {
         $payload = ['name' => 'handler', 'data' => 'test', 'meta' => $meta];
@@ -142,6 +138,7 @@ final class JsonMessageSerializerTest extends TestCase
         ];
         $serializer = $this->createSerializer();
 
+        /** @var IdEnvelope $message */
         $message = $serializer->unserialize(json_encode($payload));
 
         $this->assertEquals($payload['data'], $message->getData());
@@ -185,6 +182,7 @@ final class JsonMessageSerializerTest extends TestCase
             $json,
         );
 
+        /** @var IdEnvelope $message */
         $message = $serializer->unserialize($json);
 
         $this->assertInstanceOf(IdEnvelope::class, $message);

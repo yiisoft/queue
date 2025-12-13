@@ -46,7 +46,7 @@ final class StubQueue implements QueueInterface
         return $this->adapter;
     }
 
-    public function withAdapter(AdapterInterface $adapter): QueueInterface
+    public function withAdapter(AdapterInterface $adapter): static
     {
         $new = clone $this;
         $new->adapter = $adapter;

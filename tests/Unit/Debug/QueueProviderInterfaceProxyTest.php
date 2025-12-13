@@ -23,4 +23,14 @@ class QueueProviderInterfaceProxyTest extends TestCase
 
         $this->assertInstanceOf(QueueDecorator::class, $factory->get('test'));
     }
+
+    public function testHas(): void
+    {
+        $queueFactory = $this->createMock(QueueProviderInterface::class);
+        $queueFactory->expects($this->once())->method('has')->with('test')->willReturn(true);
+        $collector = new QueueCollector();
+        $factory = new QueueProviderInterfaceProxy($queueFactory, $collector);
+
+        $this->assertTrue($factory->has('test'));
+    }
 }
