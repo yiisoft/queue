@@ -175,7 +175,7 @@ return [
 
 ## When mapping by short names is a better idea
 
-While FQCN-as-name is convenient inside a single application, mapping by a short name is often a better contract when messages are produced outside of the current codebase, or when you want to create a stable public API for inter-service communication.
+While FQCN-as-name is convenient inside a single application, mapping by a short name is often a better contract. That is true when messages are produced outside the current codebase, or when you want to create a stable public API for inter-service communication.
 
 **Typical cases**:
 
