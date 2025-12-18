@@ -97,7 +97,7 @@ final readonly class RemoteFileHandler implements HandleInterface
 
 ### 4. Send (produce/push) a message to a queue
 
-To send a message to the queue, you need to get the queue instance and call the `push()` method. Typically with Yii Framework you'll get a `Queue` instance as a dependency of a service.
+To send a message to the queue, you need to get the queue instance and call the `push()` method. Typically, with Yii Framework you'll get a `Queue` instance as a dependency of a service.
 
 ```php
 
@@ -119,14 +119,14 @@ final readonly class Foo {
 
 ### 5. Handle queue messages
 
-By default Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/yii-console) to run CLI commands. If you installed [yiisoft/app](https://github.com/yiisoft/app) or [yiisoft/app-api](https://github.com/yiisoft/app-api), you can run the queue worker with on of these two commands:
+By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/yii-console) to run CLI commands. If you installed [yiisoft/app](https://github.com/yiisoft/app) or [yiisoft/app-api](https://github.com/yiisoft/app-api), you can run the queue worker with on of these two commands:
 
 ```bash
 ./yii queue:run # Handle all existing messages in the queue
 ./yii queue:listen # Start a daemon listening for new messages permanently
 ```
 
-> In case you're using the SynchronosAdapter for development purposes, you should not use these commands, as you have no asynchronous processing available. The messages are processed immediately when pushed.
+> In case you're using the `SynchronosAdapter` for development purposes, you should not use these commands, as you have no asynchronous processing available. The messages are processed immediately when pushed.
 
 ## Differences to yii2-queue
 

@@ -181,7 +181,7 @@ While FQCN-as-name is convenient inside a single application, mapping by a short
 
 - Another application pushes messages to the same broker.
 - A different language/runtime produces messages.
-- You want a stable public contract that is independent from your PHP namespaces and refactorings.
+- You want a stable public contract that is independent of your PHP namespaces and refactorings.
 
 In these cases you typically keep message handler names small and stable, and map them in config:
 
