@@ -4,7 +4,7 @@ A *message handler* is what processes a queue message. Internally, `Yiisoft\Queu
 
 Handler definitions are configured in:
 
-- `$params['yiisoft/queue']['handlers']` when using `yiisoft/config`, or
+- `$params['yiisoft/queue']['handlers']` when using [yiisoft/config](https://github.com/yiisoft/config), or
 - the `$handlers` argument of `Yiisoft\Queue\Worker\Worker` when creating it manually.
 
 ## Supported handler definition formats
@@ -201,7 +201,7 @@ This way external producers never need to know your internal PHP class names.
 
 - A string definition is **not** treated as a function name. It is treated only as a DI container ID.
 - A class-string that is not resolvable via `$container->has()` will not be auto-instantiated.
-- `yiisoft/definitions` array format (like `['class' => ..., '__construct()' => ...]`) is **not** supported for handlers.
+- [yiisoft/definitions](https://github.com/yiisoft/definitions) array format (like `['class' => ..., '__construct()' => ...]`) is **not** supported for handlers.
 
 ## Recommended handler implementation styles
 
@@ -211,9 +211,9 @@ This way external producers never need to know your internal PHP class names.
   - Make the handler invokable (`__invoke(MessageInterface $message): void`)
   - Provide `[HandlerClass::class, 'handle']` and keep `handle(MessageInterface $message): void` as the entry point
 
-## Config location (yiisoft/config)
+## Config location ([yiisoft/config](https://github.com/yiisoft/config))
 
-When using `yiisoft/config`, configure handlers under the `yiisoft/queue` params key:
+When using [yiisoft/config](https://github.com/yiisoft/config), configure handlers under the [`yiisoft/queue`](https://github.com/yiisoft/queue) params key:
 
 ```php
 return [

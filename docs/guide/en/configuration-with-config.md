@@ -1,17 +1,16 @@
-# Configuration with yiisoft/config
+# Configuration with [yiisoft/config](https://github.com/yiisoft/config)
 
 If you are using [yiisoft/config](https://github.com/yiisoft/config) (i.e. installed with [yiisoft/app](https://github.com/yiisoft/app) or [yiisoft/app-api](https://github.com/yiisoft/app-api)), you'll find out this package has some defaults in the [`common`](../../../config/di.php) and [`params`](../../../config/params.php) configurations saving your time.
 
 ## Where to put the configuration
 
-In `yiisoft/app` / `yiisoft/app-api` templates you typically add or adjust configuration in `config/params.php`.
-If your project structure differs, put configuration into any params config file that is loaded by `yiisoft/config`.
+In [yiisoft/app](https://github.com/yiisoft/app)/[yiisoft/app-api](https://github.com/yiisoft/app-api) templates you typically add or adjust configuration in `config/params.php`.
+If your project structure differs, put configuration into any params config file that is loaded by [yiisoft/config](https://github.com/yiisoft/config).
 
 ## What you need to configure
 
 - Optionally: define default `\Yiisoft\Queue\Adapter\AdapterInterface` implementation.
-- And/or define channel-specific `AdapterInterface` implementations in the `channels` params key to be used
-  with the [queue provider](usage.md#different-queue-channels).
+- And/or define channel-specific `AdapterInterface` implementations in the `channels` params key to be used with the [queue provider](usage.md#different-queue-channels).
 - Define [message handlers](worker.md#handler-format) in the `handlers` params key to be used with the `QueueWorker`.
 - Resolve other `\Yiisoft\Queue\Queue` dependencies (psr-compliant event dispatcher).
 
@@ -54,7 +53,7 @@ return [
 
 ## Console commands
 
-If you are using `yiisoft/config` with `yiisoft/yii-console`, the component automatically registers the commands.
+If you are using [yiisoft/config](https://github.com/yiisoft/config) with [yiisoft/yii-console](https://github.com/yiisoft/yii-console), the component automatically registers the commands.
 
 The following command obtains and executes tasks in a loop until the queue is empty:
 

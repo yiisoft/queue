@@ -1,4 +1,4 @@
-# Manual Configuration (without yiisoft/config)
+# Manual Configuration (without [yiisoft/config](https://github.com/yiisoft/config))
 
 This guide explains how to set up the queue component manually, without using [yiisoft/config](https://github.com/yiisoft/config).
 
