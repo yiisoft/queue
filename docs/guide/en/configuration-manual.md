@@ -85,8 +85,8 @@ $definitions = [
 
 $provider = new AdapterFactoryQueueProvider(
     $queue,
-    new \Yiisoft\Factory\Factory($container),
     $definitions,
+    $container,
 );
 
 $queueForChannel1 = $provider->get('channel1');

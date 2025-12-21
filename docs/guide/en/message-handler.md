@@ -134,7 +134,7 @@ If the resolved service is neither callable nor a `MessageHandlerInterface`, the
 
 **Use when**:
 
-- You already register handlers in DI (recommended for production).
+- You already registered handlers in DI (recommended for production).
 - You prefer invokable handlers (`__invoke`) or `MessageHandlerInterface`.
 
 ### 4. Two-element array of strings: `[classOrServiceId, method]`

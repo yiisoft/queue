@@ -1,5 +1,9 @@
 # Usage basics
 
+## Queue channels
+
+For a detailed explanation of what channels are and how to configure and use them (including CLI examples), see [Queue channels](channels.md).
+
 ## Configuration
 
 You can configure it with a DI container in the following way:
@@ -57,25 +61,41 @@ The exact way how a job is executed depends on the adapter used. Most adapters c
 console commands, which the component registers in your application. For more details, check the respective
 adapter documentation.
 
+If you configured multiple channels, you can choose which channel to consume with console commands:
+
+```sh
+yii queue:listen [channel]
+yii queue:run [channel1 [channel2 [...]]]
+yii queue:listen-all [channel1 [channel2 [...]]]
+```
+
 
 ## Job status
 
 ```php
-// Push a job into the queue and get a message ID.
-$id = $queue->push(new SomeJob());
+use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\Message\IdEnvelope;
 
-// Get job status.
+$pushedMessage = $queue->push($message);
+$id = $pushedMessage->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? null;
+
+if ($id === null) {
+    throw new \RuntimeException('The adapter did not provide a message ID, status tracking is unavailable.');
+}
+
 $status = $queue->status($id);
 
 // Check whether the job is waiting for execution.
-$status->isWaiting();
+$status === JobStatus::WAITING;
 
 // Check whether a worker got the job from the queue and executes it.
-$status->isReserved($id);
+$status === JobStatus::RESERVED;
 
 // Check whether a worker has executed the job.
-$status->isDone($id);
+$status === JobStatus::DONE;
 ```
+
+For details and edge cases, see [Job status](job-status.md).
 
 ## Limitations
 

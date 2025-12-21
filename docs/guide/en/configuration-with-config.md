@@ -10,8 +10,8 @@ If your project structure differs, put configuration into any params config file
 ## What you need to configure
 
 - Optionally: define default `\Yiisoft\Queue\Adapter\AdapterInterface` implementation.
-- And/or define channel-specific `AdapterInterface` implementations in the `channels` params key to be used with the [queue provider](usage.md#different-queue-channels).
-- Define [message handlers](worker.md#handler-format) in the `handlers` params key to be used with the `QueueWorker`.
+- And/or define channel-specific `AdapterInterface` implementations in the `channels` params key. See more about channels [here](./channels.md).
+- Define [message handlers](./message-handlers.md) in the `handlers` params key to be used with the `QueueWorker`.
 - Resolve other `\Yiisoft\Queue\Queue` dependencies (psr-compliant event dispatcher).
 
 ## Minimal configuration example
@@ -30,13 +30,6 @@ return [
 
 ```php
 return [
-    'yiisoft/yii-console' => [
-        'commands' => [
-            'queue:run' => \Yiisoft\Queue\Command\RunCommand::class,
-            'queue:listen' => \Yiisoft\Queue\Command\ListenCommand::class,
-            'queue:listen:all' => \Yiisoft\Queue\Command\ListenAllCommand::class,
-        ],
-    ],
     'yiisoft/queue' => [
         'handlers' => [
             'handler-name' => [FooHandler::class, 'handle'],
@@ -50,28 +43,3 @@ return [
     ],
 ];
 ```
-
-## Console commands
-
-If you are using [yiisoft/config](https://github.com/yiisoft/config) with [yiisoft/yii-console](https://github.com/yiisoft/yii-console), the component automatically registers the commands.
-
-The following command obtains and executes tasks in a loop until the queue is empty:
-
-```sh
-yii queue:run [channel1 [channel2 [...]]] --maximum=100
-```
-
-The following command launches a daemon which infinitely queries the queue:
-
-```sh
-yii queue:listen [channel]
-```
-
-The following command iterates through multiple channels and is meant to be used in development environment only:
-
-```sh
-yii queue:listen:all [channel1 [channel2 [...]]] --pause=1 --maximum=0
-```
-
-For long-running processes, graceful shutdown is controlled by `LoopInterface`. When `ext-pcntl` is available,
-the default `SignalLoop` handles signals such as `SIGTERM`/`SIGINT`.

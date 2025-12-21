@@ -19,7 +19,7 @@ An extension for running tasks asynchronously via queues.
 ## Requirements
 
 - PHP 8.1 or higher.
-- PCNTL extension for signal handling _(optional, recommended for production use)_
+- PCNTL extension for signal handling _(optional, recommended for production use)_.
 
 ## Installation
 
@@ -36,9 +36,9 @@ composer require yiisoft/queue
 For production use, you should install an adapter package that matches your message broker ([AMQP](https://github.com/yiisoft/queue-amqp), [Kafka](https://github.com/g41797/queue-kafka), [NATS](https://github.com/g41797/queue-nats), and [others](docs/guide/en/adapter-list.md)).
 See the [adapter list](docs/guide/en/adapter-list.md) and follow the adapter-specific documentation.
 
-For development and testing, you can start without an external broker using the built-in [`SynchronousAdapter`](docs/guide/en/adapter-sync.md).
-This adapter processes messages immediately in the same process, so it won't provide true async execution,
-but it's useful for getting started and writing tests.
+> For development and testing, you can start without an external broker using the built-in [`SynchronousAdapter`](docs/guide/en/adapter-sync.md).
+> This adapter processes messages immediately in the same process, so it won't provide true async execution,
+> but it's useful for getting started and writing tests.
 
 ### 2. Configure the queue
 
@@ -128,96 +128,7 @@ By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/
 
 > In case you're using the `SynchronosAdapter` for development purposes, you should not use these commands, as you have no asynchronous processing available. The messages are processed immediately when pushed.
 
-## Differences to [yiisoft/yii2-queue](https://github.com/yiisoft/yii2-queue)
 
-If you have experience with [yiisoft/yii2-queue](https://github.com/yiisoft/yii2-queue), you will find out that this package is similar.
-Though, there are some key differences that are described in the [Migrating from yii2-queue](docs/guide/migrating-from-yii2-queue.md) article.
-
-## General usage
-
-Each queue task consists of two parts:
-
-1. A message is a class implementing `MessageInterface`. For simple cases you can use the default implementation,
-   `Yiisoft\Queue\Message\Message`. For more complex cases, you should implement the interface by your own.
-2. A message handler is a callable called by a `Yiisoft\Queue\Worker\Worker`. The handler handles each queue message.
-
-For example, if you're going to download and save a file in a queue task, your message creation may look like the following:
-- Message handler as the first parameter
-- Message data as the second parameter
-
-```php
-$data = [
-    'url' => $url,
-    'destinationFile' => $filename,
-];
-$message = new \Yiisoft\Queue\Message\Message(FileDownloader::class, $data);
-```
-
-Then you should push it to the queue:
-
-```php
-$queue->push($message);
-```
-
-Its handler may look like the following:
-
-```php
-class FileDownloader
-{
-    private string $absolutePath;
-
-    public function __construct(string $absolutePath) 
-    {
-        $this->absolutePath = $absolutePath;
-    }
-
-    public function handle(\Yiisoft\Queue\Message\MessageInterface $downloadMessage): void
-    {
-        $fileName = $downloadMessage->getData()['destinationFile'];
-        $path = "$this->absolutePath/$fileName"; 
-        file_put_contents($path, file_get_contents($downloadMessage->getData()['url']));
-    }
-}
-```
-
-The last thing we should do is to create a configuration for the `Yiisoft\Queue\Worker\Worker`:
-
-```php
-$worker = $container->get(\Yiisoft\Queue\Worker\WorkerInterface::class);
-$queue = $container->get(\Yiisoft\Queue\Provider\QueueProviderInterface::class)->get('channel-name');
-```
-
-There is a way to run all the messages that are already in the queue, and then exit:
-
-```php
-$queue->run(); // this will execute all the existing messages
-$queue->run(10); // while this will execute only 10 messages as a maximum before exit
-```
-
-If you don't want your script to exit immediately, you can use the `listen` method:
-
-```php
-$queue->listen();
-```
-
-You can also check the status of a pushed message (the queue adapter you are using must support this feature):
-
-```php
-$message = $queue->push($message);
-$id = $message->getMetadata()[\Yiisoft\Queue\Message\IdEnvelope::MESSAGE_ID_KEY];
-
-// Get status of the job
-$status = $queue->status($id);
-
-// Check whether the job is waiting for execution.
-$status === \Yiisoft\Queue\JobStatus::WAITING;
-
-// Check whether a worker got the job from the queue and executes it.
-$status === \Yiisoft\Queue\JobStatus::RESERVED;
-
-// Check whether a worker has executed the job.
-$status === \Yiisoft\Queue\JobStatus::DONE;
-```
 
 ## Custom handler names
 
@@ -331,8 +242,7 @@ the default `SignalLoop` handles signals such as `SIGTERM`/`SIGINT`.
 See the documentation for more details about adapter specific console commands and their options.
 
 The component can also track the status of a job which was pushed into queue.
-
-For more details, see [the guide](docs/guide/en/README.md).
+For more details, see [Job status](docs/guide/en/job-status.md).
 
 ## Debugging
 
