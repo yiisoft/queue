@@ -22,6 +22,7 @@ An extension for running tasks asynchronously via queues.
 - [Queue channels](channels.md)
 - [Message handler](message-handler.md)
 - [Envelopes](envelopes.md)
+- [Middleware pipelines](middleware-pipelines.md)
 - [Loops](loops.md)
 
 ## Interoperability
