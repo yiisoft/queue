@@ -117,7 +117,7 @@ final readonly class Foo {
 }
 ```
 
-### 5. Handle queue messages
+### 5. Handle queued messages
 
 By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/yii-console) to run CLI commands. If you installed [yiisoft/app](https://github.com/yiisoft/app) or [yiisoft/app-api](https://github.com/yiisoft/app-api), you can run the queue worker with on of these two commands:
 
@@ -233,7 +233,7 @@ yii queue:listen [channel]
 The following command iterates through multiple channels and is meant to be used in development environment only:
 
 ```sh
-yii queue:listen:all [channel1 [channel2 [...]]] --pause=1 --maximum=0
+yii queue:listen-all [channel1 [channel2 [...]]] --pause=1 --maximum=0
 ```
 
 For long-running processes, graceful shutdown is controlled by `LoopInterface`. When `ext-pcntl` is available,
