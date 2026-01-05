@@ -4,6 +4,7 @@ An extension for running tasks asynchronously via queues.
 
 ## Getting started
 
+- [Prerequisites and installation](prerequisites-and-installation.md)
 - [Configuration with yiisoft/config](configuration-with-config.md)
 - [Manual configuration](configuration-manual.md)
 
