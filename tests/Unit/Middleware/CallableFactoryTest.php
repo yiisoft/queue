@@ -94,7 +94,7 @@ final class CallableFactoryTest extends TestCase
         };
 
         yield 'object method array' => [
-            [$service, 'go'],
+            $service->go(...),
             [],
             'ok',
             new SimpleContainer(),
