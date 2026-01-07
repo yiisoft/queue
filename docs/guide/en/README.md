@@ -32,7 +32,6 @@ An extension for running tasks asynchronously via queues.
 ## Reliability and visibility
 
 - [Errors and retryable jobs](error-handling.md)
-- [Failure handling pipeline](failure-handling-pipeline.md)
 - [Job status](job-status.md)
 - [Yii Debug integration](debug-integration.md)
 

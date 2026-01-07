@@ -130,7 +130,7 @@ The pipeline receives a `FailureHandlingRequest` that contains:
 The pipeline is selected by queue channel; if there is no channel-specific pipeline configured,
 `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` is used.
 
-See [Failure handling pipeline](failure-handling-pipeline.md) for the step-by-step flow and built-in middlewares.
+See [Error handling on message processing](error-handling.md) for the step-by-step flow and built-in middlewares.
 
 ## Configuration
 
