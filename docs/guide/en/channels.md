@@ -49,6 +49,82 @@ $emailsQueue = $provider->get('emails');
 $emailsQueue->push(new \Yiisoft\Queue\Message\Message('send-email', ['to' => 'user@example.com']));
 ```
 
+You can also check if a channel exists before trying to get it:
+
+```php
+if ($provider->has('emails')) {
+    $emailsQueue = $provider->get('emails');
+}
+```
+
+`QueueProviderInterface` accepts both strings and `BackedEnum` values (they are normalized to a string channel name).
+
+`QueueProviderInterface::get()` may throw:
+
+- `Yiisoft\Queue\Provider\ChannelNotFoundException`
+- `Yiisoft\Queue\Provider\InvalidQueueConfigException`
+- `Yiisoft\Queue\Provider\QueueProviderException`
+
+## Providers
+
+`QueueProviderInterface` is the component responsible for returning a `QueueInterface` instance bound to a particular channel.
+
+Out of the box, this package provides three implementations:
+
+- `Yiisoft\Queue\Provider\AdapterFactoryQueueProvider`
+- `Yiisoft\Queue\Provider\PrototypeQueueProvider`
+- `Yiisoft\Queue\Provider\CompositeQueueProvider`
+
+### `AdapterFactoryQueueProvider`
+
+This provider creates channel-specific `QueueInterface` instances based on adapter definitions.
+
+It uses [`yiisoft/factory`](https://github.com/yiisoft/factory) to resolve adapter definitions.
+
+This approach is recommended when you want:
+
+- Separate configuration per channel.
+- Stronger validation (unknown channels are not silently accepted).
+
+### `PrototypeQueueProvider`
+
+This provider always returns a queue by taking a base queue + base adapter and only changing the channel name.
+
+This can be useful when all channels use the same adapter and only differ by channel name.
+
+This strategy is not recommended as it does not give you any protection against typos and mistakes in channel names.
+
+Example:
+
+```php
+use Yiisoft\Queue\Provider\PrototypeQueueProvider;
+
+$provider = new PrototypeQueueProvider($queue, $adapter);
+
+$queueForEmails = $provider->get('emails');
+$queueForCritical = $provider->get('critical');
+```
+
+### `CompositeQueueProvider`
+
+This provider combines multiple providers into one.
+
+It tries to resolve a channel by calling `has()`/`get()` on each provider in the order they are passed to the constructor.
+The first provider that reports it has the channel wins.
+
+Example:
+
+```php
+use Yiisoft\Queue\Provider\CompositeQueueProvider;
+
+$provider = new CompositeQueueProvider(
+    $providerA,
+    $providerB,
+);
+
+$queue = $provider->get('emails');
+```
+
 ## Configuration with yiisoft/config
 
 When using [yiisoft/config](https://github.com/yiisoft/config), channel configuration is stored in params under `yiisoft/queue.channels`.
@@ -101,10 +177,15 @@ For multiple channels without `yiisoft/config`, you can create a provider manual
 
 ```php
 use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
+use Yiisoft\Queue\Adapter\SynchronousAdapter;
 
 $definitions = [
-    'channel1' => new \Yiisoft\Queue\Adapter\SynchronousAdapter($worker, $queue),
-    'channel2' => static fn (\Yiisoft\Queue\Adapter\SynchronousAdapter $adapter) => $adapter->withChannel('channel2'),
+    'channel1' => new SynchronousAdapter($worker, $queue),
+    'channel2' => static fn (SynchronousAdapter $adapter) => $adapter->withChannel('channel2'),
+    'channel3' => [
+        'class' => SynchronousAdapter::class,
+        '__constructor' => ['channel' => 'channel3'],
+    ],
 ];
 
 $provider = new AdapterFactoryQueueProvider(
@@ -115,4 +196,7 @@ $provider = new AdapterFactoryQueueProvider(
 
 $queueForChannel1 = $provider->get('channel1');
 $queueForChannel2 = $provider->get('channel2');
+$queueForChannel3 = $provider->get('channel3');
 ```
+
+For more information about the definition formats available, see the [`yiisoft/factory` documentation](https://github.com/yiisoft/factory).
