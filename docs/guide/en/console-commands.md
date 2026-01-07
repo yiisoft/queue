@@ -6,6 +6,9 @@ If you are using [yiisoft/config](https://github.com/yiisoft/config) and [yiisof
 
 If you are using [symfony/console](https://github.com/symfony/console) directly, you should register the commands manually.
 
+In [yiisoft/app](https://github.com/yiisoft/app) the `yii` console binary is provided out of the box.
+If you are using [yiisoft/console](https://github.com/yiisoft/console) or `symfony/console` without that template, invoke these commands the same way you invoke other console commands in your application.
+
 ## 1. Run queued messages and exit
 
 The command `queue:run` obtains and executes tasks until the queue is empty, then exits.  

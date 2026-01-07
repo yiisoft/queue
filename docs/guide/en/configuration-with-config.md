@@ -9,12 +9,26 @@ If your project structure differs, put configuration into any params config file
 
 ## What you need to configure
 
-- Optionally: define default `\Yiisoft\Queue\Adapter\AdapterInterface` implementation.
-- And/or define channel-specific `AdapterInterface` implementations in the `channels` params key. See more about channels [here](./channels.md).
-- Define [message handlers](./message-handlers.md) in the `handlers` params key to be used with the `QueueWorker`.
+- Define queue channel adapter definitions in the `channels` params key. See more about channels [here](./channels.md).
+- Optionally: define [message handlers](./message-handler.md) in the `handlers` params key to be used with the `QueueWorker`.
 - Resolve other `\Yiisoft\Queue\Queue` dependencies (psr-compliant event dispatcher).
 
+By default, when using the DI config provided by this package, `QueueProviderInterface` is bound to `AdapterFactoryQueueProvider` and uses `yiisoft/queue.channels` as a strict channel registry.
+That means unknown channels are not accepted silently and `QueueProviderInterface::get()` will throw `ChannelNotFoundException`.
+The configured channel names are also used as the default channel list for `queue:run` and `queue:listen-all`.
+
+For development and testing you can start with the synchronous adapter.
+For production you must use a real backend adapter (AMQP, Kafka, SQS, etc.). If you do not have any preference, start with [yiisoft/queue-amqp](https://github.com/yiisoft/queue-amqp) and [RabbitMQ](https://www.rabbitmq.com/).
+
+The examples below use the synchronous adapter for brevity. In production, override `yiisoft/queue.channels` with an adapter definition from the backend adapter package you selected.
+
 ## Minimal configuration example
+
+If you use the handler class FQCN as the message handler name, no additional configuration is required.
+
+See [Message handler](./message-handler.md) for details and trade-offs.
+
+## Minimal configuration example (named handlers)
 
 ```php
 return [
@@ -35,11 +49,12 @@ return [
             'handler-name' => [FooHandler::class, 'handle'],
         ],
         'channels' => [
-            \Yiisoft\Queue\QueueInterface::DEFAULT_CHANNEL => \Yiisoft\Queue\Adapter\AdapterInterface::class,
+            \Yiisoft\Queue\QueueInterface::DEFAULT_CHANNEL => \Yiisoft\Queue\Adapter\SynchronousAdapter::class,
         ],
-        'middlewares-push' => [],
-        'middlewares-consume' => [],
-        'middlewares-fail' => [],
+        'middlewares-push' => [], // push middleware pipeline definition
+        'middlewares-consume' => [], // consume middleware pipeline definition
+        'middlewares-fail' => [], // consume failure handling middleware pipeline definition
     ],
 ];
 ```
+Middleware pipelines are discussed in detail [here](./middleware-pipelines.md).

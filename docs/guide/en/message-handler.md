@@ -107,7 +107,6 @@ This way external producers never need to know your internal PHP class names.
 
 ## Common pitfalls and unsupported formats
 
-- A string definition is treated as a DI container ID first. If the container doesn't have such entry, it is resolved as a callable only when it is a valid PHP callable.
 - A class-string that is not resolvable via `$container->has()` will not be auto-instantiated.
 - [yiisoft/definitions](https://github.com/yiisoft/definitions) array format (like `['class' => ..., '__construct()' => ...]`) is **not** supported for handlers.
 

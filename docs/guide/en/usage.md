@@ -48,8 +48,13 @@ $queue->push($message);
 
 To push a job into the queue that should run after 5 minutes:
 
+Delayed execution is implemented via a push middleware.
+The middleware must implement `\Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface` and be provided by the adapter package you use.
+For example, the official AMQP adapter supports delays: <https://github.com/yiisoft/queue-amqp>
+
 ```php
-// TODO
+$delayMiddleware = $container->get(\Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface::class);
+$queue->push($message, $delayMiddleware->withDelay(5 * 60));
 ```
 
 **Important:** Not every adapter (such as synchronous adapter) supports delayed execution.

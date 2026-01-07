@@ -126,10 +126,18 @@ $queue = $provider->get('emails');
 ```
 
 ## Configuration with yiisoft/config
+ 
+ When using [yiisoft/config](https://github.com/yiisoft/config), channel configuration is stored in params under `yiisoft/queue.channels`.
 
-When using [yiisoft/config](https://github.com/yiisoft/config), channel configuration is stored in params under `yiisoft/queue.channels`.
+ By default, `QueueProviderInterface` is bound to `AdapterFactoryQueueProvider`.
+ That makes `yiisoft/queue.channels` a strict channel registry:
 
-It is a map:
+ - `QueueProviderInterface::has($channel)` checks whether the channel exists in definitions.
+ - `QueueProviderInterface::get($channel)` throws `ChannelNotFoundException` for unknown channels.
+
+ The same channel list is used by `queue:run` and `queue:listen-all` as the default set of channels to process.
+ 
+ It is a map:
 
 - key: channel name
 - value: adapter definition that should be resolved for that channel
