@@ -22,6 +22,7 @@ use Yiisoft\Queue\Middleware\Consume\MiddlewareConsumeInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
+use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeHandler;
 use Yiisoft\Queue\Tests\App\StaticMessageHandler;
@@ -182,6 +183,7 @@ final class WorkerTest extends TestCase
             $container,
             new ConsumeMiddlewareDispatcher($consumeMiddlewareFactory),
             new FailureMiddlewareDispatcher($failureMiddlewareFactory, []),
+            new CallableFactory($container),
         );
     }
 
@@ -248,13 +250,15 @@ final class WorkerTest extends TestCase
         $failureMiddlewareFactory->method('createFailureMiddleware')->willReturn($failureMiddleware);
         $failureDispatcher = new FailureMiddlewareDispatcher($failureMiddlewareFactory, ['test-channel' => ['simple']]);
 
+        $container = new SimpleContainer();
         $worker = new Worker(
             ['simple' => fn () => null],
             new NullLogger(),
-            new Injector(new SimpleContainer()),
-            new SimpleContainer(),
+            new Injector($container),
+            $container,
             $consumeDispatcher,
-            $failureDispatcher
+            $failureDispatcher,
+            new CallableFactory($container),
         );
 
         $result = $worker->process($message, $queue);

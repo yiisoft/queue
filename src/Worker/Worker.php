@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Worker;
 
 use Closure;
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionException;
-use ReflectionMethod;
 use RuntimeException;
 use Throwable;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Exception\JobFailureException;
-use Yiisoft\Queue\Message\MessageHandlerInterface;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Message\MessageHandlerInterface;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
 use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
@@ -41,6 +39,7 @@ final class Worker implements WorkerInterface
         private readonly ContainerInterface $container,
         private readonly ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher,
         private readonly FailureMiddlewareDispatcher $failureMiddlewareDispatcher,
+        private readonly CallableFactory $callableFactory,
     ) {
     }
 
@@ -52,7 +51,12 @@ final class Worker implements WorkerInterface
         $this->logger->info('Processing message #{message}.', ['message' => $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null']);
 
         $name = $message->getHandlerName();
-        $handler = $this->getHandler($name);
+        try {
+            $handler = $this->getHandler($name);
+        } catch (InvalidCallableConfigurationException $exception) {
+            throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist', $name), 0, $exception);
+        }
+
         if ($handler === null) {
             throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist', $name));
         }
@@ -84,115 +88,22 @@ final class Worker implements WorkerInterface
         }
 
         if (!array_key_exists($name, $this->handlersCached)) {
-            $definition = $this->handlers[$name] ?? null;
-            if ($definition === null) {
-                $definition = $name;
+            $definition = $this->handlers[$name] ?? $name;
+
+            if (is_string($definition) && $this->container->has($definition)) {
+                $resolved = $this->container->get($definition);
+
+                if ($resolved instanceof MessageHandlerInterface) {
+                    $this->handlersCached[$name] = $resolved->handle(...);
+
+                    return $this->handlersCached[$name];
+                }
             }
 
-            $this->handlersCached[$name] = $this->prepare($definition);
+            $this->handlersCached[$name] = $this->callableFactory->create($definition);
         }
 
         return $this->handlersCached[$name];
-    }
-
-    /**
-     * Creates a callable from a definition.
-     *
-     * @param array|callable|object|string|null $definition
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @return callable|null
-     */
-    private function prepare(callable|object|array|string|null $definition): callable|null
-    {
-        if ($definition === null) {
-            return null;
-        }
-
-        if ($definition instanceof Closure) {
-            return $definition;
-        }
-
-        if (is_string($definition) && $this->container->has($definition)) {
-            /** @var object $result */
-            $result = $this->container->get($definition);
-
-            if (is_callable($result)) {
-                return $result;
-            }
-
-            if ($result instanceof MessageHandlerInterface) {
-                return $result->handle(...);
-            }
-
-            return null;
-        }
-
-        if (
-            is_array($definition)
-            && array_keys($definition) === [0, 1]
-            && is_string($definition[1])
-        ) {
-            if (is_object($definition[0])) {
-                [$object, $methodName] = $definition;
-
-                try {
-                    $reflection = new ReflectionMethod($object, $methodName);
-                } catch (ReflectionException $e) {
-                    $this->logger->error($e);
-
-                    return null;
-                }
-
-                $callable = [$object, $methodName];
-                if (!is_callable($callable)) {
-                    $this->logger->error(sprintf('%s::%s is not a callable.', $reflection->getDeclaringClass()->getName(), $methodName));
-
-                    return null;
-                }
-
-                return $callable;
-            }
-
-            if (is_string($definition[0])) {
-                [$className, $methodName] = $definition;
-
-                if (!class_exists($className) && $this->container->has($className)) {
-                    return [
-                        $this->container->get($className),
-                        $methodName,
-                    ];
-                }
-
-                if (!class_exists($className)) {
-                    $this->logger->error("$className doesn't exist.");
-
-                    return null;
-                }
-
-                try {
-                    $reflection = new ReflectionMethod($className, $methodName);
-                } catch (ReflectionException $e) {
-                    $this->logger->error($e->getMessage());
-
-                    return null;
-                }
-                if ($reflection->isStatic()) {
-                    return [$className, $methodName];
-                }
-                if ($this->container->has($className)) {
-                    return [
-                        $this->container->get($className),
-                        $methodName,
-                    ];
-                }
-
-                return null;
-            }
-        }
-
-        return null;
     }
 
     private function createConsumeHandler(Closure $handler): MessageHandlerConsumeInterface

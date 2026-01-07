@@ -9,11 +9,11 @@ Handler definitions are configured in:
 
 ## Supported handler definition formats
 
-`Worker` supports a limited set of formats. Below are the exact formats that are converted to a callable.
-
 ### 1. HandlerInterface implementation (without mapping)
 
-If your handler is a dedicated class implementing `Yiisoft\Queue\Message\MessageHandlerInterface`, you can use the class name itself as the message handler name.
+If your handler is a dedicated class implementing `Yiisoft\Queue\Message\MessageHandlerInterface`, you can use the class name itself as the message handler name (FQCN) if your DI container can resolve the handler class.
+
+> By default the [yiisoft/di](https://github.com/yiisoft/di) container resolves all FQCNs into corresponding class objects.
 
 This is the default and most convenient option when the producer and the consumer are the same application.
 
@@ -57,9 +57,9 @@ Not needed
 - Producer and consumer are the same application.
 - You control message creation code and can safely use FQCN as the handler name.
 
-### 2. Closure
+### 2. Named handlers
 
-In this and all the cases below, you should use a proper handler name when pushing a `Message` instead of a handler class name in the example above:
+In this case you should use a proper handler name when pushing a `Message` instead of a handler class name as in the example above:
 
 ```php
 new \Yiisoft\Queue\Message\Message('send-email', ['data' => '...']);
@@ -73,105 +73,13 @@ Map handler name to a closure in `$params`:
 return [
     'yiisoft/queue' => [
         'handlers' => [
-            'send-email' => static fn (\Yiisoft\Queue\Message\MessageInterface $message, \App\Foo $foo) => $foo->bar($message->getData()),
+            'send-email' => /** handler definition */,
         ],
     ],
 ];
 ```
 
-**How it works**:
-
-- A `Closure` is accepted as-is.
-- The worker executes it using `Injector`, so you may type-hint extra dependencies in the closure parameters.
-
-**Pros**:
-
-- Very simple for small tasks and quick prototypes.
-- Easy to inject extra services via `Injector`.
-
-**Cons**:
-
-- Less reusable and harder to unit-test than a dedicated class.
-- Easy to accidentally put non-trivial business logic into config.
-- Harder to maintain and refactor as the logic grows.
-
-**Use when**:
-
-- You're prototyping async workflows and going to refactor it later into a proper handler class.
-- You want a quick "glue" handler that delegates to services.
-
-### 3. Container ID string
-
-**Config**:
-
-```php
-return [
-    'yiisoft/queue' => [
-        'handlers' => [
-            'file-download' => FileDownloader::class,
-        ],
-    ],
-];
-```
-
-**How it works**:
-
-The handler object is retrieved from the DI container. In this case the handler class should either
-
-- have the `__invoke()` method, which receives a message parameter,
-- implement `Yiisoft\Queue\Message\MessageHandlerInterface` (then the `$handler->handle(...)` method is called).
-
-If the resolved service is neither callable nor a `MessageHandlerInterface`, the handler is treated as invalid.
-
-**Pros**:
-
-- Short and clean configuration.
-- Supports invokable handlers and `MessageHandlerInterface` handlers.
-
-**Cons**:
-
-&mdash;
-
-**Use when**:
-
-- You already registered handlers in DI (recommended for production).
-- You prefer invokable handlers (`__invoke`) or `MessageHandlerInterface`.
-
-### 4. Two-element array of strings: `[classOrServiceId, method]`
-
-**Config**:
-
-```php
-return [
-    'yiisoft/queue' => [
-        'handlers' => [
-            'file-download' => [FileDownloader::class, 'handle'],
-            'file-download2' => [$handler, 'handle'],
-        ],
-    ],
-];
-```
-
-**How it works**:
-
-- If the class exists:
-  - If the method is static, it is called statically: `[$className, $methodName]`. Dependencies may be passed *to the provided method* in case they are resolvable from the DI container.
-  - If the first element is an object instance, it is called as `$firstElement->$methodName(...)` with dependency injection applied *to the $methodName*.
-  - If the method is not static, the class must be resolvable from the DI container, and the worker calls `$container->get($className)->$methodName(...)`. DI container will also resolve dependencies declared in the *class constructor*.
-
-**Pros**:
-
-- Explicit method name, good for “classic” `handle()` methods.
-- Supports static methods for pure, dependency-free handlers.
-
-**Cons**:
-
-- Harder to maintain and refactor than regular class definitions with either `__invoke` method or `MessageHandlerInterface` implementation.
-
-**Use when**:
-
-- You want to use static handlers (rare, but can be useful for pure transforms).
-- You want to group different handlers in a single class for organizational purposes.
+Handler definition should be either an [extended callable definition](./callable-definitions-extended.md) or a string for your DI container to resolve a `MessageHandlerInterface` instance.
 
 ## When mapping by short names is a better idea
 
@@ -199,7 +107,7 @@ This way external producers never need to know your internal PHP class names.
 
 ## Common pitfalls and unsupported formats
 
-- A string definition is **not** treated as a function name. It is treated only as a DI container ID.
+- A string definition is treated as a DI container ID first. If the container doesn't have such entry, it is resolved as a callable only when it is a valid PHP callable.
 - A class-string that is not resolvable via `$container->has()` will not be auto-instantiated.
 - [yiisoft/definitions](https://github.com/yiisoft/definitions) array format (like `['class' => ..., '__construct()' => ...]`) is **not** supported for handlers.
 

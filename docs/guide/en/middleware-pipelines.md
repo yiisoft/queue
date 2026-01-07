@@ -57,10 +57,9 @@ graph LR
 You can use any of these formats:
 
 - A ready-to-use middleware object.
-- An array in the format of [yiisoft/definitions](https://github.com/yiisoft/definitions).
-- A `callable` (closure, invokable object, `[$object, 'method']`, etc.). It is executed through the
-  [yiisoft/injector](https://github.com/yiisoft/injector), so its dependencies are resolved automatically.
+- An array in the format of [yiisoft/definitions](https://github.com/yiisoft/definitions), which defines a middleware implementation.
 - A string for your DI container to resolve the middleware, e.g. `FooMiddleware::class`.
+- An [extended callable definition](callable-definitions-extended.md). A callable should either be a middleware itself or return a configured middleware object.
 
 The required interface depends on the pipeline:
 

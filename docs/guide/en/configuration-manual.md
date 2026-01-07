@@ -16,6 +16,7 @@ To use the queue, you need to create instances of the following classes:
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\Worker\Worker;
+use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
@@ -33,13 +34,15 @@ $handlers = [
     FileDownloader::class => [FileDownloader::class, 'handle'],
 ];
 
+$callableFactory = new CallableFactory($container);
+
 // Create middleware dispatchers
 $consumeMiddlewareDispatcher = new ConsumeMiddlewareDispatcher(
-    new MiddlewareFactoryConsume($container),
+    new MiddlewareFactoryConsume($container, $callableFactory),
 );
 
 $failureMiddlewareDispatcher = new FailureMiddlewareDispatcher(
-    new MiddlewareFactoryFailure($container),
+    new MiddlewareFactoryFailure($container, $callableFactory),
     [],
 );
 
@@ -55,6 +58,7 @@ $worker = new Worker(
     $container,
     $consumeMiddlewareDispatcher,
     $failureMiddlewareDispatcher,
+    $callableFactory,
 );
 
 // Create queue with adapter

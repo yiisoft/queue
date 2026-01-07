@@ -1,44 +1,12 @@
-# Configuration
+# Worker
 
-To use a worker, you should resolve its dependencies (e.g., through DI container) and define handlers for each message
-that will be consumed by this worker;
-
-Handlers are callables indexed by payload names. When a message is consumed from the queue, a callable associated with
-its payload name is called.
-
-## Handler format
-
-Handler can be any callable with a couple of additions:
-
-- If a handler is provided as an array of two strings, it will be treated as a DI container service id and its method.
-  E.g. `[ClassName::class, 'handle']` will be resolved to:
-  ```php 
-  $container
-      ->get(ClassName::class)
-      ->handle();
-  ```
-- An `Injector` is used to call the handlers. This means you can define handlers as closures with their own dependencies
-  which will be resolved with DI container. In the example below you can see a closure in which `message` will be taken
-  from the queue and `ClientInterface` will be resolved via DI container.
-  
-  ```php
-  'payloadName' => fn (MessageInterface $message, ClientInterface $client) => $client->send($message->getPayloadData()),
-  ```
-
-  ```php
-  $handlers = [
-      'simple' => fn() => 'someWork',
-      'anotherHandler' => [QueueHandlerCollection::class, 'methodName']
-  ];
-  $worker = new Worker(
-      $handlers,
-      new \Psr\Log\NullLogger(),
-      new \Yiisoft\Injector\Injector($DIContainer),
-      $DIContainer
-  );
-  ```
+To use a worker, you should resolve its dependencies (e.g., through DI container) and [define handlers](message-handler.md) for each message that will be consumed by this worker.
 
 ## Starting Workers
+
+To start a worker, you should run the console commands such as `queue:run`, `queue:listen`, and `queue:listen-all`. See [Console commands](console-commands.md) for details.
+
+Below are three popular ways to run consumers in production so that they keep running in memory and are automatically restarted if needed.
 
 ### Supervisor
 
