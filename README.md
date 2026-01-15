@@ -8,10 +8,10 @@
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/queue/v/stable.svg)](https://packagist.org/packages/yiisoft/queue)
 [![Total Downloads](https://poser.pugx.org/yiisoft/queue/downloads.svg)](https://packagist.org/packages/yiisoft/queue)
-[![Build status](https://github.com/yiisoft/queue/workflows/build/badge.svg)](https://github.com/yiisoft/queue/actions)
+[![Build status](https://github.com/yiisoft/queue/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/yiisoft/queue/actions/workflows/build.yml?query=branch%3Amaster)
 [![Code coverage](https://codecov.io/gh/yiisoft/queue/graph/badge.svg?token=NU2ST01B1U)](https://codecov.io/gh/yiisoft/queue)
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fqueue%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/queue/master)
-[![static analysis](https://github.com/yiisoft/queue/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/queue/actions?query=workflow%3A%22static+analysis%22)
+[![Static analysis](https://github.com/yiisoft/queue/actions/workflows/static.yml/badge.svg?branch=master)](https://github.com/yiisoft/queue/actions/workflows/static.yml?query=branch%3Amaster)
 [![type-coverage](https://shepherd.dev/github/yiisoft/queue/coverage.svg)](https://shepherd.dev/github/yiisoft/queue)
 
 An extension for running tasks asynchronously via queues.
