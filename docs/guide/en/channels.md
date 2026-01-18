@@ -4,60 +4,141 @@ A *queue channel* is a named queue configuration.
 
 In practice, a channel is a string (for example, `yii-queue`, `emails`, `critical`) that selects which queue backend (adapter) messages are pushed to and which worker consumes them.
 
+At a high level:
+
+- You configure one or more channels.
+- When producing messages, you either:
+  - use `QueueInterface` directly (single/default channel), or
+  - use `QueueProviderInterface` to get a queue for a specific channel.
+- When consuming messages, you run a worker command for a channel (or a set of channels).
+
 Having multiple channels is useful when you want to separate workloads, for example:
 
 - **Different priorities**: `critical` vs `low`.
 - **Different message types**: `emails`, `reports`, `webhooks`.
-- **Different backends / connections**: fast Redis queue for short jobs and a different backend for long-running jobs.
+- **Different backends / connections**: fast Redis queue for short jobs and RabbitMQ backend for long-running jobs or inter-app communication.
 
 The default channel name is `Yiisoft\Queue\QueueInterface::DEFAULT_CHANNEL` (`yii-queue`).
 
-## How channels are used in the code
+## Quick start (yiisoft/config)
 
-- A channel name is passed to `Yiisoft\Queue\Provider\QueueProviderInterface::get($channel)`.
-- The provider returns a `Yiisoft\Queue\QueueInterface` instance bound to that channel.
-- Internally, the provider creates an adapter instance and calls `AdapterInterface::withChannel($channel)`.
+When using [yiisoft/config](https://github.com/yiisoft/config), channel configuration is stored in params under `yiisoft/queue.channels`.
 
-In other words, a channel is the key that lets the application select a particular adapter instance/configuration.
+### 1. Start with a single channel (default)
 
-## Choosing a channel at runtime
+If you use only a single channel, you can inject `QueueInterface` directly.
 
-### In CLI
+#### 1.1 Configure an Adapter
 
-These built-in commands accept channel names:
+Adapter is what actually sends messages to a queue broker.
 
-- `queue:listen [channel]` listens to a single channel (defaults to `yii-queue`).
-- `queue:run [channel1 [channel2 [...]]]` processes existing messages and exits.
-- `queue:listen-all [channel1 [channel2 [...]]]` iterates over multiple channels (meant mostly for development).
-
-Examples:
-
-```sh
-yii queue:listen emails
-yii queue:run critical emails --maximum=100
-yii queue:listen-all critical emails --pause=1 --maximum=500
-```
-
-### In PHP code
-
-When you have a `QueueProviderInterface`, request a queue by channel name:
+Minimal DI configuration example:
 
 ```php
-/** @var \Yiisoft\Queue\Provider\QueueProviderInterface $provider */
+use Yiisoft\Queue\Adapter\SynchronousAdapter;
+use Yiisoft\Queue\Adapter\AdapterInterface;
 
-$emailsQueue = $provider->get('emails');
-$emailsQueue->push(new \Yiisoft\Queue\Message\Message('send-email', ['to' => 'user@example.com']));
+return [
+    AdapterInterface::class => SynchronousAdapter::class,
+];
 ```
+> `SynchronousAdapter` is for learning/testing only. For production, install a real adapter, see adapter list: [adapter-list](adapter-list.md).
 
-You can also check if a channel exists before trying to get it:
+#### 1.2. Configure a default channel
+
+When you are using `yiisoft/config` and the default configs from this package are loaded, the default channel is already present in params (so you don't need to add anything). The snippet below shows what is shipped by default in [config/params.php](../../../config/params.php):
 
 ```php
-if ($provider->has('emails')) {
-    $emailsQueue = $provider->get('emails');
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\QueueInterface;
+
+return [
+    'yiisoft/queue' => [
+        'channels' => [
+            QueueInterface::DEFAULT_CHANNEL => AdapterInterface::class,
+        ],
+    ],
+];
+```
+
+Pushing a message via DI:
+
+```php
+use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Message\Message;
+
+final readonly class SendWelcomeEmail
+{
+    public function __construct(private QueueInterface $queue)
+    {
+    }
+
+    public function run(string $email): void
+    {
+        $this->queue->push(new Message('send-email', ['to' => $email]));
+    }
+}
+```
+
+### 2. Multiple channels
+
+Add more channels to the `params.php`:
+
+```php
+use Yiisoft\Queue\QueueInterface;
+
+return [
+    'yiisoft/queue' => [
+        'channels' => [
+            QueueInterface::DEFAULT_CHANNEL => \Yiisoft\Queue\Adapter\AdapterInterface::class,
+            'critical' => \Yiisoft\Queue\Adapter\AdapterInterface::class,
+            'emails' => \Yiisoft\Queue\Adapter\AdapterInterface::class,
+        ],
+    ],
+];
+```
+
+If you have multiple channels, inject `QueueProviderInterface` and call `get('channel-name')`.
+
+```php
+use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\Message\Message;
+
+final readonly class SendTransactionalEmail
+{
+    public function __construct(private QueueProviderInterface $queueProvider)
+    {
+    }
+
+    public function run(string $email): void
+    {
+        $this->queueProvider
+            ->get('emails')
+            ->push(new Message('send-email', ['to' => $email]));
+    }
 }
 ```
 
 `QueueProviderInterface` accepts both strings and `BackedEnum` values (they are normalized to a string channel name).
+
+## Running workers (CLI)
+
+To consume messages you run console commands such as `queue:run`, `queue:listen`, and `queue:listen-all`.
+See [Console commands](console-commands.md) for details.
+
+## Advanced
+
+### How channels are used in the code
+
+- A channel name is passed to `Yiisoft\Queue\Provider\QueueProviderInterface::get($channel)`.
+- The provider returns a `Yiisoft\Queue\QueueInterface` instance that uses an adapter configured for that channel.
+- Internally, the provider creates an adapter instance and calls `AdapterInterface::withChannel($channel)`.
+
+In other words, a channel is the key that lets the application select a particular adapter instance/configuration.
+
+`QueueInterface::getChannel()` is available for introspection and higher-level logic (for example, selecting middleware pipelines per channel). The channel itself is stored in the adapter and `Queue` proxies it.
+
+### Providers
 
 `QueueProviderInterface::get()` may throw:
 
@@ -65,19 +146,16 @@ if ($provider->has('emails')) {
 - `Yiisoft\Queue\Provider\InvalidQueueConfigException`
 - `Yiisoft\Queue\Provider\QueueProviderException`
 
-## Providers
-
-`QueueProviderInterface` is the component responsible for returning a `QueueInterface` instance bound to a particular channel.
-
 Out of the box, this package provides three implementations:
 
 - `Yiisoft\Queue\Provider\AdapterFactoryQueueProvider`
 - `Yiisoft\Queue\Provider\PrototypeQueueProvider`
 - `Yiisoft\Queue\Provider\CompositeQueueProvider`
 
-### `AdapterFactoryQueueProvider`
+#### `AdapterFactoryQueueProvider` (default)
 
-This provider creates channel-specific `QueueInterface` instances based on adapter definitions.
+`AdapterFactoryQueueProvider` is used by default when you use `yiisoft/config`.
+It creates `QueueInterface` instances based on adapter definitions indexed by channel name.
 
 It uses [`yiisoft/factory`](https://github.com/yiisoft/factory) to resolve adapter definitions.
 
@@ -86,7 +164,7 @@ This approach is recommended when you want:
 - Separate configuration per channel.
 - Stronger validation (unknown channels are not silently accepted).
 
-### `PrototypeQueueProvider`
+#### `PrototypeQueueProvider`
 
 This provider always returns a queue by taking a base queue + base adapter and only changing the channel name.
 
@@ -105,7 +183,7 @@ $queueForEmails = $provider->get('emails');
 $queueForCritical = $provider->get('critical');
 ```
 
-### `CompositeQueueProvider`
+#### `CompositeQueueProvider`
 
 This provider combines multiple providers into one.
 
@@ -125,74 +203,25 @@ $provider = new CompositeQueueProvider(
 $queue = $provider->get('emails');
 ```
 
-## Configuration with yiisoft/config
- 
- When using [yiisoft/config](https://github.com/yiisoft/config), channel configuration is stored in params under `yiisoft/queue.channels`.
-
- By default, `QueueProviderInterface` is bound to `AdapterFactoryQueueProvider`.
- That makes `yiisoft/queue.channels` a strict channel registry:
-
- - `QueueProviderInterface::has($channel)` checks whether the channel exists in definitions.
- - `QueueProviderInterface::get($channel)` throws `ChannelNotFoundException` for unknown channels.
-
- The same channel list is used by `queue:run` and `queue:listen-all` as the default set of channels to process.
- 
- It is a map:
-
-- key: channel name
-- value: adapter definition that should be resolved for that channel
-
-Minimal example (single channel):
-
-```php
-use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\QueueInterface;
-
-return [
-    'yiisoft/queue' => [
-        'channels' => [
-            QueueInterface::DEFAULT_CHANNEL => AdapterInterface::class,
-        ],
-    ],
-];
-```
-
-Multiple channels example:
-
-```php
-use Yiisoft\Queue\QueueInterface;
-
-return [
-    'yiisoft/queue' => [
-        'channels' => [
-            QueueInterface::DEFAULT_CHANNEL => \Yiisoft\Queue\Adapter\AdapterInterface::class,
-            'critical' => \Yiisoft\Queue\Adapter\AdapterInterface::class,
-            'emails' => \Yiisoft\Queue\Adapter\AdapterInterface::class,
-        ],
-    ],
-];
-```
-
-The exact adapter definitions depend on which queue adapter package you use (Redis, AMQP, etc.).
-
-When using the default DI config from this package, the configured channel names are also used as the default channel list for `queue:run` and `queue:listen-all`.
-
-## Manual configuration (without yiisoft/config)
+### Manual configuration (without yiisoft/config)
 
 For multiple channels without `yiisoft/config`, you can create a provider manually.
 
 `AdapterFactoryQueueProvider` accepts adapter definitions indexed by channel names and returns a `QueueInterface` for a channel on demand:
+
+> In this example, `$worker`, `$queue` and `$container` are assumed to be created already.
+> See [Manual configuration](configuration-manual.md) for a full runnable setup.
 
 ```php
 use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 
 $definitions = [
-    'channel1' => new SynchronousAdapter($worker, $queue),
-    'channel2' => static fn (SynchronousAdapter $adapter) => $adapter->withChannel('channel2'),
+    'channel1' => new SynchronousAdapter($worker, $queue, 'channel1'),
+    'channel2' => new SynchronousAdapter($worker, $queue, 'channel2'),
     'channel3' => [
         'class' => SynchronousAdapter::class,
-        '__constructor' => ['channel' => 'channel3'],
+        '__construct()' => ['channel' => 'channel3'],
     ],
 ];
 
