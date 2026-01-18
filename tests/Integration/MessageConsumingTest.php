@@ -9,6 +9,7 @@ use Psr\Log\NullLogger;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
@@ -28,6 +29,7 @@ final class MessageConsumingTest extends TestCase
         $this->messagesProcessedSecond = [];
 
         $container = $this->createMock(ContainerInterface::class);
+        $callableFactory = new CallableFactory($container);
         $worker = new Worker(
             [
                 'test' => fn (MessageInterface $message): mixed => $this->messagesProcessed[] = $message->getData(),
@@ -37,7 +39,8 @@ final class MessageConsumingTest extends TestCase
             new Injector($container),
             $container,
             new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class)),
-            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), [])
+            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), []),
+            $callableFactory,
         );
 
         $messages = [1, 'foo', 'bar-baz'];
@@ -56,13 +59,15 @@ final class MessageConsumingTest extends TestCase
         $container = $this->createMock(ContainerInterface::class);
         $container->method('get')->with(TestHandler::class)->willReturn($handler);
         $container->method('has')->with(TestHandler::class)->willReturn(true);
+        $callableFactory = new CallableFactory($container);
         $worker = new Worker(
             [],
             new NullLogger(),
             new Injector($container),
             $container,
             new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class)),
-            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), [])
+            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), []),
+            $callableFactory,
         );
 
         $messages = [1, 'foo', 'bar-baz'];

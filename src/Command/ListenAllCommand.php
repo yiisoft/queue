@@ -18,7 +18,8 @@ use Yiisoft\Queue\Provider\QueueProviderInterface;
     'Listens the all the given queues and executes messages as they come. '
         . 'Meant to be used in development environment only. '
         . 'Listens all configured queues by default in case you\'re using yiisoft/config. '
-        . 'Needs to be stopped manually.'
+        . 'Needs to be stopped manually.',
+    ['queue:listen:all'],
 )]
 final class ListenAllCommand extends Command
 {
