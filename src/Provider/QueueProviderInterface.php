@@ -12,6 +12,9 @@ use Yiisoft\Queue\QueueInterface;
  */
 interface QueueProviderInterface
 {
+    /** @psalm-suppress MissingClassConstType */
+    public const DEFAULT_CHANNEL = 'yii-queue';
+
     /**
      * Find a queue by channel name and returns it.
      *

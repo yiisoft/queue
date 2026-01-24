@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Yiisoft\Queue\ChannelNormalizer;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
@@ -22,7 +23,7 @@ final class SynchronousAdapter implements AdapterInterface
     public function __construct(
         private readonly WorkerInterface $worker,
         private readonly QueueInterface $queue,
-        string|BackedEnum $channel = QueueInterface::DEFAULT_CHANNEL,
+        string|BackedEnum $channel = QueueProviderInterface::DEFAULT_CHANNEL,
     ) {
         $this->channel = ChannelNormalizer::normalize($channel);
     }

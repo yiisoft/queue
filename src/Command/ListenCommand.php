@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
-use Yiisoft\Queue\QueueInterface;
 
 #[AsCommand(
     'queue:listen',
@@ -30,7 +29,7 @@ final class ListenCommand extends Command
             'channel',
             InputArgument::OPTIONAL,
             'Queue channel name to connect to',
-            QueueInterface::DEFAULT_CHANNEL,
+            QueueProviderInterface::DEFAULT_CHANNEL,
         );
     }
 
