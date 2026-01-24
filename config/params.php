@@ -10,7 +10,6 @@ use Yiisoft\Queue\Debug\QueueCollector;
 use Yiisoft\Queue\Debug\QueueProviderInterfaceProxy;
 use Yiisoft\Queue\Debug\QueueWorkerInterfaceProxy;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
 return [

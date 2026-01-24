@@ -10,7 +10,6 @@ use Yiisoft\Queue\ChannelNormalizer;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
-use Yiisoft\Queue\QueueInterface;
 
 /**
  * Stub adapter that does nothing. Job status is always "done".

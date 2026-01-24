@@ -11,7 +11,6 @@ use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Stubs\StubQueue;
 use Yiisoft\Queue\Stubs\StubWorker;
 use Yiisoft\Queue\Tests\TestCase;
