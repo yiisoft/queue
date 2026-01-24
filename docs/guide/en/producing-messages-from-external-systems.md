@@ -70,7 +70,7 @@ Full example:
 
 ### Notes about `meta`
 
-The `meta` key is a general-purpose metadata container (for example, tracing, correlation, tenant information). External systems may populate it, and the consumer-side application or middleware may also read, add, or override keys as needed.
+The `meta` key is a general-purpose metadata container (for example, tracing, correlation, tenant information). External systems may populate it, and the consumer-side application or middleware may also read, add, or override keys as needed. However, it's not recommended, as it highly depends on the consumer-side application code.
 
 ## 3. Data encoding rules
 

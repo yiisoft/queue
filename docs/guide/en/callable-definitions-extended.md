@@ -1,17 +1,13 @@
 # Callable Definitions Extended
 
-Callable definitions in `yiisoft/queue` are based on [native PHP callables](https://www.php.net/manual/en/language.types.callable.php).
-The package supports two types of callable definitions:
+Callable definitions in `yiisoft/queue` are based on [native PHP callables](https://www.php.net/manual/en/language.types.callable.php) and suggest additonial ways to define a callable.
 
-- Native PHP callables.
-- Extended callable definitions that allow resolving callables (and their dependencies) lazily via a DI container.
-
-Both types may declare dependencies in their parameter lists, which are resolved via [yiisoft/injector](https://github.com/yiisoft/injector) and a DI container.
+Both definition types (classic callables and new ones) allow you to use a DI container and [yiisoft/injector](https://github.com/yiisoft/injector) to resolve dependencies in a lazy way.
 These callable definition formats are used across the package to convert configuration definitions into real callables.
 
 ## Type 1: Native PHP callable
 
-When you define a callable as a native PHP callable, it is not modified in any way and is called as is. The only difference is that you can declare a dependency list in its parameter list, which will be resolved via [yiisoft/injector](https://github.com/yiisoft/injector) and a DI container.  
+When you define a callable as a native PHP callable, it is not modified in any way and is called as is. The only difference is that you can declare a dependency list as its parameter list, which will be resolved via [yiisoft/injector](https://github.com/yiisoft/injector) and a DI container.  
 As you can see in the [PHP documentation](https://www.php.net/manual/en/language.types.callable.php), there are several ways to define a native callable:
 
 - **Closure (lambda function)**. It may be static. Example:
@@ -62,8 +58,8 @@ As you can see in the [PHP documentation](https://www.php.net/manual/en/language
 
 ## Type 2: Callable definition extensions (via container)
 
-Under the hood, extended callable definitions behave exactly like **Type 1** native callables. But there is a major difference:
-all the objects are instantiated automatically with a PSR-11 DI container with all their dependencies
+Under the hood, extended callable definitions behave exactly like native callables. But there is a major difference:
+all the objects are instantiated automatically by a PSR-11 DI container with all their dependencies
 and in a lazy way (only when they are really needed).  
 Ways to define an extended callable:
 
@@ -95,7 +91,8 @@ Ways to define an extended callable:
   ```
   It works the same way as above: an object will be retrieved from a DI container and called as a function.
 
-_Note: you can use an alias registered in your DI Container instead of a class name._ This will also work if you have a "class alias" definition in container:
+> [!NOTE]
+_You can use an alias registered in your DI Container instead of a class name._ This will also work if you have a "class alias" definition in container:
 ```php
 $callable = 'class alias'; // for a "callable object" 
 $callable2 = ['class alias', 'foo']; // to call "foo" method of an object found by "class alias" in DI Container
