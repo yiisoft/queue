@@ -10,6 +10,7 @@ use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Stubs\StubQueue;
 use Yiisoft\Queue\Stubs\StubWorker;
@@ -58,7 +59,7 @@ final class SynchronousAdapterTest extends TestCase
     public function testWithSameChannel(): void
     {
         $adapter = $this->getAdapter();
-        self::assertEquals($adapter, $adapter->withChannel(QueueInterface::DEFAULT_CHANNEL));
+        self::assertEquals($adapter, $adapter->withChannel(QueueProviderInterface::DEFAULT_CHANNEL));
     }
 
     public function testWithAnotherChannel(): void
