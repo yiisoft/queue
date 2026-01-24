@@ -54,7 +54,7 @@ final class Worker implements WorkerInterface
         try {
             $handler = $this->getHandler($name);
         } catch (InvalidCallableConfigurationException $exception) {
-            throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist', $name), 0, $exception);
+            throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist.', $name), 0, $exception);
         }
 
         if ($handler === null) {

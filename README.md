@@ -69,13 +69,13 @@ For setting up all classes manually, see the [Manual configuration](docs/guide/e
 
 ### 3. Prepare a handler
 
-You need to create a handler class that will process the queue messages. The most simple way is to implement the `HandleInterface`. Let's create an example for remote file processing:
+You need to create a handler class that will process the queue messages. The most simple way is to implement the `MessageHandlerInterface`. Let's create an example for remote file processing:
 
 ```php
-use Yiisoft\Queue\Handler\HandleInterface;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Message\MessageHandlerInterface;
 
-final readonly class RemoteFileHandler implements HandleInterface
+final readonly class RemoteFileHandler implements MessageHandlerInterface
 {
     private string $absolutePath;
 
@@ -119,14 +119,14 @@ final readonly class Foo {
 
 ### 5. Handle queued messages
 
-By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/yii-console) to run CLI commands. If you installed [yiisoft/app](https://github.com/yiisoft/app) or [yiisoft/app-api](https://github.com/yiisoft/app-api), you can run the queue worker with on of these two commands:
+By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/yii-console) to run CLI commands. If you installed [yiisoft/app](https://github.com/yiisoft/app) or [yiisoft/app-api](https://github.com/yiisoft/app-api), you can run the queue worker with one of these two commands:
 
 ```bash
 ./yii queue:run # Handle all existing messages in the queue
 ./yii queue:listen # Start a daemon listening for new messages permanently
 ```
 
-> In case you're using the `SynchronosAdapter` for development purposes, you should not use these commands, as you have no asynchronous processing available. The messages are processed immediately when pushed.
+> In case you're using the `SynchronousAdapter` for development purposes, you should not use these commands, as you have no asynchronous processing available. The messages are processed immediately when pushed.
 
 ## Documentation
 

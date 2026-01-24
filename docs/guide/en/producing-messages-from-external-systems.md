@@ -70,7 +70,7 @@ Full example:
 
 ### Notes about `meta`
 
-The `meta` key is used by `yiisoft/queue` for internal processing (like tracing and correlation) and should not be set by external systems.
+The `meta` key is a general-purpose metadata container (for example, tracing, correlation, tenant information). External systems may populate it, and the consumer-side application or middleware may also read, add, or override keys as needed.
 
 ## 3. Data encoding rules
 

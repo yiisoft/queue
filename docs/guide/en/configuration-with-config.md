@@ -4,14 +4,13 @@ If you are using [yiisoft/config](https://github.com/yiisoft/config) (i.e. insta
 
 ## Where to put the configuration
 
-In [yiisoft/app](https://github.com/yiisoft/app)/[yiisoft/app-api](https://github.com/yiisoft/app-api) templates you typically add or adjust configuration in `config/params.php`.
+In [yiisoft/app](https://github.com/yiisoft/app) / [yiisoft/app-api](https://github.com/yiisoft/app-api) templates you typically add or adjust configuration in `config/params.php`.
 If your project structure differs, put configuration into any params config file that is loaded by [yiisoft/config](https://github.com/yiisoft/config).
 
 ## What you need to configure
 
 - Define queue channel adapter definitions in the `channels` params key. See more about channels [here](./channels.md).
 - Optionally: define [message handlers](./message-handler.md) in the `handlers` params key to be used with the `QueueWorker`.
-- Resolve other `\Yiisoft\Queue\Queue` dependencies (psr-compliant event dispatcher).
 
 By default, when using the DI config provided by this package, `QueueProviderInterface` is bound to `AdapterFactoryQueueProvider` and uses `yiisoft/queue.channels` as a strict channel registry.
 That means unknown channels are not accepted silently and `QueueProviderInterface::get()` will throw `ChannelNotFoundException`.

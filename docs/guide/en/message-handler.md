@@ -1,6 +1,6 @@
 # Message handler
 
-A *message handler* is what processes a queue message. Internally, `Yiisoft\Queue\Worker\Worker` resolves a handler by the message handler name (`MessageInterface::getHandlerName()`) and then executes it through `Yiisoft\Injector\Injector`.
+A *message handler* is what processes a queue message. Internally, `Yiisoft\Queue\Worker\Worker` resolves a handler by the message handler name (`MessageInterface::getHandlerName()`) and then executes it through [yiisoft/injector](https://github.com/yiisoft/injector).
 
 Handler definitions are configured in:
 
@@ -89,7 +89,6 @@ While FQCN-as-name is convenient inside a single application, mapping by a short
 
 - Another application pushes messages to the same broker.
 - A different language/runtime produces messages.
-- You want a stable public contract that is independent of your PHP namespaces and refactorings.
 
 In these cases you typically keep message handler names small and stable, and map them in config:
 

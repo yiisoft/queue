@@ -6,6 +6,8 @@ Often when some message handling is failing, we want to retry its execution a co
 
 Failure handling is triggered only when message processing throws a `Throwable`.
 
+That means PHP notices/warnings are handled according to your PHP runtime configuration: they do not trigger failure handling unless they are converted into an exception (for example, via an error handler).
+
 In practice it means:
 
 - The worker runs message processing in `Yiisoft\Queue\Worker\Worker::process()`.
@@ -24,7 +26,7 @@ In practice it means:
 
 3. Failure context is wrapped into a request object
 
-    The worker creates a `Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest` ([source](../../../src/Middleware/FailureHandling/FailureHandlingRequest.php)) containing:
+    The worker creates a `Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest` containing:
 
     - the message
     - the caught exception
@@ -118,7 +120,7 @@ Failures of messages, which are initially sent to the `failed-messages` channel,
  
  Let's see the built-in defaults.
  
- ### [SendAgainMiddleware](../../../src/Middleware/FailureHandling/Implementation/SendAgainMiddleware.php)
+ ### SendAgainMiddleware
  
  This strategy simply resends the given message to a queue. Let's see the constructor parameters through which it's configured:
 
@@ -131,7 +133,7 @@ Failures of messages, which are initially sent to the `failed-messages` channel,
  - Uses `FailureEnvelope` metadata (`failure-meta`) to store the per-middleware attempt counter.
  - The counter key is `failure-strategy-resend-attempts-{id}`.
  
- ### [ExponentialDelayMiddleware](../../../src/Middleware/FailureHandling/Implementation/ExponentialDelayMiddleware.php)
+ ### ExponentialDelayMiddleware
  
  This strategy does the same thing as the `SendAgainMiddleware` with a single difference: it resends a message with an exponentially increasing delay. The delay **must** be implemented by the used `AdapterInterface` implementation.
 

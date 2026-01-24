@@ -16,7 +16,7 @@ The command `queue:run` obtains and executes tasks until the queue is empty, the
 You can also narrow the scope of processed messages by specifying channel(s) and maximum number of messages to process:
 
 - Specify one or more channels to process. Messages from other channels will be ignored. Default is all registered channels (in case of using [yiisoft/config](https://github.com/yiisoft/config) and [yiisoft/yii-console](https://github.com/yiisoft/yii-console), otherwise pass the default channel list to the command constructor).
-- Use `--maximum` to limit the number of messages processed. When set, command will exit either when all the messages are processed or when the maximum count is reached.
+- Use `--maximum` to limit the number of messages processed. When set, command will exit either when all the messages are processed or when the maximum count is reached. Despite the name, it acts as a limit.
 
 The full command signature is:
 ```sh
@@ -39,12 +39,14 @@ The following command iterates through multiple channels and is meant to be used
 - `--maximum` option to limit the number of messages processed before switching to another channel. E.g. you set `--maximum` to 500 and right now you have 1000 messages in `channel1`. This command will consume only 500 of them, then it will switch to `channel2` to see if there are any messages there. Defaults to `0` (no limit).
 - `--pause` option to specify the number of seconds to pause between checking channels when no messages are found. Defaults to `1`.
 
+`queue:listen` does not have a `--maximum` option. If you need to stop after processing a certain number of messages, use `queue:run --maximum=...`.
+
 The full command signature is:
 ```sh
 yii queue:listen-all [channel1 [channel2 [...]]] --pause=1 --maximum=0
 ```
 
-> The command alias `queue:listen:all` is deprecated and will be removed in `1.0.0`, since it was a typo.
+> The command alias `queue:listen:all` exists for backward compatibility and may be removed in a future release, since it was a typo.
 
 For long-running processes, graceful shutdown is controlled by `LoopInterface`. When `ext-pcntl` is available,
 the default `SignalLoop` handles signals such as `SIGTERM`/`SIGINT`.

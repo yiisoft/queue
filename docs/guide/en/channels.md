@@ -1,6 +1,6 @@
 # Queue channels
 
-A *queue channel* is a named queue configuration.
+A *queue channel* is a named queue configuration (a logical namespace/identifier that separates one queue workload from another).
 
 In practice, a channel is a string (for example, `yii-queue`, `emails`, `critical`) that selects which queue backend (adapter) messages are pushed to and which worker consumes them.
 
@@ -127,6 +127,8 @@ To consume messages you run console commands such as `queue:run`, `queue:listen`
 See [Console commands](console-commands.md) for details.
 
 ## Advanced
+
+The sections below describe internal mechanics and advanced setups. You can skip them if you only need to configure and use channels.
 
 ### How channels are used in the code
 

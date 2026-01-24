@@ -16,6 +16,8 @@ It collects:
 
 ## How it works
 
+The details below are optional. You can skip them if you only need to enable the panel and see collected data.
+
 The integration is enabled by registering the collector and wrapping tracked services with proxy implementations.
 
 In this package defaults (see `config/params.php`), the following services are tracked:
