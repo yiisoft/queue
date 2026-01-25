@@ -14,9 +14,10 @@ vendor
 # composer lock files
 composer.lock
 
-# PHP CS Fixer
-.php_cs.cache
-
 # PHPUnit
 .phpunit.result.cache
 coverage.html
+
+# PHP CS Fixer
+/.php-cs-fixer.cache
+/.php-cs-fixer.php
