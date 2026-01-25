@@ -15,8 +15,7 @@ final class QueueDecorator implements QueueInterface
     public function __construct(
         private readonly QueueInterface $queue,
         private readonly QueueCollector $collector,
-    ) {
-    }
+    ) {}
 
     public function status(string|int $id): JobStatus
     {
@@ -28,7 +27,7 @@ final class QueueDecorator implements QueueInterface
 
     public function push(
         MessageInterface $message,
-        string|array|callable|MiddlewarePushInterface ...$middlewareDefinitions
+        string|array|callable|MiddlewarePushInterface ...$middlewareDefinitions,
     ): MessageInterface {
         $message = $this->queue->push($message, ...$middlewareDefinitions);
         $this->collector->collectPush($this->queue->getChannel(), $message, ...$middlewareDefinitions);

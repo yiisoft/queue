@@ -14,6 +14,8 @@ use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
+use function count;
+
 final class SynchronousAdapter implements AdapterInterface
 {
     private array $messages = [];

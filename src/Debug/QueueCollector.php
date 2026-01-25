@@ -11,6 +11,8 @@ use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
 
+use function count;
+
 final class QueueCollector implements SummaryCollectorInterface
 {
     use CollectorTrait;
@@ -70,27 +72,27 @@ final class QueueCollector implements SummaryCollectorInterface
         $this->processingMessages[$queue->getChannel()][] = $message;
     }
 
-    private function reset(): void
-    {
-        $this->pushes = [];
-        $this->statuses = [];
-        $this->processingMessages = [];
-    }
-
     public function getSummary(): array
     {
         if (!$this->isActive()) {
             return [];
         }
 
-        $countPushes = array_sum(array_map(static fn ($messages) => is_countable($messages) ? count($messages) : 0, $this->pushes));
+        $countPushes = array_sum(array_map(static fn($messages) => is_countable($messages) ? count($messages) : 0, $this->pushes));
         $countStatuses = count($this->statuses);
-        $countProcessingMessages = array_sum(array_map(static fn ($messages) => is_countable($messages) ? count($messages) : 0, $this->processingMessages));
+        $countProcessingMessages = array_sum(array_map(static fn($messages) => is_countable($messages) ? count($messages) : 0, $this->processingMessages));
 
         return [
             'countPushes' => $countPushes,
             'countStatuses' => $countStatuses,
             'countProcessingMessages' => $countProcessingMessages,
         ];
+    }
+
+    private function reset(): void
+    {
+        $this->pushes = [];
+        $this->statuses = [];
+        $this->processingMessages = [];
     }
 }

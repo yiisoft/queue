@@ -24,8 +24,7 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
     public function __construct(
         private readonly array $middlewares,
         private readonly MessageHandlerPushInterface $finishHandler,
-    ) {
-    }
+    ) {}
 
     public function handlePush(PushRequest $request): PushRequest
     {
@@ -59,8 +58,7 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
             public function __construct(
                 private readonly Closure $middlewareFactory,
                 private readonly MessageHandlerPushInterface $handler,
-            ) {
-            }
+            ) {}
 
             public function handlePush(PushRequest $request): PushRequest
             {

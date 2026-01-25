@@ -59,7 +59,7 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
 
     public function processFailure(
         FailureHandlingRequest $request,
-        MessageFailureHandlerInterface $handler
+        MessageFailureHandlerInterface $handler,
     ): FailureHandlingRequest {
         $message = $request->getMessage();
         if ($this->suites($message)) {
@@ -68,7 +68,7 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
             $middlewareDefinitions = $this->delayMiddleware->withDelay($this->getDelay($envelope));
             $messageNew = $queue->push(
                 $envelope,
-                $middlewareDefinitions
+                $middlewareDefinitions,
             );
 
             return $request->withMessage($messageNew);

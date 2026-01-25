@@ -24,8 +24,7 @@ final class MiddlewareConsumeStack implements MessageHandlerConsumeInterface
     public function __construct(
         private readonly array $middlewares,
         private readonly MessageHandlerConsumeInterface $finishHandler,
-    ) {
-    }
+    ) {}
 
     public function handleConsume(ConsumeRequest $request): ConsumeRequest
     {
@@ -59,8 +58,7 @@ final class MiddlewareConsumeStack implements MessageHandlerConsumeInterface
             public function __construct(
                 private readonly Closure $middlewareFactory,
                 private readonly MessageHandlerConsumeInterface $handler,
-            ) {
-            }
+            ) {}
 
             public function handleConsume(ConsumeRequest $request): ConsumeRequest
             {

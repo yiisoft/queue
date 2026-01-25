@@ -27,7 +27,6 @@ final class ListenAllCommandTest extends TestCase
         $loop = $this->createMock(LoopInterface::class);
         $loop->method('canContinue')->willReturn(true, false);
 
-
         $command = new ListenAllCommand(
             $queueFactory,
             $loop,

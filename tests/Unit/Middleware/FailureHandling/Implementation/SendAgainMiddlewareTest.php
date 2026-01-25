@@ -22,11 +22,11 @@ use Yiisoft\Queue\Tests\TestCase;
 
 class SendAgainMiddlewareTest extends TestCase
 {
+    final public const KEY_EXPONENTIAL_ATTEMPTS = ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test';
+    final public const KEY_EXPONENTIAL_DELAY = ExponentialDelayMiddleware::META_KEY_DELAY . '-test';
     private const EXPONENTIAL_STRATEGY_DELAY_INITIAL = 1;
     private const EXPONENTIAL_STRATEGY_DELAY_MAXIMUM = 5;
     private const EXPONENTIAL_STRATEGY_EXPONENT = 2;
-    final public const KEY_EXPONENTIAL_ATTEMPTS = ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test';
-    final public const KEY_EXPONENTIAL_DELAY = ExponentialDelayMiddleware::META_KEY_DELAY . '-test';
 
     public static function queueSendingStrategyProvider(): array
     {
@@ -145,7 +145,7 @@ class SendAgainMiddlewareTest extends TestCase
         string $strategyName,
         bool $suites,
         array $metaInitial,
-        array $metaResult
+        array $metaResult,
     ): void {
         if (!$suites) {
             $this->expectExceptionMessage('testException');
@@ -159,10 +159,10 @@ class SendAgainMiddlewareTest extends TestCase
             new Message(
                 'test',
                 null,
-                [FailureEnvelope::FAILURE_META_KEY => $metaInitial]
+                [FailureEnvelope::FAILURE_META_KEY => $metaInitial],
             ),
             new Exception('testException'),
-            $queue
+            $queue,
         );
         $result = $strategy->processFailure($request, $handler);
 

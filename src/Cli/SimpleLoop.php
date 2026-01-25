@@ -12,9 +12,7 @@ final class SimpleLoop implements LoopInterface
      * @param int $memorySoftLimit Soft RAM limit in bytes. The loop won't let you continue to execute the program if
      *     soft limit is reached. Zero means no limit.
      */
-    public function __construct(protected int $memorySoftLimit = 0)
-    {
-    }
+    public function __construct(protected int $memorySoftLimit = 0) {}
 
     public function canContinue(): bool
     {

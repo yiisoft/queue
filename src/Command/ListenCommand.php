@@ -13,12 +13,12 @@ use Yiisoft\Queue\Provider\QueueProviderInterface;
 
 #[AsCommand(
     'queue:listen',
-    'Listens the queue and executes messages as they come. Needs to be stopped manually.'
+    'Listens the queue and executes messages as they come. Needs to be stopped manually.',
 )]
 final class ListenCommand extends Command
 {
     public function __construct(
-        private readonly QueueProviderInterface $queueProvider
+        private readonly QueueProviderInterface $queueProvider,
     ) {
         parent::__construct();
     }

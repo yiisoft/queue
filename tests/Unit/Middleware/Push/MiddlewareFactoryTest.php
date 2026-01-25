@@ -39,7 +39,7 @@ final class MiddlewareFactoryTest extends TestCase
             'New test data',
             $middleware->processPush(
                 $this->getPushRequest(),
-                $this->createMock(MessageHandlerPushInterface::class)
+                $this->createMock(MessageHandlerPushInterface::class),
             )->getMessage()->getData(),
         );
     }
@@ -50,14 +50,14 @@ final class MiddlewareFactoryTest extends TestCase
         $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
             static function (): PushRequest {
                 return new PushRequest(new Message('test', 'test data'), new FakeAdapter());
-            }
+            },
         );
         self::assertSame(
             'test data',
             $middleware->processPush(
                 $this->getPushRequest(),
-                $this->createMock(MessageHandlerPushInterface::class)
-            )->getMessage()->getData()
+                $this->createMock(MessageHandlerPushInterface::class),
+            )->getMessage()->getData(),
         );
     }
 
@@ -67,14 +67,14 @@ final class MiddlewareFactoryTest extends TestCase
         $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
             static function (): MiddlewarePushInterface {
                 return new TestMiddleware();
-            }
+            },
         );
         self::assertSame(
             'New middleware test data',
             $middleware->processPush(
                 $this->getPushRequest(),
-                $this->createMock(MessageHandlerPushInterface::class)
-            )->getMessage()->getData()
+                $this->createMock(MessageHandlerPushInterface::class),
+            )->getMessage()->getData(),
         );
     }
 
@@ -87,8 +87,8 @@ final class MiddlewareFactoryTest extends TestCase
             'New middleware test data',
             $middleware->processPush(
                 $this->getPushRequest(),
-                $this->getRequestHandler()
-            )->getMessage()->getData()
+                $this->getRequestHandler(),
+            )->getMessage()->getData(),
         );
     }
 
@@ -102,8 +102,8 @@ final class MiddlewareFactoryTest extends TestCase
             'New test data',
             $middleware->processPush(
                 $request,
-                $this->getRequestHandler()
-            )->getMessage()->getData()
+                $this->getRequestHandler(),
+            )->getMessage()->getData(),
         );
     }
 
@@ -132,13 +132,13 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([InvalidController::class => new InvalidController()]);
         $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
-            [InvalidController::class, 'index']
+            [InvalidController::class, 'index'],
         );
 
         $this->expectException(InvalidMiddlewareDefinitionException::class);
         $middleware->processPush(
             $this->getPushRequest(),
-            $this->createMock(MessageHandlerPushInterface::class)
+            $this->createMock(MessageHandlerPushInterface::class),
         );
     }
 
@@ -156,7 +156,7 @@ final class MiddlewareFactoryTest extends TestCase
 
     private function getRequestHandler(): MessageHandlerPushInterface
     {
-        return new class () implements MessageHandlerPushInterface {
+        return new class implements MessageHandlerPushInterface {
             public function handlePush(PushRequest $request): PushRequest
             {
                 return $request;

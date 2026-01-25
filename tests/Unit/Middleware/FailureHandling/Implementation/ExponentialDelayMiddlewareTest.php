@@ -16,6 +16,8 @@ use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\TestCase;
 
+use const PHP_INT_MAX;
+
 class ExponentialDelayMiddlewareTest extends TestCase
 {
     public static function constructorRequirementsProvider(): array
@@ -164,7 +166,7 @@ class ExponentialDelayMiddlewareTest extends TestCase
         $message = new Message(
             'test',
             null,
-            [FailureEnvelope::FAILURE_META_KEY => [ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test' => 2]]
+            [FailureEnvelope::FAILURE_META_KEY => [ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test' => 2]],
         );
         $queue = $this->createMock(QueueInterface::class);
         $middleware = new ExponentialDelayMiddleware(

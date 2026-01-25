@@ -37,7 +37,7 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
 
     public function processFailure(
         FailureHandlingRequest $request,
-        MessageFailureHandlerInterface $handler
+        MessageFailureHandlerInterface $handler,
     ): FailureHandlingRequest {
         $message = $request->getMessage();
         if ($this->suites($message)) {

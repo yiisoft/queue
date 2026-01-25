@@ -14,13 +14,12 @@ use Yiisoft\Queue\QueueInterface;
 final class DummyQueue implements QueueInterface
 {
     public function __construct(
-        private readonly string $channel
-    ) {
-    }
+        private readonly string $channel,
+    ) {}
 
     public function push(
         MessageInterface $message,
-        string|array|callable|MiddlewarePushInterface ...$middlewareDefinitions
+        string|array|callable|MiddlewarePushInterface ...$middlewareDefinitions,
     ): MessageInterface {
         return $message;
     }
@@ -30,9 +29,7 @@ final class DummyQueue implements QueueInterface
         throw new Exception('`run()` method is not implemented yet.');
     }
 
-    public function listen(): void
-    {
-    }
+    public function listen(): void {}
 
     public function status(string|int $id): JobStatus
     {

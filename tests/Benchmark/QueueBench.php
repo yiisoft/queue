@@ -41,8 +41,7 @@ final class QueueBench
 
         $worker = new Worker(
             [
-                'foo' => static function (): void {
-                },
+                'foo' => static function (): void {},
             ],
             $logger,
             new Injector($container),

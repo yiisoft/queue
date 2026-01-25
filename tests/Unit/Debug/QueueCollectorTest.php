@@ -87,7 +87,7 @@ final class QueueCollectorTest extends AbstractCollectorTestCase
                     $this->pushMessage,
                 ],
             ],
-            $processingMessages
+            $processingMessages,
         );
     }
 

@@ -13,6 +13,8 @@ use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
 
+use function extension_loaded;
+
 final class QueueTest extends TestCase
 {
     private bool $needsRealAdapter = true;
@@ -22,11 +24,6 @@ final class QueueTest extends TestCase
         parent::setUp();
 
         $this->needsRealAdapter = true;
-    }
-
-    protected function needsRealAdapter(): bool
-    {
-        return $this->needsRealAdapter;
     }
 
     public function testPushSuccessful(): void
@@ -164,5 +161,10 @@ final class QueueTest extends TestCase
 
         $this->expectException(AdapterNotConfiguredException::class);
         $queue->getChannel();
+    }
+
+    protected function needsRealAdapter(): bool
+    {
+        return $this->needsRealAdapter;
     }
 }
