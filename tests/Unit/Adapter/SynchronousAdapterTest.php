@@ -19,11 +19,6 @@ use Yiisoft\Queue\Tests\Unit\Support\StringEnum;
 
 final class SynchronousAdapterTest extends TestCase
 {
-    protected function needsRealAdapter(): bool
-    {
-        return true;
-    }
-
     public function testNonIntegerId(): void
     {
         $queue = $this
@@ -121,5 +116,10 @@ final class SynchronousAdapterTest extends TestCase
         $adapter = new SynchronousAdapter(new StubWorker(), new StubQueue(), $channel);
 
         $this->assertSame($expected, $adapter->getChannel());
+    }
+
+    protected function needsRealAdapter(): bool
+    {
+        return true;
     }
 }

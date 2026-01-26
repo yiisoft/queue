@@ -32,7 +32,7 @@ final class MiddlewareDispatcherTest extends TestCase
                 static function (ConsumeRequest $request) use ($queue): ConsumeRequest {
                     return $request->withMessage(new Message('test', 'New closure test data'))->withQueue($queue);
                 },
-            ]
+            ],
         );
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
@@ -45,7 +45,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $container = $this->createContainer(
             [
                 TestCallableMiddleware::class => new TestCallableMiddleware(),
-            ]
+            ],
         );
         $dispatcher = $this->createDispatcher($container)->withMiddlewares([[TestCallableMiddleware::class, 'index']]);
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
@@ -117,7 +117,7 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         self::assertSame(
             $expected,
-            $this->createDispatcher()->withMiddlewares($definitions)->hasMiddlewares()
+            $this->createDispatcher()->withMiddlewares($definitions)->hasMiddlewares(),
         );
     }
 
@@ -134,7 +134,7 @@ final class MiddlewareDispatcherTest extends TestCase
             [
                 TestCallableMiddleware::class => new TestCallableMiddleware(),
                 TestMiddleware::class => new TestMiddleware(),
-            ]
+            ],
         );
 
         $dispatcher = $this
@@ -150,7 +150,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
     private function getRequestHandler(): MessageHandlerConsumeInterface
     {
-        return new class () implements MessageHandlerConsumeInterface {
+        return new class implements MessageHandlerConsumeInterface {
             public function handleConsume(ConsumeRequest $request): ConsumeRequest
             {
                 return $request;
@@ -178,7 +178,7 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         return new ConsumeRequest(
             new Message('handler', 'data'),
-            $this->createMock(QueueInterface::class)
+            $this->createMock(QueueInterface::class),
         );
     }
 }

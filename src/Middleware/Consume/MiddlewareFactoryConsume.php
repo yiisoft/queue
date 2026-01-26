@@ -15,6 +15,7 @@ use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 
 use function is_string;
+use function is_array;
 
 /**
  * Creates a middleware based on the definition provided.
@@ -27,8 +28,7 @@ final class MiddlewareFactoryConsume implements MiddlewareFactoryConsumeInterfac
     public function __construct(
         private readonly ContainerInterface $container,
         private readonly CallableFactory $callableFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array|callable|MiddlewareConsumeInterface|string $middlewareDefinition Middleware definition in one of
@@ -52,7 +52,7 @@ final class MiddlewareFactoryConsume implements MiddlewareFactoryConsumeInterfac
      * @return MiddlewareConsumeInterface
      */
     public function createConsumeMiddleware(
-        MiddlewareConsumeInterface|callable|array|string $middlewareDefinition
+        MiddlewareConsumeInterface|callable|array|string $middlewareDefinition,
     ): MiddlewareConsumeInterface {
         if ($middlewareDefinition instanceof MiddlewareConsumeInterface) {
             return $middlewareDefinition;
@@ -91,7 +91,7 @@ final class MiddlewareFactoryConsume implements MiddlewareFactoryConsumeInterfac
 
             public function __construct(
                 callable $callback,
-                private readonly ContainerInterface $container
+                private readonly ContainerInterface $container,
             ) {
                 $this->callback = $callback;
             }
@@ -113,7 +113,7 @@ final class MiddlewareFactoryConsume implements MiddlewareFactoryConsumeInterfac
     }
 
     private function tryGetFromCallable(
-        callable|MiddlewareConsumeInterface|array|string $definition
+        callable|MiddlewareConsumeInterface|array|string $definition,
     ): ?MiddlewareConsumeInterface {
         if ($definition instanceof Closure) {
             return $this->wrapCallable($definition);
@@ -134,7 +134,7 @@ final class MiddlewareFactoryConsume implements MiddlewareFactoryConsumeInterfac
     }
 
     private function tryGetFromArrayDefinition(
-        callable|MiddlewareConsumeInterface|array|string $definition
+        callable|MiddlewareConsumeInterface|array|string $definition,
     ): ?MiddlewareConsumeInterface {
         if (!is_array($definition)) {
             return null;

@@ -24,8 +24,7 @@ final class MiddlewareFailureStack implements MessageFailureHandlerInterface
     public function __construct(
         private readonly array $middlewares,
         private readonly MessageFailureHandlerInterface $finishHandler,
-    ) {
-    }
+    ) {}
 
     public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
     {
@@ -59,8 +58,7 @@ final class MiddlewareFailureStack implements MessageFailureHandlerInterface
             public function __construct(
                 private readonly Closure $middlewareFactory,
                 private readonly MessageFailureHandlerInterface $handler,
-            ) {
-            }
+            ) {}
 
             public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
             {

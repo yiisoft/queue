@@ -31,7 +31,7 @@ final class Queue implements QueueInterface
         private readonly LoggerInterface $logger,
         private readonly PushMiddlewareDispatcher $pushMiddlewareDispatcher,
         private ?AdapterInterface $adapter = null,
-        MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
+        MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ) {
         $this->middlewareDefinitions = $middlewareDefinitions;
         $this->adapterPushHandler = new AdapterPushHandler();
@@ -45,12 +45,12 @@ final class Queue implements QueueInterface
 
     public function push(
         MessageInterface $message,
-        MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions
+        MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ): MessageInterface {
         $this->checkAdapter();
         $this->logger->debug(
             'Preparing to push message with handler name "{handlerName}".',
-            ['handlerName' => $message->getHandlerName()]
+            ['handlerName' => $message->getHandlerName()],
         );
 
         $request = new PushRequest($message, $this->adapter);
@@ -62,7 +62,7 @@ final class Queue implements QueueInterface
         $messageId = $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
         $this->logger->info(
             'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
-            ['handlerName' => $message->getHandlerName(), 'id' => $messageId]
+            ['handlerName' => $message->getHandlerName(), 'id' => $messageId],
         );
 
         return $message;
@@ -88,7 +88,7 @@ final class Queue implements QueueInterface
 
         $this->logger->info(
             'Processed {count} queue messages.',
-            ['count' => $count]
+            ['count' => $count],
         );
 
         return $count;
@@ -99,7 +99,7 @@ final class Queue implements QueueInterface
         $this->checkAdapter();
 
         $this->logger->info('Start listening to the queue.');
-        $this->adapter->subscribe(fn (MessageInterface $message) => $this->handle($message));
+        $this->adapter->subscribe(fn(MessageInterface $message) => $this->handle($message));
         $this->logger->info('Finish listening to the queue.');
     }
 
@@ -155,7 +155,7 @@ final class Queue implements QueueInterface
         return new class (
             $this->adapterPushHandler,
             $this->pushMiddlewareDispatcher,
-            array_merge($this->middlewareDefinitions, $middlewares)
+            array_merge($this->middlewareDefinitions, $middlewares),
         ) implements MessageHandlerPushInterface {
             public function __construct(
                 private readonly AdapterPushHandler $adapterPushHandler,
@@ -164,8 +164,7 @@ final class Queue implements QueueInterface
                  * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
                  */
                 private readonly array $middlewares,
-            ) {
-            }
+            ) {}
 
             public function handlePush(PushRequest $request): PushRequest
             {

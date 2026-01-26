@@ -73,7 +73,7 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
     /**
      * @throws InvalidQueueConfigException
      */
-    private function getOrTryToCreate(string $channel): QueueInterface|null
+    private function getOrTryToCreate(string $channel): ?QueueInterface
     {
         if (array_key_exists($channel, $this->queues)) {
             return $this->queues[$channel];

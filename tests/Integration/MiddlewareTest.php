@@ -52,7 +52,7 @@ final class MiddlewareTest extends TestCase
             new MiddlewareFactoryPush(
                 $this->createMock(ContainerInterface::class),
                 new CallableFactory(
-                    $this->createMock(ContainerInterface::class)
+                    $this->createMock(ContainerInterface::class),
                 ),
             ),
             new TestMiddleware('common 1'),
@@ -97,7 +97,7 @@ final class MiddlewareTest extends TestCase
             new MiddlewareFactoryConsume(
                 $this->createMock(ContainerInterface::class),
                 new CallableFactory(
-                    $this->createMock(ContainerInterface::class)
+                    $this->createMock(ContainerInterface::class),
                 ),
             ),
             new TestMiddleware('common 1'),
@@ -110,7 +110,7 @@ final class MiddlewareTest extends TestCase
         );
 
         $worker = new Worker(
-            ['test' => static fn () => true],
+            ['test' => static fn() => true],
             new SimpleLogger(),
             new Injector($container),
             $container,
@@ -130,7 +130,7 @@ final class MiddlewareTest extends TestCase
         $this->expectExceptionObject($exception);
 
         $message = new Message('simple', null, []);
-        $queueCallback = static fn (MessageInterface $message): MessageInterface => $message;
+        $queueCallback = static fn(MessageInterface $message): MessageInterface => $message;
         $queue = $this->createMock(QueueInterface::class);
         $container = new SimpleContainer([SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queue)]);
         $callableFactory = new CallableFactory($container);
@@ -149,7 +149,7 @@ final class MiddlewareTest extends TestCase
                     new SendAgainMiddleware('test-callable', 1, $queue),
                     'processFailure',
                 ],
-                fn (): SendAgainMiddleware => new SendAgainMiddleware('test-callable-2', 1, $queue),
+                fn(): SendAgainMiddleware => new SendAgainMiddleware('test-callable-2', 1, $queue),
                 SendAgainMiddleware::class,
                 new ExponentialDelayMiddleware(
                     'test',

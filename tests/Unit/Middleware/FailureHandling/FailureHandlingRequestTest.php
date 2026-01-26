@@ -18,7 +18,7 @@ final class FailureHandlingRequestTest extends TestCase
         $request1 = new FailureHandlingRequest(
             new Message('test', null),
             new Exception('exception 1'),
-            $queue
+            $queue,
         );
         $request2 = $request1->withQueue($queue);
         $request3 = $request1->withException(new Exception('exception 2'));

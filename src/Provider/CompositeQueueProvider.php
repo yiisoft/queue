@@ -21,7 +21,7 @@ final class CompositeQueueProvider implements QueueProviderInterface
      * @param QueueProviderInterface ...$providers Queue providers to use.
      */
     public function __construct(
-        QueueProviderInterface ...$providers
+        QueueProviderInterface ...$providers,
     ) {
         $this->providers = $providers;
     }

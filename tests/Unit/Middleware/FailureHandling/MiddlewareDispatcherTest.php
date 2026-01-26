@@ -33,7 +33,7 @@ final class MiddlewareDispatcherTest extends TestCase
                         return $request->withMessage(new Message('test', 'New closure test data'));
                     },
                 ],
-            ]
+            ],
         );
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
@@ -46,14 +46,14 @@ final class MiddlewareDispatcherTest extends TestCase
         $container = $this->createContainer(
             [
                 TestCallableMiddleware::class => new TestCallableMiddleware(),
-            ]
+            ],
         );
         $dispatcher = $this
             ->createDispatcher($container)
             ->withMiddlewares(
                 [
                     FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [[TestCallableMiddleware::class, 'index']],
-                ]
+                ],
             );
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('New test data', $request->getMessage()->getData());
@@ -132,7 +132,7 @@ final class MiddlewareDispatcherTest extends TestCase
             [
                 TestCallableMiddleware::class => new TestCallableMiddleware(),
                 TestMiddleware::class => new TestMiddleware(),
-            ]
+            ],
         );
 
         $dispatcher = $this
@@ -148,7 +148,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
     private function getRequestHandler(): MessageFailureHandlerInterface
     {
-        return new class () implements MessageFailureHandlerInterface {
+        return new class implements MessageFailureHandlerInterface {
             public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
             {
                 return $request;
@@ -175,7 +175,7 @@ final class MiddlewareDispatcherTest extends TestCase
         return new FailureHandlingRequest(
             new Message('handler', 'data'),
             new Exception('Test exception.'),
-            $this->createMock(QueueInterface::class)
+            $this->createMock(QueueInterface::class),
         );
     }
 }

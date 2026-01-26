@@ -6,6 +6,8 @@ namespace Yiisoft\Queue\Middleware\Consume;
 
 use Closure;
 
+use function array_key_exists;
+
 final class ConsumeMiddlewareDispatcher
 {
     /**
@@ -35,7 +37,7 @@ final class ConsumeMiddlewareDispatcher
      */
     public function dispatch(
         ConsumeRequest $request,
-        MessageHandlerConsumeInterface $finishHandler
+        MessageHandlerConsumeInterface $finishHandler,
     ): ConsumeRequest {
         $handlerName = $request->getMessage()->getHandlerName();
         if (!array_key_exists($handlerName, $this->stack)) {
@@ -91,8 +93,8 @@ final class ConsumeMiddlewareDispatcher
         $factory = $this->middlewareFactory;
 
         foreach ($this->middlewareDefinitions as $middlewareDefinition) {
-            $middlewares[] = static fn (): MiddlewareConsumeInterface => $factory->createConsumeMiddleware(
-                $middlewareDefinition
+            $middlewares[] = static fn(): MiddlewareConsumeInterface => $factory->createConsumeMiddleware(
+                $middlewareDefinition,
             );
         }
 

@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Cli;
 
+use const SIGCONT;
+use const SIGHUP;
+use const SIGINT;
+use const SIGTERM;
+use const SIGTSTP;
+
 final class SignalLoop implements LoopInterface
 {
     use SoftLimitTrait;
@@ -33,13 +39,13 @@ final class SignalLoop implements LoopInterface
     public function __construct(protected int $memorySoftLimit = 0)
     {
         foreach (self::SIGNALS_EXIT as $signal) {
-            pcntl_signal($signal, fn () => $this->exit = true);
+            pcntl_signal($signal, fn() => $this->exit = true);
         }
         foreach (self::SIGNALS_SUSPEND as $signal) {
-            pcntl_signal($signal, fn () => $this->pause = true);
+            pcntl_signal($signal, fn() => $this->pause = true);
         }
         foreach (self::SIGNALS_RESUME as $signal) {
-            pcntl_signal($signal, fn () => $this->pause = false);
+            pcntl_signal($signal, fn() => $this->pause = false);
         }
     }
 

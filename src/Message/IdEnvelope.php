@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
+use function is_int;
+use function is_object;
+use function is_string;
+
 /**
  * ID envelope allows to identify a message.
  */
@@ -14,8 +18,7 @@ final class IdEnvelope extends Envelope
     public function __construct(
         protected MessageInterface $message,
         private readonly string|int|null $id,
-    ) {
-    }
+    ) {}
 
     public static function fromMessage(MessageInterface $message): static
     {
@@ -27,7 +30,7 @@ final class IdEnvelope extends Envelope
             $rawId === null => null, // don't remove this branch: it's important for compute speed
             is_string($rawId) => $rawId,
             is_int($rawId) => $rawId,
-            is_object($rawId) && method_exists($rawId, '__toString') => (string)$rawId,
+            is_object($rawId) && method_exists($rawId, '__toString') => (string) $rawId,
             default => null,
         };
 

@@ -77,7 +77,7 @@ final class AdapterFactoryQueueProviderTest extends TestCase
 
         $this->expectException(InvalidQueueConfigException::class);
         $this->expectExceptionMessage(
-            'Invalid definition: incorrect constructor arguments. Expected array, got string.'
+            'Invalid definition: incorrect constructor arguments. Expected array, got string.',
         );
         new AdapterFactoryQueueProvider($baseQueue, $definitions);
     }
@@ -88,7 +88,7 @@ final class AdapterFactoryQueueProviderTest extends TestCase
             new StubQueue(),
             [
                 'channel1' => StubLoop::class,
-            ]
+            ],
         );
 
         $this->expectException(InvalidQueueConfigException::class);
@@ -97,7 +97,7 @@ final class AdapterFactoryQueueProviderTest extends TestCase
                 'Adapter must implement "%s". For channel "channel1" got "%s" instead.',
                 AdapterInterface::class,
                 StubLoop::class,
-            )
+            ),
         );
         $provider->get('channel1');
     }

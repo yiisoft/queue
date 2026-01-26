@@ -9,6 +9,4 @@ use LogicException;
 /**
  * Thrown when queue configuration is invalid.
  */
-final class InvalidQueueConfigException extends LogicException implements QueueProviderException
-{
-}
+final class InvalidQueueConfigException extends LogicException implements QueueProviderException {}

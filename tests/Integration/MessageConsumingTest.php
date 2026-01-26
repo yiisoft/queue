@@ -30,14 +30,14 @@ final class MessageConsumingTest extends TestCase
         $container = $this->createMock(ContainerInterface::class);
         $worker = new Worker(
             [
-                'test' => fn (MessageInterface $message): mixed => $this->messagesProcessed[] = $message->getData(),
-                'test2' => fn (MessageInterface $message): mixed => $this->messagesProcessedSecond[] = $message->getData(),
+                'test' => fn(MessageInterface $message): mixed => $this->messagesProcessed[] = $message->getData(),
+                'test2' => fn(MessageInterface $message): mixed => $this->messagesProcessedSecond[] = $message->getData(),
             ],
             new NullLogger(),
             new Injector($container),
             $container,
             new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class)),
-            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), [])
+            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), []),
         );
 
         $messages = [1, 'foo', 'bar-baz'];
@@ -62,7 +62,7 @@ final class MessageConsumingTest extends TestCase
             new Injector($container),
             $container,
             new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class)),
-            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), [])
+            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), []),
         );
 
         $messages = [1, 'foo', 'bar-baz'];
