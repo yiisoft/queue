@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Cli;
 
+use const SIGCONT;
+use const SIGHUP;
+use const SIGINT;
+use const SIGTERM;
+use const SIGTSTP;
+
 final class SignalLoop implements LoopInterface
 {
     use SoftLimitTrait;

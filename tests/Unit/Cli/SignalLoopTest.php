@@ -9,6 +9,13 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Yiisoft\Queue\Cli\SignalLoop;
 
+use const SIGALRM;
+use const SIGCONT;
+use const SIGHUP;
+use const SIGINT;
+use const SIGTERM;
+use const SIGTSTP;
+
 #[RequiresPhpExtension('pcntl')]
 final class SignalLoopTest extends TestCase
 {
