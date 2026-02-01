@@ -20,8 +20,7 @@ final class PrototypeQueueProvider implements QueueProviderInterface
     public function __construct(
         private readonly QueueInterface $baseQueue,
         private readonly AdapterInterface $baseAdapter,
-    ) {
-    }
+    ) {}
 
     public function get(string|BackedEnum $channel): QueueInterface
     {

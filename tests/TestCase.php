@@ -32,7 +32,7 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 abstract class TestCase extends BaseTestCase
 {
     protected ?ContainerInterface $container = null;
-    protected Queue|null $queue = null;
+    protected ?Queue $queue = null;
     protected ?AdapterInterface $adapter = null;
     protected ?LoopInterface $loop = null;
     protected ?WorkerInterface $worker = null;
@@ -162,7 +162,7 @@ abstract class TestCase extends BaseTestCase
     protected function getMessageHandlers(): array
     {
         return [
-            'simple' => fn () => $this->executionTimes++,
+            'simple' => fn() => $this->executionTimes++,
             'exceptional' => function (): never {
                 $this->executionTimes++;
 

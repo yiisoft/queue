@@ -28,6 +28,11 @@ use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
+use function array_key_exists;
+use function is_array;
+use function is_string;
+use function sprintf;
+
 final class Worker implements WorkerInterface
 {
     private array $handlersCached = [];
@@ -39,8 +44,7 @@ final class Worker implements WorkerInterface
         private readonly ContainerInterface $container,
         private readonly ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher,
         private readonly FailureMiddlewareDispatcher $failureMiddlewareDispatcher,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Throwable
@@ -56,7 +60,7 @@ final class Worker implements WorkerInterface
         }
 
         $request = new ConsumeRequest($message, $queue);
-        $closure = fn (MessageInterface $message): mixed => $this->injector->invoke($handler, [$message]);
+        $closure = fn(MessageInterface $message): mixed => $this->injector->invoke($handler, [$message]);
         try {
             return $this->consumeMiddlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure))->getMessage();
         } catch (Throwable $exception) {
@@ -105,7 +109,7 @@ final class Worker implements WorkerInterface
      * @throws NotFoundExceptionInterface
      * @return callable|null
      */
-    private function prepare(callable|object|array|string|null $definition): callable|null
+    private function prepare(callable|object|array|string|null $definition): ?callable
     {
         if (is_string($definition) && $this->container->has($definition)) {
             return $this->container->get($definition);

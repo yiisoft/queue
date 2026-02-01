@@ -35,7 +35,7 @@ final class FailureMiddlewareDispatcher
      */
     public function dispatch(
         FailureHandlingRequest $request,
-        MessageFailureHandlerInterface $finishHandler
+        MessageFailureHandlerInterface $finishHandler,
     ): FailureHandlingRequest {
         /** @var string $channel It is always string in this context */
         $channel = $request->getQueue()->getChannel();
@@ -98,8 +98,8 @@ final class FailureMiddlewareDispatcher
         $factory = $this->middlewareFactory;
 
         foreach ($definitions as $middlewareDefinition) {
-            $middlewares[] = static fn (): MiddlewareFailureInterface =>
-                $factory->createFailureMiddleware($middlewareDefinition);
+            $middlewares[] = static fn(): MiddlewareFailureInterface
+                => $factory->createFailureMiddleware($middlewareDefinition);
         }
 
         return $middlewares;

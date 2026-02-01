@@ -15,8 +15,7 @@ final class Message implements MessageInterface
         private readonly string $handlerName,
         private readonly mixed $data,
         private array $metadata = [],
-    ) {
-    }
+    ) {}
 
     public static function fromData(string $handlerName, mixed $data, array $metadata = []): MessageInterface
     {

@@ -103,7 +103,7 @@ class QueueDecoratorTest extends TestCase
     {
         $queueDecorator = new QueueDecorator(
             $this->createMock(QueueInterface::class),
-            new QueueCollector()
+            new QueueCollector(),
         );
         $this->assertNotSame($queueDecorator, $queueDecorator->withAdapter(new FakeAdapter()));
     }

@@ -13,7 +13,7 @@ final class CallableFactoryTest extends TestCase
 {
     public function testCreateFromContainerStringInvokable(): void
     {
-        $invokable = new class () {
+        $invokable = new class {
             public function __invoke(): string
             {
                 return 'ok';
@@ -32,7 +32,7 @@ final class CallableFactoryTest extends TestCase
 
     public function testCreateFromStaticMethodArray(): void
     {
-        $class = new class () {
+        $class = new class {
             public static function ping(): string
             {
                 return 'pong';
@@ -50,7 +50,7 @@ final class CallableFactoryTest extends TestCase
 
     public function testCreateFromContainerObjectMethod(): void
     {
-        $service = new class () {
+        $service = new class {
             public function go(): string
             {
                 return 'ok';
@@ -73,6 +73,6 @@ final class CallableFactoryTest extends TestCase
         $e = new InvalidCallableConfigurationException();
         self::assertSame('Invalid callable configuration.', $e->getName());
         self::assertNotNull($e->getSolution());
-        self::assertStringContainsString('callable', (string)$e->getSolution());
+        self::assertStringContainsString('callable', (string) $e->getSolution());
     }
 }

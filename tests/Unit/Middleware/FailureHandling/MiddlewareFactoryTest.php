@@ -42,7 +42,7 @@ final class MiddlewareFactoryTest extends TestCase
             'New test data',
             $middleware->processFailure(
                 $this->getConsumeRequest(),
-                $this->createMock(MessageFailureHandlerInterface::class)
+                $this->createMock(MessageFailureHandlerInterface::class),
             )->getMessage()->getData(),
         );
     }
@@ -57,14 +57,14 @@ final class MiddlewareFactoryTest extends TestCase
                     new RuntimeException('test exception'),
                     $this->createMock(QueueInterface::class),
                 );
-            }
+            },
         );
         self::assertSame(
             'test data',
             $middleware->processFailure(
                 $this->getConsumeRequest(),
-                $this->createMock(MessageFailureHandlerInterface::class)
-            )->getMessage()->getData()
+                $this->createMock(MessageFailureHandlerInterface::class),
+            )->getMessage()->getData(),
         );
     }
 
@@ -74,14 +74,14 @@ final class MiddlewareFactoryTest extends TestCase
         $middleware = $this->getMiddlewareFactory($container)->createFailureMiddleware(
             static function (): MiddlewareFailureInterface {
                 return new TestMiddleware();
-            }
+            },
         );
         self::assertSame(
             'New middleware test data',
             $middleware->processFailure(
                 $this->getConsumeRequest(),
-                $this->createMock(MessageFailureHandlerInterface::class)
-            )->getMessage()->getData()
+                $this->createMock(MessageFailureHandlerInterface::class),
+            )->getMessage()->getData(),
         );
     }
 
@@ -94,8 +94,8 @@ final class MiddlewareFactoryTest extends TestCase
             'New middleware test data',
             $middleware->processFailure(
                 $this->getConsumeRequest(),
-                $this->getRequestHandler()
-            )->getMessage()->getData()
+                $this->getRequestHandler(),
+            )->getMessage()->getData(),
         );
     }
 
@@ -103,7 +103,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createFailureMiddleware(
-            [TestCallableMiddleware::class, 'index']
+            [TestCallableMiddleware::class, 'index'],
         );
         $request = $this->getConsumeRequest();
 
@@ -111,8 +111,8 @@ final class MiddlewareFactoryTest extends TestCase
             'New test data',
             $middleware->processFailure(
                 $request,
-                $this->getRequestHandler()
-            )->getMessage()->getData()
+                $this->getRequestHandler(),
+            )->getMessage()->getData(),
         );
     }
 
@@ -141,13 +141,13 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([InvalidController::class => new InvalidController()]);
         $middleware = $this->getMiddlewareFactory($container)->createFailureMiddleware(
-            [InvalidController::class, 'index']
+            [InvalidController::class, 'index'],
         );
 
         $this->expectException(InvalidMiddlewareDefinitionException::class);
         $middleware->processFailure(
             $this->getConsumeRequest(),
-            $this->createMock(MessageFailureHandlerInterface::class)
+            $this->createMock(MessageFailureHandlerInterface::class),
         );
     }
 
@@ -165,7 +165,7 @@ final class MiddlewareFactoryTest extends TestCase
 
     private function getRequestHandler(): MessageFailureHandlerInterface
     {
-        return new class () implements MessageFailureHandlerInterface {
+        return new class implements MessageFailureHandlerInterface {
             public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
             {
                 throw $request->getException();
@@ -178,7 +178,7 @@ final class MiddlewareFactoryTest extends TestCase
         return new FailureHandlingRequest(
             new Message('handler', 'data'),
             new Exception('test exception'),
-            $this->createMock(QueueInterface::class)
+            $this->createMock(QueueInterface::class),
         );
     }
 }

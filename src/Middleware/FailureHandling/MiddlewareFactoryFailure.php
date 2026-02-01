@@ -17,6 +17,7 @@ use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 
 use function is_string;
+use function is_array;
 
 /**
  * Creates a middleware based on the definition provided.
@@ -29,8 +30,7 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
     public function __construct(
         private readonly ContainerInterface $container,
         private readonly CallableFactory $callableFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array|callable|MiddlewareFailureInterface|string $middlewareDefinition Middleware definition in one of
@@ -55,7 +55,7 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
      * @return MiddlewareFailureInterface
      */
     public function createFailureMiddleware(
-        MiddlewareFailureInterface|callable|array|string $middlewareDefinition
+        MiddlewareFailureInterface|callable|array|string $middlewareDefinition,
     ): MiddlewareFailureInterface {
         if ($middlewareDefinition instanceof MiddlewareFailureInterface) {
             return $middlewareDefinition;
@@ -94,7 +94,7 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
 
             public function __construct(
                 callable $callback,
-                private readonly ContainerInterface $container
+                private readonly ContainerInterface $container,
             ) {
                 $this->callback = $callback;
             }
@@ -116,7 +116,7 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
     }
 
     private function tryGetFromCallable(
-        callable|MiddlewareFailureInterface|array|string $definition
+        callable|MiddlewareFailureInterface|array|string $definition,
     ): ?MiddlewareFailureInterface {
         if ($definition instanceof Closure) {
             return $this->wrapCallable($definition);
@@ -137,7 +137,7 @@ final class MiddlewareFactoryFailure implements MiddlewareFactoryFailureInterfac
     }
 
     private function tryGetFromArrayDefinition(
-        callable|MiddlewareFailureInterface|array|string $definition
+        callable|MiddlewareFailureInterface|array|string $definition,
     ): ?MiddlewareFailureInterface {
         if (!is_array($definition)) {
             return null;

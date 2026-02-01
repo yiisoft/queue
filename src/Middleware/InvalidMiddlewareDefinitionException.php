@@ -57,7 +57,7 @@ final class InvalidMiddlewareDefinitionException extends InvalidArgumentExceptio
                     if (is_string($key)) {
                         $item = '"' . $key . '" => ' . $item;
                     }
-                }
+                },
             );
 
             /** @var string[] $items */

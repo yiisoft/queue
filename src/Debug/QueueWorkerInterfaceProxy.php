@@ -13,8 +13,7 @@ final class QueueWorkerInterfaceProxy implements WorkerInterface
     public function __construct(
         private readonly WorkerInterface $worker,
         private readonly QueueCollector $collector,
-    ) {
-    }
+    ) {}
 
     public function process(MessageInterface $message, QueueInterface $queue): MessageInterface
     {

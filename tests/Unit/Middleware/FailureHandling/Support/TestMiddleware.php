@@ -11,9 +11,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 
 final class TestMiddleware implements MiddlewareFailureInterface
 {
-    public function __construct(private readonly string $message = 'New middleware test data')
-    {
-    }
+    public function __construct(private readonly string $message = 'New middleware test data') {}
 
     public function processFailure(FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest
     {

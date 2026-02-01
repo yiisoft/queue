@@ -13,6 +13,8 @@ use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Tests\Unit\Support\TestMessage;
 
+use function sprintf;
+
 /**
  * Testing message serialization options
  */

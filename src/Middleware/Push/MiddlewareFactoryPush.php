@@ -15,6 +15,7 @@ use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 
 use function is_string;
+use function is_array;
 
 /**
  * Creates a middleware based on the definition provided.
@@ -27,8 +28,7 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
     public function __construct(
         private readonly ContainerInterface $container,
         private readonly CallableFactory $callableFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array|callable|MiddlewarePushInterface|string $middlewareDefinition Middleware definition in one of
@@ -52,7 +52,7 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
      * @return MiddlewarePushInterface
      */
     public function createPushMiddleware(
-        MiddlewarePushInterface|callable|array|string $middlewareDefinition
+        MiddlewarePushInterface|callable|array|string $middlewareDefinition,
     ): MiddlewarePushInterface {
         if ($middlewareDefinition instanceof MiddlewarePushInterface) {
             return $middlewareDefinition;
@@ -91,7 +91,7 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
 
             public function __construct(
                 callable $callback,
-                private readonly ContainerInterface $container
+                private readonly ContainerInterface $container,
             ) {
                 $this->callback = $callback;
             }
@@ -113,7 +113,7 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
     }
 
     private function tryGetFromCallable(
-        callable|MiddlewarePushInterface|array|string $definition
+        callable|MiddlewarePushInterface|array|string $definition,
     ): ?MiddlewarePushInterface {
         if ($definition instanceof Closure) {
             return $this->wrapCallable($definition);
@@ -134,7 +134,7 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
     }
 
     private function tryGetFromArrayDefinition(
-        callable|MiddlewarePushInterface|array|string $definition
+        callable|MiddlewarePushInterface|array|string $definition,
     ): ?MiddlewarePushInterface {
         if (!is_array($definition)) {
             return null;

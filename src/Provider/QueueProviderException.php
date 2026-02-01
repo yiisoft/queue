@@ -9,6 +9,4 @@ use Throwable;
 /**
  * Base interface representing a generic exception in a queue provider.
  */
-interface QueueProviderException extends Throwable
-{
-}
+interface QueueProviderException extends Throwable {}

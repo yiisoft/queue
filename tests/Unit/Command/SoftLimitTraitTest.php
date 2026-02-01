@@ -11,7 +11,7 @@ final class SoftLimitTraitTest extends TestCase
 {
     public function testMemoryLimitNotReachedWhenLimitIsZero(): void
     {
-        $instance = new class () {
+        $instance = new class {
             use SoftLimitTrait {
                 memoryLimitReached as public;
             }
@@ -33,9 +33,7 @@ final class SoftLimitTraitTest extends TestCase
                 memoryLimitReached as public;
             }
 
-            public function __construct(private readonly int $limit)
-            {
-            }
+            public function __construct(private readonly int $limit) {}
 
             protected function getMemoryLimit(): int
             {
@@ -54,9 +52,7 @@ final class SoftLimitTraitTest extends TestCase
                 memoryLimitReached as public;
             }
 
-            public function __construct(private readonly int $limit)
-            {
-            }
+            public function __construct(private readonly int $limit) {}
 
             protected function getMemoryLimit(): int
             {
@@ -75,9 +71,7 @@ final class SoftLimitTraitTest extends TestCase
                 memoryLimitReached as public;
             }
 
-            public function __construct(private readonly int $limit)
-            {
-            }
+            public function __construct(private readonly int $limit) {}
 
             protected function getMemoryLimit(): int
             {

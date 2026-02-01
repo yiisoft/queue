@@ -40,7 +40,7 @@ final class CompositeQueueProviderTest extends TestCase
         $provider = new CompositeQueueProvider(
             new AdapterFactoryQueueProvider(
                 new StubQueue(new StubAdapter()),
-                ['channel1' => new StubAdapter()]
+                ['channel1' => new StubAdapter()],
             ),
         );
 

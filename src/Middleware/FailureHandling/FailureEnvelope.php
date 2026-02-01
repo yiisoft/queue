@@ -15,8 +15,7 @@ final class FailureEnvelope extends Envelope
     public function __construct(
         protected MessageInterface $message,
         private readonly array $metadata = [],
-    ) {
-    }
+    ) {}
 
     public static function fromMessage(MessageInterface $message): static
     {
