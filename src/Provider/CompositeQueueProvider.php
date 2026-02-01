@@ -26,20 +26,20 @@ final class CompositeQueueProvider implements QueueProviderInterface
         $this->providers = $providers;
     }
 
-    public function get(string|BackedEnum $channel): QueueInterface
+    public function get(string|BackedEnum $queueName): QueueInterface
     {
         foreach ($this->providers as $provider) {
-            if ($provider->has($channel)) {
-                return $provider->get($channel);
+            if ($provider->has($queueName)) {
+                return $provider->get($queueName);
             }
         }
-        throw new ChannelNotFoundException($channel);
+        throw new QueueNotFoundException($queueName);
     }
 
-    public function has(string|BackedEnum $channel): bool
+    public function has(string|BackedEnum $queueName): bool
     {
         foreach ($this->providers as $provider) {
-            if ($provider->has($channel)) {
+            if ($provider->has($queueName)) {
                 return true;
             }
         }

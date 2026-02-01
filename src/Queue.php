@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue;
 
+use BackedEnum;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
@@ -16,6 +17,7 @@ use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Push\PushRequest;
 use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 
 final class Queue implements QueueInterface
 {
@@ -30,6 +32,7 @@ final class Queue implements QueueInterface
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
         private readonly PushMiddlewareDispatcher $pushMiddlewareDispatcher,
+        private string $name = QueueProviderInterface::DEFAULT_QUEUE,
         private ?AdapterInterface $adapter = null,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ) {
@@ -37,10 +40,9 @@ final class Queue implements QueueInterface
         $this->adapterPushHandler = new AdapterPushHandler();
     }
 
-    public function getChannel(): string
+    public function getName(): string
     {
-        $this->checkAdapter();
-        return $this->adapter->getChannel();
+        return $this->name;
     }
 
     public function push(
@@ -109,10 +111,13 @@ final class Queue implements QueueInterface
         return $this->adapter->status($id);
     }
 
-    public function withAdapter(AdapterInterface $adapter): static
+    public function withAdapter(AdapterInterface $adapter, string|BackedEnum|null $queueName = null): static
     {
         $new = clone $this;
         $new->adapter = $adapter;
+        if ($queueName !== null) {
+            $new->name = QueueNameNormalizer::normalize($queueName);
+        }
 
         return $new;
     }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Provider;
 
 use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
-use Yiisoft\Queue\Provider\ChannelNotFoundException;
+use Yiisoft\Queue\Provider\QueueNotFoundException;
 use Yiisoft\Queue\Provider\CompositeQueueProvider;
 use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Queue\Stubs\StubQueue;
@@ -31,8 +31,8 @@ final class CompositeQueueProviderTest extends TestCase
         $this->assertTrue($provider->has('channel2'));
         $this->assertFalse($provider->has('channel3'));
 
-        $this->assertSame('channel1', $provider->get('channel1')->getChannel());
-        $this->assertSame('channel2', $provider->get('channel2')->getChannel());
+        $this->assertSame('channel1', $provider->get('channel1')->getName());
+        $this->assertSame('channel2', $provider->get('channel2')->getName());
     }
 
     public function testNotFound(): void
@@ -44,7 +44,7 @@ final class CompositeQueueProviderTest extends TestCase
             ),
         );
 
-        $this->expectException(ChannelNotFoundException::class);
+        $this->expectException(QueueNotFoundException::class);
         $this->expectExceptionMessage('Channel "not-exists" not found.');
         $provider->get('not-exists');
     }

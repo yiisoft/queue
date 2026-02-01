@@ -201,7 +201,7 @@ final class WorkerTest extends TestCase
         $message = new Message('simple', null);
         /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
-        $queue->method('getChannel')->willReturn('test-channel');
+        $queue->method('getName')->willReturn('test-queue');
 
         $originalException = new RuntimeException('Consume failed');
         /** @var MiddlewareConsumeInterface&MockObject $consumeMiddleware */
@@ -221,7 +221,7 @@ final class WorkerTest extends TestCase
         /** @var MiddlewareFactoryFailureInterface&MockObject $failureMiddlewareFactory */
         $failureMiddlewareFactory = $this->createMock(MiddlewareFactoryFailureInterface::class);
         $failureMiddlewareFactory->method('createFailureMiddleware')->willReturn($failureMiddleware);
-        $failureDispatcher = new FailureMiddlewareDispatcher($failureMiddlewareFactory, ['test-channel' => ['simple']]);
+        $failureDispatcher = new FailureMiddlewareDispatcher($failureMiddlewareFactory, ['test-queue' => ['simple']]);
 
         $worker = new Worker(
             ['simple' => fn() => null],

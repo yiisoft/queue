@@ -9,7 +9,7 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Factory\StrictFactory;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\ChannelNormalizer;
+use Yiisoft\Queue\QueueNameNormalizer;
 use Yiisoft\Queue\QueueInterface;
 
 use function array_key_exists;
@@ -32,7 +32,7 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
 
     /**
      * @param QueueInterface $baseQueue Base queue for queues creation.
-     * @param array $definitions Adapter definitions indexed by channel names.
+     * @param array $definitions Adapter definitions indexed by queueName names.
      * @param ContainerInterface|null $container Container to use for dependencies resolving.
      * @param bool $validate If definitions should be validated when set.
      *
@@ -52,50 +52,50 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
         }
     }
 
-    public function get(string|BackedEnum $channel): QueueInterface
+    public function get(string|BackedEnum $queueName): QueueInterface
     {
-        $channel = ChannelNormalizer::normalize($channel);
+        $queueName = QueueNameNormalizer::normalize($queueName);
 
-        $queue = $this->getOrTryToCreate($channel);
+        $queue = $this->getOrTryToCreate($queueName);
         if ($queue === null) {
-            throw new ChannelNotFoundException($channel);
+            throw new QueueNotFoundException($queueName);
         }
 
         return $queue;
     }
 
-    public function has(string|BackedEnum $channel): bool
+    public function has(string|BackedEnum $queueName): bool
     {
-        $channel = ChannelNormalizer::normalize($channel);
-        return $this->factory->has($channel);
+        $queueName = QueueNameNormalizer::normalize($queueName);
+        return $this->factory->has($queueName);
     }
 
     /**
      * @throws InvalidQueueConfigException
      */
-    private function getOrTryToCreate(string $channel): ?QueueInterface
+    private function getOrTryToCreate(string $queueName): ?QueueInterface
     {
-        if (array_key_exists($channel, $this->queues)) {
-            return $this->queues[$channel];
+        if (array_key_exists($queueName, $this->queues)) {
+            return $this->queues[$queueName];
         }
 
-        if ($this->factory->has($channel)) {
-            $adapter = $this->factory->create($channel);
+        if ($this->factory->has($queueName)) {
+            $adapter = $this->factory->create($queueName);
             if (!$adapter instanceof AdapterInterface) {
                 throw new InvalidQueueConfigException(
                     sprintf(
-                        'Adapter must implement "%s". For channel "%s" got "%s" instead.',
+                        'Adapter must implement "%s". For queueName "%s" got "%s" instead.',
                         AdapterInterface::class,
-                        $channel,
+                        $queueName,
                         get_debug_type($adapter),
                     ),
                 );
             }
-            $this->queues[$channel] = $this->baseQueue->withAdapter($adapter->withChannel($channel));
+            $this->queues[$queueName] = $this->baseQueue->withAdapter($adapter, $queueName);
         } else {
-            $this->queues[$channel] = null;
+            $this->queues[$queueName] = null;
         }
 
-        return $this->queues[$channel];
+        return $this->queues[$queueName];
     }
 }

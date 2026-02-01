@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Provider;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use Yiisoft\Queue\Provider\ChannelNotFoundException;
+use Yiisoft\Queue\Provider\QueueNotFoundException;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Tests\Unit\Support\StringEnum;
 
-final class ChannelNotFoundExceptionTest extends TestCase
+final class QueueNotFoundExceptionTest extends TestCase
 {
     public static function dataBase(): iterable
     {
@@ -20,7 +20,7 @@ final class ChannelNotFoundExceptionTest extends TestCase
     #[DataProvider('dataBase')]
     public function testBase(string $expectedChannel, mixed $channel): void
     {
-        $exception = new ChannelNotFoundException($channel);
+        $exception = new QueueNotFoundException($channel);
 
         $this->assertSame(
             'Channel "' . $expectedChannel . '" not found.',

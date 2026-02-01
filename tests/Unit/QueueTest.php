@@ -152,7 +152,7 @@ final class QueueTest extends TestCase
             ->getQueue()
             ->withAdapter(new StubAdapter('test-channel'));
 
-        $this->assertSame('test-channel', $queue->getChannel());
+        $this->assertSame('test-channel', $queue->getName());
     }
 
     public function testGetChannelWithoutAdapter(): void

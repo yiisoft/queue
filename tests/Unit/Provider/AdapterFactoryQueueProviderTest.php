@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Stubs\StubLoop;
 use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
-use Yiisoft\Queue\Provider\ChannelNotFoundException;
+use Yiisoft\Queue\Provider\QueueNotFoundException;
 use Yiisoft\Queue\Provider\InvalidQueueConfigException;
 use Yiisoft\Queue\Stubs\StubQueue;
 use Yiisoft\Queue\Stubs\StubAdapter;
@@ -27,10 +27,11 @@ final class AdapterFactoryQueueProviderTest extends TestCase
             ],
         );
 
+        /** @var StubQueue $queue */
         $queue = $provider->get('channel1');
 
         $this->assertInstanceOf(StubQueue::class, $queue);
-        $this->assertSame('channel1', $queue->getChannel());
+        $this->assertSame('channel1', $queue->getName());
         $this->assertInstanceOf(StubAdapter::class, $queue->getAdapter());
         $this->assertTrue($provider->has('channel1'));
         $this->assertFalse($provider->has('not-exist-channel'));
@@ -60,8 +61,8 @@ final class AdapterFactoryQueueProviderTest extends TestCase
             ],
         );
 
-        $this->expectException(ChannelNotFoundException::class);
-        $this->expectExceptionMessage('Channel "not-exist-channel" not found.');
+        $this->expectException(QueueNotFoundException::class);
+        $this->expectExceptionMessage('Queue with name "not-exist-channel" not found.');
         $provider->get('not-exist-channel');
     }
 
@@ -113,7 +114,7 @@ final class AdapterFactoryQueueProviderTest extends TestCase
 
         $queue = $provider->get(StringEnum::RED);
 
-        $this->assertSame('red', $queue->getChannel());
+        $this->assertSame('red', $queue->getName());
         $this->assertTrue($provider->has(StringEnum::RED));
         $this->assertFalse($provider->has(StringEnum::GREEN));
     }

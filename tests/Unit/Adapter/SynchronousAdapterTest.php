@@ -53,7 +53,7 @@ final class SynchronousAdapterTest extends TestCase
     public function testWithSameChannel(): void
     {
         $adapter = $this->getAdapter();
-        self::assertEquals($adapter, $adapter->withChannel(QueueProviderInterface::DEFAULT_CHANNEL));
+        self::assertEquals($adapter, $adapter->withChannel(QueueProviderInterface::DEFAULT_QUEUE));
     }
 
     public function testWithAnotherChannel(): void

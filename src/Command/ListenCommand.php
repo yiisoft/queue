@@ -26,17 +26,17 @@ final class ListenCommand extends Command
     public function configure(): void
     {
         $this->addArgument(
-            'channel',
+            'queue',
             InputArgument::OPTIONAL,
-            'Queue channel name to connect to',
-            QueueProviderInterface::DEFAULT_CHANNEL,
+            'Queue name to connect to',
+            QueueProviderInterface::DEFAULT_QUEUE,
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->queueProvider
-            ->get($input->getArgument('channel'))
+            ->get($input->getArgument('queue'))
             ->listen();
 
         return 0;

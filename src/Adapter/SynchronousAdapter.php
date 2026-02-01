@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Adapter;
 
 use BackedEnum;
 use InvalidArgumentException;
-use Yiisoft\Queue\ChannelNormalizer;
+use Yiisoft\Queue\QueueNameNormalizer;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
@@ -25,9 +25,9 @@ final class SynchronousAdapter implements AdapterInterface
     public function __construct(
         private readonly WorkerInterface $worker,
         private readonly QueueInterface $queue,
-        string|BackedEnum $channel = QueueProviderInterface::DEFAULT_CHANNEL,
+        string|BackedEnum $channel = QueueProviderInterface::DEFAULT_QUEUE,
     ) {
-        $this->channel = ChannelNormalizer::normalize($channel);
+        $this->channel = QueueNameNormalizer::normalize($channel);
     }
 
     public function __destruct()
@@ -83,7 +83,7 @@ final class SynchronousAdapter implements AdapterInterface
 
     public function withChannel(string|BackedEnum $channel): self
     {
-        $channel = ChannelNormalizer::normalize($channel);
+        $channel = QueueNameNormalizer::normalize($channel);
 
         if ($channel === $this->channel) {
             return $this;
