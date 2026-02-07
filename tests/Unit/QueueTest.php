@@ -12,7 +12,6 @@ use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
-use Yiisoft\Queue\Provider\QueueProviderInterface;
 
 use function extension_loaded;
 

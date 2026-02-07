@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Adapter;
 
-use BackedEnum;
 use InvalidArgumentException;
-use Yiisoft\Queue\QueueNameNormalizer;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
@@ -20,11 +17,11 @@ final class SynchronousAdapter implements AdapterInterface
 {
     private array $messages = [];
     private int $current = 0;
+
     public function __construct(
         private readonly WorkerInterface $worker,
         private readonly QueueInterface $queue,
-    ) {
-    }
+    ) {}
 
     public function __destruct()
     {
