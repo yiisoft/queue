@@ -44,11 +44,6 @@ final class VoidAdapter implements AdapterInterface
         throw new RuntimeException('Method is not implemented');
     }
 
-    public function withChannel(string|BackedEnum $channel): AdapterInterface
-    {
-        throw new RuntimeException('Method is not implemented');
-    }
-
     public function getChannel(): string
     {
         throw new RuntimeException('Method is not implemented');

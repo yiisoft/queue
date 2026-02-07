@@ -45,7 +45,7 @@ final class CompositeQueueProviderTest extends TestCase
         );
 
         $this->expectException(QueueNotFoundException::class);
-        $this->expectExceptionMessage('Channel "not-exists" not found.');
+        $this->expectExceptionMessage('Queue with name "not-exists" not found.');
         $provider->get('not-exists');
     }
 }

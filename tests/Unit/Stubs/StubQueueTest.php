@@ -25,15 +25,6 @@ final class StubQueueTest extends TestCase
         $queue->listen();
     }
 
-    public function testGetChannelWithoutAdapter(): void
-    {
-        $queue = new StubQueue();
-
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Adapter is not set.');
-        $queue->getChannel();
-    }
-
     public function testWithAdapter(): void
     {
         $sourceQueue = new StubQueue();

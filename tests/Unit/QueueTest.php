@@ -12,6 +12,7 @@ use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 
 use function extension_loaded;
 
@@ -146,21 +147,13 @@ final class QueueTest extends TestCase
         self::assertEquals(2, $this->executionTimes);
     }
 
-    public function testGetChannel(): void
+    public function testGetName(): void
     {
         $queue = $this
             ->getQueue()
-            ->withAdapter(new StubAdapter('test-channel'));
+            ->withAdapter(new StubAdapter('test-channel'), 'test-queue');
 
-        $this->assertSame('test-channel', $queue->getName());
-    }
-
-    public function testGetChannelWithoutAdapter(): void
-    {
-        $queue = $this->getQueue();
-
-        $this->expectException(AdapterNotConfiguredException::class);
-        $queue->getChannel();
+        $this->assertSame('test-queue', $queue->getName());
     }
 
     protected function needsRealAdapter(): bool

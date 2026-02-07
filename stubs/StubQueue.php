@@ -14,13 +14,18 @@ use Yiisoft\Queue\QueueNameNormalizer;
 
 /**
  * Stub queue that does nothing. Job status is always "done".
+ *
+ * @template T of AdapterInterface
  */
 final class StubQueue implements QueueInterface
 {
-    private string $name = 'default';
-
-    public function __construct(private ?AdapterInterface $adapter = null)
-    {
+    /**
+     * @param T|null $adapter
+     */
+    public function __construct(
+        private ?AdapterInterface $adapter = null,
+        private string $name = 'default'
+    ) {
     }
 
     public function push(
@@ -44,11 +49,18 @@ final class StubQueue implements QueueInterface
         return JobStatus::DONE;
     }
 
+    /**
+     * @return T|null
+     */
     public function getAdapter(): ?AdapterInterface
     {
         return $this->adapter;
     }
 
+    /**
+     * @param T $adapter
+     * @return static<T>
+     */
     public function withAdapter(AdapterInterface $adapter, string|BackedEnum|null $queueName = null): static
     {
         $new = clone $this;

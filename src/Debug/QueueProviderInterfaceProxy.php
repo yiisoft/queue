@@ -15,15 +15,15 @@ final class QueueProviderInterfaceProxy implements QueueProviderInterface
         private readonly QueueCollector $collector,
     ) {}
 
-    public function get(string|BackedEnum $queue): QueueInterface
+    public function get(string|BackedEnum $queueName): QueueInterface
     {
-        $queue = $this->queueProvider->get($queue);
+        $queue = $this->queueProvider->get($queueName);
 
         return new QueueDecorator($queue, $this->collector);
     }
 
-    public function has(string|BackedEnum $queue): bool
+    public function has(string|BackedEnum $queueName): bool
     {
-        return $this->queueProvider->has($queue);
+        return $this->queueProvider->has($queueName);
     }
 }

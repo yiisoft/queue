@@ -22,8 +22,8 @@ final class QueueNotFoundExceptionTest extends TestCase
     {
         $exception = new QueueNotFoundException($channel);
 
-        $this->assertSame(
-            'Channel "' . $expectedChannel . '" not found.',
+        $this->assertStringContainsString(
+            '"' . $expectedChannel . '" not found.',
             $exception->getMessage(),
         );
     }

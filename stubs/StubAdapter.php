@@ -42,7 +42,7 @@ final class StubAdapter implements AdapterInterface
     {
     }
 
-    public function withChannel(string|BackedEnum $channel): AdapterInterface
+    public function withChannel(string|BackedEnum $channel): self
     {
         $new = clone $this;
         $new->channel = QueueNameNormalizer::normalize($channel);

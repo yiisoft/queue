@@ -20,14 +20,10 @@ final class SynchronousAdapter implements AdapterInterface
 {
     private array $messages = [];
     private int $current = 0;
-    private string $channel;
-
     public function __construct(
         private readonly WorkerInterface $worker,
         private readonly QueueInterface $queue,
-        string|BackedEnum $channel = QueueProviderInterface::DEFAULT_QUEUE,
     ) {
-        $this->channel = QueueNameNormalizer::normalize($channel);
     }
 
     public function __destruct()
@@ -79,25 +75,5 @@ final class SynchronousAdapter implements AdapterInterface
     public function subscribe(callable $handlerCallback): void
     {
         $this->runExisting($handlerCallback);
-    }
-
-    public function withChannel(string|BackedEnum $channel): self
-    {
-        $channel = QueueNameNormalizer::normalize($channel);
-
-        if ($channel === $this->channel) {
-            return $this;
-        }
-
-        $new = clone $this;
-        $new->channel = $channel;
-        $new->messages = [];
-
-        return $new;
-    }
-
-    public function getChannel(): string
-    {
-        return $this->channel;
     }
 }

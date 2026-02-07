@@ -38,8 +38,4 @@ interface AdapterInterface
      * @param callable(MessageInterface): bool $handlerCallback The handler which will handle messages. Returns false if it cannot continue handling messages.
      */
     public function subscribe(callable $handlerCallback): void;
-
-    public function withChannel(string|BackedEnum $channel): self;
-
-    public function getChannel(): string;
 }

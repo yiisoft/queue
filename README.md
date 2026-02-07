@@ -185,10 +185,9 @@ use Yiisoft\Queue\Adapter\SynchronousAdapter;
 
 [
     'channel1' => new SynchronousAdapter(),
-    'channel2' => static fn(SynchronousAdapter $adapter) => $adapter->withChannel('channel2'),
-    'channel3' => [
+    'channel2' => new SynchronousAdapter(), // a second instance for a different queue processing pipeline
+    'channel3' => [ // use a yiisoft/factory syntax for adapter creation
         'class' => SynchronousAdapter::class,
-        '__constructor' => ['channel' => 'channel3'],
     ],
 ]
 ```
