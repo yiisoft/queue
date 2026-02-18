@@ -13,11 +13,3 @@ vendor
 
 # composer lock files
 composer.lock
-
-# PHPUnit
-.phpunit.result.cache
-coverage.html
-
-# PHP CS Fixer
-/.php-cs-fixer.cache
-/.php-cs-fixer.php

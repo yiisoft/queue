@@ -15,6 +15,7 @@ $finder = (new Finder())->in([
 return ConfigBuilder::build()
     ->setRiskyAllowed(true)
     ->setParallelConfig(ParallelConfigFactory::detect())
+    ->setCacheFile(__DIR__ . '/runtime/cache/.php-cs-fixer.cache')
     ->setRules([
         '@Yiisoft/Core' => true,
         '@Yiisoft/Core:risky' => true,

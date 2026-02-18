@@ -1,0 +1,15 @@
+name: yiisoft-queue
+
+services:
+  php:
+    image: ghcr.io/yiisoft-contrib/php-dev:${PHP_IMAGE_VERSION:?Make sure `PHP_IMAGE_VERSION` is declared in `.env`}
+    user: ${CONTAINER_USER:-}
+    environment:
+      YII_INSIDE_CONTAINER: true
+      COMPOSER_CACHE_DIR: /app/runtime/cache/composer
+      HISTFILE: /app/runtime/.docker_shell_history
+    tty: true
+    init: true
+    working_dir: /app
+    volumes:
+      - ..:/app
