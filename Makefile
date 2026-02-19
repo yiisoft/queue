@@ -3,7 +3,7 @@
 DOCKER_COMPOSE := docker compose \
  	-f docker/compose.yaml \
  	--env-file docker/.env \
- 	$(shell test -f docker/.env.local && echo '--env-file .env.local')
+ 	$(shell test -f docker/.env.local && echo '--env-file docker/.env.local')
 export CONTAINER_USER = $(shell id -u):$(shell id -g)
 
 RUN := $(if $(YII_INSIDE_CONTAINER),,$(DOCKER_COMPOSE) run --rm -i php)
