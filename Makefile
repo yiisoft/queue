@@ -1,12 +1,19 @@
 .DEFAULT_GOAL := help
 
-DOCKER_COMPOSE := docker compose \
- 	-f docker/compose.yaml \
- 	--env-file docker/.env \
- 	$(shell test -f docker/.env.local && echo '--env-file docker/.env.local')
-export CONTAINER_USER = $(shell id -u):$(shell id -g)
+include .env
+-include .env.local
 
-RUN := $(if $(YII_INSIDE_CONTAINER),,$(DOCKER_COMPOSE) run --rm -i php)
+DOCKER_RUN := docker run --rm -it \
+	--init \
+	--user $(shell id -u):$(shell id -g) \
+	--env YII_INSIDE_CONTAINER=true \
+	--env COMPOSER_CACHE_DIR=/app/runtime/cache/composer \
+	--env HISTFILE=/app/runtime/.docker_shell_history \
+	--workdir /app \
+	--volume $(CURDIR):/app \
+	ghcr.io/yiisoft-contrib/php-dev:$(PHP_IMAGE_VERSION)
+
+RUN := $(if $(YII_INSIDE_CONTAINER),,$(DOCKER_RUN))
 
 shell: ## Open a shell inside the container.
 	@if [ -n "$$YII_INSIDE_CONTAINER" ]; then \
@@ -35,7 +42,6 @@ php-cs-fixer: ## [cs-fix] Fix code style with PHP-CS-Fixer: `make php-cs-fixer A
 
 coverage: ## Generate code coverage report in HTML
 	$(RUN) ./vendor/bin/phpunit --coverage-html=runtime/coverage
-	make down
 
 help: ## This help.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)

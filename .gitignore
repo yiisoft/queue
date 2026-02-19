@@ -13,3 +13,6 @@ vendor
 
 # composer lock files
 composer.lock
+
+# local environment variables
+/.env.local
