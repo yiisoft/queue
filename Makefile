@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-include .env
+PHP_VERSION ?= 8.5
 -include .env.local
 
 DOCKER_RUN := docker run --rm -it \
@@ -11,7 +11,7 @@ DOCKER_RUN := docker run --rm -it \
 	--env HISTFILE=/app/runtime/.docker_shell_history \
 	--workdir /app \
 	--volume $(CURDIR):/app \
-	ghcr.io/yiisoft-contrib/php-dev:$(PHP_IMAGE_VERSION)
+	ghcr.io/yiisoft-contrib/php-dev:$(PHP_VERSION)
 
 RUN := $(if $(YII_INSIDE_CONTAINER),,$(DOCKER_RUN))
 
@@ -34,7 +34,7 @@ infection: ## [infection] Run mutation testing with Infection.
 	$(RUN) ./vendor/bin/roave-infection-static-analysis-plugin --threads=max --ignore-msi-with-no-mutations --only-covered
 
 psalm: ## Run Psalm static analysis: `make psalm ARGS="--show-info=true"`
-	$(RUN) ./vendor/bin/psalm $(ARGS)
+	$(RUN) ./vendor/bin/psalm $(if $(ARGS),$(ARGS),--php-version=$(PHP_VERSION))
 
 cs-fix: php-cs-fixer
 php-cs-fixer: ## [cs-fix] Fix code style with PHP-CS-Fixer: `make php-cs-fixer ARGS="--dry-run"`
