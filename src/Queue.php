@@ -26,16 +26,18 @@ final class Queue implements QueueInterface
      */
     private array $middlewareDefinitions;
     private AdapterPushHandler $adapterPushHandler;
+    private string $name;
 
     public function __construct(
         private readonly WorkerInterface $worker,
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
         private readonly PushMiddlewareDispatcher $pushMiddlewareDispatcher,
-        private string $name = QueueProviderInterface::DEFAULT_QUEUE,
+        string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
         private ?AdapterInterface $adapter = null,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ) {
+        $this->name = QueueNameNormalizer::normalize($name);
         $this->middlewareDefinitions = $middlewareDefinitions;
         $this->adapterPushHandler = new AdapterPushHandler();
     }

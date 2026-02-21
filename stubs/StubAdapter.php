@@ -18,9 +18,7 @@ final class StubAdapter implements AdapterInterface
 {
     private string $channel;
 
-    public function __construct(
-        string|BackedEnum $channel = QueueProviderInterface::DEFAULT_QUEUE
-    ) {
+    public function __construct(string|BackedEnum $channel = 'yii-queue') {
         $this->channel = QueueNameNormalizer::normalize($channel);
     }
 

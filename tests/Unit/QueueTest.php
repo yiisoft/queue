@@ -15,6 +15,13 @@ use Yiisoft\Queue\Message\IdEnvelope;
 
 use function extension_loaded;
 
+// Test enum for BackedEnum testing
+enum TestQueue: string
+{
+    case DEFAULT = 'default';
+    case HIGH_PRIORITY = 'high-priority';
+}
+
 final class QueueTest extends TestCase
 {
     private bool $needsRealAdapter = true;
@@ -153,6 +160,15 @@ final class QueueTest extends TestCase
             ->withAdapter(new StubAdapter('test-channel'), 'test-queue');
 
         $this->assertSame('test-queue', $queue->getName());
+    }
+
+    public function testGetNameWithBackedEnum(): void
+    {
+        $queue = $this
+            ->getQueue()
+            ->withAdapter(new StubAdapter('test-channel'), TestQueue::HIGH_PRIORITY);
+
+        $this->assertSame('high-priority', $queue->getName());
     }
 
     protected function needsRealAdapter(): bool
