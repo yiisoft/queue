@@ -32,8 +32,8 @@ final class MessageConsumingTest extends TestCase
         $callableFactory = new CallableFactory($container);
         $worker = new Worker(
             [
-                'test' => fn (MessageInterface $message): mixed => $this->messagesProcessed[] = $message->getData(),
-                'test2' => fn (MessageInterface $message): mixed => $this->messagesProcessedSecond[] = $message->getData(),
+                'test' => fn(MessageInterface $message): mixed => $this->messagesProcessed[] = $message->getData(),
+                'test2' => fn(MessageInterface $message): mixed => $this->messagesProcessedSecond[] = $message->getData(),
             ],
             new NullLogger(),
             new Injector($container),

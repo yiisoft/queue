@@ -19,7 +19,6 @@ use Yiisoft\Queue\Provider\QueueProviderInterface;
         . 'Meant to be used in development environment only. '
         . 'Listens all configured queues by default in case you\'re using yiisoft/config. '
         . 'Needs to be stopped manually.',
-    ['queue:listen:all'],
 )]
 final class ListenAllCommand extends Command
 {
@@ -53,8 +52,8 @@ final class ListenAllCommand extends Command
                 'maximum',
                 'm',
                 InputOption::VALUE_REQUIRED,
-                'Maximum number of messages to process in each channel before switching to another channel. ' .
-                    'Default is 0 (no limits).',
+                'Maximum number of messages to process in each channel before switching to another channel. '
+                    . 'Default is 0 (no limits).',
                 0,
             );
 

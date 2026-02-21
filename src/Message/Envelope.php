@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
+use function is_array;
+
 abstract class Envelope implements EnvelopeInterface
 {
     private ?array $metadata = null;
 
-    public function __construct(protected MessageInterface $message)
-    {
-    }
+    public function __construct(protected MessageInterface $message) {}
 
     /** @psalm-suppress MoreSpecificReturnType */
     public static function fromData(string $handlerName, mixed $data, array $metadata = []): static

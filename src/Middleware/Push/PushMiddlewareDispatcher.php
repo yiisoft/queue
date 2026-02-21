@@ -34,7 +34,7 @@ final class PushMiddlewareDispatcher
      */
     public function dispatch(
         PushRequest $request,
-        MessageHandlerPushInterface $finishHandler
+        MessageHandlerPushInterface $finishHandler,
     ): PushRequest {
         if ($this->stack === null) {
             $this->stack = new MiddlewarePushStack($this->buildMiddlewares(), $finishHandler);
@@ -89,8 +89,8 @@ final class PushMiddlewareDispatcher
         $factory = $this->middlewareFactory;
 
         foreach ($this->middlewareDefinitions as $middlewareDefinition) {
-            $middlewares[] = static fn (): MiddlewarePushInterface => $factory->createPushMiddleware(
-                $middlewareDefinition
+            $middlewares[] = static fn(): MiddlewarePushInterface => $factory->createPushMiddleware(
+                $middlewareDefinition,
             );
         }
 

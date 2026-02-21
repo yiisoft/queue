@@ -13,8 +13,7 @@ final class QueueProviderInterfaceProxy implements QueueProviderInterface
     public function __construct(
         private readonly QueueProviderInterface $queueProvider,
         private readonly QueueCollector $collector,
-    ) {
-    }
+    ) {}
 
     public function get(string|BackedEnum $channel): QueueInterface
     {

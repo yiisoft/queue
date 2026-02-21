@@ -196,6 +196,6 @@ final class CallableFactoryTest extends TestCase
         $e = new InvalidCallableConfigurationException();
         self::assertSame('Invalid callable configuration.', $e->getName());
         self::assertNotNull($e->getSolution());
-        self::assertStringContainsString('callable', (string)$e->getSolution());
+        self::assertStringContainsString('callable', (string) $e->getSolution());
     }
 }

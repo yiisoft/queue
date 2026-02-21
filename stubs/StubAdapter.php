@@ -9,7 +9,7 @@ use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\ChannelNormalizer;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 
 /**
  * Stub adapter that does nothing. Job status is always "done".
@@ -19,7 +19,7 @@ final class StubAdapter implements AdapterInterface
     private string $channel;
 
     public function __construct(
-        string|BackedEnum $channel = QueueInterface::DEFAULT_CHANNEL
+        string|BackedEnum $channel = QueueProviderInterface::DEFAULT_CHANNEL
     ) {
         $this->channel = ChannelNormalizer::normalize($channel);
     }

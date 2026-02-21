@@ -11,9 +11,6 @@ use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 
 interface QueueInterface
 {
-    /** @psalm-suppress MissingClassConstType */
-    public const DEFAULT_CHANNEL = 'yii-queue';
-
     /**
      * Pushes a message into the queue.
      *

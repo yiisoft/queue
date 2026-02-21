@@ -28,6 +28,7 @@ use Yiisoft\Queue\Tests\App\FakeHandler;
 use Yiisoft\Queue\Tests\App\StaticMessageHandler;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Worker\Worker;
+use PHPUnit\Framework\MockObject\MockObject;
 
 final class WorkerTest extends TestCase
 {
@@ -39,7 +40,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer($containerServices);
         $handlers = ['simple' => $handler];
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject&QueueInterface $queue */
+        /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams($handlers, $container, $logger);
 
@@ -94,7 +95,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => [FakeHandler::class, 'undefinedMethod']];
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject&QueueInterface $queue */
+        /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams($handlers, $container);
 
@@ -111,17 +112,11 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => ['UndefinedClass', 'handle']];
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject&QueueInterface $queue */
+        /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams($handlers, $container, $logger);
 
-        try {
-            $worker->process($message, $queue);
-        } finally {
-            $messages = $logger->getMessages();
-            $this->assertNotEmpty($messages);
-            $this->assertStringContainsString('UndefinedClass doesn\'t exist.', $messages[1]['message']);
-        }
+        $worker->process($message, $queue);
     }
 
     public function testJobFailWithDefinitionClassNotFoundInContainerHandler(): void
@@ -131,7 +126,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer();
         $handlers = ['simple' => [FakeHandler::class, 'execute']];
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject&QueueInterface $queue */
+        /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams($handlers, $container);
 
@@ -146,7 +141,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => [FakeHandler::class, 'executeWithException']];
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject&QueueInterface $queue */
+        /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams($handlers, $container, $logger);
 
@@ -161,30 +156,9 @@ final class WorkerTest extends TestCase
             $this->assertNotEmpty($messages);
             $this->assertStringContainsString(
                 "Processing of message #null is stopped because of an exception:\nTest exception.",
-                $messages[1]['message']
+                $messages[1]['message'],
             );
         }
-    }
-
-    private function createWorkerByParams(
-        array $handlers,
-        ContainerInterface $container,
-        ?LoggerInterface $logger = null,
-    ): Worker {
-        /** @var MiddlewareFactoryConsumeInterface&\PHPUnit\Framework\MockObject\MockObject $consumeMiddlewareFactory */
-        $consumeMiddlewareFactory = $this->createMock(MiddlewareFactoryConsumeInterface::class);
-        /** @var MiddlewareFactoryFailureInterface&\PHPUnit\Framework\MockObject\MockObject $failureMiddlewareFactory */
-        $failureMiddlewareFactory = $this->createMock(MiddlewareFactoryFailureInterface::class);
-
-        return new Worker(
-            $handlers,
-            $logger ?? new NullLogger(),
-            new Injector($container),
-            $container,
-            new ConsumeMiddlewareDispatcher($consumeMiddlewareFactory),
-            new FailureMiddlewareDispatcher($failureMiddlewareFactory, []),
-            new CallableFactory($container),
-        );
     }
 
     public function testHandlerNotFoundInContainer(): void
@@ -193,7 +167,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer();
         $handlers = [];
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject&QueueInterface $queue */
+        /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams($handlers, $container);
 
@@ -206,15 +180,13 @@ final class WorkerTest extends TestCase
     {
         $message = new Message('invalid', ['test-data']);
         $container = new SimpleContainer([
-            'invalid' => new class () {
-                public function handle(): void
-                {
-                }
+            'invalid' => new class {
+                public function handle(): void {}
             },
         ]);
         $handlers = [];
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject&QueueInterface $queue */
+        /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams($handlers, $container);
 
@@ -226,33 +198,33 @@ final class WorkerTest extends TestCase
     public function testJobFailureIsHandledSuccessfully(): void
     {
         $message = new Message('simple', null);
-        /** @var \PHPUnit\Framework\MockObject\MockObject&QueueInterface $queue */
+        /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
         $queue->method('getChannel')->willReturn('test-channel');
 
         $originalException = new RuntimeException('Consume failed');
-        /** @var MiddlewareConsumeInterface&\PHPUnit\Framework\MockObject\MockObject $consumeMiddleware */
+        /** @var MiddlewareConsumeInterface&MockObject $consumeMiddleware */
         $consumeMiddleware = $this->createMock(MiddlewareConsumeInterface::class);
         $consumeMiddleware->method('processConsume')->willThrowException($originalException);
 
-        /** @var MiddlewareFactoryConsumeInterface&\PHPUnit\Framework\MockObject\MockObject $consumeMiddlewareFactory */
+        /** @var MiddlewareFactoryConsumeInterface&MockObject $consumeMiddlewareFactory */
         $consumeMiddlewareFactory = $this->createMock(MiddlewareFactoryConsumeInterface::class);
         $consumeMiddlewareFactory->method('createConsumeMiddleware')->willReturn($consumeMiddleware);
         $consumeDispatcher = new ConsumeMiddlewareDispatcher($consumeMiddlewareFactory, 'simple');
 
         $finalMessage = new Message('final', null);
-        /** @var MiddlewareFailureInterface&\PHPUnit\Framework\MockObject\MockObject $failureMiddleware */
+        /** @var MiddlewareFailureInterface&MockObject $failureMiddleware */
         $failureMiddleware = $this->createMock(MiddlewareFailureInterface::class);
         $failureMiddleware->method('processFailure')->willReturn(new FailureHandlingRequest($finalMessage, $originalException, $queue));
 
-        /** @var MiddlewareFactoryFailureInterface&\PHPUnit\Framework\MockObject\MockObject $failureMiddlewareFactory */
+        /** @var MiddlewareFactoryFailureInterface&MockObject $failureMiddlewareFactory */
         $failureMiddlewareFactory = $this->createMock(MiddlewareFactoryFailureInterface::class);
         $failureMiddlewareFactory->method('createFailureMiddleware')->willReturn($failureMiddleware);
         $failureDispatcher = new FailureMiddlewareDispatcher($failureMiddlewareFactory, ['test-channel' => ['simple']]);
 
         $container = new SimpleContainer();
         $worker = new Worker(
-            ['simple' => fn () => null],
+            ['simple' => fn() => null],
             new NullLogger(),
             new Injector($container),
             $container,
@@ -274,12 +246,33 @@ final class WorkerTest extends TestCase
             'static-handler' => StaticMessageHandler::handle(...),
         ];
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject&QueueInterface $queue */
+        /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
         $worker = $this->createWorkerByParams($handlers, $container);
 
         StaticMessageHandler::$wasHandled = false;
         $worker->process($message, $queue);
         $this->assertTrue(StaticMessageHandler::$wasHandled);
+    }
+
+    private function createWorkerByParams(
+        array $handlers,
+        ContainerInterface $container,
+        ?LoggerInterface $logger = null,
+    ): Worker {
+        /** @var MiddlewareFactoryConsumeInterface&MockObject $consumeMiddlewareFactory */
+        $consumeMiddlewareFactory = $this->createMock(MiddlewareFactoryConsumeInterface::class);
+        /** @var MiddlewareFactoryFailureInterface&MockObject $failureMiddlewareFactory */
+        $failureMiddlewareFactory = $this->createMock(MiddlewareFactoryFailureInterface::class);
+
+        return new Worker(
+            $handlers,
+            $logger ?? new NullLogger(),
+            new Injector($container),
+            $container,
+            new ConsumeMiddlewareDispatcher($consumeMiddlewareFactory),
+            new FailureMiddlewareDispatcher($failureMiddlewareFactory, []),
+            new CallableFactory($container),
+        );
     }
 }

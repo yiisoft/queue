@@ -22,9 +22,8 @@ use function is_string;
 final class CallableFactory
 {
     public function __construct(
-        private readonly ContainerInterface $container
-    ) {
-    }
+        private readonly ContainerInterface $container,
+    ) {}
 
     /**
      * Create a real callable listener from definition.

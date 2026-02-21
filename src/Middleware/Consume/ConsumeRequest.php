@@ -9,9 +9,7 @@ use Yiisoft\Queue\QueueInterface;
 
 final class ConsumeRequest
 {
-    public function __construct(private MessageInterface $message, private QueueInterface $queue)
-    {
-    }
+    public function __construct(private MessageInterface $message, private QueueInterface $queue) {}
 
     public function getMessage(): MessageInterface
     {

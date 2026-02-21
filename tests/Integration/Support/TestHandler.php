@@ -9,9 +9,7 @@ use Yiisoft\Queue\Message\MessageInterface;
 
 final class TestHandler implements MessageHandlerInterface
 {
-    public function __construct(public array $messagesProcessed = [])
-    {
-    }
+    public function __construct(public array $messagesProcessed = []) {}
 
     public function handle(MessageInterface $message): void
     {

@@ -10,7 +10,7 @@ use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Message;
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\Stubs\StubQueue;
 use Yiisoft\Queue\Stubs\StubWorker;
 use Yiisoft\Queue\Tests\TestCase;
@@ -19,11 +19,6 @@ use Yiisoft\Queue\Tests\Unit\Support\StringEnum;
 
 final class SynchronousAdapterTest extends TestCase
 {
-    protected function needsRealAdapter(): bool
-    {
-        return true;
-    }
-
     public function testNonIntegerId(): void
     {
         $queue = $this
@@ -58,7 +53,7 @@ final class SynchronousAdapterTest extends TestCase
     public function testWithSameChannel(): void
     {
         $adapter = $this->getAdapter();
-        self::assertEquals($adapter, $adapter->withChannel(QueueInterface::DEFAULT_CHANNEL));
+        self::assertEquals($adapter, $adapter->withChannel(QueueProviderInterface::DEFAULT_CHANNEL));
     }
 
     public function testWithAnotherChannel(): void
@@ -121,5 +116,10 @@ final class SynchronousAdapterTest extends TestCase
         $adapter = new SynchronousAdapter(new StubWorker(), new StubQueue(), $channel);
 
         $this->assertSame($expected, $adapter->getChannel());
+    }
+
+    protected function needsRealAdapter(): bool
+    {
+        return true;
     }
 }

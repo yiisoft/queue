@@ -14,7 +14,7 @@ use Yiisoft\Queue\Provider\QueueProviderInterface;
 
 #[AsCommand(
     'queue:run',
-    'Runs all the existing messages in the given queues. Exits once messages are over.'
+    'Runs all the existing messages in the given queues. Exits once messages are over.',
 )]
 final class RunCommand extends Command
 {
@@ -50,7 +50,7 @@ final class RunCommand extends Command
             $output->write("Processing channel $channel... ");
             $count = $this->queueProvider
                 ->get($channel)
-                ->run((int)$input->getOption('maximum'));
+                ->run((int) $input->getOption('maximum'));
 
             $output->writeln("Messages processed: $count.");
         }

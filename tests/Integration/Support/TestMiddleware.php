@@ -14,9 +14,7 @@ use Yiisoft\Queue\Middleware\Push\PushRequest;
 
 final class TestMiddleware implements MiddlewarePushInterface, MiddlewareConsumeInterface
 {
-    public function __construct(private readonly string $stage)
-    {
-    }
+    public function __construct(private readonly string $stage) {}
 
     public function processPush(PushRequest $request, MessageHandlerPushInterface $handler): PushRequest
     {

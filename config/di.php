@@ -41,7 +41,7 @@ return [
     ],
     WorkerInterface::class => QueueWorker::class,
     LoopInterface::class => static function (ContainerInterface $container): LoopInterface {
-        return extension_loaded('pcntl')
+        return \extension_loaded('pcntl')
             ? $container->get(SignalLoop::class)
             : $container->get(SimpleLoop::class);
     },

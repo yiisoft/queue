@@ -26,6 +26,11 @@ use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
+use function array_key_exists;
+use function is_array;
+use function is_string;
+use function sprintf;
+
 final class Worker implements WorkerInterface
 {
     /** @var array<non-empty-string, callable|null> Cache of resolved handlers */
@@ -62,7 +67,7 @@ final class Worker implements WorkerInterface
         }
 
         $request = new ConsumeRequest($message, $queue);
-        $closure = fn (MessageInterface $message): mixed => $this->injector->invoke($handler, [$message]);
+        $closure = fn(MessageInterface $message): mixed => $this->injector->invoke($handler, [$message]);
         try {
             return $this->consumeMiddlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure))->getMessage();
         } catch (Throwable $exception) {
