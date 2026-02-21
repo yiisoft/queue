@@ -34,13 +34,13 @@ final class RunCommand extends Command
             $this->channels,
         )
             ->addOption(
-                'maximum',
+                'limit',
                 'm',
                 InputOption::VALUE_REQUIRED,
-                'Maximum number of messages to process in each channel. Default is 0 (no limits).',
+                'Number of messages to process in each channel. Default is 0 (no limits).',
                 0,
             )
-            ->addUsage('[channel1 [channel2 [...]]] --maximum 100');
+            ->addUsage('[channel1 [channel2 [...]]] --limit 100');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -50,7 +50,7 @@ final class RunCommand extends Command
             $output->write("Processing channel $channel... ");
             $count = $this->queueProvider
                 ->get($channel)
-                ->run((int) $input->getOption('maximum'));
+                ->run((int) $input->getOption('limit'));
 
             $output->writeln("Messages processed: $count.");
         }

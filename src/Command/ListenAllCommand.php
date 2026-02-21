@@ -49,15 +49,15 @@ final class ListenAllCommand extends Command
                 1,
             )
             ->addOption(
-                'maximum',
+                'limit',
                 'm',
                 InputOption::VALUE_REQUIRED,
-                'Maximum number of messages to process in each channel before switching to another channel. '
+                'Number of messages to process in each channel before switching to another channel. '
                     . 'Default is 0 (no limits).',
                 0,
             );
 
-        $this->addUsage('[channel1 [channel2 [...]]] [--timeout=<timeout>] [--maximum=<maximum>]');
+        $this->addUsage('[channel1 [channel2 [...]]] [--pause=<pause>] [--limit=<limit>]');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -76,7 +76,7 @@ final class ListenAllCommand extends Command
         while ($this->loop->canContinue()) {
             $hasMessages = false;
             foreach ($queues as $queue) {
-                $hasMessages = $queue->run((int) $input->getOption('maximum')) > 0 || $hasMessages;
+                $hasMessages = $queue->run((int) $input->getOption('limit')) > 0 || $hasMessages;
             }
 
             if (!$hasMessages) {
