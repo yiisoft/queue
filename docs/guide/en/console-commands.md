@@ -13,37 +13,37 @@ If you are using [yiisoft/console](https://github.com/yiisoft/console) or `symfo
 
 The command `queue:run` obtains and executes tasks until the queue is empty, then exits.  
 
-You can also narrow the scope of processed messages by specifying channel(s) and maximum number of messages to process:
+You can also narrow the scope of processed messages by specifying queue name(s) and maximum number of messages to process:
 
-- Specify one or more channels to process. Messages from other channels will be ignored. Default is all registered channels (in case of using [yiisoft/config](https://github.com/yiisoft/config) and [yiisoft/yii-console](https://github.com/yiisoft/yii-console), otherwise pass the default channel list to the command constructor).
+- Specify one or more queue names to process. Messages from other queues will be ignored. Default is all registered queue names (in case of using [yiisoft/config](https://github.com/yiisoft/config) and [yiisoft/yii-console](https://github.com/yiisoft/yii-console), otherwise pass the default queue name list to the command constructor).
 - Use `--limit` to limit the number of messages processed. When set, command will exit either when all the messages are processed or when the maximum count is reached.
 
 The full command signature is:
 ```sh
-yii queue:run [channel1 [channel2 [...]]] --limit=100
+yii queue:run [queueName1 [queueName2 [...]]] --limit=100
 ```
 
 ## 2. Listen for queued messages and process them continuously
 
-The following command launches a daemon, which infinitely consumes messages from a single channel of the queue. This command receives an optional `channel` argument to specify which channel to listen to, defaults to the default channel `yii-queue`.
+The following command launches a daemon, which infinitely consumes messages from a single queue. This command receives an optional `queueName` argument to specify which queue to listen to, defaults to the default queue name `yii-queue`.
 
 ```sh
-yii queue:listen [channel]
+yii queue:listen [queueName]
 ```
 
-## 3. Listen to multiple channels
+## 3. Listen to multiple queues
 
-The following command iterates through multiple channels and is meant to be used in development environment only, as it consumes a lot of CPU for iterating through channels. You can pass to it:
+The following command iterates through multiple queues and is meant to be used in development environment only, as it consumes a lot of CPU for iterating through queues. You can pass to it:
 
-- `channel` argument(s). Specify one or more channels to process. Messages from other channels will be ignored. Default is all registered channels (in case of using [yiisoft/config](https://github.com/yiisoft/config) and [yiisoft/yii-console](https://github.com/yiisoft/yii-console), otherwise pass the default channel list to the command constructor).
-- `--limit` option to limit the number of messages processed before switching to another channel. E.g. you set `--limit` to 500 and right now you have 1000 messages in `channel1`. This command will consume only 500 of them, then it will switch to `channel2` to see if there are any messages there. Defaults to `0` (no limit).
-- `--pause` option to specify the number of seconds to pause between checking channels when no messages are found. Defaults to `1`.
+- `queueName` argument(s). Specify one or more queue names to process. Messages from other queues will be ignored. Default is all registered queue names (in case of using [yiisoft/config](https://github.com/yiisoft/config) and [yiisoft/yii-console](https://github.com/yiisoft/yii-console), otherwise pass the default queue name list to the command constructor).
+- `--limit` option to limit the number of messages processed before switching to another queue. E.g. you set `--limit` to 500 and right now you have 1000 messages in `queue1`. This command will consume only 500 of them, then it will switch to `queue2` to see if there are any messages there. Defaults to `0` (no limit).
+- `--pause` option to specify the number of seconds to pause between checking queues when no messages are found. Defaults to `1`.
 
 `queue:listen` does not have a `--limit` option. If you need to stop after processing a certain number of messages, use `queue:run --limit=...`.
 
 The full command signature is:
 ```sh
-yii queue:listen-all [channel1 [channel2 [...]]] --pause=1 --limit=0
+yii queue:listen-all [queueName1 [queueName2 [...]]] --pause=1 --limit=0
 ```
 
 For long-running processes, graceful shutdown is controlled by `LoopInterface`. When `ext-pcntl` is available,

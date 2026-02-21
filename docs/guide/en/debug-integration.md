@@ -10,9 +10,9 @@ The integration is based on `Yiisoft\Queue\Debug\QueueCollector`.
 
 It collects:
 
-- Pushed messages grouped by queue channel (including middleware definitions passed to `push()`).
+- Pushed messages grouped by queue name (including middleware definitions passed to `push()`).
 - Job status checks performed via `QueueInterface::status()`.
-- Messages processed by a worker grouped by queue channel.
+- Messages processed by a worker grouped by queue name.
 
 ## How it works
 

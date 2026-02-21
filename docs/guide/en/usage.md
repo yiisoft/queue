@@ -1,8 +1,8 @@
 # Usage basics
 
-## Queue channels
+## Queue names
 
-For a detailed explanation of what channels are and how to configure and use them (including CLI examples), see [Queue channels](channels.md).
+For a detailed explanation of what queue names are and how to configure and use them (including CLI examples), see [Queue names](queue-names.md).
 
 ## Configuration
 
@@ -30,14 +30,13 @@ See also the documentation for concrete adapters ([synchronous adapter](adapter-
 ## Usage
 
 Each job sent to the queue should be defined as a separate class.
-For example, if you need to download and save a file, the class may look like the following:
+For example, if you need to download and save a file, you can create a message like this:
 
 ```php
-$data = [
-    'url' => $url,
-    'destinationFile' => $filename,
-];
-$message = new \Yiisoft\Queue\Message\Message('file-download', $data);
+$message = new \Yiisoft\Queue\Message\Message(
+    RemoteFileHandler::class,
+    ['url' => $url, 'destinationFile' => $filename]
+);
 ```
 
 Here's how to send a task to the queue:
@@ -66,12 +65,12 @@ The exact way how a job is executed depends on the adapter used. Most adapters c
 console commands, which the component registers in your application. For more details, check the respective
 adapter documentation.
 
-If you configured multiple channels, you can choose which channel to consume with console commands:
+If you configured multiple queue names, you can choose which queue to consume with console commands:
 
 ```sh
-yii queue:listen [channel]
-yii queue:run [channel1 [channel2 [...]]]
-yii queue:listen-all [channel1 [channel2 [...]]]
+yii queue:listen [queueName]
+yii queue:run [queueName1 [queueName2 [...]]]
+yii queue:listen-all [queueName1 [queueName2 [...]]]
 ```
 
 

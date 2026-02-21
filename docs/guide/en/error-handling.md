@@ -1,6 +1,6 @@
 # Error handling on message processing
 
-Often when some message handling is failing, we want to retry its execution a couple more times or redirect it to another queue channel. In `yiisoft/queue` this is handled by the failure handling middleware pipeline.
+Often when some message handling is failing, we want to retry its execution a couple more times or redirect it to another queue. In `yiisoft/queue` this is handled by the failure handling middleware pipeline.
 
 ## When failure handling is triggered
 
@@ -30,14 +30,14 @@ In practice it means:
 
     - the message
     - the caught exception
-    - the queue instance (including its channel)
+    - the queue instance
 
-4. A failure pipeline is selected by queue channel
+4. A failure pipeline is selected by queue name
 
     `FailureMiddlewareDispatcher::dispatch()` selects which pipeline to run:
 
-    - It tries to use the pipeline configured for the current queue channel.
-    - If there is no pipeline for that channel (or it is empty), it falls back to `FailureMiddlewareDispatcher::DEFAULT_PIPELINE`.
+    - It tries to use the pipeline configured for the current queue name.
+    - If there is no pipeline for that queue name (or it is empty), it falls back to `FailureMiddlewareDispatcher::DEFAULT_PIPELINE`.
 
 5. Failure middlewares are executed
 
@@ -46,7 +46,7 @@ In practice it means:
     Each failure middleware implements `MiddlewareFailureInterface`:
 
     - It receives the `FailureHandlingRequest` and a continuation handler.
-    - It may handle the failure by re-queueing the message (same or different queue/channel), optionally with a delay.
+    - It may handle the failure by re-queueing the message (same or different queue), optionally with a delay.
     - If it decides not to handle the failure, it calls `$handler->handleFailure($request)` to continue the pipeline.
 
 6. If nothing handles the failure, the exception is rethrown
@@ -60,11 +60,11 @@ In practice it means:
 ## What “handled failure” means
 
 A failure is considered handled if the failure pipeline returns a `FailureHandlingRequest` without throwing.
-In practice, built-in middlewares handle failures by re-queueing the message (same or different queue/channel), optionally with a delay, and returning the updated request.
+In practice, built-in middlewares handle failures by re-queueing the message (same or different queue), optionally with a delay, and returning the updated request.
 
 ## Configuration
 
-Here below is configuration via [yiisoft/config](https://github.com/yiisoft/config) (see also [Configuration with yiisoft/config](configuration-with-config.md)). If you don't use it, you should add a middleware definition list (in the `middlewares-fail` key here) to the `FailureMiddlewareDispatcher` [by your own](configuration-manual.md). You can define different failure handling pipelines for each queue channel (see [Queue channels](channels.md)). The example below defines two different failure handling pipelines:
+Here below is configuration via [yiisoft/config](https://github.com/yiisoft/config) (see also [Configuration with yiisoft/config](configuration-with-config.md)). If you don't use it, you should add a middleware definition list (in the `middlewares-fail` key here) to the `FailureMiddlewareDispatcher` [by your own](configuration-manual.md). You can define different failure handling pipelines for each queue name (see [Queue names](queue-names.md)). The example below defines two different failure handling pipelines:
 
 ```php
 'yiisoft/queue' => [
@@ -98,8 +98,8 @@ Here below is configuration via [yiisoft/config](https://github.com/yiisoft/conf
 ```
 
 Here is the meaning of the keys:
-- The `failed-messages` key couples the defined pipeline with the `failed-messages` queue channel. 
-- The `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` key couples the defined pipeline with all queue channels without an explicitly defined failure strategy pipeline.
+- The `failed-messages` key couples the defined pipeline with the `failed-messages` queue name. 
+- The `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` key couples the defined pipeline with all queue names without an explicitly defined failure strategy pipeline.
 
 Each middleware definition must be one of:
 - A ready-to-use `MiddlewareFailureInterface` object like `new FooMiddleware()`.
@@ -109,12 +109,12 @@ Each middleware definition must be one of:
 
 In the example above failures will be handled this way (look the concrete middleware description below):
 
-1. For the first time message will be resent to the same queue channel immediately.
-2. If it fails again, it will be resent to the queue channel named `failed-messages`.
-3. From now on it will be resent to the same queue channel (`failed-messages`) up to 30 times with a delay from 5 to 60 seconds, increased 1.5 times each time the message fails again.
+1. For the first time message will be resent to the same queue immediately.
+2. If it fails again, it will be resent to the queue named `failed-messages`.
+3. From now on it will be resent to the same queue (`failed-messages`) up to 30 times with a delay from 5 to 60 seconds, increased 1.5 times each time the message fails again.
 4. If the message handler throw an exception one more (33rd) time, the exception will not be caught.
 
-Failures of messages, which are initially sent to the `failed-messages` channel, will only be handled by the 3rd and the 4th points of this list.
+Failures of messages, which are initially sent to the `failed-messages` queue, will only be handled by the 3rd and the 4th points of this list.
 
 ## Default failure handling strategies
  
@@ -126,7 +126,7 @@ Failures of messages, which are initially sent to the `failed-messages` channel,
 
  - `id` - A unique string. Allows to use this strategy more than once for the same message, just like in example above.
  - `maxAttempts` - Maximum attempts count for this strategy with the given $id before it will give up.
- - `queue` - The strategy will send the message to the given queue when it's not `null`. That means you can use this strategy to push a message not to the same queue channel it came from. When the `queue` parameter is set to `null`, a message will be sent to the same channel it came from.
+ - `queue` - The strategy will send the message to the given queue when it's not `null`. That means you can use this strategy to push a message not to the same queue it came from. When the `queue` parameter is set to `null`, a message will be sent to the same queue it came from.
 
  State tracking:
 
@@ -144,7 +144,7 @@ It's configured via constructor parameters, too. Here they are:
  - `delayInitial` - The initial delay that will be applied to a message for the first time. It must be a positive float. 
  - `delayMaximum` - The maximum delay which can be applied to a single message. Must be above the `delayInitial`.
  - `exponent` - Message handling delay will be multiplied by exponent each time it fails.
- - `queue` - The strategy will send the message to the given queue when it's not `null`. That means you can use this strategy to push a message not to the same queue channel it came from. When the `queue` parameter is set to `null`, a message will be sent to the same channel it came from.
+ - `queue` - The strategy will send the message to the given queue when it's not `null`. That means you can use this strategy to push a message not to the same queue it came from. When the `queue` parameter is set to `null`, a message will be sent to the same queue it came from.
 
  Requirements:
 

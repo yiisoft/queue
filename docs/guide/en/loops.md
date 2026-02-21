@@ -14,21 +14,6 @@ See also:
 - [Console commands](console-commands.md)
 - [Workers](worker.md)
 
-## Loop interface
-
-The interface is minimal:
-
-```php
-namespace Yiisoft\Queue\Cli;
-
-interface LoopInterface
-{
-    public function canContinue(): bool;
-}
-```
-
-Adapters receive a callback that returns `bool`. When the callback returns `false`, the adapter should stop consuming.
-
 ## Built-in implementations
 
 ### `SignalLoop`

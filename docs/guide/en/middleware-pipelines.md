@@ -18,11 +18,11 @@ Common reasons to add middlewares:
 - **Add tracing / correlation data**
   You can put trace ids or correlation ids into message metadata so logs from producer/consumer are connected.
 - **Logging and observability**
-  You can log message ids, channels, attempts, and failures in a consistent way.
+  You can log message ids, queue names, attempts, and failures in a consistent way.
 - **Modify the message payload**
   You can obfuscate sensitive data, normalize payload, add extra fields required by consumers, or wrap a message into envelopes.
 - **Route and schedule**
-  You can switch channel, choose a different adapter, or add delay when the adapter supports it.
+  You can switch queue, choose a different adapter, or add delay when the adapter supports it.
 
 ## Pipelines overview
 
@@ -74,12 +74,12 @@ The push pipeline is executed when calling `QueueInterface::push()`.
 Push middlewares can:
 
 - Modify the message (wrap it into envelopes, add metadata, obfuscate data, etc.).
-- Modify the adapter (change channel, add delay, route to a different backend, etc.).
+- Modify the adapter (add delay, route to a different backend, etc.).
 
 In particular, push middlewares may define or replace the adapter that will be used to push the message. This can be useful when:
 
 - You choose a backend dynamically (for example, based on message type or payload).
-- You route messages to different channels/backends (for example, `critical` vs `low`).
+- You route messages to different queues/backends (for example, `critical` vs `low`).
 - You apply scheduling/delay logic in a middleware.
 
 The adapter is set by returning a modified request:
@@ -127,7 +127,7 @@ The pipeline receives a `FailureHandlingRequest` that contains:
 - the caught exception
 - the queue instance
 
-The pipeline is selected by queue channel; if there is no channel-specific pipeline configured,
+The pipeline is selected by queue name; if there is no queue-specific pipeline configured,
 `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` is used.
 
 See [Error handling on message processing](error-handling.md) for the step-by-step flow and built-in middlewares.

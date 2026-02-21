@@ -9,12 +9,12 @@ If your project structure differs, put configuration into any params config file
 
 ## What you need to configure
 
-- Define queue channel adapter definitions in the `channels` params key. See more about channels [here](./channels.md).
+- Define queue name adapter definitions in the `channels` params key. See more about queue names [here](./queue-names.md).
 - Optionally: define [message handlers](./message-handler.md) in the `handlers` params key to be used with the `QueueWorker`.
 
-By default, when using the DI config provided by this package, `QueueProviderInterface` is bound to `AdapterFactoryQueueProvider` and uses `yiisoft/queue.channels` as a strict channel registry.
-That means unknown channels are not accepted silently and `QueueProviderInterface::get()` will throw `ChannelNotFoundException`.
-The configured channel names are also used as the default channel list for `queue:run` and `queue:listen-all`.
+By default, when using the DI config provided by this package, `QueueProviderInterface` is bound to `AdapterFactoryQueueProvider` and uses `yiisoft/queue.channels` as a strict queue name registry.
+That means unknown queue names are not accepted silently and `QueueProviderInterface::get()` will throw `ChannelNotFoundException`.
+The configured queue names are also used as the default queue name list for `queue:run` and `queue:listen-all`.
 
 For development and testing you can start with the synchronous adapter.
 For production you must use a real backend adapter (AMQP, Kafka, SQS, etc.). If you do not have any preference, start with [yiisoft/queue-amqp](https://github.com/yiisoft/queue-amqp) and [RabbitMQ](https://www.rabbitmq.com/).

@@ -19,7 +19,7 @@ An extension for running tasks asynchronously via queues.
 
 ## Core concepts
 
-- [Queue channels](channels.md)
+- [Queue names](queue-names.md)
 - [Message handler](message-handler.md)
 - [Envelopes](envelopes.md)
 - [Middleware pipelines](middleware-pipelines.md)
@@ -27,13 +27,19 @@ An extension for running tasks asynchronously via queues.
 
 ## Interoperability
 
-- [Producing messages from external systems](producing-messages-from-external-systems.md)
+- [Producing messages from external systems](consuming-messages-from-external-systems.md)
 
 ## Reliability and visibility
 
 - [Errors and retryable jobs](error-handling.md)
 - [Job status](job-status.md)
 - [Yii Debug integration](debug-integration.md)
+
+## Production and optimization
+
+- [Best practices](best-practices.md)
+- [Running workers in production (systemd and Supervisor)](process-managers.md)
+- [Performance tuning](performance-tuning.md)
 
 ## Migration from Yii2
 

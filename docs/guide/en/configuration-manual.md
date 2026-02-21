@@ -76,15 +76,15 @@ $queue->push($message);
 
 ## Using Queue Provider
 
-For multiple queue channels, use `AdapterFactoryQueueProvider`:
+For multiple queue names, use `AdapterFactoryQueueProvider`:
 
 ```php
 use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 
 $definitions = [
-    'channel1' => new SynchronousAdapter($worker, $queue),
-    'channel2' => static fn(SynchronousAdapter $adapter) => $adapter->withChannel('channel2'),
+    'queue1' => new SynchronousAdapter($worker, $queue),
+    'queue2' => static fn(SynchronousAdapter $adapter) => $adapter->withChannel('channel2'),
 ];
 
 $provider = new AdapterFactoryQueueProvider(
@@ -93,8 +93,8 @@ $provider = new AdapterFactoryQueueProvider(
     $container,
 );
 
-$queueForChannel1 = $provider->get('channel1');
-$queueForChannel2 = $provider->get('channel2');
+$queueForQueue1 = $provider->get('queue1');
+$queueForQueue2 = $provider->get('queue2');
 ```
 
 ## Running the queue

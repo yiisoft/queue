@@ -34,7 +34,7 @@ composer require yiisoft/queue
 ### 1. Install an adapter
 
 For production use, you should install an adapter package that matches your message broker ([AMQP](https://github.com/yiisoft/queue-amqp), [Kafka](https://github.com/g41797/queue-kafka), [NATS](https://github.com/g41797/queue-nats), and [others](docs/guide/en/adapter-list.md)).
-See the [adapter list](docs/guide/en/adapter-list.md) and follow the adapter-specific documentation.
+See the [adapter list](docs/guide/en/adapter-list.md) and follow the adapter-specific documentation for installation and configuration details.
 
 > For development and testing, you can start without an external broker using the built-in [`SynchronousAdapter`](docs/guide/en/adapter-sync.md).
 > This adapter processes messages immediately in the same process, so it won't provide true async execution,
