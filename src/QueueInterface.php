@@ -43,7 +43,7 @@ interface QueueInterface
 
     /**
      * @param AdapterInterface $adapter Adapter to use.
-     * @param string|null $queueName Queue name to use.
+     * @param string|BackedEnum|null $queueName Queue name to use.
      *
      * @return static A new queue with the given adapter and queue name.
      */

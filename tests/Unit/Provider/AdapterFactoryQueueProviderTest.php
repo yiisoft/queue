@@ -133,9 +133,9 @@ final class AdapterFactoryQueueProviderTest extends TestCase
             ],
         );
 
-        /** @var StubQueue $mailQueue<StubAdapter> */
+        /** @var StubQueue<StubAdapter> $mailQueue */
         $mailQueue = $provider->get('mail-queue');
-        /** @var StubQueue $logQueue<StubAdapter> */
+        /** @var StubQueue<StubAdapter> $logQueue */
         $logQueue = $provider->get('log-queue');
 
         $this->assertSame('mail-queue', $mailQueue->getName());
