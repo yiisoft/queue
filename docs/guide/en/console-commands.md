@@ -46,7 +46,5 @@ The full command signature is:
 yii queue:listen-all [channel1 [channel2 [...]]] --pause=1 --maximum=0
 ```
 
-> The command alias `queue:listen:all` exists for backward compatibility and may be removed in a future release, since it was a typo.
-
 For long-running processes, graceful shutdown is controlled by `LoopInterface`. When `ext-pcntl` is available,
 the default `SignalLoop` handles signals such as `SIGTERM`/`SIGINT`.
