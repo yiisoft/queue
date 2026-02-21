@@ -9,7 +9,7 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Factory\StrictFactory;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\QueueNameNormalizer;
+use Yiisoft\Queue\StringNormalizer;
 use Yiisoft\Queue\QueueInterface;
 
 use function array_key_exists;
@@ -54,7 +54,7 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
 
     public function get(string|BackedEnum $queueName): QueueInterface
     {
-        $queueName = QueueNameNormalizer::normalize($queueName);
+        $queueName = StringNormalizer::normalize($queueName);
 
         $queue = $this->getOrTryToCreate($queueName);
         if ($queue === null) {
@@ -66,7 +66,7 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
 
     public function has(string|BackedEnum $queueName): bool
     {
-        $queueName = QueueNameNormalizer::normalize($queueName);
+        $queueName = StringNormalizer::normalize($queueName);
         return $this->factory->has($queueName);
     }
 

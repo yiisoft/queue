@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\App;
 
 use BackedEnum;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\QueueNameNormalizer;
+use Yiisoft\Queue\StringNormalizer;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 
@@ -40,7 +40,7 @@ final class FakeAdapter implements AdapterInterface
     public function withChannel(string|BackedEnum $channel): self
     {
         $new = clone $this;
-        $new->channel = QueueNameNormalizer::normalize($channel);
+        $new->channel = StringNormalizer::normalize($channel);
         return $new;
     }
 }

@@ -37,7 +37,7 @@ final class Queue implements QueueInterface
         private ?AdapterInterface $adapter = null,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ) {
-        $this->name = QueueNameNormalizer::normalize($name);
+        $this->name = StringNormalizer::normalize($name);
         $this->middlewareDefinitions = $middlewareDefinitions;
         $this->adapterPushHandler = new AdapterPushHandler();
     }
@@ -118,7 +118,7 @@ final class Queue implements QueueInterface
         $new = clone $this;
         $new->adapter = $adapter;
         if ($queueName !== null) {
-            $new->name = QueueNameNormalizer::normalize($queueName);
+            $new->name = StringNormalizer::normalize($queueName);
         }
 
         return $new;

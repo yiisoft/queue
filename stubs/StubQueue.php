@@ -10,7 +10,7 @@ use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\QueueNameNormalizer;
+use Yiisoft\Queue\StringNormalizer;
 
 /**
  * Stub queue that does nothing. Job status is always "done".
@@ -67,7 +67,7 @@ final class StubQueue implements QueueInterface
         $new->adapter = $adapter;
 
         if ($queueName !== null) {
-            $new->name = QueueNameNormalizer::normalize($queueName);
+            $new->name = StringNormalizer::normalize($queueName);
         }
 
         return $new;

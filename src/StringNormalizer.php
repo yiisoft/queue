@@ -9,7 +9,7 @@ use BackedEnum;
 /**
  * @internal
  */
-final class QueueNameNormalizer
+final class StringNormalizer
 {
     public static function normalize(string|BackedEnum $queueName): string
     {
