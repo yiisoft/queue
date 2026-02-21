@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Benchmark\Support;
 
-use BackedEnum;
 use InvalidArgumentException;
 use RuntimeException;
 use Yiisoft\Queue\Adapter\AdapterInterface;

@@ -17,11 +17,11 @@ final class SynchronousAdapter implements AdapterInterface
 {
     private array $messages = [];
     private int $current = 0;
+
     public function __construct(
         private readonly WorkerInterface $worker,
         private readonly QueueInterface $queue,
-    ) {
-    }
+    ) {}
 
     public function __destruct()
     {
