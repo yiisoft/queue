@@ -27,7 +27,6 @@ use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
 use function array_key_exists;
-use function is_array;
 use function is_string;
 use function sprintf;
 
@@ -45,8 +44,7 @@ final class Worker implements WorkerInterface
         private readonly ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher,
         private readonly FailureMiddlewareDispatcher $failureMiddlewareDispatcher,
         private readonly CallableFactory $callableFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Throwable

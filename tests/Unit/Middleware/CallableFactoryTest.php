@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
 use Yiisoft\Test\Support\Container\SimpleContainer;
+use stdClass;
 
 final class CallableFactoryTest extends TestCase
 {
@@ -25,7 +26,7 @@ final class CallableFactoryTest extends TestCase
     public static function positiveDefinitionsProvider(): iterable
     {
         yield 'closure' => [
-            static fn (): string => 'ok',
+            static fn(): string => 'ok',
             [],
             'ok',
             new SimpleContainer(),
@@ -38,7 +39,7 @@ final class CallableFactoryTest extends TestCase
             new SimpleContainer(),
         ];
 
-        $invokable = new class () {
+        $invokable = new class {
             public function __invoke(): string
             {
                 return 'ok';
@@ -54,7 +55,7 @@ final class CallableFactoryTest extends TestCase
             ]),
         ];
 
-        $class = new class () {
+        $class = new class {
             public static function ping(): string
             {
                 return 'pong';
@@ -69,7 +70,7 @@ final class CallableFactoryTest extends TestCase
             new SimpleContainer(),
         ];
 
-        $serviceFromContainer = new class () {
+        $serviceFromContainer = new class {
             public function go(): string
             {
                 return 'ok';
@@ -86,7 +87,7 @@ final class CallableFactoryTest extends TestCase
             ]),
         ];
 
-        $service = new class () {
+        $service = new class {
             public function go(): string
             {
                 return 'ok';
@@ -100,7 +101,7 @@ final class CallableFactoryTest extends TestCase
             new SimpleContainer(),
         ];
 
-        $serviceById = new class () {
+        $serviceById = new class {
             public function go(): string
             {
                 return 'ok';
@@ -141,11 +142,11 @@ final class CallableFactoryTest extends TestCase
         yield 'container string not callable' => [
             'notCallable',
             new SimpleContainer([
-                'notCallable' => new \stdClass(),
+                'notCallable' => new stdClass(),
             ]),
         ];
 
-        $service = new class () {
+        $service = new class {
             public function go(): string
             {
                 return 'ok';
@@ -157,7 +158,7 @@ final class CallableFactoryTest extends TestCase
             new SimpleContainer(),
         ];
 
-        $class = new class () {
+        $class = new class {
             public function ping(): string
             {
                 return 'pong';
@@ -175,7 +176,7 @@ final class CallableFactoryTest extends TestCase
             new SimpleContainer(),
         ];
 
-        $serviceWithoutMethod = new class () {
+        $serviceWithoutMethod = new class {
             public function go(): string
             {
                 return 'ok';
