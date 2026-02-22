@@ -27,9 +27,12 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static fn(PushRequest $request, AdapterInterface $adapter): PushRequest => $request
-                    ->withMessage(new Message('test', 'New closure test data'))
-                    ->withAdapter($adapter->withChannel('closure-channel')),
+                static function (PushRequest $request, AdapterInterface $adapter): PushRequest {
+                    /** @var FakeAdapter $adapter */
+                    return $request
+                        ->withMessage(new Message('test', 'New closure test data'))
+                        ->withAdapter($adapter->withChannel('closure-channel'));
+                },
             ],
         );
 
@@ -78,12 +81,9 @@ final class MiddlewareDispatcherTest extends TestCase
             return $handler->handlePush($request);
         };
         $middleware2 = static function (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest {
-            /**
-             * @noinspection NullPointerExceptionInspection
-             *
-             * @psalm-suppress PossiblyNullReference
-             */
-            $request = $request->withAdapter($request->getAdapter()->withChannel('new channel'));
+            /** @var FakeAdapter $adapter */
+            $adapter = $request->getAdapter();
+            $request = $request->withAdapter($adapter->withChannel('new channel'));
 
             return $handler->handlePush($request);
         };
@@ -92,10 +92,6 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('new test data', $request->getMessage()->getData());
-        /**
-         * @psalm-suppress NoInterfaceProperties
-         * @psalm-suppress PossiblyNullPropertyFetch
-         */
         $this->assertSame('new channel', $request->getAdapter()->channel);
     }
 

@@ -31,7 +31,7 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 return [
     AdapterFactoryQueueProvider::class => [
         '__construct()' => [
-            'definitions' => $params['yiisoft/queue']['channels'],
+            'definitions' => $params['yiisoft/queue']['queues'],
         ],
     ],
     QueueProviderInterface::class => AdapterFactoryQueueProvider::class,
@@ -61,12 +61,12 @@ return [
     MessageSerializerInterface::class => JsonMessageSerializer::class,
     RunCommand::class => [
         '__construct()' => [
-            'channels' => array_keys($params['yiisoft/queue']['channels']),
+            'queues' => array_keys($params['yiisoft/queue']['queues']),
         ],
     ],
     ListenAllCommand::class => [
         '__construct()' => [
-            'channels' => array_keys($params['yiisoft/queue']['channels']),
+            'queues' => array_keys($params['yiisoft/queue']['queues']),
         ],
     ],
 ];

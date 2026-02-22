@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Benchmark\Support;
 
-use BackedEnum;
 use InvalidArgumentException;
 use RuntimeException;
 use Yiisoft\Queue\Adapter\AdapterInterface;
@@ -40,11 +39,6 @@ final class VoidAdapter implements AdapterInterface
     }
 
     public function subscribe(callable $handlerCallback): void
-    {
-        throw new RuntimeException('Method is not implemented');
-    }
-
-    public function withChannel(string|BackedEnum $channel): AdapterInterface
     {
         throw new RuntimeException('Method is not implemented');
     }

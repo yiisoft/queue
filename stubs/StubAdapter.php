@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Stubs;
 
 use BackedEnum;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\ChannelNormalizer;
+use Yiisoft\Queue\StringNormalizer;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
@@ -18,10 +18,8 @@ final class StubAdapter implements AdapterInterface
 {
     private string $channel;
 
-    public function __construct(
-        string|BackedEnum $channel = QueueProviderInterface::DEFAULT_CHANNEL
-    ) {
-        $this->channel = ChannelNormalizer::normalize($channel);
+    public function __construct(string|BackedEnum $channel = 'yii-queue') {
+        $this->channel = StringNormalizer::normalize($channel);
     }
 
     public function runExisting(callable $handlerCallback): void
@@ -42,10 +40,10 @@ final class StubAdapter implements AdapterInterface
     {
     }
 
-    public function withChannel(string|BackedEnum $channel): AdapterInterface
+    public function withChannel(string|BackedEnum $channel): self
     {
         $new = clone $this;
-        $new->channel = ChannelNormalizer::normalize($channel);
+        $new->channel = StringNormalizer::normalize($channel);
         return $new;
     }
 
