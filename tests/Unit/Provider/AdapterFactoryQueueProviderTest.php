@@ -34,7 +34,7 @@ final class AdapterFactoryQueueProviderTest extends TestCase
         $this->assertSame('queue1', $queue->getName());
         $this->assertInstanceOf(StubAdapter::class, $queue->getAdapter());
         $this->assertTrue($provider->has('queue1'));
-        $this->assertFalse($provider->has('not-exist-channel'));
+        $this->assertFalse($provider->has('not-exist-queue'));
     }
 
     public function testGetTwice(): void
@@ -62,7 +62,7 @@ final class AdapterFactoryQueueProviderTest extends TestCase
         );
 
         $this->expectException(QueueNotFoundException::class);
-        $this->expectExceptionMessage('Queue with name "not-exist-channel" not found.');
+        $this->expectExceptionMessage('Queue with name "not-exist-queue" not found.');
         $provider->get('not-exist-queue');
     }
 
