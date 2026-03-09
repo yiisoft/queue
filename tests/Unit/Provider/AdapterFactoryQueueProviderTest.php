@@ -63,7 +63,7 @@ final class AdapterFactoryQueueProviderTest extends TestCase
 
         $this->expectException(QueueNotFoundException::class);
         $this->expectExceptionMessage('Queue with name "not-exist-channel" not found.');
-        $provider->get('not-exist-channel');
+        $provider->get('not-exist-queue');
     }
 
     public function testInvalidQueueConfig(): void
@@ -120,7 +120,7 @@ final class AdapterFactoryQueueProviderTest extends TestCase
         $this->assertFalse($provider->has(StringEnum::GREEN));
     }
 
-    public function testQueueNameAndAdapterChannelConfiguration(): void
+    public function testQueueNameAndAdapterConfiguration(): void
     {
         $provider = new AdapterFactoryQueueProvider(
             new StubQueue(),
