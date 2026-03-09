@@ -13,17 +13,17 @@ final class QueueNotFoundExceptionTest extends TestCase
 {
     public static function dataBase(): iterable
     {
-        yield 'string' => ['channel1', 'channel1'];
+        yield 'string' => ['queue1', 'queue1'];
         yield 'string-enum' => ['red', StringEnum::RED];
     }
 
     #[DataProvider('dataBase')]
-    public function testBase(string $expectedChannel, mixed $channel): void
+    public function testBase(string $expectedName, mixed $name): void
     {
-        $exception = new QueueNotFoundException($channel);
+        $exception = new QueueNotFoundException($name);
 
         $this->assertStringContainsString(
-            '"' . $expectedChannel . '" not found.',
+            '"' . $expectedName . '" not found.',
             $exception->getMessage(),
         );
     }
