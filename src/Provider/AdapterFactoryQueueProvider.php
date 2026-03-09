@@ -52,50 +52,50 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
         }
     }
 
-    public function get(string|BackedEnum $queueName): QueueInterface
+    public function get(string|BackedEnum $name): QueueInterface
     {
-        $queueName = StringNormalizer::normalize($queueName);
+        $name = StringNormalizer::normalize($name);
 
-        $queue = $this->getOrTryToCreate($queueName);
+        $queue = $this->getOrTryToCreate($name);
         if ($queue === null) {
-            throw new QueueNotFoundException($queueName);
+            throw new QueueNotFoundException($name);
         }
 
         return $queue;
     }
 
-    public function has(string|BackedEnum $queueName): bool
+    public function has(string|BackedEnum $name): bool
     {
-        $queueName = StringNormalizer::normalize($queueName);
-        return $this->factory->has($queueName);
+        $name = StringNormalizer::normalize($name);
+        return $this->factory->has($name);
     }
 
     /**
      * @throws InvalidQueueConfigException
      */
-    private function getOrTryToCreate(string $queueName): ?QueueInterface
+    private function getOrTryToCreate(string $name): ?QueueInterface
     {
-        if (array_key_exists($queueName, $this->queues)) {
-            return $this->queues[$queueName];
+        if (array_key_exists($name, $this->queues)) {
+            return $this->queues[$name];
         }
 
-        if ($this->factory->has($queueName)) {
-            $adapter = $this->factory->create($queueName);
+        if ($this->factory->has($name)) {
+            $adapter = $this->factory->create($name);
             if (!$adapter instanceof AdapterInterface) {
                 throw new InvalidQueueConfigException(
                     sprintf(
-                        'Adapter must implement "%s". For queueName "%s" got "%s" instead.',
+                        'Adapter must implement "%s". For queue "%s" got "%s" instead.',
                         AdapterInterface::class,
-                        $queueName,
+                        $name,
                         get_debug_type($adapter),
                     ),
                 );
             }
-            $this->queues[$queueName] = $this->baseQueue->withAdapter($adapter, $queueName);
+            $this->queues[$name] = $this->baseQueue->withAdapter($adapter, $name);
         } else {
-            $this->queues[$queueName] = null;
+            $this->queues[$name] = null;
         }
 
-        return $this->queues[$queueName];
+        return $this->queues[$name];
     }
 }

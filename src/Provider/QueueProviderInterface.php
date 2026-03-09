@@ -18,21 +18,21 @@ interface QueueProviderInterface
     /**
      * Finds a queue by name and returns it.
      *
-     * @param BackedEnum|string $queueName Queue name.
+     * @param BackedEnum|string $name Queue name.
      *
      * @throws InvalidQueueConfigException If the queue configuration is invalid.
      * @throws QueueNotFoundException If the queue is not found.
      * @throws QueueProviderException If the queue provider fails to provide a queue.
      * @return QueueInterface Queue instance.
      */
-    public function get(string|BackedEnum $queueName): QueueInterface;
+    public function get(string|BackedEnum $name): QueueInterface;
 
     /**
      * Check if a queue with the specified name exists.
      *
-     * @param BackedEnum|string $queueName Queue name.
+     * @param BackedEnum|string $name Queue name.
      *
      * @return bool Whether the queue exists.
      */
-    public function has(string|BackedEnum $queueName): bool;
+    public function has(string|BackedEnum $name): bool;
 }
