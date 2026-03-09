@@ -11,8 +11,8 @@ use BackedEnum;
  */
 final class StringNormalizer
 {
-    public static function normalize(string|BackedEnum $queueName): string
+    public static function normalize(string|BackedEnum $value): string
     {
-        return $queueName instanceof BackedEnum ? (string) $queueName->value : $queueName;
+        return $value instanceof BackedEnum ? (string) $value->value : $value;
     }
 }
