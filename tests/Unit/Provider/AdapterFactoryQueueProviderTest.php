@@ -95,7 +95,7 @@ final class AdapterFactoryQueueProviderTest extends TestCase
         $this->expectException(InvalidQueueConfigException::class);
         $this->expectExceptionMessage(
             sprintf(
-                'Adapter must implement "%s". For queueName "%s" got "%s" instead.',
+                'Adapter must implement "%s". For queue "%s" got "%s" instead.',
                 AdapterInterface::class,
                 'queue1',
                 StubLoop::class,
@@ -127,7 +127,6 @@ final class AdapterFactoryQueueProviderTest extends TestCase
             [
                 'mail-queue' => [
                     'class' => StubAdapter::class,
-                    '__construct()' => ['channel-name'],
                 ],
                 'log-queue' => StubAdapter::class,
             ],
@@ -140,10 +139,8 @@ final class AdapterFactoryQueueProviderTest extends TestCase
 
         $this->assertSame('mail-queue', $mailQueue->getName());
         $this->assertInstanceOf(StubAdapter::class, $mailQueue->getAdapter());
-        $this->assertSame('channel-name', $mailQueue->getAdapter()->getChannel());
 
         $this->assertSame('log-queue', $logQueue->getName());
         $this->assertInstanceOf(StubAdapter::class, $logQueue->getAdapter());
-        $this->assertSame('yii-queue', $logQueue->getAdapter()->getChannel());
     }
 }
