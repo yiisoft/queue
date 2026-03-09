@@ -52,7 +52,7 @@ final class AdapterFactoryQueueProviderTest extends TestCase
         $this->assertSame($queue1, $queue2);
     }
 
-    public function testGetNotExistChannel(): void
+    public function testGetNotExistQueue(): void
     {
         $provider = new AdapterFactoryQueueProvider(
             new StubQueue(),
