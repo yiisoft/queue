@@ -32,7 +32,7 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
 
     /**
      * @param QueueInterface $baseQueue Base queue for queues creation.
-     * @param array $definitions Adapter definitions indexed by queueName names.
+     * @param array $definitions Adapter definitions indexed by queue names.
      * @param ContainerInterface|null $container Container to use for dependencies resolving.
      * @param bool $validate If definitions should be validated when set.
      *
