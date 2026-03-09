@@ -84,7 +84,7 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
             if (!$adapter instanceof AdapterInterface) {
                 throw new InvalidQueueConfigException(
                     sprintf(
-                        'Adapter must implement "%s". For queueName "%s" got "%s" instead.',
+                        'Adapter must implement "%s". For queue "%s" got "%s" instead.',
                         AdapterInterface::class,
                         $queueName,
                         get_debug_type($adapter),
