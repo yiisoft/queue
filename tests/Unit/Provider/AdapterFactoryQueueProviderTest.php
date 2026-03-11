@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Stubs\StubLoop;
 use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
-use Yiisoft\Queue\Provider\ChannelNotFoundException;
+use Yiisoft\Queue\Provider\QueueNotFoundException;
 use Yiisoft\Queue\Provider\InvalidQueueConfigException;
 use Yiisoft\Queue\Stubs\StubQueue;
 use Yiisoft\Queue\Stubs\StubAdapter;
@@ -23,17 +23,18 @@ final class AdapterFactoryQueueProviderTest extends TestCase
         $provider = new AdapterFactoryQueueProvider(
             new StubQueue(),
             [
-                'channel1' => StubAdapter::class,
+                'queue1' => StubAdapter::class,
             ],
         );
 
-        $queue = $provider->get('channel1');
+        /** @var StubQueue $queue */
+        $queue = $provider->get('queue1');
 
         $this->assertInstanceOf(StubQueue::class, $queue);
-        $this->assertSame('channel1', $queue->getChannel());
+        $this->assertSame('queue1', $queue->getName());
         $this->assertInstanceOf(StubAdapter::class, $queue->getAdapter());
-        $this->assertTrue($provider->has('channel1'));
-        $this->assertFalse($provider->has('not-exist-channel'));
+        $this->assertTrue($provider->has('queue1'));
+        $this->assertFalse($provider->has('not-exist-queue'));
     }
 
     public function testGetTwice(): void
@@ -41,35 +42,35 @@ final class AdapterFactoryQueueProviderTest extends TestCase
         $provider = new AdapterFactoryQueueProvider(
             new StubQueue(),
             [
-                'channel1' => StubAdapter::class,
+                'queue1' => StubAdapter::class,
             ],
         );
 
-        $queue1 = $provider->get('channel1');
-        $queue2 = $provider->get('channel1');
+        $queue1 = $provider->get('queue1');
+        $queue2 = $provider->get('queue1');
 
         $this->assertSame($queue1, $queue2);
     }
 
-    public function testGetNotExistChannel(): void
+    public function testGetNotExistQueue(): void
     {
         $provider = new AdapterFactoryQueueProvider(
             new StubQueue(),
             [
-                'channel1' => StubAdapter::class,
+                'queue1' => StubAdapter::class,
             ],
         );
 
-        $this->expectException(ChannelNotFoundException::class);
-        $this->expectExceptionMessage('Channel "not-exist-channel" not found.');
-        $provider->get('not-exist-channel');
+        $this->expectException(QueueNotFoundException::class);
+        $this->expectExceptionMessage('Queue with name "not-exist-queue" not found.');
+        $provider->get('not-exist-queue');
     }
 
     public function testInvalidQueueConfig(): void
     {
         $baseQueue = new StubQueue();
         $definitions = [
-            'channel1' => [
+            'queue1' => [
                 'class' => StubAdapter::class,
                 '__construct()' => 'hello',
             ],
@@ -87,19 +88,20 @@ final class AdapterFactoryQueueProviderTest extends TestCase
         $provider = new AdapterFactoryQueueProvider(
             new StubQueue(),
             [
-                'channel1' => StubLoop::class,
+                'queue1' => StubLoop::class,
             ],
         );
 
         $this->expectException(InvalidQueueConfigException::class);
         $this->expectExceptionMessage(
             sprintf(
-                'Adapter must implement "%s". For channel "channel1" got "%s" instead.',
+                'Adapter must implement "%s". For queue "%s" got "%s" instead.',
                 AdapterInterface::class,
+                'queue1',
                 StubLoop::class,
             ),
         );
-        $provider->get('channel1');
+        $provider->get('queue1');
     }
 
     public function testGetHasByStringEnum(): void
@@ -113,8 +115,32 @@ final class AdapterFactoryQueueProviderTest extends TestCase
 
         $queue = $provider->get(StringEnum::RED);
 
-        $this->assertSame('red', $queue->getChannel());
+        $this->assertSame('red', $queue->getName());
         $this->assertTrue($provider->has(StringEnum::RED));
         $this->assertFalse($provider->has(StringEnum::GREEN));
+    }
+
+    public function testQueueNameAndAdapterConfiguration(): void
+    {
+        $provider = new AdapterFactoryQueueProvider(
+            new StubQueue(),
+            [
+                'mail-queue' => [
+                    'class' => StubAdapter::class,
+                ],
+                'log-queue' => StubAdapter::class,
+            ],
+        );
+
+        /** @var StubQueue<StubAdapter> $mailQueue */
+        $mailQueue = $provider->get('mail-queue');
+        /** @var StubQueue<StubAdapter> $logQueue */
+        $logQueue = $provider->get('log-queue');
+
+        $this->assertSame('mail-queue', $mailQueue->getName());
+        $this->assertInstanceOf(StubAdapter::class, $mailQueue->getAdapter());
+
+        $this->assertSame('log-queue', $logQueue->getName());
+        $this->assertInstanceOf(StubAdapter::class, $logQueue->getAdapter());
     }
 }

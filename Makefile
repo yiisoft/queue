@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-PHP_VERSION ?= 8.5
+PHP_VERSION ?= 8.4
 -include .env.local
 
 DOCKER_RUN := docker run --rm -it \

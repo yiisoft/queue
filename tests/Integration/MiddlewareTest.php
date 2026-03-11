@@ -63,6 +63,7 @@ final class MiddlewareTest extends TestCase
             $this->createMock(LoopInterface::class),
             $this->createMock(LoggerInterface::class),
             $pushMiddlewareDispatcher,
+            'test',
             new SynchronousAdapter(
                 $this->createMock(WorkerInterface::class),
                 $this->createMock(QueueInterface::class),
@@ -136,7 +137,7 @@ final class MiddlewareTest extends TestCase
         $callableFactory = new CallableFactory($container);
 
         $queue->expects(self::exactly(7))->method('push')->willReturnCallback($queueCallback);
-        $queue->method('getChannel')->willReturn('simple');
+        $queue->method('getName')->willReturn('simple');
 
         $middlewares = [
             'simple' => [

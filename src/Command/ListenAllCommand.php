@@ -25,7 +25,7 @@ final class ListenAllCommand extends Command
     public function __construct(
         private readonly QueueProviderInterface $queueProvider,
         private readonly LoopInterface $loop,
-        private readonly array $channels,
+        private readonly array $queues,
     ) {
         parent::__construct();
     }
@@ -36,36 +36,36 @@ final class ListenAllCommand extends Command
     public function configure(): void
     {
         $this->addArgument(
-            'channel',
+            'queue',
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
-            'Queue channel name list to connect to',
-            $this->channels,
+            'Queue name list to connect to',
+            $this->queues,
         )
             ->addOption(
                 'pause',
                 'p',
                 InputOption::VALUE_REQUIRED,
-                'Pause between queue channel iterations in seconds. May save some CPU. Default: 1',
+                'Pause between queue iterations in seconds. May save some CPU. Default: 1',
                 1,
             )
             ->addOption(
                 'maximum',
                 'm',
                 InputOption::VALUE_REQUIRED,
-                'Maximum number of messages to process in each channel before switching to another channel. '
+                'Maximum number of messages to process in each queue before switching to another queue. '
                     . 'Default is 0 (no limits).',
                 0,
             );
 
-        $this->addUsage('[channel1 [channel2 [...]]] [--timeout=<timeout>] [--maximum=<maximum>]');
+        $this->addUsage('[queue1 [queue2 [...]]] [--timeout=<timeout>] [--maximum=<maximum>]');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $queues = [];
-        /** @var string $channel */
-        foreach ($input->getArgument('channel') as $channel) {
-            $queues[] = $this->queueProvider->get($channel);
+        /** @var string $queue */
+        foreach ($input->getArgument('queue') as $queue) {
+            $queues[] = $this->queueProvider->get($queue);
         }
 
         $pauseSeconds = (int) $input->getOption('pause');

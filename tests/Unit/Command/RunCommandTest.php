@@ -13,23 +13,121 @@ use Yiisoft\Queue\QueueInterface;
 
 final class RunCommandTest extends TestCase
 {
-    public function testConfigure(): void
-    {
-        $command = new RunCommand($this->createMock(QueueProviderInterface::class), []);
-        $channelArgument = $command->getNativeDefinition()->getArgument('channel');
-        $this->assertEquals('channel', $channelArgument->getName());
-    }
-
-    public function testExecute(): void
+    public function testExecuteWithSingleQueue(): void
     {
         $queue = $this->createMock(QueueInterface::class);
-        $queue->expects($this->once())->method('run');
+        $queue->expects($this->once())
+            ->method('run')
+            ->with($this->equalTo(0))
+            ->willReturn(5);
+
         $queueProvider = $this->createMock(QueueProviderInterface::class);
-        $queueProvider->method('get')->willReturn($queue);
-        $input = new StringInput('channel');
+        $queueProvider->expects($this->once())
+            ->method('get')
+            ->with($this->equalTo('test-queue'))
+            ->willReturn($queue);
+
+        $input = new StringInput('test-queue');
+        $output = $this->createMock(OutputInterface::class);
+        $output->expects($this->once())
+            ->method('write')
+            ->with($this->equalTo('Processing queue test-queue... '));
+        $output->expects($this->once())
+            ->method('writeln')
+            ->with($this->equalTo('Messages processed: 5.'));
 
         $command = new RunCommand($queueProvider, []);
-        $exitCode = $command->run($input, $this->createMock(OutputInterface::class));
+        $exitCode = $command->run($input, $output);
+
+        $this->assertEquals(0, $exitCode);
+    }
+
+    public function testExecuteWithMultipleQueues(): void
+    {
+        $queue1 = $this->createMock(QueueInterface::class);
+        $queue1->expects($this->once())
+            ->method('run')
+            ->with($this->equalTo(0))
+            ->willReturn(3);
+
+        $queue2 = $this->createMock(QueueInterface::class);
+        $queue2->expects($this->once())
+            ->method('run')
+            ->with($this->equalTo(0))
+            ->willReturn(7);
+
+        $queueProvider = $this->createMock(QueueProviderInterface::class);
+        $queueProvider->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnOnConsecutiveCalls($queue1, $queue2);
+
+        $output = $this->createMock(OutputInterface::class);
+        $output->expects($this->exactly(2))
+            ->method('write');
+        $output->expects($this->exactly(2))
+            ->method('writeln');
+
+        $input = new StringInput('queue1 queue2');
+        $command = new RunCommand($queueProvider, []);
+        $exitCode = $command->run($input, $output);
+
+        $this->assertEquals(0, $exitCode);
+    }
+
+    public function testExecuteWithMaximumOption(): void
+    {
+        $queue = $this->createMock(QueueInterface::class);
+        $queue->expects($this->once())
+            ->method('run')
+            ->with($this->equalTo(100))
+            ->willReturn(10);
+
+        $queueProvider = $this->createMock(QueueProviderInterface::class);
+        $queueProvider->expects($this->once())
+            ->method('get')
+            ->with($this->equalTo('test-queue'))
+            ->willReturn($queue);
+
+        $input = new StringInput('test-queue --maximum=100');
+        $output = $this->createMock(OutputInterface::class);
+        $output->expects($this->once())
+            ->method('write')
+            ->with($this->equalTo('Processing queue test-queue... '));
+        $output->expects($this->once())
+            ->method('writeln')
+            ->with($this->equalTo('Messages processed: 10.'));
+
+        $command = new RunCommand($queueProvider, []);
+        $exitCode = $command->run($input, $output);
+
+        $this->assertEquals(0, $exitCode);
+    }
+
+    public function testExecuteWithDefaultQueues(): void
+    {
+        $queue = $this->createMock(QueueInterface::class);
+        $queue->expects($this->once())
+            ->method('run')
+            ->with($this->equalTo(0))
+            ->willReturn(2);
+
+        $queueProvider = $this->createMock(QueueProviderInterface::class);
+        $queueProvider->expects($this->once())
+            ->method('get')
+            ->with($this->equalTo('default-queue'))
+            ->willReturn($queue);
+
+        $input = new StringInput('');
+        $output = $this->createMock(OutputInterface::class);
+        $output->expects($this->once())
+            ->method('write')
+            ->with($this->equalTo('Processing queue default-queue... '));
+        $output->expects($this->once())
+            ->method('writeln')
+            ->with($this->equalTo('Messages processed: 2.'));
+
+        $command = new RunCommand($queueProvider, ['default-queue']);
+        $exitCode = $command->run($input, $output);
 
         $this->assertEquals(0, $exitCode);
     }

@@ -4,20 +4,28 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Stubs;
 
-use LogicException;
+use BackedEnum;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\StringNormalizer;
 
 /**
  * Stub queue that does nothing. Job status is always "done".
+ *
+ * @template T of AdapterInterface
  */
 final class StubQueue implements QueueInterface
 {
-    public function __construct(private ?AdapterInterface $adapter = null)
-    {
+    /**
+     * @param T|null $adapter
+     */
+    public function __construct(
+        private ?AdapterInterface $adapter = null,
+        private string $name = 'default'
+    ) {
     }
 
     public function push(
@@ -41,25 +49,32 @@ final class StubQueue implements QueueInterface
         return JobStatus::DONE;
     }
 
+    /**
+     * @return T|null
+     */
     public function getAdapter(): ?AdapterInterface
     {
         return $this->adapter;
     }
 
-    public function withAdapter(AdapterInterface $adapter): static
+    /**
+     * @param T $adapter
+     * @return static<T>
+     */
+    public function withAdapter(AdapterInterface $adapter, string|BackedEnum|null $queueName = null): static
     {
         $new = clone $this;
         $new->adapter = $adapter;
 
+        if ($queueName !== null) {
+            $new->name = StringNormalizer::normalize($queueName);
+        }
+
         return $new;
     }
 
-    public function getChannel(): string
+    public function getName(): string
     {
-        if ($this->adapter === null) {
-            throw new LogicException('Adapter is not set.');
-        }
-
-        return $this->adapter->getChannel();
+        return $this->name;
     }
 }
