@@ -157,7 +157,7 @@ final class QueueTest extends TestCase
     {
         $queue = $this
             ->getQueue()
-            ->withAdapter(new StubAdapter('test-channel'), 'test-queue');
+            ->withAdapter(new StubAdapter(), 'test-queue');
 
         $this->assertSame('test-queue', $queue->getName());
     }
@@ -166,7 +166,7 @@ final class QueueTest extends TestCase
     {
         $queue = $this
             ->getQueue()
-            ->withAdapter(new StubAdapter('test-channel'), TestQueue::HIGH_PRIORITY);
+            ->withAdapter(new StubAdapter(), TestQueue::HIGH_PRIORITY);
 
         $this->assertSame('high-priority', $queue->getName());
     }
