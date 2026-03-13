@@ -69,7 +69,7 @@ final class QueueFactoryProvider implements QueueProviderInterface
     }
 
     /**
-     * @throws InvalidConfigException
+     * @throws InvalidQueueConfigException
      */
     private function getOrTryToCreate(string $name): ?QueueInterface
     {
@@ -82,7 +82,12 @@ final class QueueFactoryProvider implements QueueProviderInterface
             return null;
         }
 
-        $queue = $this->factory->create($name);
+        try {
+            $queue = $this->factory->create($name);
+        } catch (InvalidConfigException $exception) {
+            throw new InvalidQueueConfigException($exception->getMessage(), previous: $exception);
+        }
+
         if (!$queue instanceof QueueInterface) {
             throw new InvalidQueueConfigException(
                 sprintf(
