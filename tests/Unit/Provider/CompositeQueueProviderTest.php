@@ -33,10 +33,9 @@ final class CompositeQueueProviderTest extends TestCase
     public function testNotFound(): void
     {
         $provider = new CompositeQueueProvider(
-            new AdapterFactoryQueueProvider(
-                new StubQueue(new StubAdapter()),
-                ['channel1' => new StubAdapter()],
-            ),
+            new PredefinedQueueProvider([
+                'queue1' => new StubQueue(new StubAdapter()),
+            ]),
         );
 
         $this->expectException(QueueNotFoundException::class);
