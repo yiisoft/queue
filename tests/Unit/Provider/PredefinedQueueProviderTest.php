@@ -12,6 +12,8 @@ use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Stubs\StubQueue;
 use Yiisoft\Queue\Tests\Unit\Support\StringEnum;
 
+use stdClass;
+
 use function sprintf;
 
 final class PredefinedQueueProviderTest extends TestCase
@@ -64,7 +66,7 @@ final class PredefinedQueueProviderTest extends TestCase
             ),
         );
         new PredefinedQueueProvider([
-            'queue1' => new \stdClass(),
+            'queue1' => new stdClass(),
         ]);
     }
 
