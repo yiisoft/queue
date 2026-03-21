@@ -42,4 +42,45 @@ final class CompositeQueueProviderTest extends TestCase
         $this->expectExceptionMessage('Queue with name "not-exists" not found.');
         $provider->get('not-exists');
     }
+
+    public function testGetNames(): void
+    {
+        $provider = new CompositeQueueProvider(
+            new PredefinedQueueProvider([
+                'queue1' => new StubQueue(new StubAdapter()),
+                'queue2' => new StubQueue(new StubAdapter()),
+            ]),
+            new PredefinedQueueProvider([
+                'queue3' => new StubQueue(new StubAdapter()),
+            ]),
+        );
+
+        $names = $provider->getNames();
+
+        $this->assertSame(['queue1', 'queue2', 'queue3'], $names);
+    }
+
+    public function testGetNamesWithDuplicates(): void
+    {
+        $provider = new CompositeQueueProvider(
+            new PredefinedQueueProvider([
+                'queue1' => new StubQueue(new StubAdapter()),
+            ]),
+            new PredefinedQueueProvider([
+                'queue1' => new StubQueue(new StubAdapter()),
+                'queue2' => new StubQueue(new StubAdapter()),
+            ]),
+        );
+
+        $names = $provider->getNames();
+
+        $this->assertSame(['queue1', 'queue2'], $names);
+    }
+
+    public function testGetNamesEmpty(): void
+    {
+        $provider = new CompositeQueueProvider();
+
+        $this->assertSame([], $provider->getNames());
+    }
 }

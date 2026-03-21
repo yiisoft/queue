@@ -59,14 +59,4 @@ return [
         '__construct()' => ['middlewareDefinitions' => $params['yiisoft/queue']['middlewares-fail']],
     ],
     MessageSerializerInterface::class => JsonMessageSerializer::class,
-    RunCommand::class => [
-        '__construct()' => [
-            'queues' => array_keys($params['yiisoft/queue']['queues']),
-        ],
-    ],
-    ListenAllCommand::class => [
-        '__construct()' => [
-            'queues' => array_keys($params['yiisoft/queue']['queues']),
-        ],
-    ],
 ];

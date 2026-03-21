@@ -9,6 +9,7 @@ use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\StringNormalizer;
 
 use function array_key_exists;
+use function array_keys;
 use function get_debug_type;
 use function sprintf;
 
@@ -61,5 +62,10 @@ final class PredefinedQueueProvider implements QueueProviderInterface
     {
         $name = StringNormalizer::normalize($name);
         return array_key_exists($name, $this->queues);
+    }
+
+    public function getNames(): array
+    {
+        return array_keys($this->queues);
     }
 }
