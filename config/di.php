@@ -6,8 +6,6 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Cli\SimpleLoop;
-use Yiisoft\Queue\Command\ListenAllCommand;
-use Yiisoft\Queue\Command\RunCommand;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\MessageSerializerInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
