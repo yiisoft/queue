@@ -22,11 +22,9 @@ final class RunCommandTest extends TestCase
             ->with($this->equalTo(0))
             ->willReturn(5);
 
-        $queueProvider = $this->createMock(QueueProviderInterface::class);
-        $queueProvider->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('test-queue'))
-            ->willReturn($queue);
+        $queueProvider = new PredefinedQueueProvider([
+            'test-queue' => $queue,
+        ]);
 
         $input = new StringInput('test-queue');
         $output = $this->createMock(OutputInterface::class);
@@ -37,7 +35,7 @@ final class RunCommandTest extends TestCase
             ->method('writeln')
             ->with($this->equalTo('Messages processed: 5.'));
 
-        $command = new RunCommand($queueProvider, []);
+        $command = new RunCommand($queueProvider);
         $exitCode = $command->run($input, $output);
 
         $this->assertEquals(0, $exitCode);
@@ -57,10 +55,10 @@ final class RunCommandTest extends TestCase
             ->with($this->equalTo(0))
             ->willReturn(7);
 
-        $queueProvider = $this->createMock(QueueProviderInterface::class);
-        $queueProvider->expects($this->exactly(2))
-            ->method('get')
-            ->willReturnOnConsecutiveCalls($queue1, $queue2);
+        $queueProvider = new PredefinedQueueProvider([
+            'queue1' => $queue1,
+            'queue2' => $queue2,
+        ]);
 
         $output = $this->createMock(OutputInterface::class);
         $output->expects($this->exactly(2))
@@ -69,7 +67,7 @@ final class RunCommandTest extends TestCase
             ->method('writeln');
 
         $input = new StringInput('queue1 queue2');
-        $command = new RunCommand($queueProvider, []);
+        $command = new RunCommand($queueProvider);
         $exitCode = $command->run($input, $output);
 
         $this->assertEquals(0, $exitCode);
@@ -83,11 +81,9 @@ final class RunCommandTest extends TestCase
             ->with($this->equalTo(100))
             ->willReturn(10);
 
-        $queueProvider = $this->createMock(QueueProviderInterface::class);
-        $queueProvider->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('test-queue'))
-            ->willReturn($queue);
+        $queueProvider = new PredefinedQueueProvider([
+            'test-queue' => $queue,
+        ]);
 
         $input = new StringInput('test-queue --maximum=100');
         $output = $this->createMock(OutputInterface::class);
@@ -98,7 +94,7 @@ final class RunCommandTest extends TestCase
             ->method('writeln')
             ->with($this->equalTo('Messages processed: 10.'));
 
-        $command = new RunCommand($queueProvider, []);
+        $command = new RunCommand($queueProvider);
         $exitCode = $command->run($input, $output);
 
         $this->assertEquals(0, $exitCode);
