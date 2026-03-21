@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Command\RunCommand;
+use Yiisoft\Queue\Provider\PredefinedQueueProvider;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\QueueInterface;
 
@@ -111,22 +112,20 @@ final class RunCommandTest extends TestCase
             ->with($this->equalTo(0))
             ->willReturn(2);
 
-        $queueProvider = $this->createMock(QueueProviderInterface::class);
-        $queueProvider->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('default-queue'))
-            ->willReturn($queue);
+        $queueProvider = new PredefinedQueueProvider([
+            QueueProviderInterface::DEFAULT_QUEUE => $queue,
+        ]);
 
         $input = new StringInput('');
         $output = $this->createMock(OutputInterface::class);
         $output->expects($this->once())
             ->method('write')
-            ->with($this->equalTo('Processing queue default-queue... '));
+            ->with($this->equalTo('Processing queue ' . QueueProviderInterface::DEFAULT_QUEUE . '... '));
         $output->expects($this->once())
             ->method('writeln')
             ->with($this->equalTo('Messages processed: 2.'));
 
-        $command = new RunCommand($queueProvider, ['default-queue']);
+        $command = new RunCommand($queueProvider);
         $exitCode = $command->run($input, $output);
 
         $this->assertEquals(0, $exitCode);
