@@ -37,11 +37,6 @@ final class DummyQueue implements QueueInterface
         throw new Exception('`status()` method is not implemented yet.');
     }
 
-    public function withAdapter(AdapterInterface $adapter, string|BackedEnum|null $queueName = null): static
-    {
-        throw new Exception('`withAdapter()` method is not implemented yet.');
-    }
-
     public function getName(): string
     {
         return $this->name;

@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
@@ -63,11 +64,11 @@ final class MiddlewareTest extends TestCase
             $this->createMock(LoopInterface::class),
             $this->createMock(LoggerInterface::class),
             $pushMiddlewareDispatcher,
-            'test',
             new SynchronousAdapter(
                 $this->createMock(WorkerInterface::class),
                 $this->createMock(QueueInterface::class),
             ),
+            'test',
         );
         $queue = $queue
             ->withMiddlewares(new TestMiddleware('Won\'t be executed'))

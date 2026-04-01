@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Stubs\StubQueue;
-use Yiisoft\Queue\Stubs\StubAdapter;
 
 final class StubQueueTest extends TestCase
 {
@@ -22,15 +21,5 @@ final class StubQueueTest extends TestCase
         $this->assertSame(JobStatus::DONE, $queue->status('test'));
         $this->assertNull($queue->getAdapter());
         $queue->listen();
-    }
-
-    public function testWithAdapter(): void
-    {
-        $sourceQueue = new StubQueue();
-
-        $queue = $sourceQueue->withAdapter(new StubAdapter());
-
-        $this->assertNotSame($queue, $sourceQueue);
-        $this->assertInstanceOf(StubAdapter::class, $queue->getAdapter());
     }
 }

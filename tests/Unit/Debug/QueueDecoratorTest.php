@@ -15,22 +15,6 @@ use Yiisoft\Queue\Tests\App\FakeAdapter;
 
 class QueueDecoratorTest extends TestCase
 {
-    public function testWithAdapter(): void
-    {
-        $queue = $this->createMock(QueueInterface::class);
-        $collector = new QueueCollector();
-        $decorator = new QueueDecorator(
-            $queue,
-            $collector,
-        );
-
-        $queueAdapter = $this->createMock(AdapterInterface::class);
-
-        $newDecorator = $decorator->withAdapter($queueAdapter);
-
-        $this->assertInstanceOf(QueueDecorator::class, $newDecorator);
-    }
-
     public function testStatus(): void
     {
         $queue = $this->createMock(QueueInterface::class);
@@ -97,14 +81,5 @@ class QueueDecoratorTest extends TestCase
         );
 
         $this->assertEquals('hello', $decorator->getName());
-    }
-
-    public function testImmutable(): void
-    {
-        $queueDecorator = new QueueDecorator(
-            $this->createMock(QueueInterface::class),
-            new QueueCollector(),
-        );
-        $this->assertNotSame($queueDecorator, $queueDecorator->withAdapter(new FakeAdapter()));
     }
 }

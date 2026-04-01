@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Debug;
 
-use BackedEnum;
-use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
@@ -43,11 +41,6 @@ final class QueueDecorator implements QueueInterface
     public function listen(): void
     {
         $this->queue->listen();
-    }
-
-    public function withAdapter(AdapterInterface $adapter, string|BackedEnum|null $queueName = null): static
-    {
-        return new self($this->queue->withAdapter($adapter, $queueName), $this->collector);
     }
 
     public function getName(): string

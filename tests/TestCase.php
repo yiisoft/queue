@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests;
 
+use BackedEnum;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\Stubs\StubAdapter;
+use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
@@ -103,13 +107,17 @@ abstract class TestCase extends BaseTestCase
         return $this->container;
     }
 
-    protected function createQueue(): Queue
-    {
+    protected function createQueue(
+        AdapterInterface $adapter = new StubAdapter(),
+        string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
+    ): Queue {
         return new Queue(
             $this->getWorker(),
             $this->getLoop(),
             new NullLogger(),
             $this->getPushMiddlewareDispatcher(),
+            $adapter,
+            $name,
         );
     }
 
