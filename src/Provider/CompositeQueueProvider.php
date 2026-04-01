@@ -7,6 +7,10 @@ namespace Yiisoft\Queue\Provider;
 use BackedEnum;
 use Yiisoft\Queue\QueueInterface;
 
+use function array_merge;
+use function array_unique;
+use function array_values;
+
 /**
  * Composite queue provider.
  */
@@ -44,5 +48,14 @@ final class CompositeQueueProvider implements QueueProviderInterface
             }
         }
         return false;
+    }
+
+    public function getNames(): array
+    {
+        $names = [];
+        foreach ($this->providers as $provider) {
+            $names[] = $provider->getNames();
+        }
+        return array_values(array_unique(array_merge(...$names)));
     }
 }

@@ -13,6 +13,7 @@ use Yiisoft\Queue\StringNormalizer;
 use Yiisoft\Queue\QueueInterface;
 
 use function array_key_exists;
+use function array_keys;
 use function sprintf;
 
 /**
@@ -31,6 +32,11 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
     private readonly StrictFactory $factory;
 
     /**
+     * @psalm-var list<string>
+     */
+    private readonly array $names;
+
+    /**
      * @param QueueInterface $baseQueue Base queue for queues creation.
      * @param array $definitions Adapter definitions indexed by queue names.
      * @param ContainerInterface|null $container Container to use for dependencies resolving.
@@ -45,6 +51,7 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
         ?ContainerInterface $container = null,
         bool $validate = true,
     ) {
+        $this->names = array_keys($definitions);
         try {
             $this->factory = new StrictFactory($definitions, $container, $validate);
         } catch (InvalidConfigException $exception) {
@@ -68,6 +75,11 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
     {
         $name = StringNormalizer::normalize($name);
         return $this->factory->has($name);
+    }
+
+    public function getNames(): array
+    {
+        return $this->names;
     }
 
     /**

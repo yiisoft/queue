@@ -20,7 +20,6 @@ final class RunCommand extends Command
 {
     public function __construct(
         private readonly QueueProviderInterface $queueProvider,
-        private readonly array $queues,
     ) {
         parent::__construct();
     }
@@ -31,7 +30,7 @@ final class RunCommand extends Command
             'queue',
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
             'Queue name list to connect to.',
-            $this->queues,
+            $this->queueProvider->getNames(),
         )
             ->addOption(
                 'maximum',

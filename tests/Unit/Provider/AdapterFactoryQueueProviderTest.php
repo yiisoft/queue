@@ -143,4 +143,27 @@ final class AdapterFactoryQueueProviderTest extends TestCase
         $this->assertSame('log-queue', $logQueue->getName());
         $this->assertInstanceOf(StubAdapter::class, $logQueue->getAdapter());
     }
+
+    public function testGetNames(): void
+    {
+        $provider = new AdapterFactoryQueueProvider(
+            new StubQueue(),
+            [
+                'queue1' => StubAdapter::class,
+                'queue2' => StubAdapter::class,
+            ],
+        );
+
+        $this->assertSame(['queue1', 'queue2'], $provider->getNames());
+    }
+
+    public function testGetNamesEmpty(): void
+    {
+        $provider = new AdapterFactoryQueueProvider(
+            new StubQueue(),
+            [],
+        );
+
+        $this->assertSame([], $provider->getNames());
+    }
 }

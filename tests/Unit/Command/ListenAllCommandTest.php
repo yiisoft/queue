@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Command\ListenAllCommand;
-use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\Provider\PredefinedQueueProvider;
 use Yiisoft\Queue\QueueInterface;
 
 final class ListenAllCommandTest extends TestCase
@@ -21,8 +21,10 @@ final class ListenAllCommandTest extends TestCase
         $queue2 = $this->createMock(QueueInterface::class);
         $queue2->expects($this->once())->method('run');
 
-        $queueFactory = $this->createMock(QueueProviderInterface::class);
-        $queueFactory->method('get')->willReturn($queue1, $queue2);
+        $queueFactory = new PredefinedQueueProvider([
+            'queue1' => $queue1,
+            'queue2' => $queue2,
+        ]);
 
         $loop = $this->createMock(LoopInterface::class);
         $loop->method('canContinue')->willReturn(true, false);
@@ -30,7 +32,6 @@ final class ListenAllCommandTest extends TestCase
         $command = new ListenAllCommand(
             $queueFactory,
             $loop,
-            ['channel1', 'channel2'],
         );
         $input = new ArrayInput([], $command->getNativeDefinition());
         $input->setOption('pause', 0);

@@ -88,4 +88,21 @@ final class PredefinedQueueProviderTest extends TestCase
 
         $this->assertFalse($provider->has('any'));
     }
+
+    public function testGetNames(): void
+    {
+        $provider = new PredefinedQueueProvider([
+            'queue1' => new StubQueue(),
+            'queue2' => new StubQueue(),
+        ]);
+
+        $this->assertSame(['queue1', 'queue2'], $provider->getNames());
+    }
+
+    public function testGetNamesEmpty(): void
+    {
+        $provider = new PredefinedQueueProvider([]);
+
+        $this->assertSame([], $provider->getNames());
+    }
 }

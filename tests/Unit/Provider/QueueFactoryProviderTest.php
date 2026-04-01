@@ -153,4 +153,23 @@ final class QueueFactoryProviderTest extends TestCase
 
         $this->assertTrue($provider->has('queue1'));
     }
+
+    public function testGetNames(): void
+    {
+        $provider = new QueueFactoryProvider(
+            [
+                'queue1' => StubQueue::class,
+                'queue2' => StubQueue::class,
+            ],
+        );
+
+        $this->assertSame(['queue1', 'queue2'], $provider->getNames());
+    }
+
+    public function testGetNamesEmpty(): void
+    {
+        $provider = new QueueFactoryProvider([]);
+
+        $this->assertSame([], $provider->getNames());
+    }
 }

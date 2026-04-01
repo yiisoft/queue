@@ -25,7 +25,6 @@ final class ListenAllCommand extends Command
     public function __construct(
         private readonly QueueProviderInterface $queueProvider,
         private readonly LoopInterface $loop,
-        private readonly array $queues,
     ) {
         parent::__construct();
     }
@@ -39,7 +38,7 @@ final class ListenAllCommand extends Command
             'queue',
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
             'Queue name list to connect to',
-            $this->queues,
+            $this->queueProvider->getNames(),
         )
             ->addOption(
                 'pause',

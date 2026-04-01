@@ -35,4 +35,13 @@ interface QueueProviderInterface
      * @return bool Whether the queue exists.
      */
     public function has(string|BackedEnum $name): bool;
+
+    /**
+     * Returns a list of queue names.
+     *
+     * @return string[] Queue names.
+     *
+     * @psalm-return list<string>
+     */
+    public function getNames(): array;
 }

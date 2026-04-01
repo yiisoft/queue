@@ -33,4 +33,14 @@ class QueueProviderInterfaceProxyTest extends TestCase
 
         $this->assertTrue($factory->has('test'));
     }
+
+    public function testGetNames(): void
+    {
+        $queueFactory = $this->createMock(QueueProviderInterface::class);
+        $queueFactory->expects($this->once())->method('getNames')->willReturn(['queue1', 'queue2']);
+        $collector = new QueueCollector();
+        $factory = new QueueProviderInterfaceProxy($queueFactory, $collector);
+
+        $this->assertSame(['queue1', 'queue2'], $factory->getNames());
+    }
 }
