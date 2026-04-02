@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\App;
 
-use BackedEnum;
 use Exception;
-use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;

@@ -13,7 +13,6 @@ use RuntimeException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\Stubs\StubAdapter;
-use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;

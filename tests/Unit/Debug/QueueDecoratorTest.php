@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Debug;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Debug\QueueCollector;
 use Yiisoft\Queue\Debug\QueueDecorator;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Tests\App\FakeAdapter;
 
 class QueueDecoratorTest extends TestCase
 {
