@@ -17,22 +17,12 @@ use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
-use Yiisoft\Queue\Provider\QueueProviderInterface;
-use Yiisoft\Queue\Queue;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Worker\Worker as QueueWorker;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
 /* @var array $params */
 
 return [
-    AdapterFactoryQueueProvider::class => [
-        '__construct()' => [
-            'definitions' => $params['yiisoft/queue']['queues'],
-        ],
-    ],
-    QueueProviderInterface::class => AdapterFactoryQueueProvider::class,
     QueueWorker::class => [
         'class' => QueueWorker::class,
         '__construct()' => [$params['yiisoft/queue']['handlers']],
@@ -43,7 +33,6 @@ return [
             ? $container->get(SignalLoop::class)
             : $container->get(SimpleLoop::class);
     },
-    QueueInterface::class => Queue::class,
     MiddlewareFactoryPushInterface::class => MiddlewareFactoryPush::class,
     MiddlewareFactoryConsumeInterface::class => MiddlewareFactoryConsume::class,
     MiddlewareFactoryFailureInterface::class => MiddlewareFactoryFailure::class,
