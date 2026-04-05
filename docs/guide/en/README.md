@@ -1,46 +1,36 @@
-# Yii Queue
+# Yii Queue documentation map
 
-An extension for running tasks asynchronously via queues.
-
-## Getting started
+## Install and configure
 
 - [Prerequisites and installation](prerequisites-and-installation.md)
 - [Configuration with yiisoft/config](configuration-with-config.md)
-- [Manual configuration](configuration-manual.md)
-
-- [Usage basics](usage.md)
-- [Workers](worker.md)
-- [Console commands](console-commands.md)
-
-## Adapters
-
 - [Adapter list](adapter-list.md)
 - [Synchronous adapter](adapter-sync.md)
-
-## Core concepts
-
 - [Queue names](queue-names.md)
-- [Message handler](message-handler.md)
-- [Envelopes](envelopes.md)
-- [Middleware pipelines](middleware-pipelines.md)
-- [Loops](loops.md)
 
-## Interoperability
+## Build and run jobs
 
-- [Producing messages from external systems](consuming-messages-from-external-systems.md)
+- [Usage basics](usage.md)
+- [Messages and handlers: concepts](messages-and-handlers.md)
+- [Message handler](message-handler-simple.md)
+- [Console commands](console-commands.md)
+- [Job status](job-status.md)
 
 ## Reliability and visibility
 
 - [Errors and retryable jobs](error-handling.md)
-- [Job status](job-status.md)
+- [Envelopes](envelopes.md)
 - [Yii Debug integration](debug-integration.md)
 
-## Production and optimization
+## Production readiness
 
 - [Best practices](best-practices.md)
 - [Running workers in production (systemd and Supervisor)](process-managers.md)
-- [Performance tuning](performance-tuning.md)
 
-## Migration from Yii2
+## Migration
 
 - [Migrating from `yii2-queue`](migrating-from-yii2-queue.md)
+
+## Advanced topics
+
+Open the [advanced documentation map](advanced-map.md) if you build custom middleware, adapters, queue providers, or tooling.

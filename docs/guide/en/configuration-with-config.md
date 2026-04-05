@@ -7,53 +7,13 @@ If you are using [yiisoft/config](https://github.com/yiisoft/config) (i.e. insta
 In [yiisoft/app](https://github.com/yiisoft/app) / [yiisoft/app-api](https://github.com/yiisoft/app-api) templates you typically add or adjust configuration in `config/params.php`.
 If your project structure differs, put configuration into any params config file that is loaded by [yiisoft/config](https://github.com/yiisoft/config).
 
-## What you need to configure
+When your message uses a handler class that implements `Yiisoft\Queue\Message\MessageHandlerInterface` and the handler name equals its FQCN, nothing else has to be configured: the DI container resolves the class automatically. See [Message handler: simple setup](message-handler-simple.md) for details and trade-offs.
 
-- Define queue name adapter definitions in the `channels` params key. See more about queue names [here](./queue-names.md).
-- Optionally: define [message handlers](./message-handler.md) in the `handlers` params key to be used with the `QueueWorker`.
+Advanced applications eventually need the following tweaks:
 
-By default, when using the DI config provided by this package, `QueueProviderInterface` is bound to `AdapterFactoryQueueProvider` and uses `yiisoft/queue.channels` as a strict queue name registry.
-That means unknown queue names are not accepted silently and `QueueProviderInterface::get()` will throw `ChannelNotFoundException`.
-The configured queue names are also used as the default queue name list for `queue:run` and `queue:listen-all`.
+- **Channels** — configure queue/back-end per logical queue name via [`yiisoft/queue.channels` config](queue-names.md) when you need to parallelize message handling or send some of them to a different application.
+- **Named handlers or callable definitions** — map a short handler name to a callable in [`yiisoft/queue.handlers` config](message-handler.md) when another application is the message producer and you cannot use FQCN as the handler name.
+- **Middleware pipelines** — adjust push/consume/failure behavior: collect metrics, modify messages, and so on. See [Middleware pipelines](middleware-pipelines.md) for details.
 
 For development and testing you can start with the synchronous adapter.
-For production you must use a real backend adapter (AMQP, Kafka, SQS, etc.). If you do not have any preference, start with [yiisoft/queue-amqp](https://github.com/yiisoft/queue-amqp) and [RabbitMQ](https://www.rabbitmq.com/).
-
-The examples below use the synchronous adapter for brevity. In production, override `yiisoft/queue.channels` with an adapter definition from the backend adapter package you selected.
-
-## Minimal configuration example
-
-If you use the handler class FQCN as the message handler name, no additional configuration is required.
-
-See [Message handler](./message-handler.md) for details and trade-offs.
-
-## Minimal configuration example (named handlers)
-
-```php
-return [
-    'yiisoft/queue' => [
-        'handlers' => [
-            'handler-name' => [FooHandler::class, 'handle'],
-        ],
-    ],
-];
-```
-
-## Full configuration example
-
-```php
-return [
-    'yiisoft/queue' => [
-        'handlers' => [
-            'handler-name' => [FooHandler::class, 'handle'],
-        ],
-        'channels' => [
-            \Yiisoft\Queue\QueueInterface::DEFAULT_CHANNEL => \Yiisoft\Queue\Adapter\SynchronousAdapter::class,
-        ],
-        'middlewares-push' => [], // push middleware pipeline definition
-        'middlewares-consume' => [], // consume middleware pipeline definition
-        'middlewares-fail' => [], // consume failure handling middleware pipeline definition
-    ],
-];
-```
-Middleware pipelines are discussed in detail [here](./middleware-pipelines.md).
+For production you have to use a [real backend adapter](adapter-list.md) (AMQP, Kafka, SQS, etc.). If you do not have any preference, it's simpler to start with [yiisoft/queue-amqp](https://github.com/yiisoft/queue-amqp) and [RabbitMQ](https://www.rabbitmq.com/).

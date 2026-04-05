@@ -1,6 +1,9 @@
-# Message handler
+# Message handler advanced
 
-A *message handler* is what processes a queue message. Internally, `Yiisoft\Queue\Worker\Worker` resolves a handler by the message handler name (`MessageInterface::getHandlerName()`) and then executes it through [yiisoft/injector](https://github.com/yiisoft/injector).
+This page covers named handler definitions, callable formats, pitfalls, and recommended implementation styles.
+
+For the zero-config FQCN approach (same-app producer and consumer), see [Message handler: simple setup](message-handler-simple.md).
+For a conceptual overview of what messages and handlers are, see [Messages and handlers: concepts](messages-and-handlers.md).
 
 Handler definitions are configured in:
 
@@ -9,60 +12,14 @@ Handler definitions are configured in:
 
 ## Supported handler definition formats
 
-### 1. HandlerInterface implementation (without mapping)
+### Named handlers
 
-If your handler is a dedicated class implementing `Yiisoft\Queue\Message\MessageHandlerInterface`, you can use the class name itself as the message handler name (FQCN) if your DI container can resolve the handler class.
-
-> By default the [yiisoft/di](https://github.com/yiisoft/di) container resolves all FQCNs into corresponding class objects.
-
-This is the default and most convenient option when the producer and the consumer are the same application.
-
-In this setup, you usually don't need to configure handler mapping at all as long as your DI container can resolve the handler class.
-
-**Message**:
+Use a short stable handler name when pushing a `Message` instead of a PHP class name:
 
 ```php
-new \Yiisoft\Queue\Message\Message(\App\Queue\RemoteFileHandler::class, ['url' => '...']);
-```
+use Yiisoft\Queue\Message\Message;
 
-**Handler**:
-
-```php
-final class RemoteFileHandler implements \Yiisoft\Queue\Message\MessageHandlerInterface
-{
-    public function handle(\Yiisoft\Queue\Message\MessageInterface $message): void
-    {
-        // Handle the message
-    }
-}
-```
-
-**Config**:
-
-Not needed
-
-**Pros**:
-
-- Minimal configuration.
-- Stable refactoring inside the same application (rename-safe if you rename the class and update the producer code).
-- Easy to unit-test the handler as a normal class.
-
-**Cons**:
-
-- Couples produced messages to PHP class names.
-- Requires producer and consumer to share the same naming contract (usually “same app”).
-
-**Use when**:
-
-- Producer and consumer are the same application.
-- You control message creation code and can safely use FQCN as the handler name.
-
-### 2. Named handlers
-
-In this case you should use a proper handler name when pushing a `Message` instead of a handler class name as in the example above:
-
-```php
-new \Yiisoft\Queue\Message\Message('send-email', ['data' => '...']);
+new Message('send-email', ['data' => '...']); // "send-email" is the handler name here
 ```
 
 **Config**:
@@ -80,6 +37,8 @@ return [
 ```
 
 Handler definition should be either an [extended callable definition](./callable-definitions-extended.md) or a string for your DI container to resolve a `MessageHandlerInterface` instance.
+
+For the simpler FQCN-based approach that requires no mapping, see [Message handler: simple setup](message-handler-simple.md).
 
 ## When mapping by short names is a better idea
 

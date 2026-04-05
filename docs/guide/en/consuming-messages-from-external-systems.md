@@ -1,4 +1,4 @@
-# Producing messages from external systems
+# Consuming messages from external systems
 
 This guide explains how to publish messages to a queue backend (RabbitMQ, Kafka, SQS, etc.) from *external producers* (including non-PHP services) so that `yiisoft/queue` consumers can correctly deserialize and process these messages.
 
@@ -16,7 +16,7 @@ So, external systems should produce the **same payload format** that your consum
 
 `yiisoft/queue` resolves a handler by message handler name (`MessageInterface::getHandlerName()`).
 
-For external producers, you should not rely on PHP FQCN handler names. Prefer a stable short name and map it in the consumer application configuration (see [Message handler](message-handler.md)).
+For external producers, you should not rely on PHP FQCN handler names. Prefer a stable short name and map that name to a handler callable in the consumer application configuration (see [Message handler](message-handler.md)).
 
 Example mapping:
 
@@ -70,7 +70,7 @@ Full example:
 
 ### Notes about `meta`
 
-The `meta` key is a general-purpose metadata container (for example, tracing, correlation, tenant information). External systems may populate it, and the consumer-side application or middleware may also read, add, or override keys as needed. However, it's not recommended, as it highly depends on the consumer-side application code.
+The `meta` key is a general-purpose metadata container (for example, tracing, correlation, tenant information). The consumer-side application or middleware may read, add, or override keys as needed. Populating `meta` from external producers is possible but not recommended: the accepted keys and their semantics are entirely defined by the consumer application, so any contract must be maintained manually.
 
 ## 3. Data encoding rules
 
