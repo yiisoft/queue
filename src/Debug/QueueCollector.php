@@ -47,18 +47,15 @@ final class QueueCollector implements SummaryCollectorInterface
     }
 
     public function collectPush(
-        ?string $channel,
+        string $queueName,
         MessageInterface $message,
         string|array|callable|MiddlewarePushInterface ...$middlewareDefinitions,
     ): void {
         if (!$this->isActive()) {
             return;
         }
-        if ($channel === null) {
-            $channel = 'null';
-        }
 
-        $this->pushes[$channel][] = [
+        $this->pushes[$queueName][] = [
             'message' => $message,
             'middlewares' => $middlewareDefinitions,
         ];
@@ -69,7 +66,7 @@ final class QueueCollector implements SummaryCollectorInterface
         if (!$this->isActive()) {
             return;
         }
-        $this->processingMessages[$queue->getChannel()][] = $message;
+        $this->processingMessages[$queue->getName()][] = $message;
     }
 
     public function getSummary(): array

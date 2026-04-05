@@ -22,8 +22,8 @@ return [
     ],
     'yiisoft/queue' => [
         'handlers' => [],
-        'channels' => [
-            QueueProviderInterface::DEFAULT_CHANNEL => AdapterInterface::class,
+        'queues' => [
+            QueueProviderInterface::DEFAULT_QUEUE => AdapterInterface::class,
         ],
         'middlewares-push' => [],
         'middlewares-consume' => [],

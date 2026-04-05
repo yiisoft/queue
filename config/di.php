@@ -6,8 +6,6 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Cli\SimpleLoop;
-use Yiisoft\Queue\Command\ListenAllCommand;
-use Yiisoft\Queue\Command\RunCommand;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\MessageSerializerInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
@@ -31,7 +29,7 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 return [
     AdapterFactoryQueueProvider::class => [
         '__construct()' => [
-            'definitions' => $params['yiisoft/queue']['channels'],
+            'definitions' => $params['yiisoft/queue']['queues'],
         ],
     ],
     QueueProviderInterface::class => AdapterFactoryQueueProvider::class,
@@ -59,14 +57,4 @@ return [
         '__construct()' => ['middlewareDefinitions' => $params['yiisoft/queue']['middlewares-fail']],
     ],
     MessageSerializerInterface::class => JsonMessageSerializer::class,
-    RunCommand::class => [
-        '__construct()' => [
-            'channels' => array_keys($params['yiisoft/queue']['channels']),
-        ],
-    ],
-    ListenAllCommand::class => [
-        '__construct()' => [
-            'channels' => array_keys($params['yiisoft/queue']['channels']),
-        ],
-    ],
 ];

@@ -13,24 +13,57 @@ use Yiisoft\Queue\QueueInterface;
 
 final class ListenCommandTest extends TestCase
 {
-    public function testConfigure(): void
-    {
-        $command = new ListenCommand($this->createMock(QueueProviderInterface::class));
-        $channelArgument = $command->getNativeDefinition()->getArgument('channel');
-        $this->assertEquals('channel', $channelArgument->getName());
-    }
-
-    public function testExecute(): void
+    public function testExecuteWithDefaultQueue(): void
     {
         $queue = $this->createMock(QueueInterface::class);
-        $queue->expects($this->once())->method('listen');
-        $queueFactory = $this->createMock(QueueProviderInterface::class);
-        $queueFactory->method('get')->willReturn($queue);
-        $input = new StringInput('channel');
+        $queue->expects($this->once())
+            ->method('listen');
 
-        $command = new ListenCommand($queueFactory);
+        $queueProvider = $this->createMock(QueueProviderInterface::class);
+        $queueProvider->expects($this->once())
+            ->method('get')
+            ->with($this->equalTo('yii-queue'))
+            ->willReturn($queue);
+
+        $input = new StringInput('');
+        $command = new ListenCommand($queueProvider);
         $exitCode = $command->run($input, $this->createMock(OutputInterface::class));
 
         $this->assertEquals(0, $exitCode);
+    }
+
+    public function testExecuteWithCustomQueue(): void
+    {
+        $queue = $this->createMock(QueueInterface::class);
+        $queue->expects($this->once())
+            ->method('listen');
+
+        $queueProvider = $this->createMock(QueueProviderInterface::class);
+        $queueProvider->expects($this->once())
+            ->method('get')
+            ->with($this->equalTo('custom-queue'))
+            ->willReturn($queue);
+
+        $input = new StringInput('custom-queue');
+        $command = new ListenCommand($queueProvider);
+        $exitCode = $command->run($input, $this->createMock(OutputInterface::class));
+
+        $this->assertEquals(0, $exitCode);
+    }
+
+    public function testExecuteReturnsZero(): void
+    {
+        $queue = $this->createMock(QueueInterface::class);
+        $queue->expects($this->once())
+            ->method('listen');
+
+        $queueProvider = $this->createMock(QueueProviderInterface::class);
+        $queueProvider->method('get')->willReturn($queue);
+
+        $input = new StringInput('');
+        $command = new ListenCommand($queueProvider);
+        $exitCode = $command->run($input, $this->createMock(OutputInterface::class));
+
+        $this->assertSame(0, $exitCode);
     }
 }

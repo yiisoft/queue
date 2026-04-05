@@ -86,17 +86,17 @@ class QueueDecoratorTest extends TestCase
         $decorator->listen();
     }
 
-    public function testGetChannel(): void
+    public function testGetName(): void
     {
         $queue = $this->createMock(QueueInterface::class);
-        $queue->expects($this->once())->method('getChannel')->willReturn('hello');
+        $queue->expects($this->once())->method('getName')->willReturn('hello');
         $collector = new QueueCollector();
         $decorator = new QueueDecorator(
             $queue,
             $collector,
         );
 
-        $this->assertEquals('hello', $decorator->getChannel());
+        $this->assertEquals('hello', $decorator->getName());
     }
 
     public function testImmutable(): void

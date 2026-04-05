@@ -61,7 +61,7 @@ final class QueueBench
             new SimpleLoop(0),
             $logger,
             new PushMiddlewareDispatcher(new MiddlewareFactoryPush($container, $callableFactory)),
-            $this->adapter,
+            adapter: $this->adapter,
         );
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue;
 
+use BackedEnum;
 use InvalidArgumentException;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -40,7 +41,16 @@ interface QueueInterface
      */
     public function status(string|int $id): JobStatus;
 
-    public function withAdapter(AdapterInterface $adapter): static;
+    /**
+     * @param AdapterInterface $adapter Adapter to use.
+     * @param string|BackedEnum|null $queueName Queue name to use.
+     *
+     * @return static A new queue with the given adapter and queue name.
+     */
+    public function withAdapter(AdapterInterface $adapter, string|BackedEnum|null $queueName = null): static;
 
-    public function getChannel(): string;
+    /**
+     * Returns the logical name of the queue.
+     */
+    public function getName(): string;
 }

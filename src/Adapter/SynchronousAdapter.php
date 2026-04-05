@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Adapter;
 
-use BackedEnum;
 use InvalidArgumentException;
-use Yiisoft\Queue\ChannelNormalizer;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
@@ -20,15 +17,11 @@ final class SynchronousAdapter implements AdapterInterface
 {
     private array $messages = [];
     private int $current = 0;
-    private string $channel;
 
     public function __construct(
         private readonly WorkerInterface $worker,
         private readonly QueueInterface $queue,
-        string|BackedEnum $channel = QueueProviderInterface::DEFAULT_CHANNEL,
-    ) {
-        $this->channel = ChannelNormalizer::normalize($channel);
-    }
+    ) {}
 
     public function __destruct()
     {
@@ -79,25 +72,5 @@ final class SynchronousAdapter implements AdapterInterface
     public function subscribe(callable $handlerCallback): void
     {
         $this->runExisting($handlerCallback);
-    }
-
-    public function withChannel(string|BackedEnum $channel): self
-    {
-        $channel = ChannelNormalizer::normalize($channel);
-
-        if ($channel === $this->channel) {
-            return $this;
-        }
-
-        $new = clone $this;
-        $new->channel = $channel;
-        $new->messages = [];
-
-        return $new;
-    }
-
-    public function getChannel(): string
-    {
-        return $this->channel;
     }
 }

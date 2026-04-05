@@ -18,7 +18,7 @@ An extension for running tasks asynchronously via queues.
 
 ## Requirements
 
-- PHP 8.1 or higher.
+- PHP 8.1 - 8.5.
 - PCNTL extension for signal handling _(optional, recommended for production use)_.
 
 ## Installation
@@ -46,8 +46,8 @@ See the [adapter list](docs/guide/en/adapter-list.md) and follow the adapter-spe
 
 **If you use [yiisoft/app](https://github.com/yiisoft/app) or [yiisoft/app-api](https://github.com/yiisoft/app-api)**
 
-Add queue configuration to your application `$params` config. In [yiisoft/app](https://github.com/yiisoft/app)/[yiisoft/app-api](https://github.com/yiisoft/app-api) templates it's typically the `config/params.php` file.  
-_If your project structure differs, put it into any params config file that is loaded by [yiisoft/config](https://github.com/yiisoft/config)._ 
+Add queue configuration to your application `$params` config. In [yiisoft/app](https://github.com/yiisoft/app)/[yiisoft/app-api](https://github.com/yiisoft/app-api) templates it's typically the `config/params.php` file.
+_If your project structure differs, put it into any params config file that is loaded by [yiisoft/config](https://github.com/yiisoft/config)._
 
 Minimal configuration example:
 
@@ -103,7 +103,7 @@ To send a message to the queue, you need to get the queue instance and call the 
 
 final readonly class Foo {
     public function __construct(private QueueInterface $queue) {}
-    
+
     public function bar(): void
     {
         $this->queue->push(new Message(

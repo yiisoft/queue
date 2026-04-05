@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Adapter;
 
-use BackedEnum;
 use InvalidArgumentException;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -38,8 +37,4 @@ interface AdapterInterface
      * @param callable(MessageInterface): bool $handlerCallback The handler which will handle messages. Returns false if it cannot continue handling messages.
      */
     public function subscribe(callable $handlerCallback): void;
-
-    public function withChannel(string|BackedEnum $channel): self;
-
-    public function getChannel(): string;
 }

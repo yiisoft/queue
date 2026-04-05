@@ -20,7 +20,6 @@ final class RunCommand extends Command
 {
     public function __construct(
         private readonly QueueProviderInterface $queueProvider,
-        private readonly array $channels,
     ) {
         parent::__construct();
     }
@@ -28,28 +27,28 @@ final class RunCommand extends Command
     public function configure(): void
     {
         $this->addArgument(
-            'channel',
+            'queue',
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
-            'Queue channel name list to connect to.',
-            $this->channels,
+            'Queue name list to connect to.',
+            $this->queueProvider->getNames(),
         )
             ->addOption(
                 'limit',
                 'm',
                 InputOption::VALUE_REQUIRED,
-                'Number of messages to process in each channel. Default is 0 (no limits).',
+                'Maximum number of messages to process in each queue. Default is 0 (no limits).',
                 0,
             )
-            ->addUsage('[channel1 [channel2 [...]]] --limit 100');
+            ->addUsage('[queue1 [queue2 [...]]] --limit 100');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var string $channel */
-        foreach ($input->getArgument('channel') as $channel) {
-            $output->write("Processing channel $channel... ");
+        /** @var string $queue */
+        foreach ($input->getArgument('queue') as $queue) {
+            $output->write("Processing queue $queue... ");
             $count = $this->queueProvider
-                ->get($channel)
+                ->get($queue)
                 ->run((int) $input->getOption('limit'));
 
             $output->writeln("Messages processed: $count.");

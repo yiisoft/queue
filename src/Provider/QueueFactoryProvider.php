@@ -8,21 +8,20 @@ use BackedEnum;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Factory\StrictFactory;
-use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\StringNormalizer;
 use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\StringNormalizer;
 
 use function array_key_exists;
 use function array_keys;
 use function sprintf;
 
 /**
- * This queue provider creates new queue objects based on adapter definitions.
+ * This queue provider creates queue objects directly from definitions.
  *
  * @see https://github.com/yiisoft/definitions/
  * @see https://github.com/yiisoft/factory/
  */
-final class AdapterFactoryQueueProvider implements QueueProviderInterface
+final class QueueFactoryProvider implements QueueProviderInterface
 {
     /**
      * @psalm-var array<string, QueueInterface|null>
@@ -37,16 +36,15 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
     private readonly array $names;
 
     /**
-     * @param QueueInterface $baseQueue Base queue for queues creation.
-     * @param array $definitions Adapter definitions indexed by queue names.
+     * @param array $definitions Queue definitions indexed by queue names.
      * @param ContainerInterface|null $container Container to use for dependencies resolving.
      * @param bool $validate If definitions should be validated when set.
      *
      * @psalm-param array<string, mixed> $definitions
+     *
      * @throws InvalidQueueConfigException
      */
     public function __construct(
-        private readonly QueueInterface $baseQueue,
         array $definitions,
         ?ContainerInterface $container = null,
         bool $validate = true,
@@ -91,23 +89,29 @@ final class AdapterFactoryQueueProvider implements QueueProviderInterface
             return $this->queues[$name];
         }
 
-        if ($this->factory->has($name)) {
-            $adapter = $this->factory->create($name);
-            if (!$adapter instanceof AdapterInterface) {
-                throw new InvalidQueueConfigException(
-                    sprintf(
-                        'Adapter must implement "%s". For queue "%s" got "%s" instead.',
-                        AdapterInterface::class,
-                        $name,
-                        get_debug_type($adapter),
-                    ),
-                );
-            }
-            $this->queues[$name] = $this->baseQueue->withAdapter($adapter, $name);
-        } else {
+        if (!$this->factory->has($name)) {
             $this->queues[$name] = null;
+            return null;
         }
 
-        return $this->queues[$name];
+        try {
+            $queue = $this->factory->create($name);
+        } catch (InvalidConfigException $exception) {
+            throw new InvalidQueueConfigException($exception->getMessage(), previous: $exception);
+        }
+
+        if (!$queue instanceof QueueInterface) {
+            throw new InvalidQueueConfigException(
+                sprintf(
+                    'Queue must implement "%s". For queue "%s" got "%s" instead.',
+                    QueueInterface::class,
+                    $name,
+                    get_debug_type($queue),
+                ),
+            );
+        }
+
+        $this->queues[$name] = $queue;
+        return $queue;
     }
 }

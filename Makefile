@@ -1,31 +1,47 @@
-export COMPOSE_PROJECT_NAME=yii-queue
+.DEFAULT_GOAL := help
 
-help:			## Display help information
-	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
+PHP_VERSION ?= 8.4
+-include .env.local
 
-build:			## Build an image from a docker-compose file. Params: {{ v=8.1 }}. Default latest PHP 8.1
-	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml up -d --build
+DOCKER_RUN := docker run --rm -it \
+	--init \
+	--user $(shell id -u):$(shell id -g) \
+	--env YII_INSIDE_CONTAINER=true \
+	--env COMPOSER_CACHE_DIR=/app/runtime/cache/composer \
+	--env HISTFILE=/app/runtime/.docker_shell_history \
+	--workdir /app \
+	--volume $(CURDIR):/app \
+	ghcr.io/yiisoft-contrib/php-dev:$(PHP_VERSION)
 
-down:			## Stop and remove containers, networks
-	docker-compose -f tests/docker/docker-compose.yml down
+RUN := $(if $(YII_INSIDE_CONTAINER),,$(DOCKER_RUN))
 
-sh:			## Enter the container with the application
-	docker exec -it queue-php sh
+shell: ## Open a shell inside the container.
+	@if [ -n "$$YII_INSIDE_CONTAINER" ]; then \
+		echo "You are already inside a container."; \
+		exit 1; \
+	fi
+	$(RUN) bash
 
-test:			## Run tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
-	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml build --pull queue-php
-	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml run queue-php vendor/bin/phpunit --debug
-	make down
+composer: ## Run Composer command: `make composer ARGS=start`
+	$(RUN) composer $(ARGS)
 
-mutation-test:		## Run mutation tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
-	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml build --pull queue-php
-	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml run queue-php php -dpcov.enabled=1 -dpcov.directory=. vendor/bin/roave-infection-static-analysis-plugin -j2 --ignore-msi-with-no-mutations --only-covered
-	make down
+test: phpunit
+phpunit: ## [test] Run PHPUnit tests: `make phpunit ARGS="--filter=TestName"`
+	$(RUN) ./vendor/bin/phpunit $(ARGS)
 
-coverage:		## Run code coverage. Params: {{ v=8.1 }}. Default latest PHP 8.1
-	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml run queue-php vendor/bin/phpunit --coverage-clover coverage.xml
-	make down
+mutation: infection
+infection: ## [infection] Run mutation testing with Infection.
+	$(RUN) ./vendor/bin/roave-infection-static-analysis-plugin --threads=max --ignore-msi-with-no-mutations --only-covered
 
-static-analyze:		## Run code static analyze. Params: {{ v=8.1 }}. Default latest PHP 8.1
-	PHP_VERSION=$(filter-out $@,$(v)) docker-compose -f tests/docker/docker-compose.yml run queue-php vendor/bin/psalm --config=psalm.xml --shepherd --stats --php-version=$(v)
-	make down
+psalm: ## Run Psalm static analysis: `make psalm ARGS="--show-info=true"`
+	$(RUN) ./vendor/bin/psalm $(if $(ARGS),$(ARGS),--php-version=$(PHP_VERSION))
+
+cs-fix: php-cs-fixer
+php-cs-fixer: ## [cs-fix] Fix code style with PHP-CS-Fixer: `make php-cs-fixer ARGS="--dry-run"`
+	$(RUN) ./vendor/bin/php-cs-fixer fix $(ARGS)
+
+coverage: ## Generate code coverage report in HTML
+	$(RUN) ./vendor/bin/phpunit --coverage-html=runtime/coverage
+
+help: ## This help.
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
