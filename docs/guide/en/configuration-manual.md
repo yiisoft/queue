@@ -76,15 +76,17 @@ $queue->push($message);
 
 ## Using Queue Provider
 
-For multiple queue names, use `AdapterFactoryQueueProvider`:
+For multiple queue names, use `AdapterFactoryQueueProvider` (maps queue names to adapter definitions) or `PredefinedQueueProvider` (maps queue names to pre-built queue instances):
 
 ```php
 use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
 
+// AdapterFactoryQueueProvider: each queue name maps to an adapter definition.
+// The provider wraps each adapter in a Queue with the given name.
 $definitions = [
     'queue1' => new SynchronousAdapter($worker, $queue),
-    'queue2' => static fn(SynchronousAdapter $adapter) => $adapter->withChannel('channel2'),
+    'queue2' => SynchronousAdapter::class,
 ];
 
 $provider = new AdapterFactoryQueueProvider(
@@ -95,6 +97,16 @@ $provider = new AdapterFactoryQueueProvider(
 
 $queueForQueue1 = $provider->get('queue1');
 $queueForQueue2 = $provider->get('queue2');
+```
+
+```php
+use Yiisoft\Queue\Provider\PredefinedQueueProvider;
+
+// PredefinedQueueProvider: pass fully built queue instances.
+$provider = new PredefinedQueueProvider([
+    'queue1' => $queue1,
+    'queue2' => $queue2,
+]);
 ```
 
 ## Running the queue

@@ -18,11 +18,11 @@ Having multiple queue names is useful when you want to separate workloads, for e
 - **Different message types**: `emails`, `reports`, `webhooks`.
 - **Different backends / connections**: fast Redis queue for short jobs and RabbitMQ backend for long-running jobs or inter-app communication.
 
-The default queue name is `Yiisoft\Queue\QueueInterface::DEFAULT_CHANNEL` (`yii-queue`).
+The default queue name is `Yiisoft\Queue\Provider\QueueProviderInterface::DEFAULT_QUEUE` (`yii-queue`).
 
 ## Quick start (yiisoft/config)
 
-When using [yiisoft/config](https://github.com/yiisoft/config), queue name configuration is stored in params under `yiisoft/queue.channels`.
+When using [yiisoft/config](https://github.com/yiisoft/config), queue name configuration is stored in params under `yiisoft/queue.queues`.
 
 ### 1. Start with a single queue (default)
 
@@ -50,12 +50,12 @@ When you are using `yiisoft/config` and the default configs from this package ar
 
 ```php
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 
 return [
     'yiisoft/queue' => [
-        'channels' => [
-            QueueInterface::DEFAULT_CHANNEL => AdapterInterface::class,
+        'queues' => [
+            QueueProviderInterface::DEFAULT_QUEUE => AdapterInterface::class,
         ],
     ],
 ];
@@ -85,12 +85,12 @@ final readonly class SendWelcomeEmail
 Add more queue names to the `params.php`:
 
 ```php
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Provider\QueueProviderInterface;
 
 return [
     'yiisoft/queue' => [
-        'channels' => [
-            QueueInterface::DEFAULT_CHANNEL => \Yiisoft\Queue\Adapter\AdapterInterface::class,
+        'queues' => [
+            QueueProviderInterface::DEFAULT_QUEUE => \Yiisoft\Queue\Adapter\AdapterInterface::class,
             'critical' => \Yiisoft\Queue\Adapter\AdapterInterface::class,
             'emails' => \Yiisoft\Queue\Adapter\AdapterInterface::class,
         ],

@@ -41,9 +41,9 @@ Use this index when you need to customize internals: custom middleware, adapters
 When multiple queue names share infrastructure, rely on `QueueProviderInterface`:
 
 - A queue name is passed to `QueueProviderInterface::get($queueName)` and resolved into a configured `QueueInterface` instance.
-- Providers typically construct adapters lazily via [`yiisoft/factory`](https://github.com/yiisoft/factory) and call `AdapterInterface::withChannel($channel)` to switch broker-specific channels.
-- Default implementation (`AdapterFactoryQueueProvider`) enforces a strict registry defined in `yiisoft/queue.channels`. Unknown names throw `ChannelNotFoundException`.
+- Default implementation (`AdapterFactoryQueueProvider`) enforces a strict registry defined in `yiisoft/queue.queues`. Unknown names throw `QueueNotFoundException`.
 - Alternative providers include:
-  - `PrototypeQueueProvider` — clones a base queue/adapter, switching only the channel name (useful when all queues share infrastructure but risks typos).
+  - `PredefinedQueueProvider` — accepts a pre-built map of queue name → `QueueInterface` instance.
+  - `QueueFactoryProvider` — creates queue objects lazily from [`yiisoft/factory`](https://github.com/yiisoft/factory) definitions.
   - `CompositeQueueProvider` — aggregates multiple providers and selects the first that knows the queue name.
 - Implement `QueueProviderInterface` to introduce custom registries or fallback strategies, then register the implementation in DI.

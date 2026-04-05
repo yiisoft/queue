@@ -11,7 +11,7 @@ When your message uses a handler class that implements `Yiisoft\Queue\Message\Me
 
 Advanced applications eventually need the following tweaks:
 
-- **Channels** — configure queue/back-end per logical queue name via [`yiisoft/queue.channels` config](queue-names.md) when you need to parallelize message handling or send some of them to a different application.
+- **Queue names** — configure queue/back-end per logical queue name via [`yiisoft/queue.queues` config](queue-names.md) when you need to parallelize message handling or send some of them to a different application.
 - **Named handlers or callable definitions** — map a short handler name to a callable in [`yiisoft/queue.handlers` config](message-handler.md) when another application is the message producer and you cannot use FQCN as the handler name.
 - **Middleware pipelines** — adjust push/consume/failure behavior: collect metrics, modify messages, and so on. See [Middleware pipelines](middleware-pipelines.md) for details.
 

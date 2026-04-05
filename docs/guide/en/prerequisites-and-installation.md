@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- PHP 8.1 or higher.
+- PHP 8.1 - 8.5.
 - PCNTL extension for signal handling (optional, recommended for production use).
 
 If `ext-pcntl` is not installed, workers cannot handle OS signals (such as `SIGTERM`/`SIGINT`) gracefully.
