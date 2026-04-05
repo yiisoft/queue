@@ -59,14 +59,14 @@ final class MiddlewareTest extends TestCase
             new TestMiddleware('common 2'),
         );
         $queue = new Queue(
-            $this->createMock(WorkerInterface::class),
-            $this->createMock(LoopInterface::class),
-            $this->createMock(LoggerInterface::class),
-            $pushMiddlewareDispatcher,
             new SynchronousAdapter(
                 $this->createMock(WorkerInterface::class),
                 $this->createMock(QueueInterface::class),
             ),
+            $this->createMock(WorkerInterface::class),
+            $this->createMock(LoopInterface::class),
+            $this->createMock(LoggerInterface::class),
+            $pushMiddlewareDispatcher,
             'test',
         );
         $queue = $queue

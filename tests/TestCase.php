@@ -111,11 +111,11 @@ abstract class TestCase extends BaseTestCase
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
     ): Queue {
         return new Queue(
+            $adapter,
             $this->getWorker(),
             $this->getLoop(),
             new NullLogger(),
             $this->getPushMiddlewareDispatcher(),
-            $adapter,
             $name,
         );
     }

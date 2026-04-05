@@ -28,11 +28,11 @@ final class Queue implements QueueInterface
     private string $name;
 
     public function __construct(
+        private readonly AdapterInterface $adapter,
         private readonly WorkerInterface $worker,
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
         private readonly PushMiddlewareDispatcher $pushMiddlewareDispatcher,
-        private readonly AdapterInterface $adapter,
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ) {
