@@ -19,7 +19,6 @@ final class StubQueueTest extends TestCase
         $this->assertSame($message, $queue->push($message));
         $this->assertSame(0, $queue->run());
         $this->assertSame(JobStatus::DONE, $queue->status('test'));
-        $this->assertNull($queue->getAdapter());
         $queue->listen();
     }
 }

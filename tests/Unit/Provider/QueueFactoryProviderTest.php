@@ -136,7 +136,6 @@ final class QueueFactoryProviderTest extends TestCase
         $queue = $provider->get('queue1');
 
         $this->assertInstanceOf(StubQueue::class, $queue);
-        $this->assertSame($adapter, $queue->getAdapter());
     }
 
     public function testValidateFalse(): void

@@ -12,16 +12,10 @@ use Yiisoft\Queue\QueueInterface;
 
 /**
  * Stub queue that does nothing. Job status is always "done".
- *
- * @template T of AdapterInterface
  */
 final class StubQueue implements QueueInterface
 {
-    /**
-     * @param T|null $adapter
-     */
     public function __construct(
-        private ?AdapterInterface $adapter = null,
         private string $name = 'default',
     ) {}
 
@@ -42,14 +36,6 @@ final class StubQueue implements QueueInterface
     public function status(int|string $id): JobStatus
     {
         return JobStatus::DONE;
-    }
-
-    /**
-     * @return T|null
-     */
-    public function getAdapter(): ?AdapterInterface
-    {
-        return $this->adapter;
     }
 
     public function getName(): string
