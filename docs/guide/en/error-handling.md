@@ -1,6 +1,6 @@
 # Error handling on message processing
 
-Often when some message handling is failing, we want to retry its execution a couple more times or redirect it to another queue. In `yiisoft/queue` this is handled by the failure handling middleware pipeline.
+Often when message handling fails, we want to retry it a couple more times or redirect it to another queue. In `yiisoft/queue` this is handled by the failure handling middleware pipeline.
 
 ## When failure handling is triggered
 
@@ -11,7 +11,7 @@ That means PHP notices/warnings are handled according to your PHP runtime config
 In practice it means:
 
 - The worker runs message processing in `Yiisoft\Queue\Worker\Worker::process()`.
-- Your message handler is executed through the [consume middleware pipeline](middleware-pipelines.md#consume-pipeline).
+- Your message handler is invoked through the [consume middleware pipeline](middleware-pipelines.md#consume-pipeline).
 - If any `Throwable` escapes that pipeline, the worker switches to the failure handling pipeline.
 
 ## Failure handling pipeline overview (step-by-step)
@@ -55,7 +55,7 @@ In practice it means:
 
 7. The worker wraps and rethrows
 
-    If the failure pipeline itself ends with an exception, `Worker::process()` wraps it into `Yiisoft\Queue\Exception\JobFailureException` (including message id from `IdEnvelope` metadata when available) and throws it.
+    If the failure pipeline itself ends with an exception, `Worker::process()` wraps it into `Yiisoft\Queue\Exception\MessageFailureException` (including message id from `IdEnvelope` metadata when available) and throws it.
 
 ## What “handled failure” means
 
@@ -180,9 +180,9 @@ It's configured via constructor parameters, too. Here they are:
  - Terminal failure handler.
  - Throws the exception from the request when the failure pipeline does not handle the failure.
 
- ### JobFailureException
+ ### MessageFailureException
 
- Class: `Yiisoft\Queue\Exception\JobFailureException`
+ Class: `Yiisoft\Queue\Exception\MessageFailureException`
 
  Behavior:
 

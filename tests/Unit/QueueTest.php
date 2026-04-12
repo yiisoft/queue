@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit;
 
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
-use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
@@ -102,11 +102,11 @@ final class QueueTest extends TestCase
         $id = $envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY];
 
         $status = $queue->status($id);
-        self::assertSame(JobStatus::WAITING, $status);
+        self::assertSame(MessageStatus::WAITING, $status);
 
         $queue->run();
         $status = $queue->status($id);
-        self::assertSame(JobStatus::DONE, $status);
+        self::assertSame(MessageStatus::DONE, $status);
     }
 
     public function testAdapterNotConfiguredException(): void

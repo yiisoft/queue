@@ -1,35 +1,7 @@
 # Usage basics
 
-## Queue names
-
-For a detailed explanation of what queue names are and how to configure and use them (including CLI examples), see [Queue names](queue-names.md).
-
-## Configuration
-
-You can configure it with a DI container in the following way:
-
-```php
-$logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
-
-$worker = $DIContainer->get(\Yiisoft\Queue\Worker\WorkerInterface::class);
-$loop = $DIContainer->get(\Yiisoft\Queue\Cli\LoopInterface::class);
-$adapter = $DIContainer->get(\Yiisoft\Queue\Adapter\AdapterInterface::class);
-
-$queue = new Queue(
-    $adapter,
-    $worker,
-    $loop,
-    $logger
-);
-```
-
-See also the documentation for concrete adapters ([synchronous adapter](adapter-sync.md), 
-[AMQP adapter](https://github.com/yiisoft/queue-amqp)) and [workers](worker.md)
-
-
 ## Usage
 
-Each job sent to the queue should be defined as a separate class.
 For example, if you need to download and save a file, you can create a message like this:
 
 ```php
@@ -39,13 +11,13 @@ $message = new \Yiisoft\Queue\Message\Message(
 );
 ```
 
-Here's how to send a task to the queue:
+Here's how to push a message to the queue:
 
 ```php
 $queue->push($message);
 ```
 
-To push a job into the queue that should run after 5 minutes:
+To push a message that should be processed after 5 minutes:
 
 Delayed execution is implemented via a push middleware.
 The middleware must implement `\Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface` and be provided by the adapter package you use.
@@ -61,11 +33,9 @@ $queue->push($message, $delayMiddleware->withDelay(5 * 60));
 
 ## Queue handling
 
-The exact way how a job is executed depends on the adapter used. Most adapters can be run using
-console commands, which the component registers in your application. For more details, check the respective
-adapter documentation.
+Most adapters can be run using [console commands](./console-commands.md) registered by this component in your application. For more details, check the respective adapter documentation.
 
-If you configured multiple queue names, you can choose which queue to consume with console commands:
+If you configured multiple [queue names](./queue-names.md), you can choose which queue to consume with console commands:
 
 ```sh
 yii queue:listen [queueName]
@@ -74,10 +44,10 @@ yii queue:listen-all [queueName1 [queueName2 [...]]]
 ```
 
 
-## Job status
+## Message status
 
 ```php
-use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
 
 $pushedMessage = $queue->push($message);
@@ -89,22 +59,20 @@ if ($id === null) {
 
 $status = $queue->status($id);
 
-// Check whether the job is waiting for execution.
-$status === JobStatus::WAITING;
+// Check whether the message is waiting to be handled.
+$status === MessageStatus::WAITING;
 
-// Check whether a worker got the job from the queue and executes it.
-$status === JobStatus::RESERVED;
+// Check whether a worker has picked up the message and is handling it.
+$status === MessageStatus::RESERVED;
 
-// Check whether a worker has executed the job.
-$status === JobStatus::DONE;
+// Check whether the message has been processed.
+$status === MessageStatus::DONE;
 ```
 
-For details and edge cases, see [Job status](job-status.md).
+For details and edge cases, see [Message status](message-status.md).
 
 ## Limitations
 
-When using queues, it is important to remember that tasks are put into and obtained from the queue in separate
-processes. Therefore, avoid external dependencies when executing a task if you're not sure if they are available in
-the environment where the worker does its job.
+Messages are pushed in one process and consumed in another. Avoid relying on in-process state (open connections, cached objects, etc.) that may not be available in the worker process.
 
-All the data to process the task should be provided with your payload `getData()` method.
+All data needed to handle a message must be included in the payload passed to `getData()`.

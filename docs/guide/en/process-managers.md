@@ -1,4 +1,4 @@
-# Running workers in production (systemd and Supervisor)
+# Running workers in production (systemd, Supervisor, cron)
 
 A queue worker is a long-running process.
 
@@ -196,3 +196,13 @@ sudo supervisorctl update
 ```bash
 sudo supervisorctl start yii-queue-worker:*
 ```
+
+## Cron
+
+For simple workloads without a persistent process manager, you can run `queue:run` via cron. It processes all pending messages and exits.
+
+```cron
+* * * * * /usr/bin/php /var/www/app/yii queue:run
+```
+
+This starts a worker every minute. Use this only when the message volume is low and a small processing delay is acceptable. For high-throughput or latency-sensitive queues, use `systemd` or Supervisor with `queue:listen` instead.

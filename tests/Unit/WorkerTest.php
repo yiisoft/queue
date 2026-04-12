@@ -12,7 +12,7 @@ use RuntimeException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
-use Yiisoft\Queue\Exception\JobFailureException;
+use Yiisoft\Queue\Exception\MessageFailureException;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
@@ -32,8 +32,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 final class WorkerTest extends TestCase
 {
-    #[DataProvider('jobExecutedDataProvider')]
-    public function testJobExecuted($handler, array $containerServices): void
+    #[DataProvider('messageHandledDataProvider')]
+    public function testMessageHandled($handler, array $containerServices): void
     {
         $message = new Message('simple', ['test-data']);
         $logger = new SimpleLogger();
@@ -56,26 +56,26 @@ final class WorkerTest extends TestCase
         $this->assertStringContainsString('Processing message #null.', $messages[0]['message']);
     }
 
-    public static function jobExecutedDataProvider(): iterable
+    public static function messageHandledDataProvider(): iterable
     {
         yield 'definition' => [
             FakeHandler::class,
             [FakeHandler::class => new FakeHandler()],
         ];
         yield 'definition-object' => [
-            [new FakeHandler(), 'execute'],
+            [new FakeHandler(), 'handle'],
             [],
         ];
         yield 'definition-class' => [
-            [FakeHandler::class, 'execute'],
+            [FakeHandler::class, 'handle'],
             [FakeHandler::class => new FakeHandler()],
         ];
         yield 'definition-not-found-class-but-exist-in-container' => [
-            ['not-found-class-name', 'execute'],
+            ['not-found-class-name', 'handle'],
             ['not-found-class-name' => new FakeHandler()],
         ];
         yield 'static-definition' => [
-            FakeHandler::staticExecute(...),
+            FakeHandler::staticHandle(...),
             [FakeHandler::class => new FakeHandler()],
         ];
         yield 'callable' => [
@@ -86,7 +86,7 @@ final class WorkerTest extends TestCase
         ];
     }
 
-    public function testJobFailWithDefinitionUndefinedMethodHandler(): void
+    public function testMessageFailWithDefinitionUndefinedMethodHandler(): void
     {
         $this->expectExceptionMessage('Queue handler with name "simple" does not exist');
 
@@ -102,7 +102,7 @@ final class WorkerTest extends TestCase
         $worker->process($message, $queue);
     }
 
-    public function testJobFailWithDefinitionUndefinedClassHandler(): void
+    public function testMessageFailWithDefinitionUndefinedClassHandler(): void
     {
         $this->expectExceptionMessage('Queue handler with name "simple" does not exist');
 
@@ -119,12 +119,12 @@ final class WorkerTest extends TestCase
         $worker->process($message, $queue);
     }
 
-    public function testJobFailWithDefinitionClassNotFoundInContainerHandler(): void
+    public function testMessageFailWithDefinitionClassNotFoundInContainerHandler(): void
     {
         $this->expectExceptionMessage('Queue handler with name "simple" does not exist');
         $message = new Message('simple', ['test-data']);
         $container = new SimpleContainer();
-        $handlers = ['simple' => [FakeHandler::class, 'execute']];
+        $handlers = ['simple' => [FakeHandler::class, 'handle']];
 
         /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
@@ -133,13 +133,13 @@ final class WorkerTest extends TestCase
         $worker->process($message, $queue);
     }
 
-    public function testJobFailWithDefinitionHandlerException(): void
+    public function testMessageFailWithDefinitionHandlerException(): void
     {
         $message = new Message('simple', ['test-data']);
         $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
-        $handlers = ['simple' => [FakeHandler::class, 'executeWithException']];
+        $handlers = ['simple' => [FakeHandler::class, 'handleWithException']];
 
         /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
@@ -147,8 +147,8 @@ final class WorkerTest extends TestCase
 
         try {
             $worker->process($message, $queue);
-        } catch (JobFailureException $exception) {
-            self::assertSame($exception::class, JobFailureException::class);
+        } catch (MessageFailureException $exception) {
+            self::assertSame($exception::class, MessageFailureException::class);
             self::assertSame($exception->getMessage(), "Processing of message #null is stopped because of an exception:\nTest exception.");
             self::assertEquals(['test-data'], $exception->getQueueMessage()->getData());
         } finally {
@@ -195,7 +195,7 @@ final class WorkerTest extends TestCase
         $worker->process($message, $queue);
     }
 
-    public function testJobFailureIsHandledSuccessfully(): void
+    public function testMessageFailureIsHandledSuccessfully(): void
     {
         $message = new Message('simple', null);
         /** @var MockObject&QueueInterface $queue */

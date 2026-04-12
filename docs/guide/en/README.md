@@ -8,17 +8,17 @@
 - [Synchronous adapter](adapter-sync.md)
 - [Queue names](queue-names.md)
 
-## Build and run jobs
+## Build and handle messages
 
 - [Usage basics](usage.md)
 - [Messages and handlers: concepts](messages-and-handlers.md)
 - [Message handler](message-handler-simple.md)
 - [Console commands](console-commands.md)
-- [Job status](job-status.md)
+- [Message status](message-status.md)
 
 ## Reliability and visibility
 
-- [Errors and retryable jobs](error-handling.md)
+- [Errors and retryable messages](error-handling.md)
 - [Envelopes](envelopes.md)
 - [Yii Debug integration](debug-integration.md)
 

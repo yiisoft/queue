@@ -1,11 +1,11 @@
-# Job status
+# Message status
 
-Yii Queue can report a job status by its message ID.
+Yii Queue can report the status of a message by its ID.
 
 The API surface is:
 
-- `QueueInterface::status(string|int $id): JobStatus`
-- `AdapterInterface::status(string|int $id): JobStatus`
+- `QueueInterface::status(string|int $id): MessageStatus`
+- `AdapterInterface::status(string|int $id): MessageStatus`
 
 Status tracking support depends on the adapter. If an adapter doesn't store IDs or doesn't keep status history, you might not be able to use `status()` reliably.
 
@@ -28,18 +28,18 @@ The ID type (`string` or `int`) and how long it stays queryable are adapter-spec
 
 ## Statuses
 
-Statuses are represented by the `Yiisoft\Queue\JobStatus` enum:
+Statuses are represented by the `Yiisoft\Queue\MessageStatus` enum:
 
-- `JobStatus::WAITING`
-  The job exists in the queue and is waiting for execution.
+- `MessageStatus::WAITING`
+  The message is in the queue and has not been picked up yet.
 
-- `JobStatus::RESERVED`
-  A worker has taken the job for processing.
+- `MessageStatus::RESERVED`
+  A worker has taken the message and is handling it.
 
-- `JobStatus::DONE`
-  The job has been processed.
+- `MessageStatus::DONE`
+  The message has been handled.
 
-In addition to enum cases, `JobStatus` provides a string key via `JobStatus::key()`:
+In addition to enum cases, `MessageStatus` provides a string key via `MessageStatus::key()`:
 
 ```php
 $statusKey = $status->key(); // "waiting", "reserved" or "done"
@@ -48,7 +48,7 @@ $statusKey = $status->key(); // "waiting", "reserved" or "done"
 ## Querying a status
 
 ```php
-use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
 
 $pushedMessage = $queue->push($message);
@@ -60,16 +60,16 @@ if ($id === null) {
 
 $status = $queue->status($id);
 
-if ($status === JobStatus::WAITING) {
-    // The job is waiting for execution.
+if ($status === MessageStatus::WAITING) {
+    // The message is waiting to be handled.
 }
 
-if ($status === JobStatus::RESERVED) {
-    // A worker is processing the job right now.
+if ($status === MessageStatus::RESERVED) {
+    // A worker is currently handling the message.
 }
 
-if ($status === JobStatus::DONE) {
-    // The job has been processed.
+if ($status === MessageStatus::DONE) {
+    // The message has been handled.
 }
 ```
 
@@ -79,8 +79,8 @@ if ($status === JobStatus::DONE) {
   If an adapter can't find the message by ID, it must throw `InvalidArgumentException`.
 
 - **Timing**
-  `RESERVED` can be transient: depending on the adapter, a job may move from `WAITING` to `RESERVED` and then to `DONE` quickly.
+  `RESERVED` can be transient: depending on the adapter, a message may move from `WAITING` to `RESERVED` and then to `DONE` quickly.
 
 - **Failures / retries**
-  Job failures and retries are handled by the worker and middleware pipelines and are described in [Errors and retryable jobs](./error-handling.md).
-  How failures affect job status is adapter-specific.
+  Failures and retries are handled by the worker and middleware pipelines, described in [Errors and retryable messages](./error-handling.md).
+  How failures affect the status is adapter-specific.

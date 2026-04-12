@@ -13,9 +13,11 @@ To use the queue, you need to create instances of the following classes:
 ### Example
 
 ```php
+use Psr\Container\ContainerInterface;
+use Psr\Log\NullLogger;
+use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Adapter\SynchronousAdapter;
-use Yiisoft\Queue\Queue;
-use Yiisoft\Queue\Worker\Worker;
+use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
@@ -23,10 +25,14 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
 use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Psr\Container\ContainerInterface;
+use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\Worker\Worker;
 
-// You need a PSR-11 container for dependency injection
+// A PSR-11 container is required for dependency resolution inside middleware and handlers.
+// How you build it is up to you.
 /** @var ContainerInterface $container */
+
+$logger = new NullLogger(); // replace with your PSR-3 logger in production
 
 // Define message handlers
 $handlers = [
@@ -53,21 +59,30 @@ $pushMiddlewareDispatcher = new PushMiddlewareDispatcher(
 // Create worker
 $worker = new Worker(
     $handlers,
-    $container->get(\Psr\Log\LoggerInterface::class),
-    $container->get(\Yiisoft\Injector\Injector::class),
+    $logger,
+    new Injector($container),
     $container,
     $consumeMiddlewareDispatcher,
     $failureMiddlewareDispatcher,
     $callableFactory,
 );
 
-// Create queue with adapter
+// Create loop (SignalLoop requires ext-pcntl; SimpleLoop works without it)
+$loop = new SimpleLoop();
+
+// Create queue (adapter is wired in a second step due to mutual dependency)
 $queue = new Queue(
     $worker,
+    $loop,
+    $logger,
     $pushMiddlewareDispatcher,
-    $container->get(\Psr\EventDispatcher\EventDispatcherInterface::class),
-    new SynchronousAdapter($worker, /* queue instance will be set via withAdapter */),
 );
+
+// SynchronousAdapter needs a queue reference — create it after the queue
+$adapter = new SynchronousAdapter($worker, $queue);
+
+// Wire the adapter in (returns a new Queue instance)
+$queue = $queue->withAdapter($adapter);
 
 // Now you can push messages
 $message = new \Yiisoft\Queue\Message\Message('file-download', ['url' => 'https://example.com/file.pdf']);
@@ -127,6 +142,6 @@ $queue->listen();   // Run indefinitely
 ## Next steps
 
 - [Usage basics](usage.md) - learn how to create messages and handlers
-- [Workers](worker.md) - understand handler formats
+- [Message handler](message-handler-simple.md) - understand handler formats
 - [Error handling](error-handling.md) - configure retries and failure handling
 - [Adapter list](adapter-list.md) - choose a production-ready adapter

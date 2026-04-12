@@ -16,7 +16,7 @@ Having multiple queue names is useful when you want to separate workloads, for e
 
 - **Different priorities**: `critical` vs `low`.
 - **Different message types**: `emails`, `reports`, `webhooks`.
-- **Different backends / connections**: fast Redis queue for short jobs and RabbitMQ backend for long-running jobs or inter-app communication.
+- **Different backends / connections**: fast Redis queue for short messages and RabbitMQ backend for long-running messages or inter-app communication.
 
 The default queue name is `Yiisoft\Queue\Provider\QueueProviderInterface::DEFAULT_QUEUE` (`yii-queue`).
 

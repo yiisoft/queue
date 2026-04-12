@@ -1,6 +1,6 @@
 # Console commands
 
-Yii Queue provides several console commands for processing queued jobs.
+Yii Queue provides several console commands for processing queued messages.
 
 If you are using [yiisoft/config](https://github.com/yiisoft/config) and [yiisoft/yii-console](https://github.com/yiisoft/yii-console), the commands are registered automatically.
 
@@ -11,7 +11,7 @@ If you are using [yiisoft/console](https://github.com/yiisoft/console) or `symfo
 
 ## 1. Run queued messages and exit
 
-The command `queue:run` obtains and executes tasks until the queue is empty, then exits.  
+The command `queue:run` obtains and handles messages until the queue is empty, then exits.  
 
 You can also narrow the scope of processed messages by specifying queue name(s) and maximum number of messages to process:
 

@@ -21,14 +21,14 @@ interface QueueInterface
     public function push(MessageInterface $message, MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): MessageInterface;
 
     /**
-     * Execute all existing jobs and exit
+     * Handle all existing messages and exit
      *
      * @return int Number of messages processed.
      */
     public function run(int $max = 0): int;
 
     /**
-     * Listen to the queue and execute jobs as they come
+     * Listen to the queue and handle messages as they come
      */
     public function listen(): void;
 
@@ -37,9 +37,9 @@ interface QueueInterface
      *
      * @throws InvalidArgumentException when there is no such id in the adapter
      *
-     * @return JobStatus
+     * @return MessageStatus
      */
-    public function status(string|int $id): JobStatus;
+    public function status(string|int $id): MessageStatus;
 
     /**
      * @param AdapterInterface $adapter Adapter to use.

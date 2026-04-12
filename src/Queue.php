@@ -107,7 +107,7 @@ final class Queue implements QueueInterface
         $this->logger->info('Finish listening to the queue.');
     }
 
-    public function status(string|int $id): JobStatus
+    public function status(string|int $id): MessageStatus
     {
         $this->checkAdapter();
         return $this->adapter->status($id);

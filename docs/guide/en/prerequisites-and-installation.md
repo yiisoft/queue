@@ -6,7 +6,7 @@
 - PCNTL extension for signal handling (optional, recommended for production use).
 
 If `ext-pcntl` is not installed, workers cannot handle OS signals (such as `SIGTERM`/`SIGINT`) gracefully.
-In practice it means a process manager may terminate a worker at any time, which can interrupt a job in the middle of execution.
+In practice it means a process manager may terminate a worker at any time, which can interrupt a handler in the middle of handling a message.
 See [Loops](loops.md) for details.
 
 ## Installation

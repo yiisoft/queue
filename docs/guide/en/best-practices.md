@@ -346,7 +346,7 @@ $this->logger->info('Queued task', [
 
 See [Envelopes](envelopes.md) for details on `IdEnvelope`.
 
-### Set up alerts for failed jobs
+### Set up alerts for failed messages
 
 #### Bad
 

@@ -7,7 +7,7 @@ Use this index when you need to customize internals: custom middleware, adapters
 - [Manual configuration without yiisoft/config](configuration-manual.md) — wiring queues, workers, and middleware factories without `yiisoft/config`.
 - [Queue provider registry](#queue-provider-registry) — selecting and extending adapter factories.
 - [Loops and worker processes](loops.md) — implementing custom runners, heartbeat hooks, and graceful shutdown (requires `pcntl`).
-- [Worker internals](worker.md) — dependency resolution and middleware stacks within `WorkerInterface`.
+- [Worker](worker.md) — resolving worker dependencies and starting workers.
 - [Performance tuning](performance-tuning.md) — profiling handlers, envelopes, and adapters.
 
 ## Middleware, envelopes, and handlers
@@ -29,7 +29,7 @@ Use this index when you need to customize internals: custom middleware, adapters
 ## Tooling, diagnostics, and storage
 
 - [Yii Debug collector internals](debug-integration-advanced.md) — collector internals, proxies, and manual wiring.
-- [Job status storage extensions](job-status.md#extend-storage) — persisting custom metadata or drivers.
+- [Message status storage extensions](message-status.md#extend-storage) — persisting custom metadata or drivers.
 - [Extending queue processes and supervisors](process-managers.md#custom-supervisors) — custom supervisor hooks and graceful shutdown integration.
 
 ## Internals and contribution

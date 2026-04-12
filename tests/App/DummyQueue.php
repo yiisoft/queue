@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Tests\App;
 use BackedEnum;
 use Exception;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
@@ -32,7 +32,7 @@ final class DummyQueue implements QueueInterface
 
     public function listen(): void {}
 
-    public function status(string|int $id): JobStatus
+    public function status(string|int $id): MessageStatus
     {
         throw new Exception('`status()` method is not implemented yet.');
     }

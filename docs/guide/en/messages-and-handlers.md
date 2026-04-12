@@ -1,6 +1,6 @@
 # Messages and handlers
 
-Every unit of work in a queue is called a *job*. A job has two independent parts:
+Every unit of work in a queue is called a *message*. A message has two independent parts:
 
 - **Message** — a lightweight, serializable payload that describes *what* needs to be done and carries the data needed to do it. The message knows nothing about how it will be processed.
 - **Handler** — a piece of code that receives the message and performs the actual work.
@@ -9,12 +9,12 @@ This separation is intentional and important. Understanding it will save you fro
 
 ## Producer and consumer roles
 
-A *producer* creates messages and pushes them onto the queue. A *consumer* (worker) pulls messages from the queue and executes the matching handler.
+A *producer* creates messages and pushes them onto the queue. A *consumer* (worker) pulls messages from the queue and invokes the matching handler.
 
 ```
 Producer side                      Consumer side
 ─────────────────────────────      ──────────────────────────────────
-new Message('send-email', …)  →→→  Worker resolves handler → executes
+new Message('send-email', …)  →→→  Worker resolves handler → handles
          (payload only)                     (logic only)
 ```
 
@@ -30,7 +30,7 @@ This means the producer and consumer can be:
 
 ## Message: payload only
 
-A message carries just enough data to perform the job:
+A message carries just enough data to perform the work:
 
 ```php
 new \Yiisoft\Queue\Message\Message('send-email', [
@@ -112,8 +112,8 @@ This looked convenient at first but created real problems:
 
 - **The handler class had to be available on both the producer and the consumer.** In a microservice setup this forced sharing a PHP class (and its dependency tree) across applications.
 - **PHP class names were baked into the serialized payload.** Renaming a class without a migration was risky. Versioning required workarounds.
-- **The job carried behavior**, making it impossible to produce or consume messages from non-PHP services without custom serializers.
-- **Testing was harder** — you had to mock application services inside the job class.
+- **The message carried behavior**, making it impossible to produce or consume messages from non-PHP services without custom serializers.
+- **Testing was harder** — you had to mock application services inside the message class.
 
 `yiisoft/queue` solves all of these by keeping the message as pure data and the handler as pure logic. The two evolve independently and can live in separate codebases.
 

@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Throwable;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Queue\Exception\JobFailureException;
+use Yiisoft\Queue\Exception\MessageFailureException;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Message\MessageHandlerInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
@@ -77,7 +77,7 @@ final class Worker implements WorkerInterface
 
                 return $result->getMessage();
             } catch (Throwable $exception) {
-                $exception = new JobFailureException($message, $exception);
+                $exception = new MessageFailureException($message, $exception);
                 $this->logger->error($exception->getMessage());
                 throw $exception;
             }

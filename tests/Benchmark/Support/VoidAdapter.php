@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Tests\Benchmark\Support;
 use InvalidArgumentException;
 use RuntimeException;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Message\MessageSerializerInterface;
@@ -26,7 +26,7 @@ final class VoidAdapter implements AdapterInterface
         $handlerCallback($this->serializer->unserialize($this->message));
     }
 
-    public function status(int|string $id): JobStatus
+    public function status(int|string $id): MessageStatus
     {
         throw new InvalidArgumentException();
     }

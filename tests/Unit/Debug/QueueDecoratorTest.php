@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Debug\QueueCollector;
 use Yiisoft\Queue\Debug\QueueDecorator;
-use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
@@ -34,8 +34,8 @@ class QueueDecoratorTest extends TestCase
     public function testStatus(): void
     {
         $queue = $this->createMock(QueueInterface::class);
-        $jobStatus = JobStatus::WAITING;
-        $queue->expects($this->once())->method('status')->willReturn($jobStatus);
+        $messageStatus = MessageStatus::WAITING;
+        $queue->expects($this->once())->method('status')->willReturn($messageStatus);
         $collector = new QueueCollector();
         $decorator = new QueueDecorator(
             $queue,
@@ -43,7 +43,7 @@ class QueueDecoratorTest extends TestCase
         );
 
         $result = $decorator->status('');
-        $this->assertEquals($jobStatus, $result);
+        $this->assertEquals($messageStatus, $result);
     }
 
     public function testPush(): void
