@@ -7,7 +7,7 @@ A middleware is a piece of code that receives a request object and can either:
 - change the request (for example, change the message, adapter, or error handling behavior) and continue the pipeline, or
 - stop the pipeline by returning without calling the next handler.
 
-This is similar to HTTP middleware, but it is applied to queue messages.
+The pipeline mechanism is similar to HTTP middleware, but applied to queue messages.
 
 ## What middlewares are for
 
@@ -90,7 +90,7 @@ return $pushRequest->withAdapter($adapter);
 
 ### Adapter must be configured by the end of the pipeline
 
-The pipeline ends with a final handler that actually pushes the message using the adapter.
+The push pipeline ends with a final handler that actually pushes the message using the adapter.
 
 If the adapter is not configured by the time the pipeline reaches the final handler,
 `Yiisoft\Queue\Exception\AdapterNotConfiguredException` is thrown.
@@ -157,4 +157,4 @@ You can override middleware stacks at runtime:
 - `Queue::withMiddlewares(...)` replaces the whole push middleware stack for that queue instance.
 - `Queue::withMiddlewaresAdded(...)` appends middlewares to the existing stack.
 
-These methods affect only the push pipeline of that `Queue` instance.
+These methods affect only the push pipeline of the `Queue` instance they are called on.

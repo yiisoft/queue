@@ -1,6 +1,6 @@
 # Queue names
 
-A *queue name* is a named queue configuration (a logical namespace/identifier that separates one queue workload from another).
+A *queue name* is a logical namespace/identifier that maps to a queue configuration.
 
 In practice, a queue name is a string (for example, `yii-queue`, `emails`, `critical`) that selects which queue backend (adapter) messages are pushed to and which worker consumes them.
 
@@ -119,7 +119,7 @@ final readonly class SendTransactionalEmail
 }
 ```
 
-`QueueProviderInterface` accepts both strings and `BackedEnum` values (`BackedEnum` values are normalized to their string value).
+`QueueProviderInterface` accepts both strings and `BackedEnum` values. `BackedEnum` values are normalized to strings — string-backed enums use their backing value directly, while int-backed enums are cast to string.
 
 ## Running workers (CLI)
 

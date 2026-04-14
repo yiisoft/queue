@@ -25,7 +25,7 @@ yii queue:run [queueName1 [queueName2 [...]]] --limit=100
 
 ## 2. Listen for queued messages and process them continuously
 
-The following command launches a daemon, which infinitely consumes messages from a single queue. This command receives an optional `queueName` argument to specify which queue to listen to, defaults to the default queue name `yii-queue`.
+The following command launches a daemon, which infinitely consumes messages from a single queue. This command receives an optional `queueName` argument to specify which queue to listen to, defaults to the queue name `yii-queue`.
 
 ```sh
 yii queue:listen [queueName]

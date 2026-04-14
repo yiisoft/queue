@@ -11,7 +11,7 @@ An envelope acts like the wrapped message:
 - `getHandlerName()` is delegated to the wrapped message.
 - `getData()` is delegated to the wrapped message.
 
-What an envelope adds is `getMetadata()`.
+Envelopes modify the metadata returned by `getMetadata()` and may provide convenience methods for accessing specific metadata entries (for example, `getId()` in an ID envelope).
 
 ## Metadata and envelope stacking
 
@@ -22,7 +22,7 @@ Every envelope contributes its own metadata to the resulting metadata array.
 When `getMetadata()` is called on an envelope, it returns:
 
 - the wrapped message metadata,
-- plus an updated `"envelopes"` stack (previous stack + current envelope class),
+- plus an updated `"envelopes"` stack (previous stack + current envelope's FQCN),
 - plus envelope-specific metadata.
 
 Because envelopes wrap other messages, multiple envelopes form a stack.
@@ -39,12 +39,12 @@ and, via `MessageInterface` inheritance, also support:
 
 ## Restoring envelopes from metadata
 
-If metadata contains the `"envelopes"` key with an array of envelope class names, the serializer will try to rebuild the stack by wrapping the message with each envelope class in the given order.
+If metadata contains the `"envelopes"` key with an array of envelope class names, the serializer will try to rebuild the stack by wrapping the message with each envelope in reverse order.
 
 During this process:
 
 - The `"envelopes"` key is removed from the base message metadata (it is set to an empty array before creating the base message).
-- Each envelope class from the list is applied to the message using `EnvelopeInterface::fromMessage(...)`.
+- Each envelope from the list is applied to the message using `EnvelopeInterface::fromMessage(...)` in reverse order.
 - A value is applied only if it is a string, the class exists, and it implements `EnvelopeInterface`. Otherwise it is ignored.
 
 ## Built-in envelopes

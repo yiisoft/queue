@@ -77,7 +77,7 @@ WantedBy=multi-user.target
 How it works:
 
 - `Requires` means the target requires these services to be started.
-- `Wants` expresses a weaker relationship (it is still useful to keep it together with `Requires` for clarity).
+- `Wants` expresses a weaker relationship (it is still useful to keep `Wants` together with `Requires` for clarity).
 - `[Install]` is required to make `systemctl enable yii-queue.target` work.
 
 ### Management commands
@@ -205,4 +205,4 @@ For simple workloads without a persistent process manager, you can run `queue:ru
 * * * * * /usr/bin/php /var/www/app/yii queue:run
 ```
 
-This starts a worker every minute. Use this only when the message volume is low and a small processing delay is acceptable. For high-throughput or latency-sensitive queues, use `systemd` or Supervisor with `queue:listen` instead.
+This starts a worker every minute. Use this only when the message volume is low and a processing delay of a minute or more is acceptable. For high-throughput or latency-sensitive queues, use `systemd` or Supervisor with `queue:listen` instead.

@@ -69,7 +69,7 @@ $queueForEmails = $provider->get('emails');
 ### CompositeQueueProvider
 
 - Accepts multiple providers and queries them in order.
-- The first provider that reports it has the queue name (`has()`/`get()`) wins.
+- The first provider whose `has()` returns true for the queue name wins.
 - Useful for mixing strict registries with pre-built queues.
 
 Example:

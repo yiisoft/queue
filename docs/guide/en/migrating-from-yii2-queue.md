@@ -26,7 +26,7 @@ being consumed. In the new package, it is divided into two different concepts: a
     separated into multiple applications, or you can do sending/processing only leaving part of the work to another
     system including non-PHP ones. It is fairly popular to process heavy messages with Go.
   
-- A `Handler` is called by a `Worker` when a message comes. Default `Worker` finds a corresponding message handler
-  by the message name. [See more](worker.md#handler-format).
+- A `Handler` is called by a `Worker` when a message is received. Default `Worker` finds a corresponding message handler
+  by the message name. [See more](message-handler.md).
 
-[yiisoft/yii2-queue]: (https://github.com/yiisoft/yii2-queue)
+[yiisoft/yii2-queue]: https://github.com/yiisoft/yii2-queue

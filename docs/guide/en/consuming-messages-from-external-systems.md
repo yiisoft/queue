@@ -70,7 +70,7 @@ Full example:
 
 ### Notes about `meta`
 
-The `meta` key is a general-purpose metadata container (for example, tracing, correlation, tenant information). The consumer-side application or middleware may read, add, or override keys as needed. Populating `meta` from external producers is possible but not recommended: the accepted keys and their semantics are entirely defined by the consumer application, so any contract must be maintained manually.
+The `meta` key is a general-purpose metadata container (for example, tracing, correlation, tenant information). The consumer-side application or middleware may read, add, or override keys as needed. Populating `meta` from external producers is possible but not recommended: the accepted keys and their semantics are entirely defined by the consumer application, so the mapping of field names and their expected values must be maintained manually.
 
 ## 3. Data encoding rules
 
@@ -84,7 +84,7 @@ If your broker stores bytes, publish the UTF-8 bytes of the JSON string.
 
 ## 4. Publishing to a broker: what exactly to send
 
-`yiisoft/queue` itself does not define a network protocol. The exact “where” this JSON goes depends on the adapter:
+`yiisoft/queue` itself does not define a network protocol. The exact destination or transport for this JSON depends on the adapter:
 
 - Some adapters put this JSON into the broker message **body**.
 - Some adapters may additionally use broker headers/attributes.

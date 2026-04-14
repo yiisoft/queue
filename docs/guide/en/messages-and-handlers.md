@@ -44,7 +44,7 @@ The message has:
 - A **handler name** — a string used by the worker to look up the correct handler.
 - A **data payload** — arbitrary data the handler needs. Must be serializable.
 
-The message has no methods, no business logic, no dependencies. It is a value object — a data envelope.
+The message has no methods, no business logic, no dependencies. It is a value object — a data wrapper.
 
 ## Handler: logic only
 
@@ -63,7 +63,7 @@ final class SendEmailHandler implements \Yiisoft\Queue\Message\MessageHandlerInt
 }
 ```
 
-The handler can have any dependencies injected through the DI container. The message payload remains dumb data.
+The handler can have any dependencies injected through the DI container. The message payload remains plain data.
 
 ## Why the separation matters
 

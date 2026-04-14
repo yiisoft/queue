@@ -28,7 +28,7 @@ use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\Worker\Worker;
 
-// A PSR-11 container is required for dependency resolution inside middleware and handlers.
+// A PSR-11 container is required for resolving dependencies of middleware and handlers.
 // How you build it is up to you.
 /** @var ContainerInterface $container */
 
@@ -81,7 +81,7 @@ $queue = new Queue(
 // SynchronousAdapter needs a queue reference — create it after the queue
 $adapter = new SynchronousAdapter($worker, $queue);
 
-// Wire the adapter in (returns a new Queue instance)
+// Attach the adapter to the queue (returns a new Queue instance)
 $queue = $queue->withAdapter($adapter);
 
 // Now you can push messages

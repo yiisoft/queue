@@ -53,7 +53,7 @@ final class ProcessPaymentHandler implements MessageHandlerInterface
 
 ### Keep message handlers stateless
 
-Avoid storing per-message state in handler properties. Handlers may be reused by the container and queue workers are often long-running processes.
+Avoid storing per-message state in handler properties. The container may return the same handler instance for multiple consecutive messages, so handlers should not store state between invocations. Queue workers are often long-running processes, which amplifies this issue.
 
 #### Bad
 
@@ -452,7 +452,7 @@ use Yiisoft\Queue\Cli\SignalLoop;
 return [
     SignalLoop::class => [
         '__construct()' => [
-            'memorySoftLimit' => 256 * 1024 * 1024, // 200MB, lower than a hard limit of 256MB
+            'memorySoftLimit' => 200 * 1024 * 1024, // 200MB, lower than a hard limit of 256MB
         ],
     ],
 ];

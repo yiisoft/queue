@@ -7,7 +7,7 @@ The API surface is:
 - `QueueInterface::status(string|int $id): MessageStatus`
 - `AdapterInterface::status(string|int $id): MessageStatus`
 
-Status tracking support depends on the adapter. If an adapter doesn't store IDs or doesn't keep status history, you might not be able to use `status()` reliably.
+Status tracking support depends on the adapter. If an adapter doesn't keep status history, calling `status()` with that ID will throw `InvalidArgumentException`.
 
 ## Getting a message ID
 
@@ -79,7 +79,7 @@ if ($status === MessageStatus::DONE) {
   If an adapter can't find the message by ID, it must throw `InvalidArgumentException`.
 
 - **Timing**
-  `RESERVED` can be transient: depending on the adapter, a message may move from `WAITING` to `RESERVED` and then to `DONE` quickly.
+  `RESERVED` can be short-lived and difficult to observe: depending on the adapter, a message may move from `WAITING` to `RESERVED` and then to `DONE` quickly.
 
 - **Failures / retries**
   Failures and retries are handled by the worker and middleware pipelines, described in [Errors and retryable messages](./error-handling.md).

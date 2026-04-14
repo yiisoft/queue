@@ -40,7 +40,7 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
         MessageFailureHandlerInterface $handler,
     ): FailureHandlingRequest {
         $message = $request->getMessage();
-        if ($this->suites($message)) {
+        if ($this->suits($message)) {
             $envelope = new FailureEnvelope($message, $this->createMeta($message));
             $envelope = ($this->targetQueue ?? $request->getQueue())->push($envelope);
 
@@ -51,7 +51,7 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
         return $handler->handleFailure($request);
     }
 
-    private function suites(MessageInterface $message): bool
+    private function suits(MessageInterface $message): bool
     {
         return $this->getAttempts($message) < $this->maxAttempts;
     }

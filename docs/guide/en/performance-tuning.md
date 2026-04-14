@@ -164,64 +164,7 @@ return [
 ];
 ```
 
-This prevents slow tasks from blocking fast tasks.
-
-## Adapter-specific tuning
-
-See [Adapter list](adapter-list.md) for available adapters and their documentation.
-
-### AMQP (RabbitMQ) prefetch count
-
-The prefetch count controls how many messages a worker fetches at once:
-
-```php
-use Yiisoft\Queue\AMQP\Adapter\AmqpAdapter;
-
-$adapter = new AmqpAdapter(
-    $connection,
-    $worker,
-    $loop,
-    queueName: 'my-queue',
-    prefetchCount: 10, // Fetch 10 messages at a time
-);
-```
-
-**Low prefetch (1-5)**:
-
-- Better load distribution across workers
-- Lower memory usage
-- Higher latency (more network round-trips)
-- Use for: long-running tasks, limited memory
-
-**High prefetch (10-50)**:
-
-- Better throughput
-- Higher memory usage
-- Less even load distribution
-- Use for: fast tasks, abundant memory
-
-**Finding the right value**:
-
-1. Start with 10
-2. Monitor throughput and memory usage
-3. Increase if network latency is a bottleneck
-4. Decrease if workers run out of memory
-
-### Message persistence vs. performance
-
-**Persistent messages** (durable):
-
-- Survive broker restarts
-- Slower (disk writes)
-- Use for: critical data
-
-**Non-persistent messages** (transient):
-
-- Lost on broker restart
-- Faster (memory-only)
-- Use for: non-critical data, metrics, logs
-
-Configure in your adapter settings (adapter-specific).
+Separating queues by workload type prevents slow tasks from blocking fast tasks.
 
 ## Middleware optimization
 
@@ -499,7 +442,7 @@ Adjust configuration based on observations.
 
 **Solutions**:
 
-1. Lower `memorySoftLimit` to restart workers more frequently (see [Loops](loops.md))
+1. Lower `memorySoftLimit` (set a smaller numeric value) to restart workers more frequently by hitting the memory threshold sooner (see [Loops](loops.md))
 2. Fix memory leaks in message handlers (see [Best practices](best-practices.md))
 3. Reduce prefetch count
 4. Process large datasets in chunks

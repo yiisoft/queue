@@ -14,12 +14,12 @@ The integration is based on `Yiisoft\Queue\Debug\QueueCollector` and captures:
 
 The collector is enabled by registering it in Yii Debug and wrapping tracked services with proxy implementations.
 
-Out of the box (see this package's `config/params.php`), the following services are intercepted:
+Out of the box (see this package's `config/params.php`), the following services are wrapped:
 
 - `Yiisoft\Queue\Provider\QueueProviderInterface` is wrapped with `Yiisoft\Queue\Debug\QueueProviderInterfaceProxy`. The proxy decorates returned queues with `Yiisoft\Queue\Debug\QueueDecorator` so that `push()` and `status()` calls are reported to the collector.
 - `Yiisoft\Queue\Worker\WorkerInterface` is wrapped with `Yiisoft\Queue\Debug\QueueWorkerInterfaceProxy` to record message processing events.
 
-To see data in the debug panel you must obtain `QueueProviderInterface` and `WorkerInterface` from the DI container so that the proxies remain in effect.
+To see data in the debug panel, obtain `QueueProviderInterface` and `WorkerInterface` from the DI container — the debug proxies are registered there and will not be active if the services are instantiated directly.
 
 ## Manual configuration
 

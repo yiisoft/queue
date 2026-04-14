@@ -1,6 +1,6 @@
 # Error handling on message processing
 
-Often when message handling fails, we want to retry it a couple more times or redirect it to another queue. In `yiisoft/queue` this is handled by the failure handling middleware pipeline.
+Often when message handling fails, we want to retry the message a couple more times or redirect it to another queue. In `yiisoft/queue` this is handled by the failure handling middleware pipeline.
 
 ## When failure handling is triggered
 
@@ -64,7 +64,7 @@ In practice, built-in middlewares handle failures by re-queueing the message (sa
 
 ## Configuration
 
-Here below is configuration via [yiisoft/config](https://github.com/yiisoft/config) (see also [Configuration with yiisoft/config](configuration-with-config.md)). If you don't use it, you should add a middleware definition list (in the `middlewares-fail` key here) to the `FailureMiddlewareDispatcher` [by your own](configuration-manual.md). You can define different failure handling pipelines for each queue name (see [Queue names](queue-names.md)). The example below defines two different failure handling pipelines:
+Here below is configuration via [yiisoft/config](https://github.com/yiisoft/config) (see also [Configuration with yiisoft/config](configuration-with-config.md)). If you don't use it, you should add a middleware definition list (in the `middlewares-fail` key here) to the `FailureMiddlewareDispatcher` [yourself](configuration-manual.md). You can define different failure handling pipelines for each queue name (see [Queue names](queue-names.md)). The example below defines two different failure handling pipelines:
 
 ```php
 'yiisoft/queue' => [
@@ -114,7 +114,7 @@ In the example above failures will be handled this way (look the concrete middle
 3. From now on it will be resent to the same queue (`failed-messages`) up to 30 times with a delay from 5 to 60 seconds, increased 1.5 times each time the message fails again.
 4. If the message handler throw an exception one more (33rd) time, the exception will not be caught.
 
-Failures of messages, which are initially sent to the `failed-messages` queue, will only be handled by the 3rd and the 4th points of this list.
+Failures of messages that arrived in the `failed-messages` queue directly (bypassing the error-handling pipeline) will only be handled by the 3rd and the 4th points of this list.
 
 ## Default failure handling strategies
  
@@ -197,6 +197,6 @@ This interface has the only method `handle` with these parameters:
     - a [message](../../../src/Message/MessageInterface.php)
     - a `Throwable $exception` object thrown on the `request` handling
     - a queue the message came from
-- `MessageFailureHandlerInterface $handler` - failure strategy pipeline continuation. Your Middleware should call `$pipeline->handle()` when it shouldn't interrupt failure pipeline execution.
+- `MessageFailureHandlerInterface $handler` - failure strategy pipeline continuation. Your Middleware should call `$pipeline->handle()` when the middleware itself should not interrupt failure pipeline execution.
 
-> Note: your strategy have to check by its own if it should be applied. Look into [`SendAgainMiddleware::suites()`](../../../src/Middleware/FailureHandling/Implementation/SendAgainMiddleware.php#L54) for an example.
+> Note: your strategy have to check by its own if it should be applied. Look into [`SendAgainMiddleware::suits()`](../../../src/Middleware/FailureHandling/Implementation/SendAgainMiddleware.php#L54) for an example.

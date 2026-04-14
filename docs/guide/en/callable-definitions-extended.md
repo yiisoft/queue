@@ -1,6 +1,6 @@
 # Callable Definitions Extended
 
-Callable definitions in `yiisoft/queue` are based on [native PHP callables](https://www.php.net/manual/en/language.types.callable.php) and suggest additonial ways to define a callable.
+Callable definitions in `yiisoft/queue` are based on [native PHP callables](https://www.php.net/manual/en/language.types.callable.php) and suggest additional ways to define a callable.
 
 Both definition types (classic callables and new ones) allow you to use a DI container and [yiisoft/injector](https://github.com/yiisoft/injector) to resolve dependencies in a lazy way.
 These callable definition formats are used across the package to convert configuration definitions into real callables.
@@ -16,7 +16,7 @@ As you can see in the [PHP documentation](https://www.php.net/manual/en/language
     // do stuff
   }
   ```
-- **First class callable**. It's a Closure too, BTW ;) Example:
+- **First class callable**. It is itself a `Closure`. Example:
   ```php
   $callable = trim(...);
   $callable2 = $this->foo(...);
@@ -30,8 +30,7 @@ As you can see in the [PHP documentation](https://www.php.net/manual/en/language
   $foo = new Foo();
   $callable = [$foo, 'bar']; // this will be called the same way as $foo->bar();
   ```
-- **A class static function as a string**. I don't recommend you to use this ability, as it's non-obvious and
-  hard to refactor, but it still exists:
+- **A class static function as a string**. This format is non-obvious and hard to refactor; it exists for completeness only:
   ```php
   $callable = 'Foo::bar'; // this will be called the same way as Foo::bar();
   ```
@@ -60,7 +59,7 @@ As you can see in the [PHP documentation](https://www.php.net/manual/en/language
 
 Under the hood, extended callable definitions behave exactly like native callables. But there is a major difference:
 all the objects are instantiated automatically by a PSR-11 DI container with all their dependencies
-and in a lazy way (only when they are really needed).  
+and in a lazy way (only when they are needed).  
 Ways to define an extended callable:
 
 - An object method through a class name or alias:
