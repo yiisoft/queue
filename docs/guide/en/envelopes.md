@@ -6,7 +6,7 @@ An envelope implements `Yiisoft\Queue\Message\EnvelopeInterface`, which itself e
 
 ## How an envelope behaves
 
-An envelope acts like the wrapped message:
+An envelope is transparent to callers: it delegates the wrapped message's handler name and data unchanged.
 
 - `getHandlerName()` is delegated to the wrapped message.
 - `getData()` is delegated to the wrapped message.

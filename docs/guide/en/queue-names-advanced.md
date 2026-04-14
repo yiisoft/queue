@@ -1,6 +1,6 @@
 # Advanced queue name internals
 
-Use this reference when you need to understand how queue names map to adapters, how providers resolve queues, and how to extend the registry.
+Use this reference when you need to understand how queue names map to adapters, how providers resolve queues, and how to implement your own provider.
 
 ## How queue names are used in code
 
@@ -23,7 +23,7 @@ This package ships four provider strategies:
 - Backed by the `yiisoft/queue.queues` params array.
 - Each queue name maps to an adapter definition.
 - Uses `yiisoft/factory` to create adapters lazily, then wraps them in a `Queue` with the given name.
-- Enforces a strict registry: unknown queue names throw `QueueNotFoundException` immediately.
+- Enforces a strict name mapping: unknown queue names throw `QueueNotFoundException` immediately.
 
 ### PredefinedQueueProvider
 
@@ -70,7 +70,7 @@ $queueForEmails = $provider->get('emails');
 
 - Accepts multiple providers and queries them in order.
 - The first provider whose `has()` returns true for the queue name wins.
-- Useful for mixing strict registries with pre-built queues.
+- Useful for mixing multiple providers, for example combining adapter-based and pre-built queues.
 
 Example:
 
@@ -87,8 +87,8 @@ $provider = new CompositeQueueProvider(
 $queueForEmails = $provider->get('emails');
 ```
 
-## Extending the registry
+## Implementing a custom provider
 
-- Implement `QueueProviderInterface` if you need bespoke selection logic (e.g., tenant-specific registries, remote lookups, or metrics-aware routing).
+- Implement `QueueProviderInterface` if you need bespoke selection logic (e.g., tenant-specific routing, remote lookups, or metrics-aware routing).
 - Register your provider in the DI container and swap it in wherever `QueueProviderInterface` is used.
-- Consider exposing diagnostics (e.g., list of available queues) through `getNames()`, console commands, or health checks so operators can verify the registry at runtime.
+- Consider exposing diagnostics (e.g., list of available queues) through `getNames()`, console commands, or health checks so operators can verify the available queues at runtime.

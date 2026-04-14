@@ -33,13 +33,12 @@ final class RemoteFileHandler implements \Yiisoft\Queue\Message\MessageHandlerIn
 **Pros**:
 
 - Minimal configuration.
-- Rename-safe within the same application (rename class and producer together).
+- Rename-safe within the same application (rename both the class and the message creation code together).
 - Easy to unit-test the handler as a normal class.
 
 **Cons**:
 
-- Couples message names to PHP class names.
-- Requires producer and consumer to share the same naming contract (typically the same app).
+- Message names are PHP class names — works only when message creation and handler live in the same codebase.
 
 **Use when**:
 

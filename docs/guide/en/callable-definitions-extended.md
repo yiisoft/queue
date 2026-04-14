@@ -57,9 +57,7 @@ As you can see in the [PHP documentation](https://www.php.net/manual/en/language
 
 ## Type 2: Callable definition extensions (via container)
 
-Under the hood, extended callable definitions behave exactly like native callables. But there is a major difference:
-all the objects are instantiated automatically by a PSR-11 DI container with all their dependencies
-and in a lazy way (only when they are needed).  
+The difference from native PHP callables is that you don't need to instantiate objects yourself: you pass a class name or alias, and the DI container resolves the instance lazily, only when the callable is actually invoked.
 Ways to define an extended callable:
 
 - An object method through a class name or alias:
@@ -76,14 +74,17 @@ Ways to define an extended callable:
   
   $callable = [Foo::class, 'bar'];
   ```
-  Here is a simplified example of how it works:
+  Here is a simplified example of how it works (for non-static methods):
   ```php
   if ($container->has($callable[0])) {
     $callable[0] = $container->get($callable[0])
   }
-  
+
   $callable();
   ```
+
+> [!NOTE]
+> If `bar` is declared `static`, no object is instantiated — the method is called statically on the class.
 - Class name of an object with [the `__invoke` method](https://www.php.net/manual/en/language.oop5.magic.php#object.invoke) implemented:
   ```php
   $callable = Foo::class;

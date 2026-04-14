@@ -1,8 +1,8 @@
 # Message handler advanced
 
-This page covers named handler definitions, callable formats, pitfalls, and recommended implementation styles.
+This page covers named handler definitions, callable formats, pitfalls, and valid handler signatures.
 
-For the zero-config FQCN approach (same-app producer and consumer), see [Message handler: simple setup](message-handler-simple.md).
+If you haven't read [Message handler: simple setup](message-handler-simple.md) yet, start there — it introduces handler classes and the zero-config FQCN approach.
 For a conceptual overview of what messages and handlers are, see [Messages and handlers: concepts](messages-and-handlers.md).
 
 Handler definitions are configured in:
@@ -36,9 +36,8 @@ return [
 ];
 ```
 
-Handler definition should be either an [extended callable definition](./callable-definitions-extended.md) or a string for your DI container to resolve a `MessageHandlerInterface` instance.
+Handler definition should be either an [extended callable definition](./callable-definitions-extended.md) or a container identifier that resolves to a `MessageHandlerInterface` instance.
 
-For the simpler FQCN-based approach that requires no mapping, see [Message handler: simple setup](message-handler-simple.md).
 
 ## When mapping by short names is a better idea
 
@@ -65,18 +64,18 @@ This way external producers never need to know your internal PHP class names.
 
 ## Common pitfalls and unsupported formats
 
-- A class-string that is not resolvable via `$container->has()` will not be auto-instantiated.
+- A PHP class name that is not registered in the DI container will not be auto-instantiated.
 - [yiisoft/definitions](https://github.com/yiisoft/definitions) array format (like `['class' => ..., '__construct()' => ...]`) is **not** supported for handlers.
 
-## Recommended handler implementation styles
+## Valid handler signatures
 
-- Prefer a dedicated handler class registered in DI.
-- For maximal compatibility with the worker resolution rules either:
-  - Implement `MessageHandlerInterface`
-  - Make the handler invokable (`__invoke(MessageInterface $message): void`)
-  - Provide `[HandlerClass::class, 'handle']` and keep `handle(MessageInterface $message): void` as the entry point
+The worker recognises three callable signatures:
 
-## Config location ([yiisoft/config](https://github.com/yiisoft/config))
+- `MessageHandlerInterface` — implement the interface; the worker calls `handle(MessageInterface $message): void` directly (covered in [simple setup](message-handler-simple.md)).
+- Invokable class — add `__invoke(MessageInterface $message): void`.
+- Explicit method — reference as `[HandlerClass::class, 'handle']` with `handle(MessageInterface $message): void` as the entry point.
+
+## Config location (yiisoft/config)
 
 When using [yiisoft/config](https://github.com/yiisoft/config), configure handlers under the [`yiisoft/queue`](https://github.com/yiisoft/queue) params key:
 
@@ -90,4 +89,4 @@ return [
 ];
 ```
 
-This config is consumed by the DI definitions from `config/di.php` where the `Worker` is constructed with `$params['yiisoft/queue']['handlers']`.
+This config is consumed by the DI definitions from [`config/di.php`](../../../config/di.php) where the `Worker` is constructed with `$params['yiisoft/queue']['handlers']`.
