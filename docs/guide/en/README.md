@@ -12,7 +12,7 @@
 
 - [Usage basics](usage.md)
 - [Messages and handlers: concepts](messages-and-handlers.md)
-- [Message handler](message-handler-simple.md)
+- [Message handler](message-handler.md)
 - [Console commands](console-commands.md)
 - [Message status](message-status.md)
 

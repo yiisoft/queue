@@ -1,6 +1,6 @@
 # Worker
 
-To use a worker, you should resolve the worker's dependencies (e.g., through DI container) and [define handlers](message-handler.md) for each message that will be consumed by a worker.
+To use a worker, you should resolve the worker's dependencies (e.g., through DI container) and [define handlers](message-handler-advanced.md) for each message that will be consumed by a worker.
 
 ## Starting Workers
 

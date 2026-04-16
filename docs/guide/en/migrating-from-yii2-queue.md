@@ -27,6 +27,6 @@ being consumed. In the new package, it is divided into two different concepts: a
     system including non-PHP ones (for example, a Go service handling CPU-intensive jobs).
   
 - A `Handler` is called by a `Worker` when a message is received. Default `Worker` finds a corresponding message handler
-  by the message name. [See more](message-handler.md).
+  by the message name. [See more](message-handler-advanced.md).
 
 [yiisoft/yii2-queue]: https://github.com/yiisoft/yii2-queue

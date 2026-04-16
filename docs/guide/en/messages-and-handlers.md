@@ -119,6 +119,6 @@ This looked convenient at first but created real problems:
 
 ## Next steps
 
-- [Message handler: simple setup](message-handler-simple.md) — zero-config FQCN handlers for single-application use.
-- [Message handler: named handlers and advanced formats](message-handler.md) — named handlers, callable definitions, and cross-application mapping.
+- [Message handler](message-handler.md) — zero-config FQCN handlers for single-application use.
+- [Message handler: advanced setup](message-handler-advanced.md) — named handlers, callable definitions, and cross-application mapping.
 - [Consuming messages from external systems](consuming-messages-from-external-systems.md) — producing valid JSON payloads from non-PHP services.

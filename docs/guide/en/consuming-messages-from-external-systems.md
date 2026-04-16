@@ -16,7 +16,7 @@ So, external systems should produce the **same payload format** that your consum
 
 `yiisoft/queue` resolves a handler by message handler name (`MessageInterface::getHandlerName()`).
 
-For external producers, you should not rely on PHP FQCN handler names. Prefer a stable short name and map that name to a handler callable in the consumer application configuration (see [Message handler](message-handler.md)).
+For external producers, you should not rely on PHP FQCN handler names. Prefer a stable short name and map that name to a handler callable in the consumer application configuration (see [Message handler: advanced setup](message-handler-advanced.md)).
 
 Example mapping:
 

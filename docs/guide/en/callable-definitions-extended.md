@@ -1,13 +1,13 @@
 # Callable Definitions Extended
 
-Callable definitions in `yiisoft/queue` are based on [native PHP callables](https://www.php.net/manual/en/language.types.callable.php) and suggest additional ways to define a callable.
+Callable definitions in `yiisoft/queue` are based on [native PHP callables](https://www.php.net/manual/en/language.types.callable.php) and provide additional ways to define a callable.
 
-Both definition types (classic callables and new ones) allow you to use a DI container and [yiisoft/injector](https://github.com/yiisoft/injector) to resolve dependencies in a lazy way.
+Both definition types (native PHP callables and extended callables) allow you to use a DI container and [yiisoft/injector](https://github.com/yiisoft/injector) to resolve dependencies in a lazy way.
 These callable definition formats are used across the package to convert configuration definitions into real callables.
 
 ## Type 1: Native PHP callable
 
-When you define a callable as a native PHP callable, it is not modified in any way and is called as is. The only difference is that you can declare a dependency list as its parameter list, which will be resolved via [yiisoft/injector](https://github.com/yiisoft/injector) and a DI container.  
+When you define a callable as a native PHP callable, it is not modified in any way and is called as is. Dependencies in the parameter list are resolved via [yiisoft/injector](https://github.com/yiisoft/injector) and a DI container.  
 As you can see in the [PHP documentation](https://www.php.net/manual/en/language.types.callable.php), there are several ways to define a native callable:
 
 - **Closure (lambda function)**. It may be static. Example:
@@ -23,7 +23,7 @@ As you can see in the [PHP documentation](https://www.php.net/manual/en/language
   ```
 - **A class static function**. When a class has a static function, an array syntax may be used:
   ```php
-  $callable = [Foo::class, 'bar']; // this will be called the same way as Foo::bar();
+  $callable = [Foo::class, 'bar']; // calls Foo::bar() statically
   ```
 - **An object method**. The same as above, but with an object and a non-static method:
   ```php
@@ -60,7 +60,7 @@ As you can see in the [PHP documentation](https://www.php.net/manual/en/language
 The difference from native PHP callables is that you don't need to instantiate objects yourself: you pass a class name or alias, and the DI container resolves the instance lazily, only when the callable is actually invoked.
 Ways to define an extended callable:
 
-- An object method through a class name or alias:
+- An object method through a class name or alias (non-static method only):
   ```php
   final readonly class Foo 
   {
@@ -72,19 +72,21 @@ Ways to define an extended callable:
     }
   }
   
-  $callable = [Foo::class, 'bar'];
+  $callable = [Foo::class, 'bar']; // resolves Foo from container and calls $foo->bar()
   ```
+  > [!NOTE]
+  > This format differs from Type 1: here the object is resolved from the DI container lazily when the callable is invoked. In Type 1, the same array syntax works only for static methods or pre-instantiated objects.
   Here is a simplified example of how it works (for non-static methods):
   ```php
   if ($container->has($callable[0])) {
-    $callable[0] = $container->get($callable[0])
+    $callable[0] = $container->get($callable[0]);
   }
 
   $callable();
   ```
 
 > [!NOTE]
-> If `bar` is declared `static`, no object is instantiated — the method is called statically on the class.
+> If `bar` is declared `static`, no object is instantiated — the method is called statically on the class. In this case, Type 2 behaves the same as Type 1.
 - Class name of an object with [the `__invoke` method](https://www.php.net/manual/en/language.oop5.magic.php#object.invoke) implemented:
   ```php
   $callable = Foo::class;
@@ -92,11 +94,11 @@ Ways to define an extended callable:
   It works the same way as above: an object will be retrieved from a DI container and called as a function.
 
 > [!NOTE]
-_You can use an alias registered in your DI Container instead of a class name._ This will also work if you have a "class alias" definition in container:
-```php
-$callable = 'class alias'; // for a "callable object" 
-$callable2 = ['class alias', 'foo']; // to call "foo" method of an object found by "class alias" in DI Container
-```
+> You can use an alias registered in your DI Container instead of a class name. This will also work if you have a "class alias" definition in container:
+> ```php
+> $callable = 'class alias'; // for a "callable object" 
+> $callable2 = ['class alias', 'foo']; // to call "foo" method of an object found by "class alias" in DI Container
+> ```
 
 ## Invalid definitions
 

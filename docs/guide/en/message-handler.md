@@ -1,92 +1,52 @@
-# Message handler advanced
+# Message handler
 
-This page covers named handler definitions, callable formats, pitfalls, and valid handler signatures.
+> If you are new to the concept of messages and handlers, read [Messages and handlers: concepts](messages-and-handlers.md) first.
 
-If you haven't read [Message handler: simple setup](message-handler-simple.md) yet, start there — it introduces handler classes and the zero-config FQCN approach.
-For a conceptual overview of what messages and handlers are, see [Messages and handlers: concepts](messages-and-handlers.md).
+The simplest setup requires no configuration at all: create a dedicated class implementing `Yiisoft\Queue\Message\MessageHandlerInterface` and use its FQCN as the handler name when pushing a message.
 
-Handler definitions are configured in:
+## HandlerInterface implementation (without name mapping)
 
-- `$params['yiisoft/queue']['handlers']` when using [yiisoft/config](https://github.com/yiisoft/config), or
-- the `$handlers` argument of `Yiisoft\Queue\Worker\Worker` when creating it manually.
+If your handler implements `Yiisoft\Queue\Message\MessageHandlerInterface`, you can use the class FQCN as the message handler name. The DI container resolves the handler automatically.
 
-## Supported handler definition formats
+> By default the [yiisoft/di](https://github.com/yiisoft/di) container resolves all FQCNs into corresponding class objects.
 
-### Named handlers
-
-Use a short stable handler name when pushing a `Message` instead of a PHP class name:
+**Message**:
 
 ```php
-use Yiisoft\Queue\Message\Message;
-
-new Message('send-email', ['data' => '...']); // "send-email" is the handler name here
+new \Yiisoft\Queue\Message\Message(\App\Queue\RemoteFileHandler::class, ['url' => '...']);
 ```
 
-**Config**:
-
-Map handler name to a closure in `$params`:
+**Handler**:
 
 ```php
-return [
-    'yiisoft/queue' => [
-        'handlers' => [
-            'send-email' => /** handler definition */,
-        ],
-    ],
-];
+final class RemoteFileHandler implements \Yiisoft\Queue\Message\MessageHandlerInterface
+{
+    public function handle(\Yiisoft\Queue\Message\MessageInterface $message): void
+    {
+        // Handle the message
+    }
+}
 ```
 
-Handler definition should be either an [extended callable definition](./callable-definitions-extended.md) or a container identifier that resolves to a `MessageHandlerInterface` instance.
+**Config**: Not needed.
 
+**Pros**:
 
-## When mapping by short names is a better idea
+- Minimal configuration.
+- Rename-safe within the same application (rename both the class and the message creation code together).
+- Easy to unit-test the handler as a normal class.
 
-While FQCN-as-name is convenient inside a single application, mapping by a short name is often a better contract. That is true when messages are produced outside the current codebase, or when you want to create a stable public API for inter-service communication.
+**Cons**:
 
-**Typical cases**:
+- Message names are PHP class names — works only when message creation and handler live in the same codebase.
 
-- Another application pushes messages to the same broker.
-- A different language/runtime produces messages.
+**Use when**:
 
-In these cases you typically keep message handler names small and stable, and map them in config:
+- Producer and consumer are the same application.
+- You control message creation and can safely use FQCN as the handler name.
 
-```php
-return [
-    'yiisoft/queue' => [
-        'handlers' => [
-            'file-download' => \App\Queue\RemoteFileHandler::class,
-        ],
-    ],
-];
-```
+## When FQCN is not enough
 
-This way external producers never need to know your internal PHP class names.
+When the producer is an external application or a different service, FQCN-based names create a hard dependency on PHP class names. In that case, use short stable handler names mapped to callables in config.
 
-## Common pitfalls and unsupported formats
-
-- A PHP class name that is not registered in the DI container will not be auto-instantiated.
-- [yiisoft/definitions](https://github.com/yiisoft/definitions) array format (like `['class' => ..., '__construct()' => ...]`) is **not** supported for handlers.
-
-## Valid handler signatures
-
-The worker recognises three callable signatures:
-
-- `MessageHandlerInterface` — implement the interface; the worker calls `handle(MessageInterface $message): void` directly (covered in [simple setup](message-handler-simple.md)).
-- Invokable class — add `__invoke(MessageInterface $message): void`.
-- Explicit method — reference as `[HandlerClass::class, 'handle']` with `handle(MessageInterface $message): void` as the entry point.
-
-## Config location (yiisoft/config)
-
-When using [yiisoft/config](https://github.com/yiisoft/config), configure handlers under the [`yiisoft/queue`](https://github.com/yiisoft/queue) params key:
-
-```php
-return [
-    'yiisoft/queue' => [
-        'handlers' => [
-            'handler-name' => [FooHandler::class, 'handle'],
-        ],
-    ],
-];
-```
-
-This config is consumed by the DI definitions from [`config/di.php`](../../../config/di.php) where the `Worker` is constructed with `$params['yiisoft/queue']['handlers']`.
+See [Message handler: advanced setup](message-handler-advanced.md) for all supported definition formats, pitfalls, and recommendations.

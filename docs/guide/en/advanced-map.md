@@ -14,17 +14,14 @@ Use this index when you need to customize internals: custom middleware, adapters
 
 - [Middleware pipelines deep dive](middleware-pipelines.md) — dispatcher lifecycle, request mutations, and per-pipeline contracts.
 - [Callable definitions and middleware factories](callable-definitions-extended.md) — container-aware definitions for middleware factories.
-- [Error handling](error-handling.md#failure-handling-pipeline-overview-step-by-step) — end-to-end flow of the failure pipeline.
-- [Custom failure middleware](error-handling.md#how-to-create-a-custom-failure-middleware) — implementing `MiddlewareFailureInterface`.
-- [Envelope metadata and stack reconstruction](envelopes.md#metadata-and-envelope-stacking) — stack resolution and metadata merging.
-- [FailureEnvelope usage](error-handling.md#failureenvelope) — retry metadata semantics.
-- [Handler resolver pipeline](message-handler.md) — alternative handler lookup strategies.
+- [Error handling internals](error-handling-advanced.md) — failure pipeline flow, built-in components, and custom middleware.
+- [Envelope metadata and stack reconstruction](envelopes-metadata-internals.md) — stack resolution and metadata merging.
+- [Handler resolver pipeline](message-handler-advanced.md) — alternative handler lookup strategies.
 
 ## Queue adapters and interoperability
 
 - [Custom queue provider implementations](queue-names-advanced.md#extending-the-registry) — bespoke selection logic, tenant registries, and fallback strategies.
 - [Consuming messages from external systems](consuming-messages-from-external-systems.md) — contract for third-party producers.
-- [Adapter internals](adapter-list.md) — extend or swap backend adapters.
 
 ## Tooling and diagnostics
 

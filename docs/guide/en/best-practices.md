@@ -263,7 +263,7 @@ $queue->push(new Message(
 
 #### More info
 
-See [Message handler](message-handler-simple.md) for details.
+See [Message handler](message-handler.md) for details.
 
 ## Monitoring and observability
 

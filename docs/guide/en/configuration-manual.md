@@ -142,6 +142,6 @@ $queue->listen();   // Run indefinitely
 ## Next steps
 
 - [Usage basics](usage.md) - learn how to create messages and handlers
-- [Message handler](message-handler-simple.md) - understand handler formats
+- [Message handler](message-handler.md) - understand handler formats
 - [Error handling](error-handling.md) - configure retries and failure handling
 - [Adapter list](adapter-list.md) - choose a production-ready adapter
