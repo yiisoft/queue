@@ -73,7 +73,7 @@ final class RunCommandTest extends TestCase
         $this->assertEquals(0, $exitCode);
     }
 
-    public function testExecuteWithMaximumOption(): void
+    public function testExecuteWithLimitOption(): void
     {
         $queue = $this->createMock(QueueInterface::class);
         $queue->expects($this->once())
@@ -85,7 +85,7 @@ final class RunCommandTest extends TestCase
             'test-queue' => $queue,
         ]);
 
-        $input = new StringInput('test-queue --maximum=100');
+        $input = new StringInput('test-queue --limit=100');
         $output = $this->createMock(OutputInterface::class);
         $output->expects($this->once())
             ->method('write')
