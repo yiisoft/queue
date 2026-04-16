@@ -61,7 +61,7 @@ final class Worker implements WorkerInterface
         }
 
         if ($handler === null) {
-            throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist', $name));
+            throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist.', $name));
         }
 
         $request = new ConsumeRequest($message, $queue);
