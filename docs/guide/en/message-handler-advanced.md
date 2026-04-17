@@ -2,7 +2,7 @@
 
 This page covers named handler definitions, callable formats, pitfalls, and valid handler signatures.
 
-If you haven't read [Message handler: simple setup](message-handler-simple.md) yet, start there — it introduces handler classes and the zero-config FQCN approach.
+If you haven't read [Message handler: simple setup](message-handler.md) yet, start there — it introduces handler classes and the zero-config FQCN approach.
 For a conceptual overview of what messages and handlers are, see [Messages and handlers: concepts](messages-and-handlers.md).
 
 Handler definitions are configured in:
