@@ -79,11 +79,11 @@ Behavior:
 ## How to create a custom Failure Middleware
 
 All you need is to implement the `MiddlewareFailureInterface` and add your implementation definition to the [configuration](error-handling.md#configuration).
-This interface has the only method `handle` with these parameters:
+This interface has the only method `processFailure` with these parameters:
 - [`FailureHandlingRequest $request`](../../../src/Middleware/FailureHandling/FailureHandlingRequest.php) - a request for a message handling. It consists of
     - a [message](../../../src/Message/MessageInterface.php)
     - a `Throwable $exception` object thrown on the `request` handling
     - a queue the message came from
-- `MessageFailureHandlerInterface $handler` - failure strategy pipeline continuation. Your Middleware should call `$pipeline->handle()` when the middleware itself should not interrupt failure pipeline execution.
+- `MessageFailureHandlerInterface $handler` - failure strategy pipeline continuation. Your Middleware should call `$handler->handleFailure($request)` when the middleware itself should not interrupt failure pipeline execution.
 
 > Note: your strategy have to check by its own if it should be applied. Look into [`SendAgainMiddleware::suits()`](../../../src/Middleware/FailureHandling/Implementation/SendAgainMiddleware.php#L54) for an example.
