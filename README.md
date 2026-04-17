@@ -123,8 +123,11 @@ By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/
 
 ```bash
 ./yii queue:run # Handle all existing messages in the queue
-./yii queue:listen # Start a daemon listening for new messages permanently
+./yii queue:listen [queueName] # Start a daemon listening for new messages permanently from the specified queue
+./yii queue:listen-all [queueName [queueName2 [...]]] # Start a daemon listening for new messages permanently from all queues or specified list of queues (use with caution in production, recommended for dev only)
 ```
+
+See [Console commands](docs/guide/en/console-commands.md) for more details.
 
 > In case you're using the `SynchronousAdapter` for development purposes, you should not use these commands, as you have no asynchronous processing available. The messages are processed immediately when pushed.
 
