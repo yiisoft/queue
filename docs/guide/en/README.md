@@ -1,4 +1,4 @@
-# Yii Queue documentation map
+# Yii Queue documentation
 
 ## Install and configure
 
