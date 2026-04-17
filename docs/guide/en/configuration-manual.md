@@ -53,7 +53,7 @@ $failureMiddlewareDispatcher = new FailureMiddlewareDispatcher(
 );
 
 $pushMiddlewareDispatcher = new PushMiddlewareDispatcher(
-    new MiddlewareFactoryPush($container),
+    new MiddlewareFactoryPush($container, $callableFactory),
 );
 
 // Create worker
