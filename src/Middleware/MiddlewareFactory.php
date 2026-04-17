@@ -9,6 +9,9 @@ use Yiisoft\Definitions\ArrayDefinition;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Definitions\Helpers\DefinitionValidator;
 
+use function is_array;
+use function is_string;
+
 /**
  * @template T of object
  * @internal
@@ -18,8 +21,7 @@ abstract class MiddlewareFactory
     public function __construct(
         protected readonly ContainerInterface $container,
         private readonly CallableFactory $callableFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @param callable|array|string $definition Middleware definition in one of the following formats:
