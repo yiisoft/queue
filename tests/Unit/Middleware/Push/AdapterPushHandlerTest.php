@@ -14,10 +14,10 @@ final class AdapterPushHandlerTest extends TestCase
 {
     public function testHandlePushUsesAdapter(): void
     {
-        $handler = new AdapterPushHandler();
         $adapter = new FakeAdapter();
+        $handler = new AdapterPushHandler($adapter);
         $message = new Message('handler', 'data');
-        $request = new PushRequest($message, $adapter);
+        $request = new PushRequest($message);
 
         $result = $handler->handlePush($request);
 

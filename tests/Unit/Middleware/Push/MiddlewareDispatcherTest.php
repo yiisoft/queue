@@ -27,22 +27,14 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static function (PushRequest $request, AdapterInterface $adapter): PushRequest {
-                    /** @var FakeAdapter $adapter */
-                    return $request
-                        ->withMessage(new Message('test', 'New closure test data'))
-                        ->withAdapter($adapter->withChannel('closure-channel'));
+                static function (PushRequest $request): PushRequest {
+                    return $request->withMessage(new Message('test', 'New closure test data'));
                 },
             ],
         );
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('New closure test data', $request->getMessage()->getData());
-        /**
-         * @psalm-suppress NoInterfaceProperties
-         * @psalm-suppress PossiblyNullPropertyFetch
-         */
-        $this->assertSame('closure-channel', $request->getAdapter()->channel);
     }
 
     public function testArrayMiddlewareCallableDefinition(): void
@@ -81,10 +73,6 @@ final class MiddlewareDispatcherTest extends TestCase
             return $handler->handlePush($request);
         };
         $middleware2 = static function (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest {
-            /** @var FakeAdapter $adapter */
-            $adapter = $request->getAdapter();
-            $request = $request->withAdapter($adapter->withChannel('new channel'));
-
             return $handler->handlePush($request);
         };
 
@@ -92,7 +80,6 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('new test data', $request->getMessage()->getData());
-        $this->assertSame('new channel', $request->getAdapter()->channel);
     }
 
     public function testMiddlewareStackInterrupted(): void
@@ -180,6 +167,6 @@ final class MiddlewareDispatcherTest extends TestCase
 
     private function getPushRequest(): PushRequest
     {
-        return new PushRequest(new Message('handler', 'data'), new FakeAdapter());
+        return new PushRequest(new Message('handler', 'data'));
     }
 }

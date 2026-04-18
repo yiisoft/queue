@@ -38,7 +38,7 @@ final class Queue implements QueueInterface
     ) {
         $this->name = StringNormalizer::normalize($name);
         $this->middlewareDefinitions = $middlewareDefinitions;
-        $this->adapterPushHandler = new AdapterPushHandler();
+        $this->adapterPushHandler = new AdapterPushHandler($this->adapter);
     }
 
     public function getName(): string
@@ -55,7 +55,7 @@ final class Queue implements QueueInterface
             ['handlerName' => $message->getHandlerName()],
         );
 
-        $request = new PushRequest($message, $this->adapter);
+        $request = new PushRequest($message);
         $message = $this->pushMiddlewareDispatcher
             ->dispatch($request, $this->createPushHandler(...$middlewareDefinitions))
             ->getMessage();
