@@ -53,15 +53,15 @@ final class Worker implements WorkerInterface
     {
         $this->logger->info('Processing message #{message}.', ['message' => $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null']);
 
-        $name = $message->getHandlerName();
+        $messageType = $message->getType();
         try {
-            $handler = $this->getHandler($name);
+            $handler = $this->getHandler($messageType);
         } catch (InvalidCallableConfigurationException $exception) {
-            throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist.', $name), 0, $exception);
+            throw new RuntimeException(sprintf('Queue handler for message type "%s" does not exist.', $messageType), 0, $exception);
         }
 
         if ($handler === null) {
-            throw new RuntimeException(sprintf('Queue handler with name "%s" does not exist.', $name));
+            throw new RuntimeException(sprintf('Queue handler for message type "%s" does not exist.', $messageType));
         }
 
         $request = new ConsumeRequest($message, $queue);
@@ -84,29 +84,29 @@ final class Worker implements WorkerInterface
         }
     }
 
-    private function getHandler(string $name): ?callable
+    private function getHandler(string $messageType): ?callable
     {
-        if ($name === '') {
+        if ($messageType === '') {
             return null;
         }
 
-        if (!array_key_exists($name, $this->handlersCached)) {
-            $definition = $this->handlers[$name] ?? $name;
+        if (!array_key_exists($messageType, $this->handlersCached)) {
+            $definition = $this->handlers[$messageType] ?? $messageType;
 
             if (is_string($definition) && $this->container->has($definition)) {
                 $resolved = $this->container->get($definition);
 
                 if ($resolved instanceof MessageHandlerInterface) {
-                    $this->handlersCached[$name] = $resolved->handle(...);
+                    $this->handlersCached[$messageType] = $resolved->handle(...);
 
-                    return $this->handlersCached[$name];
+                    return $this->handlersCached[$messageType];
                 }
             }
 
-            $this->handlersCached[$name] = $this->callableFactory->create($definition);
+            $this->handlersCached[$messageType] = $this->callableFactory->create($definition);
         }
 
-        return $this->handlersCached[$name];
+        return $this->handlersCached[$messageType];
     }
 
     private function createConsumeHandler(Closure $handler): MessageHandlerConsumeInterface

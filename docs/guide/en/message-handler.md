@@ -2,11 +2,11 @@
 
 > If you are new to the concept of messages and handlers, read [Messages and handlers: concepts](messages-and-handlers.md) first.
 
-The simplest setup requires no configuration at all: create a dedicated class implementing `Yiisoft\Queue\Message\MessageHandlerInterface` and use its FQCN as the handler name when pushing a message.
+The simplest setup requires no configuration at all: create a dedicated class implementing `Yiisoft\Queue\Message\MessageHandlerInterface` and use its FQCN as the message type when pushing a message.
 
-## HandlerInterface implementation (without name mapping)
+## HandlerInterface implementation (without type mapping)
 
-If your handler implements `Yiisoft\Queue\Message\MessageHandlerInterface`, you can use the class FQCN as the message handler name. The DI container resolves the handler automatically.
+If your handler implements `Yiisoft\Queue\Message\MessageHandlerInterface`, you can use the class FQCN as the message type. The DI container resolves the handler automatically.
 
 > By default the [yiisoft/di](https://github.com/yiisoft/di) container resolves all FQCNs into corresponding class objects.
 
@@ -38,15 +38,15 @@ final class RemoteFileHandler implements \Yiisoft\Queue\Message\MessageHandlerIn
 
 **Cons**:
 
-- Message names are PHP class names — works only when message creation and handler live in the same codebase.
+- Message types are PHP class names — works only when message creation and handler live in the same codebase.
 
 **Use when**:
 
 - Producer and consumer are the same application.
-- You control message creation and can safely use FQCN as the handler name.
+- You control message creation and can safely use FQCN as the message type.
 
 ## When FQCN is not enough
 
-When the producer is an external application or a different service, FQCN-based names create a hard dependency on PHP class names. In that case, use short stable handler names mapped to callables in config.
+When the producer is an external application or a different service, FQCN-based types create a hard dependency on PHP class names. In that case, use short stable message types mapped to callables in config.
 
 See [Message handler: advanced setup](message-handler-advanced.md) for all supported definition formats, pitfalls, and recommendations.

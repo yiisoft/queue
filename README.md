@@ -55,7 +55,7 @@ Minimal configuration example:
 return [
     'yiisoft/queue' => [
         'handlers' => [
-            'handler-name' => [FooHandler::class, 'handle'],
+            'message-type' => [FooHandler::class, 'handle'],
         ],
     ],
 ];
@@ -107,7 +107,7 @@ final readonly class Foo {
     public function bar(): void
     {
         $this->queue->push(new Message(
-            // The first parameter is the handler name that will process this concrete message
+            // The first parameter is the message type used to resolve the handler which will process the message
             RemoteFileHandler::class,
             // The second parameter is the data that will be passed to the handler.
             // It should be serializable to JSON format

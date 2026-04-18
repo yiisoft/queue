@@ -20,7 +20,7 @@ final class JsonMessageSerializer implements MessageSerializerInterface
     public function serialize(MessageInterface $message): string
     {
         $payload = [
-            'name' => $message->getHandlerName(),
+            'type' => $message->getType(),
             'data' => $message->getData(),
             'meta' => $message->getMetadata(),
         ];
@@ -44,9 +44,9 @@ final class JsonMessageSerializer implements MessageSerializerInterface
             throw new InvalidArgumentException('Payload must be array. Got ' . get_debug_type($payload) . '.');
         }
 
-        $name = $payload['name'] ?? null;
-        if (!isset($name) || !is_string($name)) {
-            throw new InvalidArgumentException('Handler name must be a string. Got ' . get_debug_type($name) . '.');
+        $type = $payload['type'] ?? null;
+        if (!isset($type) || !is_string($type)) {
+            throw new InvalidArgumentException('Message type must be a string. Got ' . get_debug_type($type) . '.');
         }
 
         $meta = $payload['meta'] ?? [];
@@ -69,7 +69,7 @@ final class JsonMessageSerializer implements MessageSerializerInterface
         /**
          * @var class-string<MessageInterface> $class
          */
-        $message = $class::fromData($name, $payload['data'] ?? null, $meta);
+        $message = $class::fromData($type, $payload['data'] ?? null, $meta);
 
         foreach ($envelopes as $envelope) {
             if (is_string($envelope) && class_exists($envelope) && is_subclass_of($envelope, EnvelopeInterface::class)) {

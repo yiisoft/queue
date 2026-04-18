@@ -18,9 +18,9 @@ new Message('send-email', …)  →→→  Worker resolves handler → handles
          (payload only)                     (logic only)
 ```
 
-The producer only needs to know the message name and its data. It does not need to know anything about how the message will be processed, or even in which application.
+The producer only needs to know the message type and its data. It does not need to know anything about how the message will be processed, or even in which application.
 
-The consumer only needs to know how to handle a message by name. It does not need to know where the message came from.
+The consumer only needs to know how to handle a message by type. It does not need to know where the message came from.
 
 This means the producer and consumer can be:
 
@@ -41,7 +41,7 @@ new \Yiisoft\Queue\Message\Message('send-email', [
 
 The message has:
 
-- A **handler name** — a string used by the worker to look up the correct handler.
+- A **message type** — a string used by the worker to look up the correct handler.
 - A **data payload** — arbitrary data the handler needs. Must be serializable.
 
 The message has no methods, no business logic, no dependencies. It is a value object — a data wrapper.
@@ -69,15 +69,15 @@ The handler can have any dependencies injected through the DI container. The mes
 
 ### Versioning
 
-When payload and logic are one object, renaming a class or changing its constructor breaks all messages that are already sitting in the queue. With separated payload you can evolve the handler independently: rename it, replace it, or run multiple handler versions side by side, as long as the message name and data contract stay compatible.
+When payload and logic are one object, renaming a class or changing its constructor breaks all messages that are already sitting in the queue. With separated payload you can evolve the handler independently: rename it, replace it, or run multiple handler versions side by side, as long as the message type and data contract stay compatible.
 
 ### Cross-application queues
 
-When the producer and consumer live in different applications (or even different repos), the producer cannot import the consumer's handler classes. With the separated model the producer only sends a name + data; the consumer maps that name to a local handler class. No shared class dependencies are needed.
+When the producer and consumer live in different applications (or even different repos), the producer cannot import the consumer's handler classes. With the separated model the producer only sends a type + data; the consumer maps that type to a local handler class. No shared class dependencies are needed.
 
 ### Cross-language interoperability
 
-Because the payload is just data, any language can produce or consume it. A Python service or a Node.js microservice can push a `{"name":"send-email","data":{…}}` JSON object and `yiisoft/queue` will process it correctly. No PHP class names appear in the wire format.
+Because the payload is just data, any language can produce or consume it. A Python service or a Node.js microservice can push a `{"type":"send-email","data":{…}}` JSON object and `yiisoft/queue` will process it correctly. No PHP class names appear in the wire format.
 
 ## Why JSON is the default serialization
 
@@ -120,5 +120,5 @@ This looked convenient at first but created real problems:
 ## Next steps
 
 - [Message handler](message-handler.md) — zero-config FQCN handlers for single-application use.
-- [Message handler: advanced setup](message-handler-advanced.md) — named handlers, callable definitions, and cross-application mapping.
+- [Message handler: advanced setup](message-handler-advanced.md) — handler definitions by message type, callable definitions, and cross-application mapping.
 - [Consuming messages from external systems](consuming-messages-from-external-systems.md) — producing valid JSON payloads from non-PHP services.

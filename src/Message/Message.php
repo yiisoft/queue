@@ -7,24 +7,24 @@ namespace Yiisoft\Queue\Message;
 final class Message implements MessageInterface
 {
     /**
-     * @param string $handlerName A name of a handler which should handle this message.
+     * @param string $type A message type used to resolve the handler.
      * @param mixed $data Message data, encodable by a queue adapter
      * @param array $metadata Message metadata, encodable by a queue adapter
      */
     public function __construct(
-        private readonly string $handlerName,
+        private readonly string $type,
         private readonly mixed $data,
         private array $metadata = [],
     ) {}
 
-    public static function fromData(string $handlerName, mixed $data, array $metadata = []): MessageInterface
+    public static function fromData(string $type, mixed $data, array $metadata = []): MessageInterface
     {
-        return new self($handlerName, $data, $metadata);
+        return new self($type, $data, $metadata);
     }
 
-    public function getHandlerName(): string
+    public function getType(): string
     {
-        return $this->handlerName;
+        return $this->type;
     }
 
     public function getData(): mixed

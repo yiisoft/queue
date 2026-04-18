@@ -1,6 +1,6 @@
 # Message handler advanced
 
-This page covers named handler definitions, callable formats, pitfalls, and valid handler signatures.
+This page covers handler definitions by message type, callable formats, pitfalls, and valid handler signatures.
 
 If you haven't read [Message handler: simple setup](message-handler.md) yet, start there — it introduces handler classes and the zero-config FQCN approach.
 For a conceptual overview of what messages and handlers are, see [Messages and handlers: concepts](messages-and-handlers.md).
@@ -12,19 +12,19 @@ Handler definitions are configured in:
 
 ## Supported handler definition formats
 
-### Named handlers
+### Handlers mapped by short message type
 
-Use a short stable handler name when pushing a `Message` instead of a PHP class name:
+Use a short stable message type when pushing a `Message` instead of a PHP class name:
 
 ```php
 use Yiisoft\Queue\Message\Message;
 
-new Message('send-email', ['data' => '...']); // "send-email" is the handler name here
+new Message('send-email', ['data' => '...']); // "send-email" is the message type here
 ```
 
 **Config**:
 
-Map handler name to a closure in `$params`:
+Map message type to a handler in `$params`:
 
 ```php
 return [
@@ -48,7 +48,7 @@ While FQCN-as-name is convenient inside a single application, mapping by a short
 - Another application pushes messages to the same broker.
 - A different language/runtime produces messages.
 
-In these cases you typically keep message handler names small and stable, and map them in config:
+In these cases you typically keep message types small and stable, and map them in config:
 
 ```php
 return [
@@ -83,7 +83,7 @@ When using [yiisoft/config](https://github.com/yiisoft/config), configure handle
 return [
     'yiisoft/queue' => [
         'handlers' => [
-            'handler-name' => [FooHandler::class, 'handle'],
+            'message-type' => [FooHandler::class, 'handle'],
         ],
     ],
 ];

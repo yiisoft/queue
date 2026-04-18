@@ -39,12 +39,12 @@ final class ConsumeMiddlewareDispatcher
         ConsumeRequest $request,
         MessageHandlerConsumeInterface $finishHandler,
     ): ConsumeRequest {
-        $handlerName = $request->getMessage()->getHandlerName();
-        if (!array_key_exists($handlerName, $this->stack)) {
-            $this->stack[$handlerName] = new MiddlewareConsumeStack($this->buildMiddlewares(), $finishHandler);
+        $type = $request->getMessage()->getType();
+        if (!array_key_exists($type, $this->stack)) {
+            $this->stack[$type] = new MiddlewareConsumeStack($this->buildMiddlewares(), $finishHandler);
         }
 
-        return $this->stack[$handlerName]->handleConsume($request);
+        return $this->stack[$type]->handleConsume($request);
     }
 
     /**

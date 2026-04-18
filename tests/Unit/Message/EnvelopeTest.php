@@ -13,14 +13,14 @@ final class EnvelopeTest extends TestCase
 {
     public function testFromData(): void
     {
-        $handlerName = 'test-handler';
+        $type = 'test-handler';
         $data = ['key' => 'value'];
         $metadata = ['meta' => 'data'];
 
-        $envelope = DummyEnvelope::fromData($handlerName, $data, $metadata);
+        $envelope = DummyEnvelope::fromData($type, $data, $metadata);
 
         $this->assertInstanceOf(DummyEnvelope::class, $envelope);
-        $this->assertSame($handlerName, $envelope->getHandlerName());
+        $this->assertSame($type, $envelope->getType());
         $this->assertSame($data, $envelope->getData());
         $this->assertArrayHasKey('meta', $envelope->getMetadata());
         $this->assertSame('data', $envelope->getMetadata()['meta']);

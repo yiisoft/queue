@@ -6,9 +6,9 @@ An envelope implements `Yiisoft\Queue\Message\EnvelopeInterface`, which itself e
 
 ## How an envelope behaves
 
-An envelope is transparent to callers: it delegates the wrapped message's handler name and data unchanged.
+An envelope is transparent to callers: it delegates the wrapped message type and data unchanged.
 
-- `getHandlerName()` is delegated to the wrapped message.
+- `getType()` is delegated to the wrapped message.
 - `getData()` is delegated to the wrapped message.
 
 Envelopes modify the metadata returned by `getMetadata()` and may provide convenience methods for accessing specific metadata entries (for example, `getId()` in an ID envelope).
@@ -21,7 +21,7 @@ To wrap a message into an envelope, envelope classes provide:
 
 and, via `MessageInterface` inheritance, also support:
 
-- `Envelope::fromData(string $handlerName, mixed $data, array $metadata = []): static`
+- `Envelope::fromData(string $type, mixed $data, array $metadata = []): static`
 
 ## Built-in envelopes
 

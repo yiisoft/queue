@@ -18,7 +18,7 @@ There was a concept in [yiisoft/yii2-queue] called `Job`: you had to push it to 
 being consumed. In the new package, it is divided into two different concepts: a message and a handler.
 
 - A `Message` is a class implementing `MessageInterface`. It contains two types of data:
-    - Name. The worker uses it to find the right handler for a message.
+    - Type. The worker uses it to find the right handler for a message.
     - Data. Any serializable data that should be used by the message handler.
     
     All the message data is fully serializable (that means message `data` must be serializable too). It allows you to
@@ -27,6 +27,6 @@ being consumed. In the new package, it is divided into two different concepts: a
     system including non-PHP ones (for example, a Go service handling CPU-intensive jobs).
   
 - A `Handler` is called by a `Worker` when a message is received. Default `Worker` finds a corresponding message handler
-  by the message name. [See more](message-handler-advanced.md).
+  by the message type. [See more](message-handler-advanced.md).
 
 [yiisoft/yii2-queue]: https://github.com/yiisoft/yii2-queue

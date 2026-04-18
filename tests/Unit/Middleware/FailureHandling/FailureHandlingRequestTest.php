@@ -31,7 +31,7 @@ final class FailureHandlingRequestTest extends TestCase
         $this->assertEquals($request3->getException()->getMessage(), 'exception 2');
 
         $this->assertNotSame($request1, $request4);
-        $this->assertEquals($request1->getMessage()->getHandlerName(), 'test');
-        $this->assertEquals($request4->getMessage()->getHandlerName(), 'test2');
+        $this->assertEquals($request1->getMessage()->getType(), 'test');
+        $this->assertEquals($request4->getMessage()->getType(), 'test2');
     }
 }

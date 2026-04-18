@@ -12,11 +12,11 @@ The key idea is simple:
 
 So, external systems should produce the **same payload format** that your consumer-side serializer expects (JSON described below is for the default `JsonMessageSerializer`).
 
-## 1. Handler name contract (most important part)
+## 1. Message type contract (most important part)
 
-`yiisoft/queue` resolves a handler by message handler name (`MessageInterface::getHandlerName()`).
+`yiisoft/queue` resolves a handler by message type (`MessageInterface::getType()`).
 
-For external producers, you should not rely on PHP FQCN handler names. Prefer a stable short name and map that name to a handler callable in the consumer application configuration (see [Message handler: advanced setup](message-handler-advanced.md)).
+For external producers, you should not rely on PHP FQCN handler names as messages types. Prefer a stable short type and map that type to a handler callable in the consumer application configuration (see [Message handler: advanced setup](message-handler-advanced.md)).
 
 Example mapping:
 
@@ -30,13 +30,13 @@ return [
 ];
 ```
 
-External producer then always publishes `"name": "file-download"`.
+External producer then always publishes `"type": "file-download"`.
 
 ## 2. JSON payload format (JsonMessageSerializer)
 
 `Yiisoft\Queue\Message\JsonMessageSerializer` expects the message body to be a JSON object with these keys:
 
-- `name` (string, required)
+- `type` (string, required)
 - `data` (any JSON value, optional; defaults to `null`)
 - `meta` (object, optional; defaults to `{}`)
 
@@ -44,7 +44,7 @@ Minimal example:
 
 ```json
 {
-  "name": "file-download",
+  "type": "file-download",
   "data": {
     "url": "https://example.com/file.pdf",
     "destinationFile": "/tmp/file.pdf"
@@ -56,7 +56,7 @@ Full example:
 
 ```json
 {
-  "name": "file-download",
+  "type": "file-download",
   "data": {
     "url": "https://example.com/file.pdf",
     "destinationFile": "/tmp/file.pdf"
@@ -104,7 +104,7 @@ These examples show how to produce the JSON body. You still need to publish it w
 import json
 
 payload = {
-    "name": "file-download",
+    "type": "file-download",
     "data": {"url": "https://example.com/file.pdf"}
 }
 
@@ -115,7 +115,7 @@ body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
 
 ```js
 const payload = {
-  name: 'file-download',
+  type: 'file-download',
   data: { url: 'https://example.com/file.pdf' },
 };
 
@@ -127,6 +127,6 @@ const body = Buffer.from(JSON.stringify(payload), 'utf8');
 ```sh
 curl -X POST \
   -H 'Content-Type: application/json' \
-  --data '{"name":"file-download","data":{"url":"https://example.com/file.pdf"}}' \
+  --data '{"type":"file-download","data":{"url":"https://example.com/file.pdf"}}' \
   https://your-broker-gateway.example.com/publish
 ```

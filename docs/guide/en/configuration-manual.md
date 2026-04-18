@@ -6,7 +6,7 @@ This guide explains how to set up the queue component manually, without using [y
 
 To use the queue, you need to create instances of the following classes:
 
-1. **Adapter** - handles the actual queue backend (e.g., `SynchronousAdapter`, or an adapter from external packages like Redis, AMQP, etc.)
+1. **Adapter** - handles the actual queue backend like AMQP, Redis, etc.
 2. **Worker** - processes messages from the queue
 3. **Queue** - the main entry point for pushing messages
 

@@ -13,10 +13,10 @@ abstract class Envelope implements EnvelopeInterface
     public function __construct(protected MessageInterface $message) {}
 
     /** @psalm-suppress MoreSpecificReturnType */
-    public static function fromData(string $handlerName, mixed $data, array $metadata = []): static
+    public static function fromData(string $type, mixed $data, array $metadata = []): static
     {
         /** @psalm-suppress LessSpecificReturnStatement */
-        return static::fromMessage(Message::fromData($handlerName, $data, $metadata));
+        return static::fromMessage(Message::fromData($type, $data, $metadata));
     }
 
     public function getMessage(): MessageInterface
@@ -24,9 +24,9 @@ abstract class Envelope implements EnvelopeInterface
         return $this->message;
     }
 
-    public function getHandlerName(): string
+    public function getType(): string
     {
-        return $this->message->getHandlerName();
+        return $this->message->getType();
     }
 
     public function getData(): mixed

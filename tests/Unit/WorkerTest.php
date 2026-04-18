@@ -88,7 +88,7 @@ final class WorkerTest extends TestCase
 
     public function testMessageFailWithDefinitionUndefinedMethodHandler(): void
     {
-        $this->expectExceptionMessage('Queue handler with name "simple" does not exist');
+        $this->expectExceptionMessage('Queue handler for message type "simple" does not exist');
 
         $message = new Message('simple', ['test-data']);
         $handler = new FakeHandler();
@@ -104,7 +104,7 @@ final class WorkerTest extends TestCase
 
     public function testMessageFailWithDefinitionUndefinedClassHandler(): void
     {
-        $this->expectExceptionMessage('Queue handler with name "simple" does not exist');
+        $this->expectExceptionMessage('Queue handler for message type "simple" does not exist');
 
         $message = new Message('simple', ['test-data']);
         $logger = new SimpleLogger();
@@ -121,7 +121,7 @@ final class WorkerTest extends TestCase
 
     public function testMessageFailWithDefinitionClassNotFoundInContainerHandler(): void
     {
-        $this->expectExceptionMessage('Queue handler with name "simple" does not exist');
+        $this->expectExceptionMessage('Queue handler for message type "simple" does not exist');
         $message = new Message('simple', ['test-data']);
         $container = new SimpleContainer();
         $handlers = ['simple' => [FakeHandler::class, 'handle']];
@@ -172,7 +172,7 @@ final class WorkerTest extends TestCase
         $worker = $this->createWorkerByParams($handlers, $container);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Queue handler with name "nonexistent" does not exist');
+        $this->expectExceptionMessage('Queue handler for message type "nonexistent" does not exist');
         $worker->process($message, $queue);
     }
 
@@ -191,7 +191,7 @@ final class WorkerTest extends TestCase
         $worker = $this->createWorkerByParams($handlers, $container);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Queue handler with name "invalid" does not exist');
+        $this->expectExceptionMessage('Queue handler for message type "invalid" does not exist');
         $worker->process($message, $queue);
     }
 

@@ -195,9 +195,9 @@ new Message(SendEmailHandler::class, [
 - Closures and anonymous functions cannot be serialized.
 - Objects with circular references or without proper serialization support will fail.
 
-## Message handler naming
+## Message type
 
-### Use stable names (not FQCN) for inter-service communication
+### Use stable types (not FQCN) for inter-service communication
 
 #### Bad
 
@@ -218,13 +218,13 @@ return [
     ],
 ];
 
-// External system uses stable name
+// External system uses stable type
 new Message('send-email', ['to' => 'user@example.com']);
 ```
 
 #### Why
 
-- Short stable names decouple producer and consumer implementations.
+- Short stable types decouple producer and consumer implementations.
 - External systems don't need to know your internal PHP class names.
 - You can refactor handler classes without breaking external producers.
 
@@ -257,7 +257,7 @@ $queue->push(new Message(
 
 #### Why
 
-- Using the handler class name is simpler for internal tasks.
+- Using the FQCN as the message type is simpler for internal tasks.
 - This approach is refactoring-safe (IDE can rename the class).
 - Requires no configuration mapping.
 
@@ -332,7 +332,7 @@ $id = $pushedMessage->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? null;
 
 $this->logger->info('Queued task', [
     'messageId' => $id,
-    'handler' => $message->getHandlerName(),
+    'messageType' => $message->getType(),
 ]);
 ```
 
