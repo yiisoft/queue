@@ -276,19 +276,7 @@ Keep envelope depth reasonable (typically 2-3 layers).
 
 ### Use connection pooling
 
-For database-heavy message handlers, use connection pooling to avoid connection overhead:
-
-```php
-// Configure in your database connection
-$db = new Connection([
-    'dsn' => 'mysql:host=localhost;dbname=mydb',
-    'username' => 'user',
-    'password' => 'pass',
-    'attributes' => [
-        PDO::ATTR_PERSISTENT => true, // Persistent connections
-    ],
-]);
-```
+For database-heavy message handlers, use an external connection pooler such as [PgBouncer](https://www.pgbouncer.org/) (PostgreSQL) or [ProxySQL](https://proxysql.com/) (MySQL/MariaDB). These sit between your workers and the database server, maintaining a pool of live connections and reusing them across requests — reducing connection overhead without requiring any application-level changes.
 
 ### Batch database operations
 
