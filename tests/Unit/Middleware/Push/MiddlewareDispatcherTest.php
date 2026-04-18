@@ -10,11 +10,11 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Push\PushRequest;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestCallableMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestMiddleware;
@@ -23,76 +23,74 @@ final class MiddlewareDispatcherTest extends TestCase
 {
     public function testCallableMiddlewareCalled(): void
     {
-        $request = $this->getPushRequest();
+        $message = $this->getMessage();
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static function (PushRequest $request): PushRequest {
-                    return $request->withMessage(new Message('test', 'New closure test data'));
+                static function (MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface {
+                    return new Message('test', 'New closure test data');
                 },
             ],
         );
 
-        $request = $dispatcher->dispatch($request, $this->getRequestHandler());
-        $this->assertSame('New closure test data', $request->getMessage()->getData());
+        $result = $dispatcher->dispatch($message, $this->getRequestHandler());
+        $this->assertSame('New closure test data', $result->getData());
     }
 
     public function testArrayMiddlewareCallableDefinition(): void
     {
-        $request = $this->getPushRequest();
+        $message = $this->getMessage();
         $container = $this->createContainer(
             [
                 TestCallableMiddleware::class => new TestCallableMiddleware(),
             ],
         );
         $dispatcher = $this->createDispatcher($container)->withMiddlewares([[TestCallableMiddleware::class, 'index']]);
-        $request = $dispatcher->dispatch($request, $this->getRequestHandler());
-        $this->assertSame('New test data', $request->getMessage()->getData());
+        $result = $dispatcher->dispatch($message, $this->getRequestHandler());
+        $this->assertSame('New test data', $result->getData());
     }
 
     public function testFactoryArrayDefinition(): void
     {
-        $request = $this->getPushRequest();
+        $message = $this->getMessage();
         $container = $this->createContainer();
         $definition = [
             'class' => TestMiddleware::class,
             '__construct()' => ['message' => 'New test data from the definition'],
         ];
         $dispatcher = $this->createDispatcher($container)->withMiddlewares([$definition]);
-        $request = $dispatcher->dispatch($request, $this->getRequestHandler());
-        $this->assertSame('New test data from the definition', $request->getMessage()->getData());
+        $result = $dispatcher->dispatch($message, $this->getRequestHandler());
+        $this->assertSame('New test data from the definition', $result->getData());
     }
 
     public function testMiddlewareFullStackCalled(): void
     {
-        $request = $this->getPushRequest();
+        $message = $this->getMessage();
 
-        $middleware1 = static function (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest {
-            $request = $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'new test data'));
-
-            return $handler->handlePush($request);
+        $middleware1 = static function (MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface {
+            return $handler->handlePush(new Message($message->getHandlerName(), 'new test data'));
         };
-        $middleware2 = static function (PushRequest $request, MessageHandlerPushInterface $handler): PushRequest {
-            return $handler->handlePush($request);
+        $middleware2 = static function (MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface {
+            return $handler->handlePush($message);
         };
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
-        $request = $dispatcher->dispatch($request, $this->getRequestHandler());
-        $this->assertSame('new test data', $request->getMessage()->getData());
+        $result = $dispatcher->dispatch($message, $this->getRequestHandler());
+        $this->assertSame('new test data', $result->getData());
     }
 
     public function testMiddlewareStackInterrupted(): void
     {
-        $request = $this->getPushRequest();
+        $message = $this->getMessage();
 
-        $middleware1 = static fn(PushRequest $request, MessageHandlerPushInterface $handler): PushRequest => $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'first'));
-        $middleware2 = static fn(PushRequest $request, MessageHandlerPushInterface $handler): PushRequest => $request->withMessage(new Message($request->getMessage()->getHandlerName(), 'second'));
+        $middleware1 = static fn(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface => new Message($message->getHandlerName(), 'first');
+        $middleware2 = static fn(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface => new Message($message->getHandlerName(), 'second');
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
-        $request = $dispatcher->dispatch($request, $this->getRequestHandler());
-        $this->assertSame('first', $request->getMessage()->getData());
+        $result = $dispatcher->dispatch($message, $this->getRequestHandler());
+        $this->assertSame('first', $result->getData());
     }
 
     public static function dataHasMiddlewares(): array
@@ -120,7 +118,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
     public function testResetStackOnWithMiddlewares(): void
     {
-        $request = $this->getPushRequest();
+        $message = $this->getMessage();
         $container = $this->createContainer(
             [
                 TestCallableMiddleware::class => new TestCallableMiddleware(),
@@ -131,20 +129,20 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this
             ->createDispatcher($container)
             ->withMiddlewares([[TestCallableMiddleware::class, 'index']]);
-        $dispatcher->dispatch($request, $this->getRequestHandler());
+        $dispatcher->dispatch($message, $this->getRequestHandler());
 
         $dispatcher = $dispatcher->withMiddlewares([TestMiddleware::class]);
-        $request = $dispatcher->dispatch($request, $this->getRequestHandler());
+        $result = $dispatcher->dispatch($message, $this->getRequestHandler());
 
-        self::assertSame('New middleware test data', $request->getMessage()->getData());
+        self::assertSame('New middleware test data', $result->getData());
     }
 
     private function getRequestHandler(): MessageHandlerPushInterface
     {
         return new class implements MessageHandlerPushInterface {
-            public function handlePush(PushRequest $request): PushRequest
+            public function handlePush(MessageInterface $message): MessageInterface
             {
-                return $request;
+                return $message;
             }
         };
     }
@@ -165,8 +163,8 @@ final class MiddlewareDispatcherTest extends TestCase
         return new SimpleContainer($instances);
     }
 
-    private function getPushRequest(): PushRequest
+    private function getMessage(): MessageInterface
     {
-        return new PushRequest(new Message('handler', 'data'));
+        return new Message('handler', 'data');
     }
 }

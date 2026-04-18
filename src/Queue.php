@@ -13,7 +13,6 @@ use Yiisoft\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Push\PushRequest;
 use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
@@ -55,10 +54,10 @@ final class Queue implements QueueInterface
             ['handlerName' => $message->getHandlerName()],
         );
 
-        $request = new PushRequest($message);
-        $message = $this->pushMiddlewareDispatcher
-            ->dispatch($request, $this->createPushHandler(...$middlewareDefinitions))
-            ->getMessage();
+        $message = $this->pushMiddlewareDispatcher->dispatch(
+            $message,
+            $this->createPushHandler(...$middlewareDefinitions),
+        );
 
         /** @var string $messageId */
         $messageId = $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
@@ -145,11 +144,11 @@ final class Queue implements QueueInterface
                 private readonly array $middlewares,
             ) {}
 
-            public function handlePush(PushRequest $request): PushRequest
+            public function handlePush(MessageInterface $message): MessageInterface
             {
                 return $this->dispatcher
                     ->withMiddlewares($this->middlewares)
-                    ->dispatch($request, $this->adapterPushHandler);
+                    ->dispatch($message, $this->adapterPushHandler);
             }
         };
     }

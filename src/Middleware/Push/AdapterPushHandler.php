@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Middleware\Push;
 
 use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Message\MessageInterface;
 
 /**
  * @internal
@@ -15,12 +16,8 @@ final class AdapterPushHandler implements MessageHandlerPushInterface
         private readonly AdapterInterface $adapter,
     ) {}
 
-    public function handlePush(PushRequest $request): PushRequest
+    public function handlePush(MessageInterface $message): MessageInterface
     {
-        return $request->withMessage(
-            $this->adapter->push(
-                $request->getMessage(),
-            ),
-        );
+        return $this->adapter->push($message);
     }
 }

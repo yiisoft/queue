@@ -9,14 +9,12 @@ use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\Push\Implementation\IdMiddleware;
 use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
-use Yiisoft\Queue\Middleware\Push\PushRequest;
 
 final class IdMiddlewareTest extends TestCase
 {
     public function testWithId(): void
     {
         $message = new Message('test', null, [IdEnvelope::MESSAGE_ID_KEY => 'test-id']);
-        $originalRequest = new PushRequest($message);
         $handler = $this->createMock(MessageHandlerPushInterface::class);
 
         $handler->expects($this->once())
@@ -24,19 +22,18 @@ final class IdMiddlewareTest extends TestCase
             ->willReturnArgument(0);
 
         $middleware = new IdMiddleware();
-        $finalRequest = $middleware->processPush($originalRequest, $handler);
+        $result = $middleware->processPush($message, $handler);
 
-        $this->assertSame($originalRequest, $finalRequest);
-        $this->assertNotInstanceOf(IdEnvelope::class, $finalRequest->getMessage());
-        $this->assertEquals('test-id', $finalRequest->getMessage()->getMetadata()[IdEnvelope::MESSAGE_ID_KEY]);
-        $this->assertSame($originalRequest->getMessage()->getData(), $finalRequest->getMessage()->getData());
-        $this->assertSame($originalRequest->getMessage()->getHandlerName(), $finalRequest->getMessage()->getHandlerName());
+        $this->assertSame($message, $result);
+        $this->assertNotInstanceOf(IdEnvelope::class, $result);
+        $this->assertEquals('test-id', $result->getMetadata()[IdEnvelope::MESSAGE_ID_KEY]);
+        $this->assertSame($message->getData(), $result->getData());
+        $this->assertSame($message->getHandlerName(), $result->getHandlerName());
     }
 
     public function testWithoutId(): void
     {
         $message = new Message('test', null);
-        $originalRequest = new PushRequest($message);
         $handler = $this->createMock(MessageHandlerPushInterface::class);
 
         $handler->expects($this->once())
@@ -44,12 +41,12 @@ final class IdMiddlewareTest extends TestCase
             ->willReturnArgument(0);
 
         $middleware = new IdMiddleware();
-        $finalRequest = $middleware->processPush($originalRequest, $handler);
+        $result = $middleware->processPush($message, $handler);
 
-        $this->assertInstanceOf(IdEnvelope::class, $finalRequest->getMessage());
-        $this->assertNotSame($originalRequest, $finalRequest);
-        $this->assertNotEmpty($finalRequest->getMessage()->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? null);
-        $this->assertSame($originalRequest->getMessage()->getData(), $finalRequest->getMessage()->getData());
-        $this->assertSame($originalRequest->getMessage()->getHandlerName(), $finalRequest->getMessage()->getHandlerName());
+        $this->assertInstanceOf(IdEnvelope::class, $result);
+        $this->assertNotSame($message, $result);
+        $this->assertNotEmpty($result->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? null);
+        $this->assertSame($message->getData(), $result->getData());
+        $this->assertSame($message->getHandlerName(), $result->getHandlerName());
     }
 }
