@@ -7,39 +7,15 @@ namespace Yiisoft\Queue\Adapter;
 use InvalidArgumentException;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
-use function count;
-
-final class SynchronousAdapter implements AdapterInterface
+final class SynchronousAdapter implements AdapterInterface, ImmediateProcessingAdapterInterface
 {
-    private array $messages = [];
-    private int $current = 0;
-
-    public function __construct(
-        private readonly WorkerInterface $worker,
-        private readonly QueueInterface $queue,
-    ) {}
-
-    public function __destruct()
-    {
-        $this->runExisting(function (MessageInterface $message): bool {
-            $this->worker->process($message, $this->queue);
-
-            return true;
-        });
-    }
+    private int $processed = 0;
 
     public function runExisting(callable $handlerCallback): void
     {
-        $result = true;
-        while (isset($this->messages[$this->current]) && $result === true) {
-            $result = $handlerCallback($this->messages[$this->current]);
-            unset($this->messages[$this->current]);
-            $this->current++;
-        }
+        // Messages are handled immediately in Queue::push().
     }
 
     public function status(string|int $id): MessageStatus
@@ -50,12 +26,8 @@ final class SynchronousAdapter implements AdapterInterface
             throw new InvalidArgumentException('This adapter IDs start with 0.');
         }
 
-        if ($id < $this->current) {
+        if ($id < $this->processed) {
             return MessageStatus::DONE;
-        }
-
-        if (isset($this->messages[$id])) {
-            return MessageStatus::WAITING;
         }
 
         throw new InvalidArgumentException('There is no message with the given ID.');
@@ -63,8 +35,8 @@ final class SynchronousAdapter implements AdapterInterface
 
     public function push(MessageInterface $message): MessageInterface
     {
-        $key = count($this->messages) + $this->current;
-        $this->messages[] = $message;
+        $key = $this->processed;
+        $this->processed++;
 
         return new IdEnvelope($message, $key);
     }

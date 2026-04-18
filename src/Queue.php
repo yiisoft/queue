@@ -7,6 +7,7 @@ namespace Yiisoft\Queue;
 use BackedEnum;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Adapter\ImmediateProcessingAdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -58,9 +59,9 @@ final class Queue implements QueueInterface
         );
 
         $request = new PushRequest($message, $this->adapter);
-        $message = $this->pushMiddlewareDispatcher
-            ->dispatch($request, $this->createPushHandler(...$middlewareDefinitions))
-            ->getMessage();
+        $request = $this->pushMiddlewareDispatcher
+            ->dispatch($request, $this->createPushHandler(...$middlewareDefinitions));
+        $message = $request->getMessage();
 
         /** @var string $messageId */
         $messageId = $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
@@ -68,6 +69,10 @@ final class Queue implements QueueInterface
             'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
             ['handlerName' => $message->getHandlerName(), 'id' => $messageId],
         );
+
+        if ($request->getAdapter() instanceof ImmediateProcessingAdapterInterface) {
+            $this->handle($message);
+        }
 
         return $message;
     }
