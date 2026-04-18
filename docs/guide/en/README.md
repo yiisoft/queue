@@ -25,7 +25,7 @@
 ## Production readiness
 
 - [Best practices](best-practices.md)
-- [Running workers in production (systemd and Supervisor)](process-managers.md)
+- [Running workers in production (systemd, Supervisor, cron)](process-managers.md)
 
 ## Migration
 

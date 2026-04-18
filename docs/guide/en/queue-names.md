@@ -121,6 +121,17 @@ final readonly class SendTransactionalEmail
 
 `QueueProviderInterface` accepts both strings and `BackedEnum` values. `BackedEnum` values are normalized to strings — string-backed enums use their backing value directly, while int-backed enums are cast to string.
 
+```php
+enum QueueChannel: string
+{
+    case Emails = 'emails';
+    case Reports = 'reports';
+}
+
+// Using enum value:
+$queueProvider->get(QueueChannel::Emails); // resolves to 'emails'
+```
+
 ## Running workers (CLI)
 
 To consume messages you run console commands such as `queue:run`, `queue:listen`, and `queue:listen-all`.

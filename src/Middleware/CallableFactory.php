@@ -9,7 +9,6 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
-use ReflectionMethod;
 
 use function is_array;
 use function is_callable;
@@ -110,9 +109,7 @@ final class CallableFactory
 
     private function fromObjectDefinition(object $object, string $methodName): ?callable
     {
-        try {
-            new ReflectionMethod($object, $methodName);
-        } catch (ReflectionException) {
+        if (!method_exists($object, $methodName)) {
             return null;
         }
 

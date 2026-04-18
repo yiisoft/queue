@@ -125,7 +125,7 @@ Use different queue names for different priority levels. See [Queue names](queue
 ```php
 return [
     'yiisoft/queue' => [
-        'channels' => [
+        'queues' => [
             'critical' => AmqpAdapter::class,
             'normal' => AmqpAdapter::class,
             'low' => AmqpAdapter::class,
@@ -154,7 +154,7 @@ Create separate queues for different workload characteristics:
 ```php
 return [
     'yiisoft/queue' => [
-        'channels' => [
+        'queues' => [
             'fast' => AmqpAdapter::class,      // Quick tasks (< 1s)
             'slow' => AmqpAdapter::class,      // Long tasks (> 10s)
             'cpu-bound' => AmqpAdapter::class, // CPU-intensive

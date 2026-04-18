@@ -9,7 +9,7 @@ If you are using [symfony/console](https://github.com/symfony/console) directly,
 > **Note:** The default queue name list (used when no queue names are passed to a command) is only available when using [yiisoft/config](https://github.com/yiisoft/config) and [yiisoft/yii-console](https://github.com/yiisoft/yii-console). Without them, you must pass the queue name list explicitly to the command constructor.
 
 In [yiisoft/app](https://github.com/yiisoft/app) the `yii` console binary is provided out of the box.
-If you are using [yiisoft/console](https://github.com/yiisoft/console) or `symfony/console` without that template, invoke these commands the same way you invoke other console commands in your application.
+If you are using [yiisoft/yii-console](https://github.com/yiisoft/yii-console) or `symfony/console` without that template, invoke these commands the same way you invoke other console commands in your application.
 
 ## 1. Run queued messages and exit
 

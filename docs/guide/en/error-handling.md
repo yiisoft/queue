@@ -96,7 +96,7 @@ Failures of messages that arrived in the `failed-messages` queue directly (bypas
 
 It's configured via constructor parameters, too. Here they are:
 
-- `id` - A unique string allows to use this strategy more than once for the same message, just like in example above.
+- `id` - A unique string that allows to use this strategy more than once for the same message, just like in example above.
 - `maxAttempts` - Maximum attempts count for this strategy with the given $id before it will give up.
  - `delayInitial` - The initial delay that will be applied to a message for the first time. It must be a positive float. 
  - `delayMaximum` - The maximum delay which can be applied to a single message. Must be above the `delayInitial`.

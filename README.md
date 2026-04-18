@@ -77,8 +77,6 @@ use Yiisoft\Queue\Message\MessageHandlerInterface;
 
 final readonly class RemoteFileHandler implements MessageHandlerInterface
 {
-    private string $absolutePath;
-
     // These dependencies will be resolved on handler creation by the DI container
     public function __construct(
         private FileDownloader $downloader,
@@ -88,8 +86,8 @@ final readonly class RemoteFileHandler implements MessageHandlerInterface
     // Every received message will be processed by this method
     public function handle(MessageInterface $downloadMessage): void
     {
-        $fileName = $downloadMessage->getData()['destinationFile'];
-        $localPath = $this->downloader->download($fileName);
+        $url = $downloadMessage->getData()['url'];
+        $localPath = $this->downloader->download($url);
         $this->processor->process($localPath);
     }
 }
@@ -111,7 +109,7 @@ final readonly class Foo {
             RemoteFileHandler::class,
             // The second parameter is the data that will be passed to the handler.
             // It should be serializable to JSON format
-            ['destinationFile' => 'https://example.com/file-path.csv'],
+            ['url' => 'https://example.com/file-path.csv'],
         ));
     }
 }

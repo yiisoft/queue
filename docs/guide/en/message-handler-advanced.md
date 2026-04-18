@@ -1,4 +1,4 @@
-# Message handler advanced
+# Message handler: advanced setup
 
 This page covers handler definitions by message type, callable formats, pitfalls, and valid handler signatures.
 
