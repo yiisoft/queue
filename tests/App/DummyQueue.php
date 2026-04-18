@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\App;
 
-use BackedEnum;
 use Exception;
-use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
@@ -35,11 +33,6 @@ final class DummyQueue implements QueueInterface
     public function status(string|int $id): JobStatus
     {
         throw new Exception('`status()` method is not implemented yet.');
-    }
-
-    public function withAdapter(AdapterInterface $adapter, string|BackedEnum|null $queueName = null): static
-    {
-        throw new Exception('`withAdapter()` method is not implemented yet.');
     }
 
     public function getName(): string

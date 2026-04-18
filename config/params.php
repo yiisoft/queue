@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Command\ListenAllCommand;
 use Yiisoft\Queue\Command\ListenCommand;
 use Yiisoft\Queue\Command\RunCommand;
@@ -22,9 +21,6 @@ return [
     ],
     'yiisoft/queue' => [
         'handlers' => [],
-        'queues' => [
-            QueueProviderInterface::DEFAULT_QUEUE => AdapterInterface::class,
-        ],
         'middlewares-push' => [],
         'middlewares-consume' => [],
         'middlewares-fail' => [],

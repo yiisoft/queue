@@ -56,11 +56,11 @@ final class QueueBench
         $this->adapter = new VoidAdapter($this->serializer);
 
         $this->queue = new Queue(
+            $this->adapter,
             $worker,
             new SimpleLoop(0),
             $logger,
             new PushMiddlewareDispatcher(new MiddlewareFactoryPush($container, $callableFactory)),
-            adapter: $this->adapter,
         );
     }
 

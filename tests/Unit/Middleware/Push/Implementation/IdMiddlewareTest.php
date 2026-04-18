@@ -10,13 +10,14 @@ use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\Push\Implementation\IdMiddleware;
 use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
 use Yiisoft\Queue\Middleware\Push\PushRequest;
+use Yiisoft\Queue\Stubs\StubAdapter;
 
 final class IdMiddlewareTest extends TestCase
 {
     public function testWithId(): void
     {
         $message = new Message('test', null, [IdEnvelope::MESSAGE_ID_KEY => 'test-id']);
-        $originalRequest = new PushRequest($message, null);
+        $originalRequest = new PushRequest($message, new StubAdapter());
         $handler = $this->createMock(MessageHandlerPushInterface::class);
 
         $handler->expects($this->once())
@@ -36,7 +37,7 @@ final class IdMiddlewareTest extends TestCase
     public function testWithoutId(): void
     {
         $message = new Message('test', null);
-        $originalRequest = new PushRequest($message, null);
+        $originalRequest = new PushRequest($message, new StubAdapter());
         $handler = $this->createMock(MessageHandlerPushInterface::class);
 
         $handler->expects($this->once())

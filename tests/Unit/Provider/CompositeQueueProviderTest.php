@@ -7,7 +7,6 @@ namespace Yiisoft\Queue\Tests\Unit\Provider;
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;
 use Yiisoft\Queue\Provider\QueueNotFoundException;
 use Yiisoft\Queue\Provider\CompositeQueueProvider;
-use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Queue\Stubs\StubQueue;
 use Yiisoft\Queue\Tests\TestCase;
 
@@ -15,8 +14,8 @@ final class CompositeQueueProviderTest extends TestCase
 {
     public function testBase(): void
     {
-        $queue1 = new StubQueue(new StubAdapter());
-        $queue2 = new StubQueue(new StubAdapter());
+        $queue1 = new StubQueue();
+        $queue2 = new StubQueue();
         $provider = new CompositeQueueProvider(
             new PredefinedQueueProvider(['queue1' => $queue1]),
             new PredefinedQueueProvider(['queue2' => $queue2]),
@@ -34,7 +33,7 @@ final class CompositeQueueProviderTest extends TestCase
     {
         $provider = new CompositeQueueProvider(
             new PredefinedQueueProvider([
-                'queue1' => new StubQueue(new StubAdapter()),
+                'queue1' => new StubQueue(),
             ]),
         );
 
@@ -47,11 +46,11 @@ final class CompositeQueueProviderTest extends TestCase
     {
         $provider = new CompositeQueueProvider(
             new PredefinedQueueProvider([
-                'queue1' => new StubQueue(new StubAdapter()),
-                'queue2' => new StubQueue(new StubAdapter()),
+                'queue1' => new StubQueue(),
+                'queue2' => new StubQueue(),
             ]),
             new PredefinedQueueProvider([
-                'queue3' => new StubQueue(new StubAdapter()),
+                'queue3' => new StubQueue(),
             ]),
         );
 
@@ -64,11 +63,11 @@ final class CompositeQueueProviderTest extends TestCase
     {
         $provider = new CompositeQueueProvider(
             new PredefinedQueueProvider([
-                'queue1' => new StubQueue(new StubAdapter()),
+                'queue1' => new StubQueue(),
             ]),
             new PredefinedQueueProvider([
-                'queue1' => new StubQueue(new StubAdapter()),
-                'queue2' => new StubQueue(new StubAdapter()),
+                'queue1' => new StubQueue(),
+                'queue2' => new StubQueue(),
             ]),
         );
 

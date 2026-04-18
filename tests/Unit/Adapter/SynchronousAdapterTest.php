@@ -5,32 +5,33 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Adapter;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Message;
-use Yiisoft\Queue\Tests\TestCase;
+use Yiisoft\Queue\Stubs\StubQueue;
+use Yiisoft\Queue\Stubs\StubWorker;
 
 final class SynchronousAdapterTest extends TestCase
 {
     public function testNonIntegerId(): void
     {
-        $queue = $this
-            ->getQueue()
-            ->withAdapter($this->getAdapter());
+        $adapter = new SynchronousAdapter(new StubWorker(), new StubQueue());
         $message = new Message('simple', null);
-        $envelope = $queue->push($message);
+        $envelope = $adapter->push($message);
 
         self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
         $id = $envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY];
 
         $wrongId = "$id ";
-        self::assertSame(JobStatus::WAITING, $queue->status($wrongId));
+        self::assertSame(JobStatus::WAITING, $adapter->status($wrongId));
     }
 
     public function testIdSetting(): void
     {
         $message = new Message('simple', []);
-        $adapter = $this->getAdapter();
+        $adapter = new SynchronousAdapter(new StubWorker(), new StubQueue());
 
         $ids = [];
         $envelope = $adapter->push($message);
@@ -45,7 +46,8 @@ final class SynchronousAdapterTest extends TestCase
 
     public function testStatusIdLessZero(): void
     {
-        $adapter = $this->getAdapter();
+        $adapter = new SynchronousAdapter(new StubWorker(), new StubQueue());
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('This adapter IDs start with 0.');
         $adapter->status('-1');
@@ -53,14 +55,10 @@ final class SynchronousAdapterTest extends TestCase
 
     public function testStatusNotMessage(): void
     {
-        $adapter = $this->getAdapter();
+        $adapter = new SynchronousAdapter(new StubWorker(), new StubQueue());
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('There is no message with the given ID.');
         $adapter->status('1');
-    }
-
-    protected function needsRealAdapter(): bool
-    {
-        return true;
     }
 }

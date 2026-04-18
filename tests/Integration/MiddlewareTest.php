@@ -59,15 +59,15 @@ final class MiddlewareTest extends TestCase
             new TestMiddleware('common 2'),
         );
         $queue = new Queue(
+            new SynchronousAdapter(
+                $this->createMock(WorkerInterface::class),
+                $this->createMock(QueueInterface::class),
+            ),
             $this->createMock(WorkerInterface::class),
             $this->createMock(LoopInterface::class),
             $this->createMock(LoggerInterface::class),
             $pushMiddlewareDispatcher,
             'test',
-            new SynchronousAdapter(
-                $this->createMock(WorkerInterface::class),
-                $this->createMock(QueueInterface::class),
-            ),
         );
         $queue = $queue
             ->withMiddlewares(new TestMiddleware('Won\'t be executed'))

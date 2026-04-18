@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit;
 
 use Yiisoft\Queue\Cli\SignalLoop;
-use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Queue\JobStatus;
 use Yiisoft\Queue\Message\Message;
-use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
@@ -36,9 +34,7 @@ final class QueueTest extends TestCase
     public function testPushSuccessful(): void
     {
         $adapter = new FakeAdapter();
-        $queue = $this
-            ->getQueue()
-            ->withAdapter($adapter);
+        $queue = $this->createQueue($adapter);
         $message = new Message('simple', null);
         $queue->push($message);
 
@@ -47,9 +43,7 @@ final class QueueTest extends TestCase
 
     public function testRun(): void
     {
-        $queue = $this
-            ->getQueue()
-            ->withAdapter($this->getAdapter());
+        $queue = $this->createQueue($this->getAdapter());
         $message = new Message('simple', null);
         $message2 = clone $message;
         $queue->push($message);
@@ -62,9 +56,7 @@ final class QueueTest extends TestCase
     public function testRunPartly(): void
     {
         $message = new Message('simple', null);
-        $queue = $this
-            ->getQueue()
-            ->withAdapter($this->getAdapter());
+        $queue = $this->createQueue($this->getAdapter());
         $message2 = clone $message;
         $queue->push($message);
         $queue->push($message2);
@@ -75,9 +67,7 @@ final class QueueTest extends TestCase
 
     public function testListen(): void
     {
-        $queue = $this
-            ->getQueue()
-            ->withAdapter($this->getAdapter());
+        $queue = $this->createQueue($this->getAdapter());
         $message = new Message('simple', null);
         $message2 = clone $message;
         $queue->push($message);
@@ -89,9 +79,7 @@ final class QueueTest extends TestCase
 
     public function testStatus(): void
     {
-        $queue = $this
-            ->getQueue()
-            ->withAdapter($this->getAdapter());
+        $queue = $this->createQueue($this->getAdapter());
         $message = new Message('simple', null);
         $envelope = $queue->push($message);
 
@@ -109,31 +97,6 @@ final class QueueTest extends TestCase
         self::assertSame(JobStatus::DONE, $status);
     }
 
-    public function testAdapterNotConfiguredException(): void
-    {
-        try {
-            $queue = $this->getQueue();
-            $message = new Message('simple', null);
-            $envelope = $queue->push($message);
-            $queue->status($envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY]);
-        } catch (AdapterNotConfiguredException $exception) {
-            self::assertSame($exception::class, AdapterNotConfiguredException::class);
-            self::assertSame($exception->getName(), 'Adapter is not configured');
-            $this->assertMatchesRegularExpression('/withAdapter/', $exception->getSolution());
-        }
-    }
-
-    public function testAdapterNotConfiguredExceptionForRun(): void
-    {
-        try {
-            $this->getQueue()->run();
-        } catch (AdapterNotConfiguredException $exception) {
-            self::assertSame($exception::class, AdapterNotConfiguredException::class);
-            self::assertSame($exception->getName(), 'Adapter is not configured');
-            $this->assertMatchesRegularExpression('/withAdapter/', $exception->getSolution());
-        }
-    }
-
     public function testRunWithSignalLoop(): void
     {
         if (!extension_loaded('pcntl')) {
@@ -141,9 +104,7 @@ final class QueueTest extends TestCase
         }
 
         $this->loop = new SignalLoop();
-        $queue = $this
-            ->getQueue()
-            ->withAdapter($this->getAdapter());
+        $queue = $this->createQueue($this->getAdapter());
         $message = new Message('simple', null);
         $message2 = clone $message;
         $queue->push($message);
@@ -155,18 +116,14 @@ final class QueueTest extends TestCase
 
     public function testGetName(): void
     {
-        $queue = $this
-            ->getQueue()
-            ->withAdapter(new StubAdapter(), 'test-queue');
+        $queue = $this->createQueue(name: 'test-queue');
 
         $this->assertSame('test-queue', $queue->getName());
     }
 
     public function testGetNameWithBackedEnum(): void
     {
-        $queue = $this
-            ->getQueue()
-            ->withAdapter(new StubAdapter(), TestQueue::HIGH_PRIORITY);
+        $queue = $this->createQueue(name: TestQueue::HIGH_PRIORITY);
 
         $this->assertSame('high-priority', $queue->getName());
     }
