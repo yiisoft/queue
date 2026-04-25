@@ -9,6 +9,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
+use ReflectionMethod;
 
 use function is_array;
 use function is_callable;
