@@ -8,7 +8,6 @@ use BackedEnum;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
-use Yiisoft\Queue\Exception\AdapterConfiguration\AdapterNotConfiguredException;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
@@ -29,12 +28,12 @@ final class Queue implements QueueInterface
     private string $name;
 
     public function __construct(
+        private readonly AdapterInterface $adapter,
         private readonly WorkerInterface $worker,
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
         private readonly PushMiddlewareDispatcher $pushMiddlewareDispatcher,
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
-        private ?AdapterInterface $adapter = null,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ) {
         $this->name = StringNormalizer::normalize($name);
@@ -51,7 +50,6 @@ final class Queue implements QueueInterface
         MessageInterface $message,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ): MessageInterface {
-        $this->checkAdapter();
         $this->logger->debug(
             'Preparing to push message with message type "{messageType}".',
             ['messageType' => $message->getType()],
@@ -74,8 +72,6 @@ final class Queue implements QueueInterface
 
     public function run(int $max = 0): int
     {
-        $this->checkAdapter();
-
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
@@ -100,8 +96,6 @@ final class Queue implements QueueInterface
 
     public function listen(): void
     {
-        $this->checkAdapter();
-
         $this->logger->info('Start listening to the queue.');
         $this->adapter->subscribe(fn(MessageInterface $message) => $this->handle($message));
         $this->logger->info('Finish listening to the queue.');
@@ -109,19 +103,7 @@ final class Queue implements QueueInterface
 
     public function status(string|int $id): MessageStatus
     {
-        $this->checkAdapter();
         return $this->adapter->status($id);
-    }
-
-    public function withAdapter(AdapterInterface $adapter, string|BackedEnum|null $queueName = null): static
-    {
-        $new = clone $this;
-        $new->adapter = $adapter;
-        if ($queueName !== null) {
-            $new->name = StringNormalizer::normalize($queueName);
-        }
-
-        return $new;
     }
 
     public function withMiddlewares(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
@@ -145,16 +127,6 @@ final class Queue implements QueueInterface
         $this->worker->process($message, $this);
 
         return $this->loop->canContinue();
-    }
-
-    /**
-     * @psalm-assert AdapterInterface $this->adapter
-     */
-    private function checkAdapter(): void
-    {
-        if ($this->adapter === null) {
-            throw new AdapterNotConfiguredException();
-        }
     }
 
     private function createPushHandler(MiddlewarePushInterface|callable|array|string ...$middlewares): MessageHandlerPushInterface

@@ -9,14 +9,17 @@ use Yiisoft\Queue\Message\MessageInterface;
 
 final class PushRequest
 {
-    public function __construct(private MessageInterface $message, private ?AdapterInterface $adapter) {}
+    public function __construct(
+        private MessageInterface $message,
+        private AdapterInterface $adapter,
+    ) {}
 
     public function getMessage(): MessageInterface
     {
         return $this->message;
     }
 
-    public function getAdapter(): ?AdapterInterface
+    public function getAdapter(): AdapterInterface
     {
         return $this->adapter;
     }
