@@ -19,7 +19,9 @@ use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\CallableObjectMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\InvalidController;
+use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\StringCallableMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestMiddleware;
 
@@ -114,6 +116,34 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processConsume(
                 $request,
                 $this->getRequestHandler(),
+            )->getMessage()->getData(),
+        );
+    }
+
+    public function testCreateFromStringCallable(): void
+    {
+        $middleware = $this->getMiddlewareFactory()->createConsumeMiddleware(
+            StringCallableMiddleware::class . '::handle',
+        );
+        self::assertSame(
+            'String callable data',
+            $middleware->processConsume(
+                $this->getConsumeRequest(),
+                $this->createMock(MessageHandlerConsumeInterface::class),
+            )->getMessage()->getData(),
+        );
+    }
+
+    public function testCreateFromCallableObject(): void
+    {
+        $middleware = $this->getMiddlewareFactory()->createConsumeMiddleware(
+            new CallableObjectMiddleware(),
+        );
+        self::assertSame(
+            'Callable object data',
+            $middleware->processConsume(
+                $this->getConsumeRequest(),
+                $this->createMock(MessageHandlerConsumeInterface::class),
             )->getMessage()->getData(),
         );
     }

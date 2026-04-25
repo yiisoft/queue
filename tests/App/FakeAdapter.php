@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Tests\App;
 use BackedEnum;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\StringNormalizer;
-use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 
 final class FakeAdapter implements AdapterInterface
@@ -27,7 +27,7 @@ final class FakeAdapter implements AdapterInterface
         //skip
     }
 
-    public function status(string|int $id): JobStatus
+    public function status(string|int $id): MessageStatus
     {
         //skip
     }

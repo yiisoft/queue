@@ -21,20 +21,20 @@ use function sprintf;
 final class JsonMessageSerializerTest extends TestCase
 {
     /**
-     * @dataProvider dataUnsupportedHandlerNameFormat
+     * @dataProvider dataUnsupportedTypeFormat
      */
-    #[DataProvider('dataUnsupportedHandlerNameFormat')]
-    public function testHandlerNameFormat(mixed $name): void
+    #[DataProvider('dataUnsupportedTypeFormat')]
+    public function testTypeFormat(mixed $type): void
     {
-        $payload = ['name' => $name, 'data' => 'test'];
+        $payload = ['type' => $type, 'data' => 'test'];
         $serializer = $this->createSerializer();
 
-        $this->expectExceptionMessage(sprintf('Handler name must be a string. Got %s.', get_debug_type($name)));
+        $this->expectExceptionMessage(sprintf('Message type must be a string. Got %s.', get_debug_type($type)));
         $this->expectException(InvalidArgumentException::class);
         $serializer->unserialize(json_encode($payload));
     }
 
-    public static function dataUnsupportedHandlerNameFormat(): iterable
+    public static function dataUnsupportedTypeFormat(): iterable
     {
         yield 'number' => [1];
         yield 'boolean' => [true];
@@ -46,7 +46,7 @@ final class JsonMessageSerializerTest extends TestCase
     {
         $serializer = $this->createSerializer();
         $payload = [
-            'name' => 'handler',
+            'type' => 'handler',
             'data' => 'test',
             'meta' => [
                 'message-class' => 'NonExistentClass',
@@ -61,7 +61,7 @@ final class JsonMessageSerializerTest extends TestCase
     {
         $serializer = $this->createSerializer();
         $payload = [
-            'name' => 'handler',
+            'type' => 'handler',
             'data' => 'test',
             'meta' => [],
         ];
@@ -90,7 +90,7 @@ final class JsonMessageSerializerTest extends TestCase
     #[DataProvider('dataUnsupportedMetadataFormat')]
     public function testMetadataFormat(mixed $meta): void
     {
-        $payload = ['name' => 'handler', 'data' => 'test', 'meta' => $meta];
+        $payload = ['type' => 'handler', 'data' => 'test', 'meta' => $meta];
         $serializer = $this->createSerializer();
 
         $this->expectExceptionMessage(sprintf('Metadata must be an array. Got %s.', get_debug_type($meta)));
@@ -107,7 +107,7 @@ final class JsonMessageSerializerTest extends TestCase
 
     public function testUnserializeFromData(): void
     {
-        $payload = ['name' => 'handler', 'data' => 'test'];
+        $payload = ['type' => 'handler', 'data' => 'test'];
         $serializer = $this->createSerializer();
 
         $message = $serializer->unserialize(json_encode($payload));
@@ -118,7 +118,7 @@ final class JsonMessageSerializerTest extends TestCase
 
     public function testUnserializeWithMetadata(): void
     {
-        $payload = ['name' => 'handler', 'data' => 'test', 'meta' => ['int' => 1, 'str' => 'string', 'bool' => true]];
+        $payload = ['type' => 'handler', 'data' => 'test', 'meta' => ['int' => 1, 'str' => 'string', 'bool' => true]];
         $serializer = $this->createSerializer();
 
         $message = $serializer->unserialize(json_encode($payload));
@@ -130,7 +130,7 @@ final class JsonMessageSerializerTest extends TestCase
     public function testUnserializeEnvelopeStack(): void
     {
         $payload = [
-            'name' => 'handler',
+            'type' => 'handler',
             'data' => 'test',
             'meta' => [
                 EnvelopeInterface::ENVELOPE_STACK_KEY => [
@@ -160,7 +160,7 @@ final class JsonMessageSerializerTest extends TestCase
         $json = $serializer->serialize($message);
 
         $this->assertEquals(
-            '{"name":"handler","data":"test","meta":{"message-class":"Yiisoft\\\\Queue\\\\Message\\\\Message"}}',
+            '{"type":"handler","data":"test","meta":{"message-class":"Yiisoft\\\\Queue\\\\Message\\\\Message"}}',
             $json,
         );
     }
@@ -176,7 +176,7 @@ final class JsonMessageSerializerTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '{"name":"handler","data":"test","meta":{"envelopes":["%s"],"%s":"test-id","message-class":"%s"}}',
+                '{"type":"handler","data":"test","meta":{"envelopes":["%s"],"%s":"test-id","message-class":"%s"}}',
                 str_replace('\\', '\\\\', IdEnvelope::class),
                 IdEnvelope::MESSAGE_ID_KEY,
                 str_replace('\\', '\\\\', Message::class),

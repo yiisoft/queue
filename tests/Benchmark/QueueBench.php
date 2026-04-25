@@ -51,6 +51,7 @@ final class QueueBench
                 new MiddlewareFactoryFailure($container, $callableFactory),
                 [],
             ),
+            $callableFactory,
         );
         $this->serializer = new JsonMessageSerializer();
         $this->adapter = new VoidAdapter($this->serializer);

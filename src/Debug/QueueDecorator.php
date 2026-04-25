@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Debug;
 
-use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
@@ -16,7 +16,7 @@ final class QueueDecorator implements QueueInterface
         private readonly QueueCollector $collector,
     ) {}
 
-    public function status(string|int $id): JobStatus
+    public function status(string|int $id): MessageStatus
     {
         $result = $this->queue->status($id);
         $this->collector->collectStatus((string) $id, $result);

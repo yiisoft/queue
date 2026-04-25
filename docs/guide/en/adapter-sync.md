@@ -1,7 +1,7 @@
 Synchronous Adapter
 ==================
 
-Run tasks synchronously in the same process. It could be used when developing and debugging an application.
+Run tasks synchronously in the same process. The adapter is intended for use when developing and debugging an application.
 
 Configuration example:
 

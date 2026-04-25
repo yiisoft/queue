@@ -143,6 +143,7 @@ abstract class TestCase extends BaseTestCase
             $this->getContainer(),
             $this->getConsumeMiddlewareDispatcher(),
             $this->getFailureMiddlewareDispatcher(),
+            new CallableFactory($this->getContainer()),
         );
     }
 
