@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit;
 
+use BadMethodCallException;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\App\InMemoryAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
+use Yiisoft\Queue\Worker\WorkerInterface;
 
 use function extension_loaded;
 
@@ -22,15 +28,6 @@ enum TestQueue: string
 
 final class QueueTest extends TestCase
 {
-    private bool $needsRealAdapter = true;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->needsRealAdapter = true;
-    }
-
     public function testPushSuccessful(): void
     {
         $adapter = new FakeAdapter();
@@ -128,8 +125,61 @@ final class QueueTest extends TestCase
         $this->assertSame('high-priority', $queue->getName());
     }
 
+    public function testPushWithoutAdapterProcessesInline(): void
+    {
+        $message = new Message('simple', null);
+        $worker = $this->createMock(WorkerInterface::class);
+        $worker->expects(self::once())->method('process')->with($message);
+
+        $queue = new Queue(
+            $worker,
+            $this->getLoop(),
+            new NullLogger(),
+            $this->getPushMiddlewareDispatcher(),
+        );
+
+        $queue->push($message);
+    }
+
+    public function testConstructorWarnsWhenNoAdapter(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())->method('warning');
+
+        new Queue(
+            $this->getWorker(),
+            $this->getLoop(),
+            $logger,
+            $this->getPushMiddlewareDispatcher(),
+        );
+    }
+
+    public function testRunThrowsWithoutAdapter(): void
+    {
+        $queue = $this->createQueue();
+
+        $this->expectException(BadMethodCallException::class);
+        $queue->run();
+    }
+
+    public function testListenThrowsWithoutAdapter(): void
+    {
+        $queue = $this->createQueue();
+
+        $this->expectException(BadMethodCallException::class);
+        $queue->listen();
+    }
+
+    public function testStatusThrowsWithoutAdapter(): void
+    {
+        $queue = $this->createQueue();
+
+        $this->expectException(BadMethodCallException::class);
+        $queue->status('1');
+    }
+
     protected function needsRealAdapter(): bool
     {
-        return $this->needsRealAdapter;
+        return true;
     }
 }

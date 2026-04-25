@@ -15,5 +15,5 @@ Advanced applications eventually need the following tweaks:
 - **Named handlers or callable definitions** — map a short message type to a callable in [`yiisoft/queue.handlers` config](message-handler-advanced.md) when another application is the message producer and you cannot use FQCN as message type.
 - **Middleware pipelines** — adjust push/consume/failure behavior: collect metrics, modify messages, and so on. See [Middleware pipelines](middleware-pipelines.md) for details.
 
-For development and testing you can start with the synchronous adapter.
-For production you have to use a [real backend adapter](adapter-list.md) (AMQP, Kafka, SQS, etc.). If you do not have any preference, it's simpler to start with [yiisoft/queue-amqp](https://github.com/yiisoft/queue-amqp) and [RabbitMQ](https://www.rabbitmq.com/).
+For development and testing you can omit the adapter — the queue will [process messages synchronously on push](no-adapter.md).
+For production you must use a [real backend adapter](adapter-list.md) (AMQP, Kafka, SQS, etc.). If you do not have any preference, it's simpler to start with [yiisoft/queue-amqp](https://github.com/yiisoft/queue-amqp) and [RabbitMQ](https://www.rabbitmq.com/).

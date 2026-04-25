@@ -11,10 +11,14 @@ final class AdapterPushHandler implements MessageHandlerPushInterface
 {
     public function handlePush(PushRequest $request): PushRequest
     {
+        $adapter = $request->getAdapter();
+
+        if ($adapter === null) {
+            return $request;
+        }
+
         return $request->withMessage(
-            $request->getAdapter()->push(
-                $request->getMessage(),
-            ),
+            $adapter->push($request->getMessage()),
         );
     }
 }

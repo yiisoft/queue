@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue;
 
 use BackedEnum;
+use BadMethodCallException;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
@@ -28,17 +29,25 @@ final class Queue implements QueueInterface
     private string $name;
 
     public function __construct(
-        private readonly AdapterInterface $adapter,
         private readonly WorkerInterface $worker,
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
         private readonly PushMiddlewareDispatcher $pushMiddlewareDispatcher,
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
+        private ?AdapterInterface $adapter = null,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ) {
         $this->name = StringNormalizer::normalize($name);
         $this->middlewareDefinitions = $middlewareDefinitions;
         $this->adapterPushHandler = new AdapterPushHandler();
+
+        if ($this->adapter === null) {
+            $this->logger->warning(
+                'Queue "{name}" has no adapter configured. Messages will be processed synchronously on push.'
+                . ' Add an adapter for asynchronous processing in production.',
+                ['name' => $this->name],
+            );
+        }
     }
 
     public function getName(): string
@@ -60,6 +69,11 @@ final class Queue implements QueueInterface
             ->dispatch($request, $this->createPushHandler(...$middlewareDefinitions))
             ->getMessage();
 
+        if ($this->adapter === null) {
+            $this->logger->debug('No adapter configured. Processing message synchronously on push.');
+            $this->worker->process($message, $this);
+        }
+
         /** @var string $messageId */
         $messageId = $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
         $this->logger->info(
@@ -72,6 +86,13 @@ final class Queue implements QueueInterface
 
     public function run(int $max = 0): int
     {
+        if ($this->adapter === null) {
+            throw new BadMethodCallException(
+                'Cannot run queue "' . $this->name . '": no adapter configured.'
+                . ' Messages are processed synchronously on push when no adapter is set.',
+            );
+        }
+
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
@@ -96,6 +117,13 @@ final class Queue implements QueueInterface
 
     public function listen(): void
     {
+        if ($this->adapter === null) {
+            throw new BadMethodCallException(
+                'Cannot listen to queue "' . $this->name . '": no adapter configured.'
+                . ' Messages are processed synchronously on push when no adapter is set.',
+            );
+        }
+
         $this->logger->info('Start listening to the queue.');
         $this->adapter->subscribe(fn(MessageInterface $message) => $this->handle($message));
         $this->logger->info('Finish listening to the queue.');
@@ -103,6 +131,13 @@ final class Queue implements QueueInterface
 
     public function status(string|int $id): MessageStatus
     {
+        if ($this->adapter === null) {
+            throw new BadMethodCallException(
+                'Cannot check message status in queue "' . $this->name . '": no adapter configured.'
+                . ' Messages are processed synchronously on push when no adapter is set.',
+            );
+        }
+
         return $this->adapter->status($id);
     }
 

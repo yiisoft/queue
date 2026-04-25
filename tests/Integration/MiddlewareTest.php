@@ -11,7 +11,7 @@ use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
-use Yiisoft\Queue\Adapter\SynchronousAdapter;
+use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -59,15 +59,12 @@ final class MiddlewareTest extends TestCase
             new TestMiddleware('common 2'),
         );
         $queue = new Queue(
-            new SynchronousAdapter(
-                $this->createMock(WorkerInterface::class),
-                $this->createMock(QueueInterface::class),
-            ),
             $this->createMock(WorkerInterface::class),
             $this->createMock(LoopInterface::class),
             $this->createMock(LoggerInterface::class),
             $pushMiddlewareDispatcher,
             'test',
+            new StubAdapter(),
         );
         $queue = $queue
             ->withMiddlewares(new TestMiddleware('Won\'t be executed'))

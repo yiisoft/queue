@@ -11,7 +11,7 @@ final class PushRequest
 {
     public function __construct(
         private MessageInterface $message,
-        private AdapterInterface $adapter,
+        private ?AdapterInterface $adapter,
     ) {}
 
     public function getMessage(): MessageInterface
@@ -19,7 +19,7 @@ final class PushRequest
         return $this->message;
     }
 
-    public function getAdapter(): AdapterInterface
+    public function getAdapter(): ?AdapterInterface
     {
         return $this->adapter;
     }

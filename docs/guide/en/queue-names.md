@@ -35,14 +35,14 @@ Adapter is what actually sends messages to a queue broker.
 Minimal DI configuration example:
 
 ```php
-use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Adapter\AdapterInterface;
+use MyPackage\Adapter\MyAdapter; // replace with your chosen adapter
 
 return [
-    AdapterInterface::class => SynchronousAdapter::class,
+    AdapterInterface::class => MyAdapter::class,
 ];
 ```
-> `SynchronousAdapter` is for learning/testing only. For production, install a real adapter, see adapter list: [adapter-list](adapter-list.md).
+> For available adapters, see [adapter-list](adapter-list.md). During development you can omit the adapter entirely — the queue will [process messages synchronously on push](no-adapter.md).
 
 #### 1.2. Configure a default queue name
 

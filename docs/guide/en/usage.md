@@ -28,7 +28,7 @@ $delayMiddleware = $container->get(\Yiisoft\Queue\Middleware\Push\Implementation
 $queue->push($message, $delayMiddleware->withDelay(5 * 60));
 ```
 
-**Important:** Not every adapter (such as synchronous adapter) supports delayed execution.
+**Important:** Delay is only meaningful with adapters that support it. In synchronous mode (no adapter), delay middleware has no effect — the message is handled immediately.
 
 
 ## Queue handling

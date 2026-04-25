@@ -12,10 +12,8 @@ use Psr\Log\NullLogger;
 use RuntimeException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
-use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Middleware\CallableFactory;
@@ -26,6 +24,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
 use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\Tests\App\InMemoryAdapter;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
@@ -107,23 +106,23 @@ abstract class TestCase extends BaseTestCase
     }
 
     protected function createQueue(
-        AdapterInterface $adapter = new StubAdapter(),
+        ?AdapterInterface $adapter = null,
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
     ): Queue {
         return new Queue(
-            $adapter,
             $this->getWorker(),
             $this->getLoop(),
             new NullLogger(),
             $this->getPushMiddlewareDispatcher(),
             $name,
+            $adapter,
         );
     }
 
     protected function createAdapter(bool $realAdapter = false): AdapterInterface
     {
         if ($realAdapter) {
-            return new SynchronousAdapter($this->getWorker(), $this->createQueue());
+            return new InMemoryAdapter();
         }
 
         return $this->createMock(AdapterInterface::class);

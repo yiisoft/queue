@@ -6,9 +6,9 @@ This guide explains how to set up the queue component manually, without using [y
 
 To use the queue, you need to create instances of the following classes:
 
-1. **Adapter** - handles the actual queue backend like AMQP, Redis, etc.
-2. **Worker** - processes messages from the queue
-3. **Queue** - the main entry point for pushing messages
+1. **Worker** — processes messages from the queue.
+2. **Queue** — the main entry point for pushing messages.
+3. **Adapter** — connects the queue to a message broker (required for production).
 
 ### Example
 
@@ -16,7 +16,6 @@ To use the queue, you need to create instances of the following classes:
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
@@ -70,24 +69,37 @@ $worker = new Worker(
 // Create loop (SignalLoop requires ext-pcntl; SimpleLoop works without it)
 $loop = new SimpleLoop();
 
-// Create queue (adapter is wired in a second step due to mutual dependency)
+// Create queue with a real adapter (e.g. AMQP, SQS, …)
+/** @var \Yiisoft\Queue\Adapter\AdapterInterface $adapter */
 $queue = new Queue(
-    $worker,
-    $loop,
-    $logger,
-    $pushMiddlewareDispatcher,
+    worker: $worker,
+    loop: $loop,
+    logger: $logger,
+    pushMiddlewareDispatcher: $pushMiddlewareDispatcher,
+    adapter: $adapter,
 );
-
-// SynchronousAdapter needs a queue reference — create it after the queue
-$adapter = new SynchronousAdapter($worker, $queue);
-
-// Attach the adapter to the queue (returns a new Queue instance)
-$queue = $queue->withAdapter($adapter);
 
 // Now you can push messages
 $message = new \Yiisoft\Queue\Message\Message('file-download', ['url' => 'https://example.com/file.pdf']);
 $queue->push($message);
 ```
+
+### Development / testing: no adapter needed
+
+For local development or tests you can omit the adapter. The queue then runs in
+[synchronous mode](no-adapter.md): each `push()` call processes the message immediately in the same process.
+
+```php
+$queue = new Queue(
+    worker: $worker,
+    loop: $loop,
+    logger: $logger,
+    pushMiddlewareDispatcher: $pushMiddlewareDispatcher,
+    // no adapter — messages are handled on push
+);
+```
+
+A warning is logged at construction time to remind you that no adapter is configured. See [Queue without an adapter](no-adapter.md) for full details.
 
 ## Using Queue Provider
 
@@ -95,13 +107,12 @@ For multiple queue names, use `AdapterFactoryQueueProvider` (maps queue names to
 
 ```php
 use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
-use Yiisoft\Queue\Adapter\SynchronousAdapter;
 
 // AdapterFactoryQueueProvider: each queue name maps to an adapter definition.
 // The provider wraps each adapter in a Queue with the given name.
 $definitions = [
-    'queue1' => new SynchronousAdapter($worker, $queue),
-    'queue2' => SynchronousAdapter::class,
+    'queue1' => $adapter1,
+    'queue2' => MyAdapter::class,
 ];
 
 $provider = new AdapterFactoryQueueProvider(
@@ -141,7 +152,7 @@ $queue->listen();   // Run indefinitely
 
 ## Next steps
 
-- [Usage basics](usage.md) - learn how to create messages and handlers
-- [Message handler](message-handler.md) - understand handler formats
-- [Error handling](error-handling.md) - configure retries and failure handling
-- [Adapter list](adapter-list.md) - choose a production-ready adapter
+- [Usage basics](usage.md) — learn how to create messages and handlers
+- [Message handler](message-handler.md) — understand handler formats
+- [Error handling](error-handling.md) — configure retries and failure handling
+- [Adapter list](adapter-list.md) — choose a production-ready adapter
