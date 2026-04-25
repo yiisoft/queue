@@ -4,35 +4,21 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Middleware\Push;
 
-use Closure;
 use Psr\Container\ContainerInterface;
-use Yiisoft\Definitions\ArrayDefinition;
-use Yiisoft\Definitions\Exception\InvalidConfigException;
-use Yiisoft\Definitions\Helpers\DefinitionValidator;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
-
-use function is_string;
-use function is_array;
+use Yiisoft\Queue\Middleware\MiddlewareFactory;
 
 /**
  * Creates a middleware based on the definition provided.
+ *
+ * @template-extends MiddlewareFactory<MiddlewarePushInterface>
  */
-final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
+final class MiddlewareFactoryPush extends MiddlewareFactory implements MiddlewareFactoryPushInterface
 {
     /**
-     * @param ContainerInterface $container Container to use for resolving definitions.
-     */
-    public function __construct(
-        private readonly ContainerInterface $container,
-        private readonly CallableFactory $callableFactory,
-    ) {}
-
-    /**
-     * @param array|callable|MiddlewarePushInterface|string $middlewareDefinition Middleware definition in one of
+     * @param MiddlewarePushInterface|callable|array|string $middlewareDefinition Middleware definition in one of
      * the following formats:
      *
      * - A middleware object.
@@ -59,33 +45,21 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
             return $middlewareDefinition;
         }
 
-        if (is_string($middlewareDefinition)) {
-            return $this->getFromContainer($middlewareDefinition);
+        $middleware = $this->create($middlewareDefinition);
+
+        if (!$middleware instanceof MiddlewarePushInterface) {
+            throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
         }
 
-        return $this->tryGetFromCallable($middlewareDefinition)
-            ?? $this->tryGetFromArrayDefinition($middlewareDefinition)
-            ?? throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
+        return $middleware;
     }
 
-    private function getFromContainer(string $middlewareDefinition): MiddlewarePushInterface
+    protected function getInterfaceName(): string
     {
-        if (class_exists($middlewareDefinition)) {
-            if (is_subclass_of($middlewareDefinition, MiddlewarePushInterface::class)) {
-                /** @var MiddlewarePushInterface */
-                return $this->container->get($middlewareDefinition);
-            }
-        } elseif ($this->container->has($middlewareDefinition)) {
-            $middleware = $this->container->get($middlewareDefinition);
-            if ($middleware instanceof MiddlewarePushInterface) {
-                return $middleware;
-            }
-        }
-
-        throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
+        return MiddlewarePushInterface::class;
     }
 
-    private function wrapCallable(callable $callback): MiddlewarePushInterface
+    protected function wrapMiddleware(callable $callback): MiddlewarePushInterface
     {
         return new class ($callback, $this->container) implements MiddlewarePushInterface {
             private $callback;
@@ -111,48 +85,5 @@ final class MiddlewareFactoryPush implements MiddlewareFactoryPushInterface
                 throw new InvalidMiddlewareDefinitionException($this->callback);
             }
         };
-    }
-
-    private function tryGetFromCallable(
-        callable|MiddlewarePushInterface|array|string $definition,
-    ): ?MiddlewarePushInterface {
-        if ($definition instanceof Closure) {
-            return $this->wrapCallable($definition);
-        }
-
-        if (
-            is_array($definition)
-            && array_keys($definition) === [0, 1]
-        ) {
-            try {
-                return $this->wrapCallable($this->callableFactory->create($definition));
-            } catch (InvalidCallableConfigurationException $exception) {
-                throw new InvalidMiddlewareDefinitionException($definition, previous: $exception);
-            }
-        } else {
-            return null;
-        }
-    }
-
-    private function tryGetFromArrayDefinition(
-        callable|MiddlewarePushInterface|array|string $definition,
-    ): ?MiddlewarePushInterface {
-        if (!is_array($definition)) {
-            return null;
-        }
-
-        try {
-            DefinitionValidator::validateArrayDefinition($definition);
-
-            $middleware = ArrayDefinition::fromConfig($definition)->resolve($this->container);
-            if ($middleware instanceof MiddlewarePushInterface) {
-                return $middleware;
-            }
-
-            throw new InvalidMiddlewareDefinitionException($definition);
-        } catch (InvalidConfigException) {
-        }
-
-        throw new InvalidMiddlewareDefinitionException($definition);
     }
 }

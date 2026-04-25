@@ -59,17 +59,17 @@ final class FailureEnvelopeTest extends TestCase
 
     public function testFromData(): void
     {
-        $handlerName = 'test-handler';
+        $type = 'test-handler';
         $data = ['key' => 'value'];
         $metadata = [
             'meta' => 'data',
             FailureEnvelope::FAILURE_META_KEY => ['attempt' => 1],
         ];
 
-        $envelope = FailureEnvelope::fromData($handlerName, $data, $metadata);
+        $envelope = FailureEnvelope::fromData($type, $data, $metadata);
 
         $this->assertInstanceOf(FailureEnvelope::class, $envelope);
-        $this->assertSame($handlerName, $envelope->getHandlerName());
+        $this->assertSame($type, $envelope->getType());
         $this->assertSame($data, $envelope->getData());
         $this->assertArrayHasKey('meta', $envelope->getMetadata());
         $this->assertSame('data', $envelope->getMetadata()['meta']);

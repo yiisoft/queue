@@ -33,13 +33,13 @@ final class RunCommand extends Command
             $this->queueProvider->getNames(),
         )
             ->addOption(
-                'maximum',
+                'limit',
                 'm',
                 InputOption::VALUE_REQUIRED,
                 'Maximum number of messages to process in each queue. Default is 0 (no limits).',
                 0,
             )
-            ->addUsage('[queue1 [queue2 [...]]] --maximum 100');
+            ->addUsage('[queue1 [queue2 [...]]] --limit 100');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -49,7 +49,7 @@ final class RunCommand extends Command
             $output->write("Processing queue $queue... ");
             $count = $this->queueProvider
                 ->get($queue)
-                ->run((int) $input->getOption('maximum'));
+                ->run((int) $input->getOption('limit'));
 
             $output->writeln("Messages processed: $count.");
         }

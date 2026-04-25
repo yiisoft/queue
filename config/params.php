@@ -16,7 +16,7 @@ return [
         'commands' => [
             'queue:run' => RunCommand::class,
             'queue:listen' => ListenCommand::class,
-            'queue:listen:all' => ListenAllCommand::class,
+            'queue:listen-all' => ListenAllCommand::class,
         ],
     ],
     'yiisoft/queue' => [

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit;
 
 use Yiisoft\Queue\Cli\SignalLoop;
-use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
@@ -90,11 +90,11 @@ final class QueueTest extends TestCase
         $id = $envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY];
 
         $status = $queue->status($id);
-        self::assertSame(JobStatus::WAITING, $status);
+        self::assertSame(MessageStatus::WAITING, $status);
 
         $queue->run();
         $status = $queue->status($id);
-        self::assertSame(JobStatus::DONE, $status);
+        self::assertSame(MessageStatus::DONE, $status);
     }
 
     public function testRunWithSignalLoop(): void

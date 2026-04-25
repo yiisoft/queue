@@ -21,7 +21,7 @@ final class TestMiddleware implements MiddlewarePushInterface, MiddlewareConsume
         $stack = $message->getData();
         $stack[] = $this->stage;
 
-        return $handler->handlePush(new Message($message->getHandlerName(), $stack));
+        return $handler->handlePush(new Message($message->getType(), $stack));
     }
 
     public function processConsume(ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest
@@ -29,7 +29,7 @@ final class TestMiddleware implements MiddlewarePushInterface, MiddlewareConsume
         $message = $request->getMessage();
         $stack = $message->getData();
         $stack[] = $this->stage;
-        $messageNew = new Message($message->getHandlerName(), $stack);
+        $messageNew = new Message($message->getType(), $stack);
 
         return $handler->handleConsume($request->withMessage($messageNew));
     }

@@ -6,12 +6,12 @@ namespace Yiisoft\Queue\Message;
 
 interface MessageInterface
 {
-    public static function fromData(string $handlerName, mixed $data, array $metadata = []): self;
+    public static function fromData(string $type, mixed $data, array $metadata = []): self;
 
     /**
-     * Returns handler name.
+     * Returns message type.
      */
-    public function getHandlerName(): string;
+    public function getType(): string;
 
     /**
      * Returns payload data.

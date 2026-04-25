@@ -18,7 +18,9 @@ use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\CallableObjectMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\InvalidController;
+use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\StringCallableMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestCallableMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestMiddleware;
 
@@ -103,6 +105,34 @@ final class MiddlewareFactoryTest extends TestCase
                 $this->getMessage(),
                 $this->getRequestHandler(),
             )->getData(),
+        );
+    }
+
+    public function testCreateFromStringCallable(): void
+    {
+        $middleware = $this->getMiddlewareFactory()->createPushMiddleware(
+            StringCallableMiddleware::class . '::handle',
+        );
+        self::assertSame(
+            'String callable data',
+            $middleware->processPush(
+                $this->getPushRequest(),
+                $this->createMock(MessageHandlerPushInterface::class),
+            )->getMessage()->getData(),
+        );
+    }
+
+    public function testCreateFromCallableObject(): void
+    {
+        $middleware = $this->getMiddlewareFactory()->createPushMiddleware(
+            new CallableObjectMiddleware(),
+        );
+        self::assertSame(
+            'Callable object data',
+            $middleware->processPush(
+                $this->getPushRequest(),
+                $this->createMock(MessageHandlerPushInterface::class),
+            )->getMessage()->getData(),
         );
     }
 

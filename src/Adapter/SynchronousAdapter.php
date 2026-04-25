@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Adapter;
 
 use InvalidArgumentException;
-use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -42,7 +42,7 @@ final class SynchronousAdapter implements AdapterInterface
         }
     }
 
-    public function status(string|int $id): JobStatus
+    public function status(string|int $id): MessageStatus
     {
         $id = (int) $id;
 
@@ -51,11 +51,11 @@ final class SynchronousAdapter implements AdapterInterface
         }
 
         if ($id < $this->current) {
-            return JobStatus::DONE;
+            return MessageStatus::DONE;
         }
 
         if (isset($this->messages[$id])) {
-            return JobStatus::WAITING;
+            return MessageStatus::WAITING;
         }
 
         throw new InvalidArgumentException('There is no message with the given ID.');

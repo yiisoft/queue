@@ -50,8 +50,8 @@ final class Queue implements QueueInterface
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ): MessageInterface {
         $this->logger->debug(
-            'Preparing to push message with handler name "{handlerName}".',
-            ['handlerName' => $message->getHandlerName()],
+            'Preparing to push message with message type "{messageType}".',
+            ['messageType' => $message->getType()],
         );
 
         $message = $this->pushMiddlewareDispatcher->dispatch(
@@ -62,8 +62,8 @@ final class Queue implements QueueInterface
         /** @var string $messageId */
         $messageId = $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
         $this->logger->info(
-            'Pushed message with handler name "{handlerName}" to the queue. Assigned ID #{id}.',
-            ['handlerName' => $message->getHandlerName(), 'id' => $messageId],
+            'Pushed message with message type "{messageType}" to the queue. Assigned ID #{id}.',
+            ['messageType' => $message->getType(), 'id' => $messageId],
         );
 
         return $message;
@@ -100,7 +100,7 @@ final class Queue implements QueueInterface
         $this->logger->info('Finish listening to the queue.');
     }
 
-    public function status(string|int $id): JobStatus
+    public function status(string|int $id): MessageStatus
     {
         return $this->adapter->status($id);
     }

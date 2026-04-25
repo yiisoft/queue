@@ -117,6 +117,7 @@ final class MiddlewareTest extends TestCase
             $container,
             $consumeMiddlewareDispatcher,
             $failureMiddlewareDispatcher,
+            $callableFactory,
         );
 
         $message = new Message('test', ['initial']);

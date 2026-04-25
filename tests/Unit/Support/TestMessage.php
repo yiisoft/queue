@@ -8,12 +8,12 @@ use Yiisoft\Queue\Message\MessageInterface;
 
 final class TestMessage implements MessageInterface
 {
-    public static function fromData(string $handlerName, mixed $data, array $metadata = []): MessageInterface
+    public static function fromData(string $type, mixed $data, array $metadata = []): MessageInterface
     {
         return new self();
     }
 
-    public function getHandlerName(): string
+    public function getType(): string
     {
         return 'test';
     }

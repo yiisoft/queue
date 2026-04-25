@@ -28,7 +28,7 @@ final class IdMiddlewareTest extends TestCase
         $this->assertNotInstanceOf(IdEnvelope::class, $result);
         $this->assertEquals('test-id', $result->getMetadata()[IdEnvelope::MESSAGE_ID_KEY]);
         $this->assertSame($message->getData(), $result->getData());
-        $this->assertSame($message->getHandlerName(), $result->getHandlerName());
+        $this->assertSame($message->getType(), $result->getType());
     }
 
     public function testWithoutId(): void
@@ -47,6 +47,6 @@ final class IdMiddlewareTest extends TestCase
         $this->assertNotSame($message, $result);
         $this->assertNotEmpty($result->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? null);
         $this->assertSame($message->getData(), $result->getData());
-        $this->assertSame($message->getHandlerName(), $result->getHandlerName());
+        $this->assertSame($message->getType(), $result->getType());
     }
 }

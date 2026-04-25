@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Adapter;
 
 use InvalidArgumentException;
-use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 
 interface AdapterInterface
@@ -20,11 +20,11 @@ interface AdapterInterface
     /**
      * Returns status code of a message with the given id.
      *
-     * @param int|string $id ID of a job message.
+     * @param int|string $id ID of a message.
      *
      * @throws InvalidArgumentException When there is no such id in the adapter.
      */
-    public function status(string|int $id): JobStatus;
+    public function status(string|int $id): MessageStatus;
 
     /**
      * Pushing a message to the queue. Adapter sets message ID if available.

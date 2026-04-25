@@ -21,17 +21,17 @@ final class FakeHandler
         self::$processedMessages[] = $message;
     }
 
-    public function execute(MessageInterface $message): void
+    public function handle(MessageInterface $message): void
     {
         self::$processedMessages[] = $message;
     }
 
-    public static function staticExecute(MessageInterface $message): void
+    public static function staticHandle(MessageInterface $message): void
     {
         self::$processedMessages[] = $message;
     }
 
-    public function executeWithException(MessageInterface $message): never
+    public function handleWithException(MessageInterface $message): never
     {
         throw new RuntimeException('Test exception');
     }

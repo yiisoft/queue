@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Debug;
 
-use Yiisoft\Queue\JobStatus;
+use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Yii\Debug\Collector\CollectorTrait;
 use Yiisoft\Yii\Debug\Collector\SummaryCollectorInterface;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -34,7 +34,7 @@ final class QueueCollector implements SummaryCollectorInterface
         ];
     }
 
-    public function collectStatus(string $id, JobStatus $status): void
+    public function collectStatus(string $id, MessageStatus $status): void
     {
         if (!$this->isActive()) {
             return;

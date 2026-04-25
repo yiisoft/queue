@@ -12,21 +12,21 @@ and more structured than the old one allowing better maintenance.
   then you may seamlessly switch to `redis` if needed. This also means you can write your own adapter implementation
   if necessary.
 
-## Jobs (Messages and Handlers)
+## Messages and Handlers
 
-There was a concept in [yiisoft/yii2-queue] called `Job`: you had to push it to the queue, and it was executed after
+There was a concept in [yiisoft/yii2-queue] called `Job`: you had to push it to the queue, and it was handled after
 being consumed. In the new package, it is divided into two different concepts: a message and a handler.
 
 - A `Message` is a class implementing `MessageInterface`. It contains two types of data:
-    - Name. The worker uses it to find the right handler for a message.
+    - Type. The worker uses it to find the right handler for a message.
     - Data. Any serializable data that should be used by the message handler.
     
     All the message data is fully serializable (that means message `data` must be serializable too). It allows you to
-    freely choose where and how to send and process jobs. Both can be implemented in a single application, or
-    separated into multiple applications, or you can do sending/processing only leaving part of the job to another
-    system including non-PHP ones. It is fairly popular to process heavy jobs with Go.
+    freely choose where and how to send and process messages. Both can be implemented in a single application, or
+    separated into multiple applications, or you can do sending/processing only, leaving part of the work to another
+    system including non-PHP ones (for example, a Go service handling CPU-intensive jobs).
   
-- A `Handler` is called by a `Worker` when a message comes. Default `Worker` finds a corresponding message handler
-  by the message name. [See more](worker.md#handler-format).
+- A `Handler` is called by a `Worker` when a message is received. Default `Worker` finds a corresponding message handler
+  by the message type. [See more](message-handler-advanced.md).
 
-[yiisoft/yii2-queue]: (https://github.com/yiisoft/yii2-queue)
+[yiisoft/yii2-queue]: https://github.com/yiisoft/yii2-queue

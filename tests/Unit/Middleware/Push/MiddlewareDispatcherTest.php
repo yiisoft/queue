@@ -68,7 +68,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $message = $this->getMessage();
 
         $middleware1 = static function (MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface {
-            return $handler->handlePush(new Message($message->getHandlerName(), 'new test data'));
+            return $handler->handlePush(new Message($message->getType(), 'new test data'));
         };
         $middleware2 = static function (MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface {
             return $handler->handlePush($message);
@@ -84,8 +84,8 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $message = $this->getMessage();
 
-        $middleware1 = static fn(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface => new Message($message->getHandlerName(), 'first');
-        $middleware2 = static fn(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface => new Message($message->getHandlerName(), 'second');
+        $middleware1 = static fn(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface => new Message($message->getType(), 'first');
+        $middleware2 = static fn(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface => new Message($message->getType(), 'second');
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 

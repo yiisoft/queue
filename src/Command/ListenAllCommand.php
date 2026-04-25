@@ -48,7 +48,7 @@ final class ListenAllCommand extends Command
                 1,
             )
             ->addOption(
-                'maximum',
+                'limit',
                 'm',
                 InputOption::VALUE_REQUIRED,
                 'Maximum number of messages to process in each queue before switching to another queue. '
@@ -56,7 +56,7 @@ final class ListenAllCommand extends Command
                 0,
             );
 
-        $this->addUsage('[queue1 [queue2 [...]]] [--timeout=<timeout>] [--maximum=<maximum>]');
+        $this->addUsage('[queue1 [queue2 [...]]] [--pause=<pause>] [--limit=<limit>]');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -75,7 +75,7 @@ final class ListenAllCommand extends Command
         while ($this->loop->canContinue()) {
             $hasMessages = false;
             foreach ($queues as $queue) {
-                $hasMessages = $queue->run((int) $input->getOption('maximum')) > 0 || $hasMessages;
+                $hasMessages = $queue->run((int) $input->getOption('limit')) > 0 || $hasMessages;
             }
 
             if (!$hasMessages) {

@@ -20,7 +20,7 @@ final class StubWorkerTest extends TestCase
         $message = $worker->process($sourceMessage, $this->createMock(QueueInterface::class));
 
         $this->assertSame($sourceMessage, $message);
-        $this->assertSame('test', $message->getHandlerName());
+        $this->assertSame('test', $message->getType());
         $this->assertSame(42, $message->getData());
         $this->assertSame([], $message->getMetadata());
     }
