@@ -116,9 +116,9 @@ final class MiddlewareFactoryTest extends TestCase
         self::assertSame(
             'String callable data',
             $middleware->processPush(
-                $this->getPushRequest(),
+                $this->getMessage(),
                 $this->createMock(MessageHandlerPushInterface::class),
-            )->getMessage()->getData(),
+            )->getData(),
         );
     }
 
@@ -130,9 +130,9 @@ final class MiddlewareFactoryTest extends TestCase
         self::assertSame(
             'Callable object data',
             $middleware->processPush(
-                $this->getPushRequest(),
+                $this->getMessage(),
                 $this->createMock(MessageHandlerPushInterface::class),
-            )->getMessage()->getData(),
+            )->getData(),
         );
     }
 
