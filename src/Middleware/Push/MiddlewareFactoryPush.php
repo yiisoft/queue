@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Middleware\Push;
 
 use Psr\Container\ContainerInterface;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
 
@@ -22,16 +23,16 @@ final class MiddlewareFactoryPush extends MiddlewareFactory implements Middlewar
      *
      * - A middleware object.
      * - A name of a middleware class. The middleware instance will be obtained from container and executed.
-     * - A callable with `function(ServerRequestInterface $request, RequestHandlerInterface $handler):
-     *     ResponseInterface` signature.
+     * - A callable with `function(MessageInterface $message, MessageHandlerPushInterface $handler):
+     *     MessageInterface` signature.
      * - A controller handler action in format `[TestController::class, 'index']`. `TestController` instance will
      *   be created and `index()` method will be executed.
      * - A function returning a middleware. The middleware returned will be executed.
      *
      * For handler action and callable
      * typed parameters are automatically injected using dependency injection container.
-     * Current request and handler could be obtained by type-hinting for {@see ServerRequestInterface}
-     * and {@see RequestHandlerInterface}.
+     * Current message and handler could be obtained by type-hinting for {@see MessageInterface}
+     * and {@see MessageHandlerPushInterface}.
      *
      * @throws InvalidMiddlewareDefinitionException
      *
@@ -70,15 +71,15 @@ final class MiddlewareFactoryPush extends MiddlewareFactory implements Middlewar
                 $this->callback = $callback;
             }
 
-            public function processPush(PushRequest $request, MessageHandlerPushInterface $handler): PushRequest
+            public function processPush(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface
             {
-                $response = (new Injector($this->container))->invoke($this->callback, [$request, $handler]);
-                if ($response instanceof PushRequest) {
+                $response = (new Injector($this->container))->invoke($this->callback, [$message, $handler]);
+                if ($response instanceof MessageInterface) {
                     return $response;
                 }
 
                 if ($response instanceof MiddlewarePushInterface) {
-                    return $response->processPush($request, $handler);
+                    return $response->processPush($message, $handler);
                 }
 
                 throw new InvalidMiddlewareDefinitionException($this->callback);

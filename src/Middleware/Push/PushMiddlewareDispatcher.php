@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Middleware\Push;
 
 use Closure;
+use Yiisoft\Queue\Message\MessageInterface;
 
 final class PushMiddlewareDispatcher
 {
@@ -27,20 +28,20 @@ final class PushMiddlewareDispatcher
     }
 
     /**
-     * Dispatch request through middleware to get response.
+     * Dispatch message through middleware to get response.
      *
-     * @param PushRequest $request Request to pass to middleware.
+     * @param MessageInterface $message Message to pass to middleware.
      * @param MessageHandlerPushInterface $finishHandler Handler to use in case no middleware produced a response.
      */
     public function dispatch(
-        PushRequest $request,
+        MessageInterface $message,
         MessageHandlerPushInterface $finishHandler,
-    ): PushRequest {
+    ): MessageInterface {
         if ($this->stack === null) {
             $this->stack = new MiddlewarePushStack($this->buildMiddlewares(), $finishHandler);
         }
 
-        return $this->stack->handlePush($request);
+        return $this->stack->handlePush($message);
     }
 
     /**

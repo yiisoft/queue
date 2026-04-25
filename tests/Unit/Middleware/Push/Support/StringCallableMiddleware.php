@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Middleware\Push\Support;
 
 use Yiisoft\Queue\Message\Message;
-use Yiisoft\Queue\Middleware\Push\PushRequest;
+use Yiisoft\Queue\Message\MessageInterface;
 
 final class StringCallableMiddleware
 {
-    public static function handle(PushRequest $request): PushRequest
+    public static function handle(MessageInterface $message): MessageInterface
     {
-        return $request->withMessage(new Message('test', 'String callable data'));
+        return new Message('test', 'String callable data');
     }
 }
