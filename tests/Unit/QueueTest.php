@@ -12,7 +12,6 @@ use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Queue\Tests\App\InMemoryAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Worker\WorkerInterface;
