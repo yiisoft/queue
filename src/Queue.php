@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue;
 
 use BackedEnum;
+use BadMethodCallException;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
@@ -13,6 +14,7 @@ use Yiisoft\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Push\SynchronousPushHandler;
 use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
@@ -23,21 +25,23 @@ final class Queue implements QueueInterface
      * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
      */
     private array $middlewareDefinitions;
-    private AdapterPushHandler $adapterPushHandler;
+    private MessageHandlerPushInterface $finalPushHandler;
     private string $name;
 
     public function __construct(
-        private readonly AdapterInterface $adapter,
         private readonly WorkerInterface $worker,
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
         private readonly PushMiddlewareDispatcher $pushMiddlewareDispatcher,
+        private readonly ?AdapterInterface $adapter = null,
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ) {
         $this->name = StringNormalizer::normalize($name);
         $this->middlewareDefinitions = $middlewareDefinitions;
-        $this->adapterPushHandler = new AdapterPushHandler($this->adapter);
+        $this->finalPushHandler = $adapter === null
+            ? new SynchronousPushHandler($worker, $this)
+            : new AdapterPushHandler($adapter);
     }
 
     public function getName(): string
@@ -59,6 +63,14 @@ final class Queue implements QueueInterface
             $this->createPushHandler(...$middlewareDefinitions),
         );
 
+        if ($this->adapter === null) {
+            $this->logger->info(
+                'Processed message with message type "{messageType}" synchronously.',
+                ['messageType' => $message->getType()],
+            );
+            return $message;
+        }
+
         /** @var string $messageId */
         $messageId = $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
         $this->logger->info(
@@ -71,6 +83,13 @@ final class Queue implements QueueInterface
 
     public function run(int $max = 0): int
     {
+        if ($this->adapter === null) {
+            $this->logger->debug(
+                'Queue is in synchronous mode (no adapter). Messages are processed on push. run() does nothing.',
+            );
+            return 0;
+        }
+
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
 
@@ -95,6 +114,12 @@ final class Queue implements QueueInterface
 
     public function listen(): void
     {
+        if ($this->adapter === null) {
+            throw new BadMethodCallException(
+                'Cannot listen without an adapter. Queue is in synchronous mode.',
+            );
+        }
+
         $this->logger->info('Start listening to the queue.');
         $this->adapter->subscribe(fn(MessageInterface $message) => $this->handle($message));
         $this->logger->info('Finish listening to the queue.');
@@ -102,6 +127,12 @@ final class Queue implements QueueInterface
 
     public function status(string|int $id): MessageStatus
     {
+        if ($this->adapter === null) {
+            throw new BadMethodCallException(
+                'Cannot get message status without an adapter. Queue is in synchronous mode.',
+            );
+        }
+
         return $this->adapter->status($id);
     }
 
@@ -131,12 +162,12 @@ final class Queue implements QueueInterface
     private function createPushHandler(MiddlewarePushInterface|callable|array|string ...$middlewares): MessageHandlerPushInterface
     {
         return new class (
-            $this->adapterPushHandler,
+            $this->finalPushHandler,
             $this->pushMiddlewareDispatcher,
             array_merge($this->middlewareDefinitions, $middlewares),
         ) implements MessageHandlerPushInterface {
             public function __construct(
-                private readonly AdapterPushHandler $adapterPushHandler,
+                private readonly MessageHandlerPushInterface $finishHandler,
                 private readonly PushMiddlewareDispatcher $dispatcher,
                 /**
                  * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
@@ -148,7 +179,7 @@ final class Queue implements QueueInterface
             {
                 return $this->dispatcher
                     ->withMiddlewares($this->middlewares)
-                    ->dispatch($message, $this->adapterPushHandler);
+                    ->dispatch($message, $this->finishHandler);
             }
         };
     }

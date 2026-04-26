@@ -36,9 +36,11 @@ composer require yiisoft/queue
 For production use, you should install an adapter package that matches your message broker ([AMQP](https://github.com/yiisoft/queue-amqp), [Kafka](https://github.com/g41797/queue-kafka), [NATS](https://github.com/g41797/queue-nats), and [others](docs/guide/en/adapter-list.md)).
 See the [adapter list](docs/guide/en/adapter-list.md) and follow the adapter-specific documentation for installation and configuration details.
 
-> For development and testing, you can start without an external broker using the built-in [`SynchronousAdapter`](docs/guide/en/adapter-sync.md).
-> This adapter processes messages immediately in the same process, so it won't provide true async execution,
-> but it's useful for getting started and writing tests.
+> If you don't have an external broker — whether for development, testing, or because you want to
+> design around `QueueInterface` from day one and add a real broker later — you can run the queue
+> in [synchronous mode](docs/guide/en/synchronous-mode.md) (the adapter argument is optional).
+> In this mode messages are processed immediately in the same process, so it won't provide true
+> async execution, but call sites stay the same when you switch to a real adapter.
 
 ### 2. Configure the queue
 
@@ -127,7 +129,7 @@ By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/
 
 See [Console commands](docs/guide/en/console-commands.md) for more details.
 
-> In case you're using the `SynchronousAdapter` for development purposes, you should not use these commands, as you have no asynchronous processing available. The messages are processed immediately when pushed.
+> In case you're running the queue in synchronous mode (no adapter) for development purposes, you should not use these commands, as you have no asynchronous processing available. The messages are processed immediately when pushed.
 
 ## Documentation
 

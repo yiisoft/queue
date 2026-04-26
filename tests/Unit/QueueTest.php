@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit;
 
+use BadMethodCallException;
 use Yiisoft\Queue\Cli\SignalLoop;
-use Yiisoft\Queue\MessageStatus;
-use Yiisoft\Queue\Message\Message;
-use Yiisoft\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
+use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\MessageStatus;
+use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Tests\App\InMemoryAdapter;
+use Yiisoft\Queue\Tests\TestCase;
 
 use function extension_loaded;
 
@@ -22,15 +24,6 @@ enum TestQueue: string
 
 final class QueueTest extends TestCase
 {
-    private bool $needsRealAdapter = true;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->needsRealAdapter = true;
-    }
-
     public function testPushSuccessful(): void
     {
         $adapter = new FakeAdapter();
@@ -41,60 +34,93 @@ final class QueueTest extends TestCase
         self::assertSame([$message], $adapter->pushMessages);
     }
 
-    public function testRun(): void
+    public function testPushSynchronouslyProcessesMessage(): void
     {
-        $queue = $this->createQueue($this->getAdapter());
+        $queue = $this->createQueue();
         $message = new Message('simple', null);
-        $message2 = clone $message;
-        $queue->push($message);
-        $queue->push($message2);
-        $queue->run();
 
-        self::assertEquals(2, $this->executionTimes);
+        $queue->push($message);
+        $queue->push(clone $message);
+
+        self::assertSame(2, $this->executionTimes);
     }
 
-    public function testRunPartly(): void
+    public function testRunWithoutAdapterReturnsZero(): void
     {
+        $queue = $this->createQueue();
         $message = new Message('simple', null);
-        $queue = $this->createQueue($this->getAdapter());
-        $message2 = clone $message;
         $queue->push($message);
-        $queue->push($message2);
-        $queue->run(1);
+        $queue->push(clone $message);
 
-        self::assertEquals(1, $this->executionTimes);
+        self::assertSame(0, $queue->run());
+        self::assertSame(2, $this->executionTimes);
     }
 
-    public function testListen(): void
+    public function testListenThrowsWithoutAdapter(): void
     {
-        $queue = $this->createQueue($this->getAdapter());
+        $queue = $this->createQueue();
+
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Cannot listen without an adapter. Queue is in synchronous mode.');
+        $queue->listen();
+    }
+
+    public function testStatusThrowsWithoutAdapter(): void
+    {
+        $queue = $this->createQueue();
+
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Cannot get message status without an adapter. Queue is in synchronous mode.');
+        $queue->status('1');
+    }
+
+    public function testRunWithAdapter(): void
+    {
+        $queue = $this->createQueue(new InMemoryAdapter());
         $message = new Message('simple', null);
-        $message2 = clone $message;
         $queue->push($message);
-        $queue->push($message2);
+        $queue->push(clone $message);
+
+        self::assertSame(2, $queue->run());
+        self::assertSame(2, $this->executionTimes);
+    }
+
+    public function testRunPartlyWithAdapter(): void
+    {
+        $queue = $this->createQueue(new InMemoryAdapter());
+        $message = new Message('simple', null);
+        $queue->push($message);
+        $queue->push(clone $message);
+
+        self::assertSame(1, $queue->run(1));
+        self::assertSame(1, $this->executionTimes);
+    }
+
+    public function testListenWithAdapter(): void
+    {
+        $queue = $this->createQueue(new InMemoryAdapter());
+        $message = new Message('simple', null);
+        $queue->push($message);
+        $queue->push(clone $message);
+
         $queue->listen();
 
-        self::assertEquals(2, $this->executionTimes);
+        self::assertSame(2, $this->executionTimes);
     }
 
-    public function testStatus(): void
+    public function testStatusWithAdapter(): void
     {
-        $queue = $this->createQueue($this->getAdapter());
-        $message = new Message('simple', null);
-        $envelope = $queue->push($message);
+        $queue = $this->createQueue(new InMemoryAdapter());
+        $envelope = $queue->push(new Message('simple', null));
 
         self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
-        /**
-         * @var int|string $id
-         */
+        /** @var int|string $id */
         $id = $envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY];
 
-        $status = $queue->status($id);
-        self::assertSame(MessageStatus::WAITING, $status);
+        self::assertSame(MessageStatus::WAITING, $queue->status($id));
 
         $queue->run();
-        $status = $queue->status($id);
-        self::assertSame(MessageStatus::DONE, $status);
+        self::assertSame(MessageStatus::DONE, $queue->status($id));
     }
 
     public function testRunWithSignalLoop(): void
@@ -104,14 +130,13 @@ final class QueueTest extends TestCase
         }
 
         $this->loop = new SignalLoop();
-        $queue = $this->createQueue($this->getAdapter());
+        $queue = $this->createQueue();
         $message = new Message('simple', null);
-        $message2 = clone $message;
         $queue->push($message);
-        $queue->push($message2);
-        $queue->run();
+        $queue->push(clone $message);
 
-        self::assertEquals(2, $this->executionTimes);
+        self::assertSame(0, $queue->run());
+        self::assertSame(2, $this->executionTimes);
     }
 
     public function testGetName(): void
@@ -126,10 +151,5 @@ final class QueueTest extends TestCase
         $queue = $this->createQueue(name: TestQueue::HIGH_PRIORITY);
 
         $this->assertSame('high-priority', $queue->getName());
-    }
-
-    protected function needsRealAdapter(): bool
-    {
-        return $this->needsRealAdapter;
     }
 }

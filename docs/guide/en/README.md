@@ -5,7 +5,7 @@
 - [Prerequisites and installation](prerequisites-and-installation.md)
 - [Configuration with yiisoft/config](configuration-with-config.md)
 - [Adapter list](adapter-list.md)
-- [Synchronous adapter](adapter-sync.md)
+- [Synchronous mode](synchronous-mode.md)
 - [Queue names](queue-names.md)
 
 ## Build and handle messages
