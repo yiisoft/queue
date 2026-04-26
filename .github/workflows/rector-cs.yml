@@ -12,7 +12,7 @@ on:
       - '.php-cs-fixer.dist.php'
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   rector:
-    uses: yiisoft/actions/.github/workflows/rector-cs.yml@fix-rector-cs
+    uses: yiisoft/actions/.github/workflows/rector-cs.yml@master
     with:
       repository: ${{ github.event.pull_request.head.repo.full_name }}
       php: '8.1'
