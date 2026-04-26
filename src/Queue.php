@@ -115,9 +115,8 @@ final class Queue implements QueueInterface
     public function listen(): void
     {
         if ($this->adapter === null) {
-            throw new BadMethodCallException(
-                'Cannot listen without an adapter. Queue is in synchronous mode.',
-            );
+            $this->logger->info('Cannot listen without an adapter. Queue is in synchronous mode.');
+            return;
         }
 
         $this->logger->info('Start listening to the queue.');

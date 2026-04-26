@@ -56,13 +56,13 @@ final class QueueTest extends TestCase
         self::assertSame(2, $this->executionTimes);
     }
 
-    public function testListenThrowsWithoutAdapter(): void
+    public function testListenWithoutAdapter(): void
     {
         $queue = $this->createQueue();
 
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Cannot listen without an adapter. Queue is in synchronous mode.');
         $queue->listen();
+
+        $this->expectNotToPerformAssertions();
     }
 
     public function testStatusThrowsWithoutAdapter(): void

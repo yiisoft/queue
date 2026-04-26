@@ -129,7 +129,7 @@ By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/
 
 See [Console commands](docs/guide/en/console-commands.md) for more details.
 
-> In case you're running the queue in synchronous mode (no adapter) for development purposes, you should not use these commands, as you have no asynchronous processing available. The messages are processed immediately when pushed.
+> In case you're running the queue in synchronous mode (no adapter), `queue:listen` logs an info message and exits. The messages are processed immediately when pushed.
 
 ## Documentation
 

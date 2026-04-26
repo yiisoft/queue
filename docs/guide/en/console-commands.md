@@ -33,6 +33,8 @@ The following command launches a daemon, which infinitely consumes messages from
 yii queue:listen [queueName]
 ```
 
+> **Note:** If the queue is not configured with an adapter (synchronous mode), the command logs an info message and exits gracefully.
+
 ## 3. Listen to multiple queues
 
 The following command iterates through multiple queues and is meant to be used in development environment only, as it consumes a lot of CPU for iterating through queues. You can pass to it:

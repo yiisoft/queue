@@ -35,5 +35,5 @@ since no adapter is involved to assign an ID.
 Limitations:
 
 - `run()` does nothing and returns `0`.
-- `listen()` throws `BadMethodCallException`.
+- `listen()` logs an info message and returns without listening.
 - `status()` throws `BadMethodCallException` — there is no message storage to track IDs.
