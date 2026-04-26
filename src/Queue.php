@@ -38,7 +38,7 @@ final class Queue implements QueueInterface
     ) {
         $this->name = StringNormalizer::normalize($name);
         $this->middlewareDefinitions = $middlewareDefinitions;
-        $this->finalPushHandler = $adapter === null
+        $this->finalPushHandler = $this->isSynchronous()
             ? new SynchronousPushHandler($worker, $this)
             : new AdapterPushHandler($adapter);
     }
@@ -62,7 +62,7 @@ final class Queue implements QueueInterface
             $this->createPushHandler(...$middlewareDefinitions),
         );
 
-        if ($this->adapter === null) {
+        if ($this->isSynchronous()) {
             $this->logger->info(
                 'Processed message with message type "{messageType}" synchronously.',
                 ['messageType' => $message->getType()],
@@ -82,7 +82,7 @@ final class Queue implements QueueInterface
 
     public function run(int $max = 0): int
     {
-        if ($this->adapter === null) {
+        if ($this->isSynchronous()) {
             $this->logger->debug(
                 'Queue is in synchronous mode (no adapter). Messages are processed on push. run() does nothing.',
             );
@@ -113,7 +113,7 @@ final class Queue implements QueueInterface
 
     public function listen(): void
     {
-        if ($this->adapter === null) {
+        if ($this->isSynchronous()) {
             $this->logger->info('Cannot listen without an adapter. Queue is in synchronous mode.');
             return;
         }
@@ -125,7 +125,7 @@ final class Queue implements QueueInterface
 
     public function status(string|int $id): MessageStatus
     {
-        if ($this->adapter === null) {
+        if ($this->isSynchronous()) {
             return MessageStatus::NOT_FOUND;
         }
 
@@ -178,5 +178,10 @@ final class Queue implements QueueInterface
                     ->dispatch($message, $this->finishHandler);
             }
         };
+    }
+
+    private function isSynchronous(): bool
+    {
+        return $this->adapter === null;
     }
 }
