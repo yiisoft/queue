@@ -40,7 +40,7 @@ See the [adapter list](docs/guide/en/adapter-list.md) and follow the adapter-spe
 > design around `QueueInterface` from day one and add a real broker later — you can run the queue
 > in [synchronous mode](docs/guide/en/synchronous-mode.md) (the adapter argument is optional).
 > In this mode messages are processed immediately in the same process, so it won't provide true
-> async execution, but call sites stay the same when you switch to a real adapter.
+> async execution, but the code stays the same when you switch to a real adapter.
 
 ### 2. Configure the queue
 
