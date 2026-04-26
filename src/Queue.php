@@ -40,7 +40,7 @@ final class Queue implements QueueInterface
         $this->middlewareDefinitions = $middlewareDefinitions;
         $this->finalPushHandler = $this->isSynchronous()
             ? new SynchronousPushHandler($worker, $this)
-            : new AdapterPushHandler($adapter);
+            : new AdapterPushHandler($this->adapter);
     }
 
     public function getName(): string
@@ -180,6 +180,9 @@ final class Queue implements QueueInterface
         };
     }
 
+    /**
+     * @psalm-assert-if-false !null $this->adapter
+     */
     private function isSynchronous(): bool
     {
         return $this->adapter === null;
