@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\App;
 
-use InvalidArgumentException;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -46,7 +45,7 @@ final class InMemoryAdapter implements AdapterInterface
         $id = (int) $id;
 
         if ($id < 0) {
-            throw new InvalidArgumentException('IDs start with 0.');
+            return MessageStatus::NOT_FOUND;
         }
 
         if ($id < $this->current) {
@@ -57,6 +56,6 @@ final class InMemoryAdapter implements AdapterInterface
             return MessageStatus::WAITING;
         }
 
-        throw new InvalidArgumentException('There is no message with the given ID.');
+        return MessageStatus::NOT_FOUND;
     }
 }

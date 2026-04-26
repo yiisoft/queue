@@ -6,6 +6,7 @@ namespace Yiisoft\Queue;
 
 enum MessageStatus: int
 {
+    case NOT_FOUND = 0;
     case WAITING = 1;
     case RESERVED = 2;
     case DONE = 3;
@@ -13,6 +14,7 @@ enum MessageStatus: int
     public function key(): string
     {
         return match ($this) {
+            self::NOT_FOUND => 'not-found',
             self::WAITING => 'waiting',
             self::RESERVED => 'reserved',
             self::DONE => 'done',

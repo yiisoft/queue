@@ -36,4 +36,4 @@ Limitations:
 
 - `run()` does nothing and returns `0`.
 - `listen()` logs an info message and returns without listening.
-- `status()` throws `BadMethodCallException` — there is no message storage to track IDs.
+- `status()` always returns `MessageStatus::NOT_FOUND` — there is no message storage to track IDs.

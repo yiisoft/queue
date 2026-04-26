@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit;
 
-use BadMethodCallException;
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Message;
@@ -65,13 +64,11 @@ final class QueueTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testStatusThrowsWithoutAdapter(): void
+    public function testStatusReturnsNotFoundWithoutAdapter(): void
     {
         $queue = $this->createQueue();
 
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Cannot get message status without an adapter. Queue is in synchronous mode.');
-        $queue->status('1');
+        self::assertSame(MessageStatus::NOT_FOUND, $queue->status('1'));
     }
 
     public function testRunWithAdapter(): void

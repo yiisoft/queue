@@ -7,7 +7,7 @@ The API surface is:
 - `QueueInterface::status(string|int $id): MessageStatus`
 - `AdapterInterface::status(string|int $id): MessageStatus`
 
-Status tracking support depends on the adapter. If an adapter doesn't keep status history, calling `status()` with that ID will throw `InvalidArgumentException`.
+Status tracking support depends on the adapter. If an adapter doesn't support status tracking or can't find the message by ID, it returns `MessageStatus::NOT_FOUND`.
 
 ## Getting a message ID
 
@@ -30,6 +30,9 @@ The ID type (`string` or `int`) and how long it stays queryable are adapter-spec
 
 Statuses are represented by the `Yiisoft\Queue\MessageStatus` enum:
 
+- `MessageStatus::NOT_FOUND`
+  The message is not known to the queue, or the adapter doesn't support status tracking.
+
 - `MessageStatus::WAITING`
   The message is in the queue and has not been picked up yet.
 
@@ -42,7 +45,7 @@ Statuses are represented by the `Yiisoft\Queue\MessageStatus` enum:
 In addition to enum cases, `MessageStatus` provides a string key via `MessageStatus::key()`:
 
 ```php
-$statusKey = $status->key(); // "waiting", "reserved" or "done"
+$statusKey = $status->key(); // "not-found", "waiting", "reserved" or "done"
 ```
 
 ## Querying a status
@@ -73,10 +76,10 @@ if ($status === MessageStatus::DONE) {
 }
 ```
 
-## Errors and edge cases
+## Edge cases
 
-- **Unknown ID**
-  If an adapter can't find the message by ID, it must throw `InvalidArgumentException`.
+- **Unknown ID or unsupported tracking**
+  If an adapter doesn't support status tracking or can't find the message by ID, it returns `MessageStatus::NOT_FOUND`.
 
 - **Timing**
   `RESERVED` can be short-lived and difficult to observe: depending on the adapter, a message may move from `WAITING` to `RESERVED` and then to `DONE` quickly.

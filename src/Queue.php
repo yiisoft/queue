@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Queue;
 
 use BackedEnum;
-use BadMethodCallException;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
@@ -127,9 +126,7 @@ final class Queue implements QueueInterface
     public function status(string|int $id): MessageStatus
     {
         if ($this->adapter === null) {
-            throw new BadMethodCallException(
-                'Cannot get message status without an adapter. Queue is in synchronous mode.',
-            );
+            return MessageStatus::NOT_FOUND;
         }
 
         return $this->adapter->status($id);
