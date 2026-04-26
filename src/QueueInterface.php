@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue;
 
-use InvalidArgumentException;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 
