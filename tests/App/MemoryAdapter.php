@@ -11,7 +11,7 @@ use Yiisoft\Queue\MessageStatus;
 
 use function count;
 
-final class InMemoryAdapter implements AdapterInterface
+final class MemoryAdapter implements AdapterInterface
 {
     /** @var array<int, MessageInterface> */
     private array $messages = [];
