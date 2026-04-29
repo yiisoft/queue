@@ -58,7 +58,7 @@ $provider = new QueueFactoryProvider(
     [
         'emails' => [
             'class' => Queue::class,
-            '__construct()' => [$worker, $pushDispatcher, $eventDispatcher, $adapter],
+            '__construct()' => [$worker, $loop, $logger, $pushDispatcher, $adapter],
         ],
     ],
     $container,

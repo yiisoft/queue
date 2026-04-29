@@ -19,8 +19,7 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
 
     /**
      * @param Closure[] $middlewares Middlewares.
-     * @param MessageHandlerPushInterface $finishHandler Fallback handler
-     * events.
+     * @param MessageHandlerPushInterface $finishHandler Final handler invoked after all middlewares are processed.
      */
     public function __construct(
         private readonly array $middlewares,

@@ -16,7 +16,6 @@ To use the queue, you need to create instances of the following classes:
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
@@ -70,19 +69,14 @@ $worker = new Worker(
 // Create loop (SignalLoop requires ext-pcntl; SimpleLoop works without it)
 $loop = new SimpleLoop();
 
-// Create queue (adapter is wired in a second step due to mutual dependency)
+// Create queue. Without an adapter the queue runs in synchronous mode (messages are processed
+// immediately on push). Pass an adapter (e.g., AMQP, Redis) for asynchronous processing.
 $queue = new Queue(
     $worker,
     $loop,
     $logger,
     $pushMiddlewareDispatcher,
 );
-
-// SynchronousAdapter needs a queue reference — create it after the queue
-$adapter = new SynchronousAdapter($worker, $queue);
-
-// Attach the adapter to the queue (returns a new Queue instance)
-$queue = $queue->withAdapter($adapter);
 
 // Now you can push messages
 $message = new \Yiisoft\Queue\Message\Message('file-download', ['url' => 'https://example.com/file.pdf']);
@@ -91,28 +85,7 @@ $queue->push($message);
 
 ## Using Queue Provider
 
-For multiple queue names, use `AdapterFactoryQueueProvider` (maps queue names to adapter definitions) or `PredefinedQueueProvider` (maps queue names to pre-built queue instances):
-
-```php
-use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
-use Yiisoft\Queue\Adapter\SynchronousAdapter;
-
-// AdapterFactoryQueueProvider: each queue name maps to an adapter definition.
-// The provider wraps each adapter in a Queue with the given name.
-$definitions = [
-    'queue1' => new SynchronousAdapter($worker, $queue),
-    'queue2' => SynchronousAdapter::class,
-];
-
-$provider = new AdapterFactoryQueueProvider(
-    $queue,
-    $definitions,
-    $container,
-);
-
-$queueForQueue1 = $provider->get('queue1');
-$queueForQueue2 = $provider->get('queue2');
-```
+For multiple queue names, use `PredefinedQueueProvider` (maps queue names to pre-built queue instances):
 
 ```php
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;

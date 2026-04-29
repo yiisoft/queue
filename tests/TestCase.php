@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests;
 
 use BackedEnum;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
-use Yiisoft\Queue\Stubs\StubAdapter;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Middleware\CallableFactory;
@@ -36,7 +33,6 @@ abstract class TestCase extends BaseTestCase
 {
     protected ?ContainerInterface $container = null;
     protected ?Queue $queue = null;
-    protected ?AdapterInterface $adapter = null;
     protected ?LoopInterface $loop = null;
     protected ?WorkerInterface $worker = null;
     protected array $eventHandlers = [];
@@ -48,7 +44,6 @@ abstract class TestCase extends BaseTestCase
 
         $this->container = null;
         $this->queue = null;
-        $this->adapter = null;
         $this->loop = null;
         $this->worker = null;
         $this->eventHandlers = [];
@@ -65,18 +60,6 @@ abstract class TestCase extends BaseTestCase
         }
 
         return $this->queue;
-    }
-
-    /**
-     * @return AdapterInterface|MockObject
-     */
-    protected function getAdapter(): AdapterInterface
-    {
-        if ($this->adapter === null) {
-            $this->adapter = $this->createAdapter($this->needsRealAdapter());
-        }
-
-        return $this->adapter;
     }
 
     protected function getLoop(): LoopInterface
@@ -107,26 +90,17 @@ abstract class TestCase extends BaseTestCase
     }
 
     protected function createQueue(
-        AdapterInterface $adapter = new StubAdapter(),
+        ?AdapterInterface $adapter = null,
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
     ): Queue {
         return new Queue(
-            $adapter,
             $this->getWorker(),
             $this->getLoop(),
             new NullLogger(),
             $this->getPushMiddlewareDispatcher(),
+            $adapter,
             $name,
         );
-    }
-
-    protected function createAdapter(bool $realAdapter = false): AdapterInterface
-    {
-        if ($realAdapter) {
-            return new SynchronousAdapter($this->getWorker(), $this->createQueue());
-        }
-
-        return $this->createMock(AdapterInterface::class);
     }
 
     protected function createLoop(): LoopInterface
@@ -182,11 +156,6 @@ abstract class TestCase extends BaseTestCase
                 throw new RuntimeException('test');
             },
         ];
-    }
-
-    protected function needsRealAdapter(): bool
-    {
-        return false;
     }
 
     protected function getPushMiddlewareDispatcher(): PushMiddlewareDispatcher

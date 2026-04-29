@@ -30,19 +30,22 @@ If you use only a single queue, you can inject `QueueInterface` directly.
 
 #### 1.1 Configure an Adapter
 
-Adapter is what actually sends messages to a queue broker.
-
-Minimal DI configuration example:
+An adapter is what actually delivers messages to a queue broker. Pick one from the
+[adapter list](adapter-list.md), install it, and bind it in DI:
 
 ```php
-use Yiisoft\Queue\Adapter\SynchronousAdapter;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 
 return [
-    AdapterInterface::class => SynchronousAdapter::class,
+    AdapterInterface::class => YourBrokerAdapter::class,
 ];
 ```
-> `SynchronousAdapter` is for learning/testing only. For production, install a real adapter, see adapter list: [adapter-list](adapter-list.md).
+
+Refer to the chosen adapter's documentation for connection settings and any additional bindings.
+
+If you don't have a broker yet, you can skip this step — the queue will run in
+[synchronous mode](synchronous-mode.md) and process messages immediately on `push()`. You can
+plug in a real adapter later without changing any call sites.
 
 #### 1.2. Configure a default queue name
 
