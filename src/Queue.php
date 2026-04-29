@@ -24,7 +24,14 @@ final class Queue implements QueueInterface
      * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
      */
     private array $middlewareDefinitions;
+
+    /**
+     * @var MessageHandlerPushInterface $finalPushHandler The final push handler in the middleware chain, responsible
+     * for actually sending the message. Uses {@see SynchronousPushHandler} in synchronous mode or
+     * {@see AdapterPushHandler} otherwise.
+     */
     private MessageHandlerPushInterface $finalPushHandler;
+
     private string $name;
 
     public function __construct(
@@ -164,6 +171,10 @@ final class Queue implements QueueInterface
         ) implements MessageHandlerPushInterface {
             public function __construct(
                 private readonly MessageHandlerPushInterface $finishHandler,
+                /**
+                 * @var MessageHandlerPushInterface $finishHandler Final handler invoked after all middlewares are
+                 * processed.
+                 */
                 private readonly PushMiddlewareDispatcher $dispatcher,
                 /**
                  * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
