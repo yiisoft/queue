@@ -1,5 +1,4 @@
-Synchronous Mode
-================
+# Synchronous Mode
 
 Run tasks synchronously in the same process. Useful for:
 
