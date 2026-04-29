@@ -8,7 +8,7 @@ Run tasks synchronously in the same process. Useful for:
   doesn't have an external broker yet — you can switch to a real adapter later without touching
   the call sites.
 
-To enable it, construct the queue without an adapter (the `adapter` argument defaults to `null`):
+To enable it, create the queue instance without an adapter (the `adapter` argument defaults to `null`):
 
 ```php
 $logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
