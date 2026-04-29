@@ -55,10 +55,8 @@ final class Queue implements QueueInterface
         return $this->name;
     }
 
-    public function push(
-        MessageInterface $message,
-        MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
-    ): MessageInterface {
+    public function push(MessageInterface $message): MessageInterface
+    {
         $this->logger->debug(
             'Preparing to push message with message type "{messageType}".',
             ['messageType' => $message->getType()],
@@ -66,7 +64,7 @@ final class Queue implements QueueInterface
 
         $message = $this->pushMiddlewareDispatcher->dispatch(
             $message,
-            $this->createPushHandler(...$middlewareDefinitions),
+            $this->createPushHandler(),
         );
 
         if ($this->isSynchronous()) {
@@ -162,12 +160,12 @@ final class Queue implements QueueInterface
         return $this->loop->canContinue();
     }
 
-    private function createPushHandler(MiddlewarePushInterface|callable|array|string ...$middlewares): MessageHandlerPushInterface
+    private function createPushHandler(): MessageHandlerPushInterface
     {
         return new class (
             $this->finalPushHandler,
             $this->pushMiddlewareDispatcher,
-            array_merge($this->middlewareDefinitions, $middlewares),
+            $this->middlewareDefinitions,
         ) implements MessageHandlerPushInterface {
             public function __construct(
                 /**

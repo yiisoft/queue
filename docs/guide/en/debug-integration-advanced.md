@@ -6,7 +6,7 @@ Use this guide when you need to understand which events are tracked by the queue
 
 The integration is based on `Yiisoft\Queue\Debug\QueueCollector` and captures:
 
-- Pushed messages grouped by queue name (including middleware definitions passed to `push()`).
+- Pushed messages grouped by queue name.
 - Message status checks performed via `QueueInterface::status()`.
 - Messages processed by a worker grouped by queue name.
 

@@ -61,13 +61,11 @@ final class QueueCollectorTest extends AbstractCollectorTestCase
             'chan1' => [
                 [
                     'message' => $this->pushMessage,
-                    'middlewares' => [],
                 ],
             ],
             'chan2' => [
                 [
                     'message' => $this->pushMessage,
-                    'middlewares' => [],
                 ],
             ],
         ], $pushes);

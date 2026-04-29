@@ -25,7 +25,7 @@ For example, the official AMQP adapter supports delays: <https://github.com/yiis
 
 ```php
 $delayMiddleware = $container->get(\Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface::class);
-$queue->push($message, $delayMiddleware->withDelay(5 * 60));
+$queue->withMiddlewaresAdded($delayMiddleware->withDelay(5 * 60))->push($message);
 ```
 
 **Important:** Not every adapter (such as synchronous adapter) supports delayed execution.

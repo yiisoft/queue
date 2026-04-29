@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Stubs;
 
-use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
 
 /**
@@ -19,10 +17,8 @@ final class StubQueue implements QueueInterface
         private string $name = 'default',
     ) {}
 
-    public function push(
-        MessageInterface $message,
-        string|array|callable|MiddlewarePushInterface ...$middlewareDefinitions,
-    ): MessageInterface {
+    public function push(MessageInterface $message): MessageInterface
+    {
         return $message;
     }
 

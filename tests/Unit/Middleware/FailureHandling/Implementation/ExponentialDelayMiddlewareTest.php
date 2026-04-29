@@ -12,8 +12,8 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Stubs\StubDelayMiddleware;
 use Yiisoft\Queue\Tests\TestCase;
 
 use const PHP_INT_MAX;
@@ -119,7 +119,7 @@ class ExponentialDelayMiddlewareTest extends TestCase
     #[DataProvider('constructorRequirementsProvider')]
     public function testConstructorRequirements(bool $success, array $arguments): void
     {
-        $arguments[] = $this->createMock(DelayMiddlewareInterface::class);
+        $arguments[] = new StubDelayMiddleware();
         $arguments[] = $this->createMock(QueueInterface::class);
 
         if (!$success) {
@@ -141,7 +141,7 @@ class ExponentialDelayMiddlewareTest extends TestCase
             1,
             1,
             1,
-            $this->createMock(DelayMiddlewareInterface::class),
+            new StubDelayMiddleware(),
             $queue,
         );
         $nextHandler = $this->createMock(MessageFailureHandlerInterface::class);
@@ -175,7 +175,7 @@ class ExponentialDelayMiddlewareTest extends TestCase
             1,
             1,
             1,
-            $this->createMock(DelayMiddlewareInterface::class),
+            new StubDelayMiddleware(),
             $queue,
         );
         $nextHandler = $this->createMock(MessageFailureHandlerInterface::class);
