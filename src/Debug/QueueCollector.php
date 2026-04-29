@@ -8,7 +8,6 @@ use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Yii\Debug\Collector\CollectorTrait;
 use Yiisoft\Yii\Debug\Collector\SummaryCollectorInterface;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
 
 use function count;
@@ -46,18 +45,14 @@ final class QueueCollector implements SummaryCollectorInterface
         ];
     }
 
-    public function collectPush(
-        string $queueName,
-        MessageInterface $message,
-        string|array|callable|MiddlewarePushInterface ...$middlewareDefinitions,
-    ): void {
+    public function collectPush(string $queueName, MessageInterface $message): void
+    {
         if (!$this->isActive()) {
             return;
         }
 
         $this->pushes[$queueName][] = [
             'message' => $message,
-            'middlewares' => $middlewareDefinitions,
         ];
     }
 

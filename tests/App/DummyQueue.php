@@ -7,7 +7,6 @@ namespace Yiisoft\Queue\Tests\App;
 use Exception;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
 
 final class DummyQueue implements QueueInterface
@@ -16,10 +15,8 @@ final class DummyQueue implements QueueInterface
         private readonly string $name,
     ) {}
 
-    public function push(
-        MessageInterface $message,
-        string|array|callable|MiddlewarePushInterface ...$middlewareDefinitions,
-    ): MessageInterface {
+    public function push(MessageInterface $message): MessageInterface
+    {
         return $message;
     }
 

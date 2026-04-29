@@ -16,8 +16,8 @@ use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMidd
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
-use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Stubs\StubDelayMiddleware;
 use Yiisoft\Queue\Tests\TestCase;
 
 class SendAgainMiddlewareTest extends TestCase
@@ -179,7 +179,7 @@ class SendAgainMiddlewareTest extends TestCase
                 self::EXPONENTIAL_STRATEGY_DELAY_INITIAL,
                 self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
                 self::EXPONENTIAL_STRATEGY_EXPONENT,
-                $this->createMock(DelayMiddlewareInterface::class),
+                new StubDelayMiddleware(),
                 $queue,
             ),
             default => throw new RuntimeException('Unknown strategy'),

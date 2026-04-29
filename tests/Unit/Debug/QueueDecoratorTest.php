@@ -39,7 +39,7 @@ class QueueDecoratorTest extends TestCase
             $collector,
         );
 
-        $decorator->push($message, []);
+        $decorator->push($message);
     }
 
     public function testRun(): void
