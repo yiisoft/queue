@@ -170,11 +170,11 @@ final class Queue implements QueueInterface
             array_merge($this->middlewareDefinitions, $middlewares),
         ) implements MessageHandlerPushInterface {
             public function __construct(
-                private readonly MessageHandlerPushInterface $finishHandler,
                 /**
                  * @var MessageHandlerPushInterface $finishHandler Final handler invoked after all middlewares are
                  * processed.
                  */
+                private readonly MessageHandlerPushInterface $finishHandler,
                 private readonly PushMiddlewareDispatcher $dispatcher,
                 /**
                  * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
