@@ -10,7 +10,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Queue\Middleware\Push\Implementation\NoopMessageHandlerPush;
+use Yiisoft\Queue\Middleware\Push\NoopMessageHandlerPush;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 

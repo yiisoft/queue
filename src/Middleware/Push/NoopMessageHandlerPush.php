@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Middleware\Push\Implementation;
+namespace Yiisoft\Queue\Middleware\Push;
 
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
