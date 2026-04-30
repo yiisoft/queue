@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Debug;
 
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
 
 final class QueueDecorator implements QueueInterface
@@ -28,6 +29,16 @@ final class QueueDecorator implements QueueInterface
         $message = $this->queue->push($message);
         $this->collector->collectPush($this->queue->getName(), $message);
         return $message;
+    }
+
+    public function withMiddlewares(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
+    {
+        return new self($this->queue->withMiddlewares(...$middlewareDefinitions), $this->collector);
+    }
+
+    public function withMiddlewaresAdded(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
+    {
+        return new self($this->queue->withMiddlewaresAdded(...$middlewareDefinitions), $this->collector);
     }
 
     public function run(int $max = 0): int
