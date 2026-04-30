@@ -215,11 +215,11 @@ class ExponentialDelayMiddlewareTest extends TestCase
 
 final class AdapterContextDelayMiddleware implements DelayMiddlewareInterface
 {
+    private float $delay = 0.0;
+
     public function __construct(
         private readonly DelayAwareAdapter $adapter,
     ) {}
-
-    private float $delay = 0.0;
 
     public function withDelay(float $seconds): self
     {
@@ -250,9 +250,7 @@ final class DelayAwareAdapter implements AdapterInterface
 
     public ?float $activeDelay = null;
 
-    public function runExisting(callable $handlerCallback): void
-    {
-    }
+    public function runExisting(callable $handlerCallback): void {}
 
     public function status(string|int $id): MessageStatus
     {
@@ -266,9 +264,7 @@ final class DelayAwareAdapter implements AdapterInterface
         return $message;
     }
 
-    public function subscribe(callable $handlerCallback): void
-    {
-    }
+    public function subscribe(callable $handlerCallback): void {}
 }
 
 final class ThrowingFailureHandler implements MessageFailureHandlerInterface
