@@ -212,6 +212,7 @@ class SendAgainMiddlewareTest extends TestCase
         };
 
         $queue = $this->createMock(QueueInterface::class);
+        $queue->method('withMiddlewaresAdded')->willReturnSelf();
         $queue->expects($suites ? self::once() : self::never())
             ->method('push')
             ->willReturnCallback($queueAssertion);
