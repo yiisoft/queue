@@ -13,7 +13,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Stubs\StubDelayMiddleware;
+use Yiisoft\Queue\Message\DelayEnvelope;
 use Yiisoft\Queue\Tests\TestCase;
 
 use const PHP_INT_MAX;
@@ -119,7 +119,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
     #[DataProvider('constructorRequirementsProvider')]
     public function testConstructorRequirements(bool $success, array $arguments): void
     {
-        $arguments[] = new StubDelayMiddleware();
         $arguments[] = $this->createMock(QueueInterface::class);
 
         if (!$success) {
@@ -141,7 +140,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
             1,
             1,
             1,
-            new StubDelayMiddleware(),
             $queue,
         );
         $nextHandler = $this->createMock(MessageFailureHandlerInterface::class);
@@ -152,6 +150,7 @@ class ExponentialDelayMiddlewareTest extends TestCase
         self::assertNotEquals($request, $result);
         $message = $result->getMessage();
         self::assertArrayHasKey(FailureEnvelope::FAILURE_META_KEY, $message->getMetadata());
+        self::assertArrayHasKey(DelayEnvelope::META_DELAY_SECONDS, $message->getMetadata());
 
         $meta = $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY];
         self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test', $meta);
@@ -175,7 +174,6 @@ class ExponentialDelayMiddlewareTest extends TestCase
             1,
             1,
             1,
-            new StubDelayMiddleware(),
             $queue,
         );
         $nextHandler = $this->createMock(MessageFailureHandlerInterface::class);

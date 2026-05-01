@@ -19,16 +19,16 @@ $queue->push($message);
 
 To push a message that should be processed after 5 minutes:
 
-Delayed execution is implemented via a push middleware.
-The middleware must implement `\Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface` and is provided by the adapter package you use.
-For example, the official AMQP adapter supports delays: <https://github.com/yiisoft/queue-amqp>
+Delayed execution is implemented using the `DelayEnvelope`. The envelope wraps your message with delay information that adapters can use if they support delayed execution.
 
 ```php
-$delayMiddleware = $container->get(\Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface::class);
-$queue->withMiddlewaresAdded($delayMiddleware->withDelay(5 * 60))->push($message);
+use Yiisoft\Queue\Message\DelayEnvelope;
+
+$delayedMessage = new DelayEnvelope($message, 5 * 60); // 5 minutes delay
+$queue->push($delayedMessage);
 ```
 
-**Important:** Not every adapter (such as synchronous adapter) supports delayed execution.
+**Important:** Adapters that support delaying will use the delay information from `DelayEnvelope` to schedule the message accordingly. Adapters that don't support delaying will **ignore the delay data** and process the message in the queue order.
 
 
 ## Queue handling

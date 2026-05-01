@@ -9,8 +9,7 @@ use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
-use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
-use Yiisoft\Queue\Middleware\Push\NoopMessageHandlerPush;
+use Yiisoft\Queue\Message\DelayEnvelope;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 
@@ -29,7 +28,6 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
      * @param float $delayInitial The first delay period
      * @param float $delayMaximum The maximum delay period
      * @param float $exponent Message handling delay will be increased by this multiplication each time it fails
-     * @param DelayMiddlewareInterface $delayMiddleware A middleware for message delaying.
      * @param QueueInterface|null $queue
      */
     public function __construct(
@@ -38,7 +36,6 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
         private readonly float $delayInitial,
         private readonly float $delayMaximum,
         private readonly float $exponent,
-        private readonly DelayMiddlewareInterface $delayMiddleware,
         private readonly ?QueueInterface $queue = null,
     ) {
         if ($maxAttempts <= 0) {
@@ -64,12 +61,10 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
     ): FailureHandlingRequest {
         $message = $request->getMessage();
         if ($this->suites($message)) {
-            $envelope = new FailureEnvelope($message, $this->createNewMeta($message));
-            $envelope = $this->delayMiddleware
-                ->withDelay($this->getDelay($envelope))
-                ->processPush($envelope, new NoopMessageHandlerPush());
+            $failureEnvelope = new FailureEnvelope($message, $this->createNewMeta($message));
+            $delayEnvelope = new DelayEnvelope($failureEnvelope, $this->getDelay($failureEnvelope));
             $queue = $this->queue ?? $request->getQueue();
-            $messageNew = $queue->push($envelope);
+            $messageNew = $queue->push($delayEnvelope);
 
             return $request->withMessage($messageNew);
         }
@@ -92,11 +87,14 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
 
     private function getAttempts(MessageInterface $message): int
     {
-        return $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY][self::META_KEY_ATTEMPTS . "-$this->id"] ?? 0;
+        /** @var array{failure-strategy-exponential-delay-attempts?: int} $failureMeta */
+        $failureMeta = $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY] ?? [];
+        return $failureMeta[self::META_KEY_ATTEMPTS . "-$this->id"] ?? 0;
     }
 
     private function getDelay(MessageInterface $message): float
     {
+        /** @var array{failure-strategy-exponential-delay-delay?: float} $meta */
         $meta = $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY] ?? [];
         $key = self::META_KEY_DELAY . "-$this->id";
 
