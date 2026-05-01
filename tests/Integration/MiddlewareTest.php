@@ -43,6 +43,7 @@ final class MiddlewareTest extends TestCase
             'channel 1',
             'channel 2',
             'channel 3',
+            'channel 4',
         ];
 
         $pushMiddlewareDispatcher = new PushMiddlewareDispatcher(
@@ -67,7 +68,7 @@ final class MiddlewareTest extends TestCase
         $queue = $queue
             ->withMiddlewares(new TestMiddleware('Won\'t be executed'))
             ->withMiddlewares(new TestMiddleware('channel 1'), new TestMiddleware('channel 2'))
-            ->withMiddlewaresAdded(new TestMiddleware('channel 3'));
+            ->withMiddlewaresAdded(new TestMiddleware('channel 3'), new TestMiddleware('channel 4'));
 
         $message = new Message('test', ['initial']);
         $messagePushed = $queue->push($message);
