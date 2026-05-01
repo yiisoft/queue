@@ -15,6 +15,8 @@ use Yiisoft\Queue\Tests\Unit\Support\TestMessage;
 
 use function sprintf;
 
+use const JSON_THROW_ON_ERROR;
+
 /**
  * Testing message serialization options
  */
