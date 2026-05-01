@@ -35,11 +35,6 @@ final class Queue implements QueueInterface
     private string $name;
 
     /**
-     * @var PushMiddlewareDispatcher The base middleware dispatcher.
-     */
-    private readonly PushMiddlewareDispatcher $baseDispatcher;
-
-    /**
      * @var PushMiddlewareDispatcher The dispatcher used for push messages, combining base dispatcher middleware with
      * queue-specific middleware.
      */
@@ -49,7 +44,7 @@ final class Queue implements QueueInterface
      * @param WorkerInterface $worker The worker that processes messages.
      * @param LoopInterface $loop The loop for controlling message processing.
      * @param LoggerInterface $logger The logger for debug and informational messages.
-     * @param PushMiddlewareDispatcher $dispatcher The middleware dispatcher.
+     * @param PushMiddlewareDispatcher $baseDispatcher The middleware dispatcher.
      * @param AdapterInterface|null $adapter The message adapter (`null` for synchronous mode).
      * @param string|BackedEnum $name The queue name.
      * @param MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions Queue-specific middleware
@@ -59,12 +54,11 @@ final class Queue implements QueueInterface
         private readonly WorkerInterface $worker,
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
-        PushMiddlewareDispatcher $dispatcher,
+        private readonly PushMiddlewareDispatcher $baseDispatcher,
         private readonly ?AdapterInterface $adapter = null,
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ) {
-        $this->baseDispatcher = $dispatcher;
         $this->name = StringNormalizer::normalize($name);
         $this->finalPushHandler = $this->isSynchronous()
             ? new SynchronousPushHandler($worker, $this)
