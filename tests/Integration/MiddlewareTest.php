@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Queue\Stubs\StubDelayMiddleware;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Cli\LoopInterface;
@@ -150,7 +149,6 @@ final class MiddlewareTest extends TestCase
                     1,
                     5,
                     2,
-                    new StubDelayMiddleware(),
                     $queue,
                 ),
             ],

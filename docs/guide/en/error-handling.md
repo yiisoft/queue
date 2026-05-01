@@ -105,7 +105,7 @@ It's configured via constructor parameters, too. Here they are:
 
  Requirements:
 
- - Requires a `DelayMiddlewareInterface` implementation and an adapter that supports delayed delivery.
+ - Requires an adapter that supports delayed delivery. The middleware uses `DelayEnvelope` to specify the delay time. If the adapter doesn't support delaying, it will **ignore the delay data** and process the message immediately.
 
  State tracking:
 
