@@ -31,7 +31,7 @@ final class JsonMessageSerializerTest extends TestCase
 
         $this->expectExceptionMessage(sprintf('Message type must be a string. Got %s.', get_debug_type($type)));
         $this->expectException(InvalidArgumentException::class);
-        $serializer->unserialize(json_encode($payload));
+        $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
     }
 
     public static function dataUnsupportedTypeFormat(): iterable
@@ -53,7 +53,7 @@ final class JsonMessageSerializerTest extends TestCase
             ],
         ];
 
-        $message = $serializer->unserialize(json_encode($payload));
+        $message = $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
         $this->assertInstanceOf(Message::class, $message);
     }
 
@@ -65,7 +65,7 @@ final class JsonMessageSerializerTest extends TestCase
             'data' => 'test',
             'meta' => [],
         ];
-        $message = $serializer->unserialize(json_encode($payload));
+        $message = $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
         $this->assertInstanceOf(Message::class, $message);
     }
 
@@ -76,7 +76,7 @@ final class JsonMessageSerializerTest extends TestCase
 
         $this->expectExceptionMessage(sprintf('Payload must be array. Got %s.', get_debug_type($payload)));
         $this->expectException(InvalidArgumentException::class);
-        $serializer->unserialize(json_encode($payload));
+        $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
     }
 
     public static function dataUnsupportedPayloadFormat(): iterable
@@ -95,7 +95,7 @@ final class JsonMessageSerializerTest extends TestCase
 
         $this->expectExceptionMessage(sprintf('Metadata must be an array. Got %s.', get_debug_type($meta)));
         $this->expectException(InvalidArgumentException::class);
-        $serializer->unserialize(json_encode($payload));
+        $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
     }
 
     public static function dataUnsupportedMetadataFormat(): iterable
@@ -110,7 +110,7 @@ final class JsonMessageSerializerTest extends TestCase
         $payload = ['type' => 'handler', 'data' => 'test'];
         $serializer = $this->createSerializer();
 
-        $message = $serializer->unserialize(json_encode($payload));
+        $message = $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
 
         $this->assertEquals($payload['data'], $message->getData());
         $this->assertEquals([EnvelopeInterface::ENVELOPE_STACK_KEY => []], $message->getMetadata());
@@ -121,7 +121,7 @@ final class JsonMessageSerializerTest extends TestCase
         $payload = ['type' => 'handler', 'data' => 'test', 'meta' => ['int' => 1, 'str' => 'string', 'bool' => true]];
         $serializer = $this->createSerializer();
 
-        $message = $serializer->unserialize(json_encode($payload));
+        $message = $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
 
         $this->assertEquals($payload['data'], $message->getData());
         $this->assertEquals(['int' => 1, 'str' => 'string', 'bool' => true, EnvelopeInterface::ENVELOPE_STACK_KEY => []], $message->getMetadata());
@@ -141,7 +141,7 @@ final class JsonMessageSerializerTest extends TestCase
         $serializer = $this->createSerializer();
 
         /** @var IdEnvelope $message */
-        $message = $serializer->unserialize(json_encode($payload));
+        $message = $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
 
         $this->assertEquals($payload['data'], $message->getData());
         $this->assertEquals([IdEnvelope::class], $message->getMetadata()[EnvelopeInterface::ENVELOPE_STACK_KEY]);

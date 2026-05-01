@@ -33,7 +33,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 final class WorkerTest extends TestCase
 {
     #[DataProvider('messageHandledDataProvider')]
-    public function testMessageHandled($handler, array $containerServices): void
+    public function testMessageHandled(mixed $handler, array $containerServices): void
     {
         $message = new Message('simple', ['test-data']);
         $logger = new SimpleLogger();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\App;
 
-class StaticMessageHandler
+final class StaticMessageHandler
 {
     public static bool $wasHandled = false;
 

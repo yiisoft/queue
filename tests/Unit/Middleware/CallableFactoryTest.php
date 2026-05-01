@@ -19,6 +19,7 @@ final class CallableFactoryTest extends TestCase
         $factory = new CallableFactory($container);
         $callable = $factory->create($definition);
 
+        /** @psalm-suppress RedundantCondition */
         self::assertIsCallable($callable);
         self::assertSame($expectedResult, $callable(...$arguments));
     }

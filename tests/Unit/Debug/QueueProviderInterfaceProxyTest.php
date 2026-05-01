@@ -11,7 +11,7 @@ use Yiisoft\Queue\Debug\QueueProviderInterfaceProxy;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
 use Yiisoft\Queue\QueueInterface;
 
-class QueueProviderInterfaceProxyTest extends TestCase
+final class QueueProviderInterfaceProxyTest extends TestCase
 {
     public function testGet(): void
     {

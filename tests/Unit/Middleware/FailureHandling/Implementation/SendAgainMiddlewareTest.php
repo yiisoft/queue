@@ -20,7 +20,7 @@ use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Stubs\StubDelayMiddleware;
 use Yiisoft\Queue\Tests\TestCase;
 
-class SendAgainMiddlewareTest extends TestCase
+final class SendAgainMiddlewareTest extends TestCase
 {
     final public const KEY_EXPONENTIAL_ATTEMPTS = ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test';
     final public const KEY_EXPONENTIAL_DELAY = ExponentialDelayMiddleware::META_KEY_DELAY . '-test';
