@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace Yiisoft\Queue;
 
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 
 interface QueueInterface
 {
     /**
      * Pushes a message into the queue.
      *
-     * @param array|callable|MiddlewarePushInterface|string ...$middlewareDefinitions
-     * @return MessageInterface
+     * @param MessageInterface $message The message to push.
+     *
+     * @return MessageInterface The pushed message, possibly enriched with metadata such as an assigned ID.
      */
-    public function push(MessageInterface $message, MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): MessageInterface;
+    public function push(MessageInterface $message): MessageInterface;
 
     /**
      * Handle all existing messages and exit

@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Queue\Stubs\StubDelayMiddleware;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Cli\LoopInterface;
@@ -23,7 +24,6 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
 use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
@@ -43,8 +43,6 @@ final class MiddlewareTest extends TestCase
             'channel 1',
             'channel 2',
             'channel 3',
-            'message 1',
-            'message 2',
         ];
 
         $pushMiddlewareDispatcher = new PushMiddlewareDispatcher(
@@ -72,11 +70,7 @@ final class MiddlewareTest extends TestCase
             ->withMiddlewaresAdded(new TestMiddleware('channel 3'));
 
         $message = new Message('test', ['initial']);
-        $messagePushed = $queue->push(
-            $message,
-            new TestMiddleware('message 1'),
-            new TestMiddleware('message 2'),
-        );
+        $messagePushed = $queue->push($message);
 
         self::assertEquals($stack, $messagePushed->getData());
     }
@@ -156,7 +150,7 @@ final class MiddlewareTest extends TestCase
                     1,
                     5,
                     2,
-                    $this->createMock(DelayMiddlewareInterface::class),
+                    new StubDelayMiddleware(),
                     $queue,
                 ),
             ],

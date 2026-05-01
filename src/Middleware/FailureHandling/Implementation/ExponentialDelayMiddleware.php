@@ -10,6 +10,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Queue\Middleware\Push\Implementation\DelayMiddlewareInterface;
+use Yiisoft\Queue\Middleware\Push\NoopMessageHandlerPush;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 
@@ -64,12 +65,11 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
         $message = $request->getMessage();
         if ($this->suites($message)) {
             $envelope = new FailureEnvelope($message, $this->createNewMeta($message));
+            $envelope = $this->delayMiddleware
+                ->withDelay($this->getDelay($envelope))
+                ->processPush($envelope, new NoopMessageHandlerPush());
             $queue = $this->queue ?? $request->getQueue();
-            $middlewareDefinitions = $this->delayMiddleware->withDelay($this->getDelay($envelope));
-            $messageNew = $queue->push(
-                $envelope,
-                $middlewareDefinitions,
-            );
+            $messageNew = $queue->push($envelope);
 
             return $request->withMessage($messageNew);
         }
