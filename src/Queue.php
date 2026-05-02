@@ -60,10 +60,13 @@ final class Queue implements QueueInterface
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ) {
         $this->name = StringNormalizer::normalize($name);
-        $this->finalPushHandler = $this->isSynchronous()
-            ? new SynchronousPushHandler($worker, $this)
-            : new AdapterPushHandler($this->adapter);
+        $this->finalPushHandler = $this->createFinalPushHandler();
         $this->setMiddlewaresAndPrepareDispatcher($middlewareDefinitions);
+    }
+
+    public function __clone()
+    {
+        $this->finalPushHandler = $this->createFinalPushHandler();
     }
 
     public function getName(): string
@@ -186,5 +189,12 @@ final class Queue implements QueueInterface
     private function isSynchronous(): bool
     {
         return $this->adapter === null;
+    }
+
+    private function createFinalPushHandler(): MessageHandlerPushInterface
+    {
+        return $this->isSynchronous()
+            ? new SynchronousPushHandler($this->worker, $this)
+            : new AdapterPushHandler($this->adapter);
     }
 }
