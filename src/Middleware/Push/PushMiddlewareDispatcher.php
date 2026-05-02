@@ -45,6 +45,18 @@ final class PushMiddlewareDispatcher
         return $this->stack->handlePush($message);
     }
 
+    public function withFinishHandler(PushHandlerInterface $finishHandler): self
+    {
+        $instance = clone $this;
+        $instance->finishHandler = $finishHandler;
+
+        // Fixes a memory leak.
+        unset($instance->stack);
+        $instance->stack = null;
+
+        return $instance;
+    }
+
     /**
      * Returns new instance with middleware handlers replaced with the ones provided.
      *
@@ -61,18 +73,6 @@ final class PushMiddlewareDispatcher
      *
      * @return self New instance of the {@see PushMiddlewareDispatcher}
      */
-    public function withFinishHandler(PushHandlerInterface $finishHandler): self
-    {
-        $instance = clone $this;
-        $instance->finishHandler = $finishHandler;
-
-        // Fixes a memory leak.
-        unset($instance->stack);
-        $instance->stack = null;
-
-        return $instance;
-    }
-
     public function withMiddlewares(array $middlewareDefinitions): self
     {
         $instance = clone $this;
