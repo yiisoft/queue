@@ -23,7 +23,7 @@ final class PushMiddlewareDispatcher
     /**
      * @param PushMiddlewareFactoryInterface $middlewareFactory Factory used to instantiate middleware.
      * @param array<array|callable|PushMiddlewareInterface|string> $middlewareDefinitions Middleware definitions.
-     * @param PushHandlerInterface $finishHandler Handler to use when no middleware produces a response.
+     * @param PushHandlerInterface $finishHandler Finish message handler.
      */
     public function __construct(
         private readonly PushMiddlewareFactoryInterface $middlewareFactory,
