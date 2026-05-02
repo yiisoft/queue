@@ -197,11 +197,4 @@ final class Queue implements QueueInterface
     {
         return $this->adapter === null;
     }
-
-    private function createFinalPushHandler(): MessageHandlerPushInterface
-    {
-        return $this->isSynchronous()
-            ? new SynchronousPushHandler($this->worker, $this)
-            : new AdapterPushHandler($this->adapter);
-    }
 }
