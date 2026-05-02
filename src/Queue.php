@@ -13,6 +13,7 @@ use Yiisoft\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
 use Yiisoft\Queue\Middleware\Push\SynchronousPushHandler;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -26,13 +27,6 @@ final class Queue implements QueueInterface
      */
     private array $middlewareDefinitions;
 
-    /**
-     * @var PushHandlerInterface The final push handler in the middleware chain, responsible
-     * for actually sending the message. Uses {@see SynchronousPushHandler} in synchronous mode or
-     * {@see AdapterPushHandler} otherwise.
-     */
-    private PushHandlerInterface $finalPushHandler;
-
     private string $name;
 
     /**
@@ -42,10 +36,10 @@ final class Queue implements QueueInterface
     private PushMiddlewareDispatcher $dispatcher;
 
     /**
-     * @var PushMiddlewareDispatcher The base dispatcher created from the {@see PushMiddlewareConfig} provided to
-     * the constructor. Holds the common middleware applied to all queues.
+     * @var PushMiddlewareDispatcher The base dispatcher built from {@see PushMiddlewareConfig}.
+     * Holds the common middleware applied to all queues.
      */
-    private readonly PushMiddlewareDispatcher $baseDispatcher;
+    private PushMiddlewareDispatcher $baseDispatcher;
 
     /**
      * @param WorkerInterface $worker The worker that processes messages.
@@ -67,18 +61,20 @@ final class Queue implements QueueInterface
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
         PushMiddlewareInterface|callable|array|string ...$middlewareDefinitions,
     ) {
+        $this->name = StringNormalizer::normalize($name);
         $this->baseDispatcher = new PushMiddlewareDispatcher(
             $middlewareConfig->middlewareFactory,
-            ...$middlewareConfig->commonMiddlewareDefinitions,
+            $middlewareConfig->commonMiddlewareDefinitions,
+            $this->createFinalPushHandler(),
         );
-        $this->name = StringNormalizer::normalize($name);
-        $this->finalPushHandler = $this->createFinalPushHandler();
         $this->setMiddlewaresAndPrepareDispatcher($middlewareDefinitions);
     }
 
     public function __clone()
     {
-        $this->finalPushHandler = $this->createFinalPushHandler();
+        $finalPushHandler = $this->createFinalPushHandler();
+        $this->baseDispatcher = $this->baseDispatcher->withFinishHandler($finalPushHandler);
+        $this->dispatcher = $this->dispatcher->withFinishHandler($finalPushHandler);
     }
 
     public function getName(): string
@@ -93,7 +89,7 @@ final class Queue implements QueueInterface
             ['messageType' => $message->getType()],
         );
 
-        $message = $this->dispatcher->dispatch($message, $this->finalPushHandler);
+        $message = $this->dispatcher->dispatch($message);
 
         if ($this->isSynchronous()) {
             $this->logger->info(

@@ -19,30 +19,27 @@ final class PushMiddlewareDispatcher
      * @var PushMiddlewareStack|null The middleware stack.
      */
     private ?PushMiddlewareStack $stack = null;
-    /**
-     * @var array[]|callable[]|PushMiddlewareInterface[]|string[]
-     */
-    private array $middlewareDefinitions;
 
+    /**
+     * @param PushMiddlewareFactoryInterface $middlewareFactory Factory used to instantiate middleware.
+     * @param array<array|callable|PushMiddlewareInterface|string> $middlewareDefinitions Middleware definitions.
+     * @param PushHandlerInterface $finishHandler Handler to use when no middleware produces a response.
+     */
     public function __construct(
         private readonly PushMiddlewareFactoryInterface $middlewareFactory,
-        array|callable|string|PushMiddlewareInterface ...$middlewareDefinitions,
-    ) {
-        $this->middlewareDefinitions = $middlewareDefinitions;
-    }
+        private array $middlewareDefinitions,
+        private PushHandlerInterface $finishHandler,
+    ) {}
 
     /**
      * Dispatch message through middleware to get response.
      *
      * @param MessageInterface $message Message to pass to middleware.
-     * @param PushHandlerInterface $finishHandler Handler to use in case no middleware produced a response.
      */
-    public function dispatch(
-        MessageInterface $message,
-        PushHandlerInterface $finishHandler,
-    ): MessageInterface {
+    public function dispatch(MessageInterface $message): MessageInterface
+    {
         if ($this->stack === null) {
-            $this->stack = new PushMiddlewareStack($this->buildMiddlewares(), $finishHandler);
+            $this->stack = new PushMiddlewareStack($this->buildMiddlewares(), $this->finishHandler);
         }
 
         return $this->stack->handlePush($message);
@@ -64,6 +61,18 @@ final class PushMiddlewareDispatcher
      *
      * @return self New instance of the {@see PushMiddlewareDispatcher}
      */
+    public function withFinishHandler(PushHandlerInterface $finishHandler): self
+    {
+        $instance = clone $this;
+        $instance->finishHandler = $finishHandler;
+
+        // Fixes a memory leak.
+        unset($instance->stack);
+        $instance->stack = null;
+
+        return $instance;
+    }
+
     public function withMiddlewares(array $middlewareDefinitions): self
     {
         $instance = clone $this;
