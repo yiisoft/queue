@@ -59,8 +59,8 @@ Here is the meaning of the keys:
 - The `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` key couples the defined pipeline with all queue names without an explicitly defined failure strategy pipeline.
 
 Each middleware definition must be one of:
-- A ready-to-use `MiddlewareFailureInterface` object like `new FooMiddleware()`.
-- A valid definition for the [yiisoft/definitions](https://github.com/yiisoft/definitions). It must describe an object, implementing the `MiddlewareFailureInterface`.
+- A ready-to-use `FailureMiddlewareInterface` object like `new FooMiddleware()`.
+- A valid definition for the [yiisoft/definitions](https://github.com/yiisoft/definitions). It must describe an object, implementing the `FailureMiddlewareInterface`.
 - An [extended callable definition](callable-definitions-extended.md).
 - An id string for your DI container to resolve a middleware, e.g. `FooMiddleware::class`.
 

@@ -13,15 +13,15 @@ final class FailureMiddlewareDispatcher
     /**
      * Contains a middleware pipeline handler.
      *
-     * @var MiddlewareFailureStack[] The middleware stack.
+     * @var FailureMiddlewareStack[] The middleware stack.
      */
     private array $stack = [];
 
     /**
-     * @param array[][]|callable[][]|MiddlewareFailureInterface[][]|string[][] $middlewareDefinitions
+     * @param array[][]|callable[][]|FailureMiddlewareInterface[][]|string[][] $middlewareDefinitions
      */
     public function __construct(
-        private readonly MiddlewareFactoryFailureInterface $middlewareFactory,
+        private readonly FailureMiddlewareFactoryInterface $middlewareFactory,
         private array $middlewareDefinitions,
     ) {
         $this->init();
@@ -31,11 +31,11 @@ final class FailureMiddlewareDispatcher
      * Dispatch request through middleware to get response.
      *
      * @param FailureHandlingRequest $request Request to pass to middleware.
-     * @param MessageFailureHandlerInterface $finishHandler Handler to use in case no middleware produced a response.
+     * @param FailureHandlerInterface $finishHandler Handler to use in case no middleware produced a response.
      */
     public function dispatch(
         FailureHandlingRequest $request,
-        MessageFailureHandlerInterface $finishHandler,
+        FailureHandlerInterface $finishHandler,
     ): FailureHandlingRequest {
         $queueName = $request->getQueue()->getName();
         if (!isset($this->middlewareDefinitions[$queueName]) || $this->middlewareDefinitions[$queueName] === []) {
@@ -44,7 +44,7 @@ final class FailureMiddlewareDispatcher
         $definitions = array_reverse($this->middlewareDefinitions[$queueName]);
 
         if (!isset($this->stack[$queueName])) {
-            $this->stack[$queueName] = new MiddlewareFailureStack($this->buildMiddlewares(...$definitions), $finishHandler);
+            $this->stack[$queueName] = new FailureMiddlewareStack($this->buildMiddlewares(...$definitions), $finishHandler);
         }
 
         return $this->stack[$queueName]->handleFailure($request);
@@ -54,7 +54,7 @@ final class FailureMiddlewareDispatcher
      * Returns new instance with middleware handlers replaced with the ones provided.
      * The last specified handler will be executed first.
      *
-     * @param array[][]|callable[][]|MiddlewareFailureInterface[][]|string[][] $middlewareDefinitions Each array element is:
+     * @param array[][]|callable[][]|FailureMiddlewareInterface[][]|string[][] $middlewareDefinitions Each array element is:
      *
      * - A name of a middleware class. The middleware instance will be obtained from container executed.
      * - A callable with `function(ServerRequestInterface $request, RequestHandlerInterface $handler):
@@ -91,13 +91,13 @@ final class FailureMiddlewareDispatcher
     /**
      * @return Closure[]
      */
-    private function buildMiddlewares(array|callable|string|MiddlewareFailureInterface ...$definitions): array
+    private function buildMiddlewares(array|callable|string|FailureMiddlewareInterface ...$definitions): array
     {
         $middlewares = [];
         $factory = $this->middlewareFactory;
 
         foreach ($definitions as $middlewareDefinition) {
-            $middlewares[] = static fn(): MiddlewareFailureInterface
+            $middlewares[] = static fn(): FailureMiddlewareInterface
                 => $factory->createFailureMiddleware($middlewareDefinition);
         }
 

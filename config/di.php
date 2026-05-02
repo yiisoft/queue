@@ -9,13 +9,13 @@ use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\MessageSerializerInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPushInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Worker\Worker as QueueWorker;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -33,9 +33,9 @@ return [
             ? $container->get(SignalLoop::class)
             : $container->get(SimpleLoop::class);
     },
-    MiddlewareFactoryPushInterface::class => MiddlewareFactoryPush::class,
-    MiddlewareFactoryConsumeInterface::class => MiddlewareFactoryConsume::class,
-    MiddlewareFactoryFailureInterface::class => MiddlewareFactoryFailure::class,
+    PushMiddlewareFactoryInterface::class => PushMiddlewareFactory::class,
+    ConsumeMiddlewareFactoryInterface::class => ConsumeMiddlewareFactory::class,
+    FailureMiddlewareFactoryInterface::class => FailureMiddlewareFactory::class,
     PushMiddlewareDispatcher::class => [
         '__construct()' => ['middlewareDefinitions' => $params['yiisoft/queue']['middlewares-push']],
     ],

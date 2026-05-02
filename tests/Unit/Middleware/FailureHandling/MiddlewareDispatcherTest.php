@@ -13,8 +13,8 @@ use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support\TestCallableMiddleware;
@@ -76,12 +76,12 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $request = $this->getFailureHandlingRequest();
 
-        $middleware1 = static function (FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest {
+        $middleware1 = static function (FailureHandlingRequest $request, FailureHandlerInterface $handler): FailureHandlingRequest {
             $request = $request->withMessage(new Message($request->getMessage()->getType(), 'new test data'));
 
             return $handler->handleFailure($request);
         };
-        $middleware2 = static function (FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest {
+        $middleware2 = static function (FailureHandlingRequest $request, FailureHandlerInterface $handler): FailureHandlingRequest {
             $request = $request->withMessage(new Message('new handler', $request->getMessage()->getData()));
 
             return $handler->handleFailure($request);
@@ -98,10 +98,10 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $request = $this->getFailureHandlingRequest();
 
-        $middleware1 = static function (FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest {
+        $middleware1 = static function (FailureHandlingRequest $request, FailureHandlerInterface $handler): FailureHandlingRequest {
             return $request->withMessage(new Message($request->getMessage()->getType(), 'first'));
         };
-        $middleware2 = static function (FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest {
+        $middleware2 = static function (FailureHandlingRequest $request, FailureHandlerInterface $handler): FailureHandlingRequest {
             return $request->withMessage(new Message($request->getMessage()->getType(), 'second'));
         };
 
@@ -146,9 +146,9 @@ final class MiddlewareDispatcherTest extends TestCase
         self::assertSame('New middleware test data', $request->getMessage()->getData());
     }
 
-    private function getRequestHandler(): MessageFailureHandlerInterface
+    private function getRequestHandler(): FailureHandlerInterface
     {
-        return new class implements MessageFailureHandlerInterface {
+        return new class implements FailureHandlerInterface {
             public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
             {
                 return $request;
@@ -162,7 +162,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $container ??= $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
         $callableFactory = new CallableFactory($container);
 
-        return new FailureMiddlewareDispatcher(new MiddlewareFactoryFailure($container, $callableFactory), []);
+        return new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container, $callableFactory), []);
     }
 
     private function createContainer(array $instances = []): ContainerInterface

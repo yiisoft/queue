@@ -7,16 +7,16 @@ namespace Yiisoft\Queue\Tests\Integration\Support;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareConsumeInterface;
-use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
+use Yiisoft\Queue\Middleware\Consume\ConsumeHandlerInterface;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareInterface;
+use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
 
-final class TestMiddleware implements MiddlewarePushInterface, MiddlewareConsumeInterface
+final class TestMiddleware implements PushMiddlewareInterface, ConsumeMiddlewareInterface
 {
     public function __construct(private readonly string $stage) {}
 
-    public function processPush(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface
+    public function processPush(MessageInterface $message, PushHandlerInterface $handler): MessageInterface
     {
         $stack = $message->getData();
         $stack[] = $this->stage;
@@ -24,7 +24,7 @@ final class TestMiddleware implements MiddlewarePushInterface, MiddlewareConsume
         return $handler->handlePush(new Message($message->getType(), $stack));
     }
 
-    public function processConsume(ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest
+    public function processConsume(ConsumeRequest $request, ConsumeHandlerInterface $handler): ConsumeRequest
     {
         $message = $request->getMessage();
         $stack = $message->getData();

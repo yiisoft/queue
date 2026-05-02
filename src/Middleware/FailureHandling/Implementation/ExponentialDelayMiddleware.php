@@ -7,8 +7,8 @@ namespace Yiisoft\Queue\Middleware\FailureHandling\Implementation;
 use InvalidArgumentException;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
 use Yiisoft\Queue\Message\DelayEnvelope;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
@@ -17,7 +17,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
  * Failure strategy which resends the given message to a queue with an exponentially increasing delay.
  * The delay mechanism **must** be implemented by the used {@see AdapterInterface} implementation.
  */
-final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
+final class ExponentialDelayMiddleware implements FailureMiddlewareInterface
 {
     public const META_KEY_ATTEMPTS = 'failure-strategy-exponential-delay-attempts';
     public const META_KEY_DELAY = 'failure-strategy-exponential-delay-delay';
@@ -57,7 +57,7 @@ final class ExponentialDelayMiddleware implements MiddlewareFailureInterface
 
     public function processFailure(
         FailureHandlingRequest $request,
-        MessageFailureHandlerInterface $handler,
+        FailureHandlerInterface $handler,
     ): FailureHandlingRequest {
         $message = $request->getMessage();
         if ($this->suites($message)) {

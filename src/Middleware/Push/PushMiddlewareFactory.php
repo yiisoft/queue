@@ -13,12 +13,12 @@ use Yiisoft\Queue\Middleware\MiddlewareFactory;
 /**
  * Creates a middleware based on the definition provided.
  *
- * @template-extends MiddlewareFactory<MiddlewarePushInterface>
+ * @template-extends MiddlewareFactory<PushMiddlewareInterface>
  */
-final class MiddlewareFactoryPush extends MiddlewareFactory implements MiddlewareFactoryPushInterface
+final class PushMiddlewareFactory extends MiddlewareFactory implements PushMiddlewareFactoryInterface
 {
     /**
-     * @param MiddlewarePushInterface|callable|array|string $middlewareDefinition Middleware definition in one of
+     * @param PushMiddlewareInterface|callable|array|string $middlewareDefinition Middleware definition in one of
      * the following formats:
      *
      * - A middleware object.
@@ -32,22 +32,22 @@ final class MiddlewareFactoryPush extends MiddlewareFactory implements Middlewar
      * For handler action and callable
      * typed parameters are automatically injected using dependency injection container.
      * Current message and handler could be obtained by type-hinting for {@see MessageInterface}
-     * and {@see MessageHandlerPushInterface}.
+     * and {@see PushHandlerInterface}.
      *
      * @throws InvalidMiddlewareDefinitionException
      *
-     * @return MiddlewarePushInterface
+     * @return PushMiddlewareInterface
      */
     public function createPushMiddleware(
-        MiddlewarePushInterface|callable|array|string $middlewareDefinition,
-    ): MiddlewarePushInterface {
-        if ($middlewareDefinition instanceof MiddlewarePushInterface) {
+        PushMiddlewareInterface|callable|array|string $middlewareDefinition,
+    ): PushMiddlewareInterface {
+        if ($middlewareDefinition instanceof PushMiddlewareInterface) {
             return $middlewareDefinition;
         }
 
         $middleware = $this->create($middlewareDefinition);
 
-        if (!$middleware instanceof MiddlewarePushInterface) {
+        if (!$middleware instanceof PushMiddlewareInterface) {
             throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
         }
 
@@ -56,12 +56,12 @@ final class MiddlewareFactoryPush extends MiddlewareFactory implements Middlewar
 
     protected function getInterfaceName(): string
     {
-        return MiddlewarePushInterface::class;
+        return PushMiddlewareInterface::class;
     }
 
-    protected function wrapMiddleware(callable $callback): MiddlewarePushInterface
+    protected function wrapMiddleware(callable $callback): PushMiddlewareInterface
     {
-        return new class ($callback, $this->container) implements MiddlewarePushInterface {
+        return new class ($callback, $this->container) implements PushMiddlewareInterface {
             private $callback;
 
             public function __construct(
@@ -71,14 +71,14 @@ final class MiddlewareFactoryPush extends MiddlewareFactory implements Middlewar
                 $this->callback = $callback;
             }
 
-            public function processPush(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface
+            public function processPush(MessageInterface $message, PushHandlerInterface $handler): MessageInterface
             {
                 $response = (new Injector($this->container))->invoke($this->callback, [$message, $handler]);
                 if ($response instanceof MessageInterface) {
                     return $response;
                 }
 
-                if ($response instanceof MiddlewarePushInterface) {
+                if ($response instanceof PushMiddlewareInterface) {
                     return $response->processPush($message, $handler);
                 }
 

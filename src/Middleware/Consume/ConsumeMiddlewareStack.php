@@ -2,38 +2,38 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Middleware\FailureHandling;
+namespace Yiisoft\Queue\Middleware\Consume;
 
 use Closure;
 
-final class MiddlewareFailureStack implements MessageFailureHandlerInterface
+final class ConsumeMiddlewareStack implements ConsumeHandlerInterface
 {
     /**
      * Contains a stack of middleware wrapped in handlers.
      * Each handler points to the handler of middleware that will be processed next.
      *
-     * @var MessageFailureHandlerInterface|null stack of middleware
+     * @var ConsumeHandlerInterface|null stack of middleware
      */
-    private ?MessageFailureHandlerInterface $stack = null;
+    private ?ConsumeHandlerInterface $stack = null;
 
     /**
      * @param Closure[] $middlewares Middlewares.
-     * @param MessageFailureHandlerInterface $finishHandler Fallback handler
+     * @param ConsumeHandlerInterface $finishHandler Fallback handler
      * events.
      */
     public function __construct(
         private readonly array $middlewares,
-        private readonly MessageFailureHandlerInterface $finishHandler,
+        private readonly ConsumeHandlerInterface $finishHandler,
     ) {}
 
-    public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
+    public function handleConsume(ConsumeRequest $request): ConsumeRequest
     {
         if ($this->stack === null) {
             $this->build();
         }
 
         /** @psalm-suppress PossiblyNullReference */
-        return $this->stack->handleFailure($request);
+        return $this->stack->handleConsume($request);
     }
 
     private function build(): void
@@ -50,23 +50,23 @@ final class MiddlewareFailureStack implements MessageFailureHandlerInterface
     /**
      * Wrap handler by middlewares.
      */
-    private function wrap(Closure $middlewareFactory, MessageFailureHandlerInterface $handler): MessageFailureHandlerInterface
+    private function wrap(Closure $middlewareFactory, ConsumeHandlerInterface $handler): ConsumeHandlerInterface
     {
-        return new class ($middlewareFactory, $handler) implements MessageFailureHandlerInterface {
-            private ?MiddlewareFailureInterface $middleware = null;
+        return new class ($middlewareFactory, $handler) implements ConsumeHandlerInterface {
+            private ?ConsumeMiddlewareInterface $middleware = null;
 
             public function __construct(
                 private readonly Closure $middlewareFactory,
-                private readonly MessageFailureHandlerInterface $handler,
+                private readonly ConsumeHandlerInterface $handler,
             ) {}
 
-            public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
+            public function handleConsume(ConsumeRequest $request): ConsumeRequest
             {
                 if ($this->middleware === null) {
                     $this->middleware = ($this->middlewareFactory)();
                 }
 
-                return $this->middleware->processFailure($request, $this->handler);
+                return $this->middleware->processConsume($request, $this->handler);
             }
         };
     }

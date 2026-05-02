@@ -12,17 +12,17 @@ final class PushMiddlewareDispatcher
     /**
      * Contains a middleware pipeline handler.
      *
-     * @var MiddlewarePushStack|null The middleware stack.
+     * @var PushMiddlewareStack|null The middleware stack.
      */
-    private ?MiddlewarePushStack $stack = null;
+    private ?PushMiddlewareStack $stack = null;
     /**
-     * @var array[]|callable[]|MiddlewarePushInterface[]|string[]
+     * @var array[]|callable[]|PushMiddlewareInterface[]|string[]
      */
     private array $middlewareDefinitions;
 
     public function __construct(
-        private readonly MiddlewareFactoryPushInterface $middlewareFactory,
-        array|callable|string|MiddlewarePushInterface ...$middlewareDefinitions,
+        private readonly PushMiddlewareFactoryInterface $middlewareFactory,
+        array|callable|string|PushMiddlewareInterface ...$middlewareDefinitions,
     ) {
         $this->middlewareDefinitions = $middlewareDefinitions;
     }
@@ -31,14 +31,14 @@ final class PushMiddlewareDispatcher
      * Dispatch message through middleware to get response.
      *
      * @param MessageInterface $message Message to pass to middleware.
-     * @param MessageHandlerPushInterface $finishHandler Handler to use in case no middleware produced a response.
+     * @param PushHandlerInterface $finishHandler Handler to use in case no middleware produced a response.
      */
     public function dispatch(
         MessageInterface $message,
-        MessageHandlerPushInterface $finishHandler,
+        PushHandlerInterface $finishHandler,
     ): MessageInterface {
         if ($this->stack === null) {
-            $this->stack = new MiddlewarePushStack($this->buildMiddlewares(), $finishHandler);
+            $this->stack = new PushMiddlewareStack($this->buildMiddlewares(), $finishHandler);
         }
 
         return $this->stack->handlePush($message);
@@ -47,10 +47,10 @@ final class PushMiddlewareDispatcher
     /**
      * Returns new instance with middleware handlers replaced with the ones provided.
      *
-     * @param array[]|callable[]|MiddlewarePushInterface[]|string[] $middlewareDefinitions Each array element is:
+     * @param array[]|callable[]|PushMiddlewareInterface[]|string[] $middlewareDefinitions Each array element is:
      *
      * - A name of a middleware class. The middleware instance will be obtained from container executed.
-     * - A callable with `function(MessageInterface $message, MessageHandlerPushInterface $handler):
+     * - A callable with `function(MessageInterface $message, PushHandlerInterface $handler):
      *     MessageInterface` signature.
      * - A "callable-like" array in format `[FooMiddleware::class, 'index']`. `FooMiddleware` instance will
      *   be created and `index()` method will be executed.
@@ -75,10 +75,10 @@ final class PushMiddlewareDispatcher
     /**
      * Returns a new instance with additional middleware handlers added to the existing ones.
      *
-     * @param array[]|callable[]|MiddlewarePushInterface[]|string[] $middlewareDefinitions Each array element is:
+     * @param array[]|callable[]|PushMiddlewareInterface[]|string[] $middlewareDefinitions Each array element is:
      *
      * - A name of a middleware class. The middleware instance will be obtained from container executed.
-     * - A callable with `function(MessageInterface $message, MessageHandlerPushInterface $handler):
+     * - A callable with `function(MessageInterface $message, PushHandlerInterface $handler):
      *     MessageInterface` signature.
      * - A "callable-like" array in format `[FooMiddleware::class, 'index']`. `FooMiddleware` instance will
      *   be created and `index()` method will be executed.
@@ -110,7 +110,7 @@ final class PushMiddlewareDispatcher
         $factory = $this->middlewareFactory;
 
         foreach ($this->middlewareDefinitions as $middlewareDefinition) {
-            $middlewares[] = static fn(): MiddlewarePushInterface => $factory->createPushMiddleware(
+            $middlewares[] = static fn(): PushMiddlewareInterface => $factory->createPushMiddleware(
                 $middlewareDefinition,
             );
         }

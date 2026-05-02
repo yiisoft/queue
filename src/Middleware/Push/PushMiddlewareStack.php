@@ -10,23 +10,23 @@ use Yiisoft\Queue\Message\MessageInterface;
 /**
  * @internal
  */
-final class MiddlewarePushStack implements MessageHandlerPushInterface
+final class PushMiddlewareStack implements PushHandlerInterface
 {
     /**
      * Contains a stack of middleware wrapped in handlers.
      * Each handler points to the handler of middleware that will be processed next.
      *
-     * @var MessageHandlerPushInterface|null stack of middleware
+     * @var PushHandlerInterface|null stack of middleware
      */
-    private ?MessageHandlerPushInterface $stack = null;
+    private ?PushHandlerInterface $stack = null;
 
     /**
      * @param Closure[] $middlewares Middlewares.
-     * @param MessageHandlerPushInterface $finishHandler Final handler invoked after all middlewares are processed.
+     * @param PushHandlerInterface $finishHandler Final handler invoked after all middlewares are processed.
      */
     public function __construct(
         private readonly array $middlewares,
-        private readonly MessageHandlerPushInterface $finishHandler,
+        private readonly PushHandlerInterface $finishHandler,
     ) {}
 
     public function handlePush(MessageInterface $message): MessageInterface
@@ -53,14 +53,14 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
     /**
      * Wrap handler by middlewares.
      */
-    private function wrap(Closure $middlewareFactory, MessageHandlerPushInterface $handler): MessageHandlerPushInterface
+    private function wrap(Closure $middlewareFactory, PushHandlerInterface $handler): PushHandlerInterface
     {
-        return new class ($middlewareFactory, $handler) implements MessageHandlerPushInterface {
-            private ?MiddlewarePushInterface $middleware = null;
+        return new class ($middlewareFactory, $handler) implements PushHandlerInterface {
+            private ?PushMiddlewareInterface $middleware = null;
 
             public function __construct(
                 private readonly Closure $middlewareFactory,
-                private readonly MessageHandlerPushInterface $handler,
+                private readonly PushHandlerInterface $handler,
             ) {}
 
             public function handlePush(MessageInterface $message): MessageInterface

@@ -18,11 +18,11 @@ use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
 use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Queue\Middleware\Consume\MessageHandlerConsumeInterface;
+use Yiisoft\Queue\Middleware\Consume\ConsumeHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
@@ -109,12 +109,12 @@ final class Worker implements WorkerInterface
         return $this->handlersCached[$messageType];
     }
 
-    private function createConsumeHandler(Closure $handler): MessageHandlerConsumeInterface
+    private function createConsumeHandler(Closure $handler): ConsumeHandlerInterface
     {
         return new ConsumeFinalHandler($handler);
     }
 
-    private function createFailureHandler(): MessageFailureHandlerInterface
+    private function createFailureHandler(): FailureHandlerInterface
     {
         return new FailureFinalHandler();
     }

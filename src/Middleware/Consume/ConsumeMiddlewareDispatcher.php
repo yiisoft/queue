@@ -13,18 +13,18 @@ final class ConsumeMiddlewareDispatcher
     /**
      * Contains a middleware pipeline handlers.
      *
-     * @var MiddlewareConsumeStack[] The middleware stack divided by message types.
+     * @var ConsumeMiddlewareStack[] The middleware stack divided by message types.
      */
     private array $stack = [];
 
     /**
-     * @var array[]|callable[]|MiddlewareConsumeInterface[]|string[]
+     * @var array[]|callable[]|ConsumeMiddlewareInterface[]|string[]
      */
     private array $middlewareDefinitions;
 
     public function __construct(
-        private readonly MiddlewareFactoryConsumeInterface $middlewareFactory,
-        array|callable|string|MiddlewareConsumeInterface ...$middlewareDefinitions,
+        private readonly ConsumeMiddlewareFactoryInterface $middlewareFactory,
+        array|callable|string|ConsumeMiddlewareInterface ...$middlewareDefinitions,
     ) {
         $this->middlewareDefinitions = array_reverse($middlewareDefinitions);
     }
@@ -33,15 +33,15 @@ final class ConsumeMiddlewareDispatcher
      * Dispatch request through middleware to get response.
      *
      * @param ConsumeRequest $request Request to pass to middleware.
-     * @param MessageHandlerConsumeInterface $finishHandler Handler to use in case no middleware produced a response.
+     * @param ConsumeHandlerInterface $finishHandler Handler to use in case no middleware produced a response.
      */
     public function dispatch(
         ConsumeRequest $request,
-        MessageHandlerConsumeInterface $finishHandler,
+        ConsumeHandlerInterface $finishHandler,
     ): ConsumeRequest {
         $type = $request->getMessage()->getType();
         if (!array_key_exists($type, $this->stack)) {
-            $this->stack[$type] = new MiddlewareConsumeStack($this->buildMiddlewares(), $finishHandler);
+            $this->stack[$type] = new ConsumeMiddlewareStack($this->buildMiddlewares(), $finishHandler);
         }
 
         return $this->stack[$type]->handleConsume($request);
@@ -51,7 +51,7 @@ final class ConsumeMiddlewareDispatcher
      * Returns new instance with middleware handlers replaced with the ones provided.
      * The last specified handler will be executed first.
      *
-     * @param array[]|callable[]|MiddlewareConsumeInterface[]|string[] $middlewareDefinitions Each array element is:
+     * @param array[]|callable[]|ConsumeMiddlewareInterface[]|string[] $middlewareDefinitions Each array element is:
      *
      * - A name of a middleware class. The middleware instance will be obtained from container executed.
      * - A callable with `function(ServerRequestInterface $request, RequestHandlerInterface $handler):
@@ -93,7 +93,7 @@ final class ConsumeMiddlewareDispatcher
         $factory = $this->middlewareFactory;
 
         foreach ($this->middlewareDefinitions as $middlewareDefinition) {
-            $middlewares[] = static fn(): MiddlewareConsumeInterface => $factory->createConsumeMiddleware(
+            $middlewares[] = static fn(): ConsumeMiddlewareInterface => $factory->createConsumeMiddleware(
                 $middlewareDefinition,
             );
         }

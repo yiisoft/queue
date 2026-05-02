@@ -6,15 +6,15 @@ namespace Yiisoft\Queue\Middleware\Push\Implementation;
 
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
+use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
 
 /**
  * A middleware for message ID setting.
  */
-final class IdMiddleware implements MiddlewarePushInterface
+final class IdMiddleware implements PushMiddlewareInterface
 {
-    public function processPush(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface
+    public function processPush(MessageInterface $message, PushHandlerInterface $handler): MessageInterface
     {
         $meta = $message->getMetadata();
         if (empty($meta[IdEnvelope::MESSAGE_ID_KEY])) {

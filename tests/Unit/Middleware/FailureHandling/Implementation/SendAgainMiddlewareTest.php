@@ -14,8 +14,8 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\TestCase;
 
@@ -168,7 +168,7 @@ final class SendAgainMiddlewareTest extends TestCase
         self::assertInstanceOf(FailureHandlingRequest::class, $result);
     }
 
-    private function getStrategy(string $strategyName, QueueInterface $queue): MiddlewareFailureInterface
+    private function getStrategy(string $strategyName, QueueInterface $queue): FailureMiddlewareInterface
     {
         return match ($strategyName) {
             SendAgainMiddleware::class => new SendAgainMiddleware('', 2, $queue),
@@ -184,7 +184,7 @@ final class SendAgainMiddlewareTest extends TestCase
         };
     }
 
-    private function getHandler(array $metaResult, bool $suites): MessageFailureHandlerInterface
+    private function getHandler(array $metaResult, bool $suites): FailureHandlerInterface
     {
         $pipelineAssertion = static function (FailureHandlingRequest $request) use (
             $metaResult
@@ -193,7 +193,7 @@ final class SendAgainMiddlewareTest extends TestCase
 
             throw $request->getException();
         };
-        $handler = $this->createMock(MessageFailureHandlerInterface::class);
+        $handler = $this->createMock(FailureHandlerInterface::class);
         $handler->expects($suites ? self::never() : self::once())
             ->method('handleFailure')
             ->willReturnCallback($pipelineAssertion);

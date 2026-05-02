@@ -8,14 +8,14 @@ use InvalidArgumentException;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
 
 /**
  * Failure strategy which resends the given message to a queue.
  */
-final class SendAgainMiddleware implements MiddlewareFailureInterface
+final class SendAgainMiddleware implements FailureMiddlewareInterface
 {
     public const META_KEY_RESEND = 'failure-strategy-resend-attempts';
 
@@ -37,7 +37,7 @@ final class SendAgainMiddleware implements MiddlewareFailureInterface
 
     public function processFailure(
         FailureHandlingRequest $request,
-        MessageFailureHandlerInterface $handler,
+        FailureHandlerInterface $handler,
     ): FailureHandlingRequest {
         $message = $request->getMessage();
         if ($this->suits($message)) {

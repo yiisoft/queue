@@ -17,10 +17,10 @@ use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\Worker\Worker;
@@ -161,7 +161,7 @@ abstract class TestCase extends BaseTestCase
     protected function getPushMiddlewareDispatcher(): PushMiddlewareDispatcher
     {
         return new PushMiddlewareDispatcher(
-            new MiddlewareFactoryPush(
+            new PushMiddlewareFactory(
                 $this->getContainer(),
                 new CallableFactory($this->getContainer()),
             ),
@@ -171,7 +171,7 @@ abstract class TestCase extends BaseTestCase
     protected function getConsumeMiddlewareDispatcher(): ConsumeMiddlewareDispatcher
     {
         return new ConsumeMiddlewareDispatcher(
-            new MiddlewareFactoryConsume(
+            new ConsumeMiddlewareFactory(
                 $this->getContainer(),
                 new CallableFactory($this->getContainer()),
             ),
@@ -181,7 +181,7 @@ abstract class TestCase extends BaseTestCase
     protected function getFailureMiddlewareDispatcher(): FailureMiddlewareDispatcher
     {
         return new FailureMiddlewareDispatcher(
-            new MiddlewareFactoryFailure(
+            new FailureMiddlewareFactory(
                 $this->getContainer(),
                 new CallableFactory($this->getContainer()),
             ),

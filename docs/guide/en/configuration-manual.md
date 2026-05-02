@@ -19,10 +19,10 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\Worker\Worker;
@@ -43,16 +43,16 @@ $callableFactory = new CallableFactory($container);
 
 // Create middleware dispatchers
 $consumeMiddlewareDispatcher = new ConsumeMiddlewareDispatcher(
-    new MiddlewareFactoryConsume($container, $callableFactory),
+    new ConsumeMiddlewareFactory($container, $callableFactory),
 );
 
 $failureMiddlewareDispatcher = new FailureMiddlewareDispatcher(
-    new MiddlewareFactoryFailure($container, $callableFactory),
+    new FailureMiddlewareFactory($container, $callableFactory),
     [],
 );
 
 $pushMiddlewareDispatcher = new PushMiddlewareDispatcher(
-    new MiddlewareFactoryPush($container, $callableFactory),
+    new PushMiddlewareFactory($container, $callableFactory),
 );
 
 // Create worker

@@ -10,7 +10,7 @@ use Yiisoft\Queue\Message\MessageInterface;
 /**
  * @internal
  */
-final class AdapterPushHandler implements MessageHandlerPushInterface
+final class AdapterPushHandler implements PushHandlerInterface
 {
     public function __construct(
         private readonly AdapterInterface $adapter,

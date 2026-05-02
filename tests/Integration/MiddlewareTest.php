@@ -16,14 +16,14 @@ use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueInterface;
@@ -46,7 +46,7 @@ final class MiddlewareTest extends TestCase
         ];
 
         $pushMiddlewareDispatcher = new PushMiddlewareDispatcher(
-            new MiddlewareFactoryPush(
+            new PushMiddlewareFactory(
                 $this->createMock(ContainerInterface::class),
                 new CallableFactory(
                     $this->createMock(ContainerInterface::class),
@@ -86,7 +86,7 @@ final class MiddlewareTest extends TestCase
         $callableFactory = new CallableFactory($container);
 
         $consumeMiddlewareDispatcher = new ConsumeMiddlewareDispatcher(
-            new MiddlewareFactoryConsume(
+            new ConsumeMiddlewareFactory(
                 $this->createMock(ContainerInterface::class),
                 new CallableFactory(
                     $this->createMock(ContainerInterface::class),
@@ -97,7 +97,7 @@ final class MiddlewareTest extends TestCase
         );
 
         $failureMiddlewareDispatcher = new FailureMiddlewareDispatcher(
-            new MiddlewareFactoryFailure($container, $callableFactory),
+            new FailureMiddlewareFactory($container, $callableFactory),
             [],
         );
 
@@ -155,7 +155,7 @@ final class MiddlewareTest extends TestCase
             ],
         ];
         $dispatcher = new FailureMiddlewareDispatcher(
-            new MiddlewareFactoryFailure($container, $callableFactory),
+            new FailureMiddlewareFactory($container, $callableFactory),
             $middlewares,
         );
 

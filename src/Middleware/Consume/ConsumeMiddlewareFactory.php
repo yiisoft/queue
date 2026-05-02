@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Middleware\FailureHandling;
+namespace Yiisoft\Queue\Middleware\Consume;
 
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
@@ -14,12 +12,12 @@ use Yiisoft\Queue\Middleware\MiddlewareFactory;
 /**
  * Creates a middleware based on the definition provided.
  *
- * @template-extends MiddlewareFactory<MiddlewareFailureInterface>
+ * @template-extends MiddlewareFactory<ConsumeMiddlewareInterface>
  */
-final class MiddlewareFactoryFailure extends MiddlewareFactory implements MiddlewareFactoryFailureInterface
+final class ConsumeMiddlewareFactory extends MiddlewareFactory implements ConsumeMiddlewareFactoryInterface
 {
     /**
-     * @param array|callable|MiddlewareFailureInterface|string $middlewareDefinition Middleware definition in one of
+     * @param ConsumeMiddlewareInterface|callable|array|string $middlewareDefinition Middleware definition in one of
      * the following formats:
      *
      * - A middleware object.
@@ -35,22 +33,20 @@ final class MiddlewareFactoryFailure extends MiddlewareFactory implements Middle
      * Current request and handler could be obtained by type-hinting for {@see ServerRequestInterface}
      * and {@see RequestHandlerInterface}.
      *
-     * @throws NotFoundExceptionInterface
-     * @throws ContainerExceptionInterface
      * @throws InvalidMiddlewareDefinitionException
      *
-     * @return MiddlewareFailureInterface
+     * @return ConsumeMiddlewareInterface
      */
-    public function createFailureMiddleware(
-        MiddlewareFailureInterface|callable|array|string $middlewareDefinition,
-    ): MiddlewareFailureInterface {
-        if ($middlewareDefinition instanceof MiddlewareFailureInterface) {
+    public function createConsumeMiddleware(
+        ConsumeMiddlewareInterface|callable|array|string $middlewareDefinition,
+    ): ConsumeMiddlewareInterface {
+        if ($middlewareDefinition instanceof ConsumeMiddlewareInterface) {
             return $middlewareDefinition;
         }
 
         $middleware = $this->create($middlewareDefinition);
 
-        if (!$middleware instanceof MiddlewareFailureInterface) {
+        if (!$middleware instanceof ConsumeMiddlewareInterface) {
             throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
         }
 
@@ -59,13 +55,13 @@ final class MiddlewareFactoryFailure extends MiddlewareFactory implements Middle
 
     protected function getInterfaceName(): string
     {
-        return MiddlewareFailureInterface::class;
+        return ConsumeMiddlewareInterface::class;
     }
 
-    protected function wrapMiddleware(callable $callback): MiddlewareFailureInterface
+    protected function wrapMiddleware(callable $callback): ConsumeMiddlewareInterface
     {
         $container = $this->container;
-        return new class ($callback, $container) implements MiddlewareFailureInterface {
+        return new class ($callback, $container) implements ConsumeMiddlewareInterface {
             private $callback;
 
             public function __construct(
@@ -75,15 +71,15 @@ final class MiddlewareFactoryFailure extends MiddlewareFactory implements Middle
                 $this->callback = $callback;
             }
 
-            public function processFailure(FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest
+            public function processConsume(ConsumeRequest $request, ConsumeHandlerInterface $handler): ConsumeRequest
             {
                 $response = (new Injector($this->container))->invoke($this->callback, [$request, $handler]);
-                if ($response instanceof FailureHandlingRequest) {
+                if ($response instanceof ConsumeRequest) {
                     return $response;
                 }
 
-                if ($response instanceof MiddlewareFailureInterface) {
-                    return $response->processFailure($request, $handler);
+                if ($response instanceof ConsumeMiddlewareInterface) {
+                    return $response->processConsume($request, $handler);
                 }
 
                 throw new InvalidMiddlewareDefinitionException($this->callback);
