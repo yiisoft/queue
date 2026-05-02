@@ -7,6 +7,9 @@ namespace Yiisoft\Queue\Middleware\Push;
 use Closure;
 use Yiisoft\Queue\Message\MessageInterface;
 
+/**
+ * @internal
+ */
 final class MiddlewarePushStack implements MessageHandlerPushInterface
 {
     /**
@@ -40,7 +43,7 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
     {
         $handler = $this->finishHandler;
 
-        foreach ($this->middlewares as $middleware) {
+        foreach (array_reverse($this->middlewares) as $middleware) {
             $handler = $this->wrap($middleware, $handler);
         }
 
