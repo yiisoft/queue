@@ -48,17 +48,11 @@ final class QueueDecorator implements QueueInterface
 
     public function withMiddlewares(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
     {
-        $instance = clone $this;
-        $instance->queue = $this->queue->withMiddlewares(...$middlewareDefinitions);
-
-        return $instance;
+        return new self($this->queue->withMiddlewares(...$middlewareDefinitions), $this->collector);
     }
 
     public function withMiddlewaresAdded(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
     {
-        $instance = clone $this;
-        $instance->queue = $this->queue->withMiddlewaresAdded(...$middlewareDefinitions);
-
-        return $instance;
+        return new self($this->queue->withMiddlewaresAdded(...$middlewareDefinitions), $this->collector);
     }
 }
