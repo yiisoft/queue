@@ -16,6 +16,10 @@ use const SIGINT;
 use const SIGTERM;
 use const SIGTSTP;
 
+/**
+ * @psalm-suppress UndefinedConstant
+ * @psalm-suppress PossiblyFalseArgument
+ */
 #[RequiresPhpExtension('pcntl')]
 final class SignalLoopTest extends TestCase
 {

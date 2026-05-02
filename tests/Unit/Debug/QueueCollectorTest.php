@@ -22,7 +22,8 @@ final class QueueCollectorTest extends AbstractCollectorTestCase
     }
 
     /**
-     * @param CollectorInterface|QueueCollector $collector
+     * @param QueueCollector $collector
+     * @psalm-suppress MoreSpecificImplementedParamType
      */
     protected function collectTestData(CollectorInterface $collector): void
     {

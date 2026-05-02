@@ -29,7 +29,7 @@ final class EnvelopeTest extends TestCase
     public function testNonArrayStackIsNormalized(): void
     {
         $base = new Message('handler', 'data', [EnvelopeInterface::ENVELOPE_STACK_KEY => 'oops']);
-        $wrapped = new DummyEnvelope($base, 'id-1');
+        $wrapped = new DummyEnvelope($base);
 
         $meta = $wrapped->getMetadata();
         self::assertIsArray($meta[EnvelopeInterface::ENVELOPE_STACK_KEY]);

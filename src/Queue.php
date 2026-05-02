@@ -45,9 +45,12 @@ final class Queue implements QueueInterface
     ) {
         $this->name = StringNormalizer::normalize($name);
         $this->middlewareDefinitions = $middlewareDefinitions;
-        $this->finalPushHandler = $this->isSynchronous()
-            ? new SynchronousPushHandler($worker, $this)
-            : new AdapterPushHandler($this->adapter);
+        $this->finalPushHandler = $this->createFinalPushHandler();
+    }
+
+    public function __clone()
+    {
+        $this->finalPushHandler = $this->createFinalPushHandler();
     }
 
     public function getName(): string
@@ -187,6 +190,13 @@ final class Queue implements QueueInterface
                     ->dispatch($message, $this->finishHandler);
             }
         };
+    }
+
+    private function createFinalPushHandler(): MessageHandlerPushInterface
+    {
+        return $this->isSynchronous()
+            ? new SynchronousPushHandler($this->worker, $this)
+            : new AdapterPushHandler($this->adapter);
     }
 
     /**

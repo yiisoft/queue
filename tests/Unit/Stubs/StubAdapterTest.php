@@ -7,6 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit\Stubs;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Stubs\StubAdapter;
 
 final class StubAdapterTest extends TestCase
@@ -18,7 +19,7 @@ final class StubAdapterTest extends TestCase
 
         $this->assertSame($message, $adapter->push($message));
         $this->assertSame(MessageStatus::DONE, $adapter->status('test'));
-        $adapter->runExisting(static fn() => null);
-        $adapter->subscribe(static fn() => null);
+        $adapter->runExisting(static fn(MessageInterface $message): bool => true);
+        $adapter->subscribe(static fn(MessageInterface $message): bool => true);
     }
 }

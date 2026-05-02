@@ -18,7 +18,7 @@ use Yiisoft\Queue\Tests\TestCase;
 
 use const PHP_INT_MAX;
 
-class ExponentialDelayMiddlewareTest extends TestCase
+final class ExponentialDelayMiddlewareTest extends TestCase
 {
     public static function constructorRequirementsProvider(): array
     {

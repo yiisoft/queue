@@ -11,7 +11,7 @@ use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueInterface;
 
-class QueueDecoratorTest extends TestCase
+final class QueueDecoratorTest extends TestCase
 {
     public function testStatus(): void
     {
