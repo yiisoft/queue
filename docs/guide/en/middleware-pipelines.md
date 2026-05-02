@@ -63,9 +63,9 @@ You can use any of these formats:
 
 The required interface depends on the pipeline:
 
-- Push: `Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface`
-- Consume: `Yiisoft\Queue\Middleware\Consume\MiddlewareConsumeInterface`
-- Failure handling: `Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface`
+- Push: `Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface`
+- Consume: `Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareInterface`
+- Failure handling: `Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface`
 
 ## Push pipeline
 
@@ -97,7 +97,7 @@ If the adapter is not configured by the time the pipeline reaches the final hand
 
 ### Custom push middleware
 
-Implement `MiddlewarePushInterface` and return a modified `PushRequest` from `processPush()`:
+Implement `PushMiddlewareInterface` and return a modified `PushRequest` from `processPush()`:
 
 ```php
 return $pushRequest

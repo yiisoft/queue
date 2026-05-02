@@ -192,7 +192,7 @@ See [Envelopes](envelopes.md) for details on `IdEnvelope`.
 **Bad**:
 
 ```php
-public function processConsume(ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest
+public function processConsume(ConsumeRequest $request, ConsumeHandlerInterface $handler): ConsumeRequest
 {
     // Heavy operation on every message
     $this->logger->debug('Full message dump', [
@@ -207,7 +207,7 @@ public function processConsume(ConsumeRequest $request, MessageHandlerConsumeInt
 **Good**:
 
 ```php
-public function processConsume(ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest
+public function processConsume(ConsumeRequest $request, ConsumeHandlerInterface $handler): ConsumeRequest
 {
     // Lightweight logging
     $this->logger->debug('Processing message', [

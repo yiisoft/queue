@@ -11,7 +11,7 @@ use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Message\DelayEnvelope;
 use Yiisoft\Queue\Tests\TestCase;
@@ -142,7 +142,7 @@ final class ExponentialDelayMiddlewareTest extends TestCase
             1,
             $queue,
         );
-        $nextHandler = $this->createMock(MessageFailureHandlerInterface::class);
+        $nextHandler = $this->createMock(FailureHandlerInterface::class);
         $nextHandler->expects(self::never())->method('handleFailure');
         $request = new FailureHandlingRequest($message, new Exception('test'), $queue);
         $result = $middleware->processFailure($request, $nextHandler);
@@ -176,7 +176,7 @@ final class ExponentialDelayMiddlewareTest extends TestCase
             1,
             $queue,
         );
-        $nextHandler = $this->createMock(MessageFailureHandlerInterface::class);
+        $nextHandler = $this->createMock(FailureHandlerInterface::class);
         $exception = new Exception('test');
         $nextHandler->expects(self::once())->method('handleFailure')->willThrowException($exception);
         $request = new FailureHandlingRequest($message, $exception, $queue);

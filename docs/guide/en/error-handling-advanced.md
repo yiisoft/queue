@@ -29,9 +29,9 @@ This document covers advanced internals of the failure handling pipeline, built-
 
 5. Failure middlewares are executed
 
-    The dispatcher builds a lazy middleware stack (`MiddlewareFailureStack`) and invokes it.
+    The dispatcher builds a lazy middleware stack (`FailureMiddlewareStack`) and invokes it.
 
-    Each failure middleware implements `MiddlewareFailureInterface`:
+    Each failure middleware implements `FailureMiddlewareInterface`:
 
     - It receives the `FailureHandlingRequest` and a continuation handler.
     - It may handle the failure by re-queueing the message (same or different queue), optionally with a delay.
@@ -78,12 +78,12 @@ Behavior:
 
 ## How to create a custom Failure Middleware
 
-All you need is to implement the `MiddlewareFailureInterface` and add your implementation definition to the [configuration](error-handling.md#configuration).
+All you need is to implement the `FailureMiddlewareInterface` and add your implementation definition to the [configuration](error-handling.md#configuration).
 This interface has the only method `processFailure` with these parameters:
 - [`FailureHandlingRequest $request`](../../../src/Middleware/FailureHandling/FailureHandlingRequest.php) - a request for a message handling. It consists of
     - a [message](../../../src/Message/MessageInterface.php)
     - a `Throwable $exception` object thrown on the `request` handling
     - a queue the message came from
-- `MessageFailureHandlerInterface $handler` - failure strategy pipeline continuation. Your Middleware should call `$handler->handleFailure($request)` when the middleware itself should not interrupt failure pipeline execution.
+- `FailureHandlerInterface $handler` - failure strategy pipeline continuation. Your Middleware should call `$handler->handleFailure($request)` when the middleware itself should not interrupt failure pipeline execution.
 
 > Note: your strategy have to check by its own if it should be applied. Look into [`SendAgainMiddleware::suits()`](../../../src/Middleware/FailureHandling/Implementation/SendAgainMiddleware.php#L54) for an example.

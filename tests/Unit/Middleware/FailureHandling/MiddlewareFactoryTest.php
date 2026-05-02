@@ -14,10 +14,10 @@ use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
@@ -44,7 +44,7 @@ final class MiddlewareFactoryTest extends TestCase
             'New test data',
             $middleware->processFailure(
                 $this->getConsumeRequest(),
-                $this->createMock(MessageFailureHandlerInterface::class),
+                $this->createMock(FailureHandlerInterface::class),
             )->getMessage()->getData(),
         );
     }
@@ -65,7 +65,7 @@ final class MiddlewareFactoryTest extends TestCase
             'test data',
             $middleware->processFailure(
                 $this->getConsumeRequest(),
-                $this->createMock(MessageFailureHandlerInterface::class),
+                $this->createMock(FailureHandlerInterface::class),
             )->getMessage()->getData(),
         );
     }
@@ -74,7 +74,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createFailureMiddleware(
-            static function (): MiddlewareFailureInterface {
+            static function (): FailureMiddlewareInterface {
                 return new TestMiddleware();
             },
         );
@@ -82,7 +82,7 @@ final class MiddlewareFactoryTest extends TestCase
             'New middleware test data',
             $middleware->processFailure(
                 $this->getConsumeRequest(),
-                $this->createMock(MessageFailureHandlerInterface::class),
+                $this->createMock(FailureHandlerInterface::class),
             )->getMessage()->getData(),
         );
     }
@@ -127,7 +127,7 @@ final class MiddlewareFactoryTest extends TestCase
             'String callable data',
             $middleware->processFailure(
                 $this->getConsumeRequest(),
-                $this->createMock(MessageFailureHandlerInterface::class),
+                $this->createMock(FailureHandlerInterface::class),
             )->getMessage()->getData(),
         );
     }
@@ -141,7 +141,7 @@ final class MiddlewareFactoryTest extends TestCase
             'Callable object data',
             $middleware->processFailure(
                 $this->getConsumeRequest(),
-                $this->createMock(MessageFailureHandlerInterface::class),
+                $this->createMock(FailureHandlerInterface::class),
             )->getMessage()->getData(),
         );
     }
@@ -177,15 +177,15 @@ final class MiddlewareFactoryTest extends TestCase
         $this->expectException(InvalidMiddlewareDefinitionException::class);
         $middleware->processFailure(
             $this->getConsumeRequest(),
-            $this->createMock(MessageFailureHandlerInterface::class),
+            $this->createMock(FailureHandlerInterface::class),
         );
     }
 
-    private function getMiddlewareFactory(?ContainerInterface $container = null): MiddlewareFactoryFailureInterface
+    private function getMiddlewareFactory(?ContainerInterface $container = null): FailureMiddlewareFactoryInterface
     {
         $container ??= $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
 
-        return new MiddlewareFactoryFailure($container, new CallableFactory($container));
+        return new FailureMiddlewareFactory($container, new CallableFactory($container));
     }
 
     private function getContainer(array $instances = []): ContainerInterface
@@ -193,9 +193,9 @@ final class MiddlewareFactoryTest extends TestCase
         return new SimpleContainer($instances);
     }
 
-    private function getRequestHandler(): MessageFailureHandlerInterface
+    private function getRequestHandler(): FailureHandlerInterface
     {
-        return new class implements MessageFailureHandlerInterface {
+        return new class implements FailureHandlerInterface {
             public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
             {
                 throw $request->getException();

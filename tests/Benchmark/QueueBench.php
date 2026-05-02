@@ -14,11 +14,11 @@ use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsume;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailure;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueInterface;
@@ -45,9 +45,9 @@ final class QueueBench
             $logger,
             new Injector($container),
             $container,
-            new ConsumeMiddlewareDispatcher(new MiddlewareFactoryConsume($container, $callableFactory)),
+            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container, $callableFactory)),
             new FailureMiddlewareDispatcher(
-                new MiddlewareFactoryFailure($container, $callableFactory),
+                new FailureMiddlewareFactory($container, $callableFactory),
                 [],
             ),
             $callableFactory,
@@ -59,7 +59,7 @@ final class QueueBench
             $worker,
             new SimpleLoop(0),
             $logger,
-            new PushMiddlewareDispatcher(new MiddlewareFactoryPush($container, $callableFactory)),
+            new PushMiddlewareDispatcher(new PushMiddlewareFactory($container, $callableFactory)),
             $this->adapter,
         );
     }

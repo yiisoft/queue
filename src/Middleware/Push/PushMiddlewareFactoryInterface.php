@@ -9,14 +9,14 @@ namespace Yiisoft\Queue\Middleware\Push;
  * You may implement this interface if you want to introduce custom definitions or pass additional data to
  * the middleware created.
  */
-interface MiddlewareFactoryPushInterface
+interface PushMiddlewareFactoryInterface
 {
     /**
      * Create a middleware based on definition provided.
      *
-     * @param array|callable|MiddlewarePushInterface|string $middlewareDefinition Middleware definition to use.
+     * @param array|callable|PushMiddlewareInterface|string $middlewareDefinition Middleware definition to use.
      *
-     * @return MiddlewarePushInterface
+     * @return PushMiddlewareInterface
      */
-    public function createPushMiddleware(callable|array|string|MiddlewarePushInterface $middlewareDefinition): MiddlewarePushInterface;
+    public function createPushMiddleware(callable|array|string|PushMiddlewareInterface $middlewareDefinition): PushMiddlewareInterface;
 }

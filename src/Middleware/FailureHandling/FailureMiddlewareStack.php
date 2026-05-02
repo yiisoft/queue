@@ -6,24 +6,24 @@ namespace Yiisoft\Queue\Middleware\FailureHandling;
 
 use Closure;
 
-final class MiddlewareFailureStack implements MessageFailureHandlerInterface
+final class FailureMiddlewareStack implements FailureHandlerInterface
 {
     /**
      * Contains a stack of middleware wrapped in handlers.
      * Each handler points to the handler of middleware that will be processed next.
      *
-     * @var MessageFailureHandlerInterface|null stack of middleware
+     * @var FailureHandlerInterface|null stack of middleware
      */
-    private ?MessageFailureHandlerInterface $stack = null;
+    private ?FailureHandlerInterface $stack = null;
 
     /**
      * @param Closure[] $middlewares Middlewares.
-     * @param MessageFailureHandlerInterface $finishHandler Fallback handler
+     * @param FailureHandlerInterface $finishHandler Fallback handler
      * events.
      */
     public function __construct(
         private readonly array $middlewares,
-        private readonly MessageFailureHandlerInterface $finishHandler,
+        private readonly FailureHandlerInterface $finishHandler,
     ) {}
 
     public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
@@ -50,14 +50,14 @@ final class MiddlewareFailureStack implements MessageFailureHandlerInterface
     /**
      * Wrap handler by middlewares.
      */
-    private function wrap(Closure $middlewareFactory, MessageFailureHandlerInterface $handler): MessageFailureHandlerInterface
+    private function wrap(Closure $middlewareFactory, FailureHandlerInterface $handler): FailureHandlerInterface
     {
-        return new class ($middlewareFactory, $handler) implements MessageFailureHandlerInterface {
-            private ?MiddlewareFailureInterface $middleware = null;
+        return new class ($middlewareFactory, $handler) implements FailureHandlerInterface {
+            private ?FailureMiddlewareInterface $middleware = null;
 
             public function __construct(
                 private readonly Closure $middlewareFactory,
-                private readonly MessageFailureHandlerInterface $handler,
+                private readonly FailureHandlerInterface $handler,
             ) {}
 
             public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest

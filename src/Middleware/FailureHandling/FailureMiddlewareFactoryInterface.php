@@ -9,14 +9,14 @@ namespace Yiisoft\Queue\Middleware\FailureHandling;
  * You may implement this interface if you want to introduce custom definitions or pass additional data to
  * the middleware created.
  */
-interface MiddlewareFactoryFailureInterface
+interface FailureMiddlewareFactoryInterface
 {
     /**
      * Create a middleware based on definition provided.
      *
-     * @param array|callable|MiddlewareFailureInterface|string $middlewareDefinition Middleware definition to use.
+     * @param array|callable|FailureMiddlewareInterface|string $middlewareDefinition Middleware definition to use.
      *
-     * @return MiddlewareFailureInterface
+     * @return FailureMiddlewareInterface
      */
-    public function createFailureMiddleware(callable|array|string|MiddlewareFailureInterface $middlewareDefinition): MiddlewareFailureInterface;
+    public function createFailureMiddleware(callable|array|string|FailureMiddlewareInterface $middlewareDefinition): FailureMiddlewareInterface;
 }

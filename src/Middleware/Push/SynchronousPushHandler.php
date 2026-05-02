@@ -11,7 +11,7 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 /**
  * @internal
  */
-final class SynchronousPushHandler implements MessageHandlerPushInterface
+final class SynchronousPushHandler implements PushHandlerInterface
 {
     public function __construct(
         private readonly WorkerInterface $worker,

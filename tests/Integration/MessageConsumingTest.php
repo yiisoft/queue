@@ -11,9 +11,9 @@ use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
 use Yiisoft\Queue\Tests\Integration\Support\TestHandler;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Worker\Worker;
@@ -38,8 +38,8 @@ final class MessageConsumingTest extends TestCase
             new NullLogger(),
             new Injector($container),
             $container,
-            new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class)),
-            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), []),
+            new ConsumeMiddlewareDispatcher($this->createMock(ConsumeMiddlewareFactoryInterface::class)),
+            new FailureMiddlewareDispatcher($this->createMock(FailureMiddlewareFactoryInterface::class), []),
             $callableFactory,
         );
 
@@ -65,8 +65,8 @@ final class MessageConsumingTest extends TestCase
             new NullLogger(),
             new Injector($container),
             $container,
-            new ConsumeMiddlewareDispatcher($this->createMock(MiddlewareFactoryConsumeInterface::class)),
-            new FailureMiddlewareDispatcher($this->createMock(MiddlewareFactoryFailureInterface::class), []),
+            new ConsumeMiddlewareDispatcher($this->createMock(ConsumeMiddlewareFactoryInterface::class)),
+            new FailureMiddlewareDispatcher($this->createMock(FailureMiddlewareFactoryInterface::class), []),
             $callableFactory,
         );
 

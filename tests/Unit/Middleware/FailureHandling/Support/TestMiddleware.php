@@ -6,14 +6,14 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support;
 
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
 
-final class TestMiddleware implements MiddlewareFailureInterface
+final class TestMiddleware implements FailureMiddlewareInterface
 {
     public function __construct(private readonly string $message = 'New middleware test data') {}
 
-    public function processFailure(FailureHandlingRequest $request, MessageFailureHandlerInterface $handler): FailureHandlingRequest
+    public function processFailure(FailureHandlingRequest $request, FailureHandlerInterface $handler): FailureHandlingRequest
     {
         return $request->withMessage(new Message('test', $this->message));
     }

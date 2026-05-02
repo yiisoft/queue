@@ -2,38 +2,38 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Middleware\Push;
+namespace Yiisoft\Queue\Middleware\Consume;
 
 use Closure;
-use Yiisoft\Queue\Message\MessageInterface;
 
-final class MiddlewarePushStack implements MessageHandlerPushInterface
+final class ConsumeMiddlewareStack implements ConsumeHandlerInterface
 {
     /**
      * Contains a stack of middleware wrapped in handlers.
      * Each handler points to the handler of middleware that will be processed next.
      *
-     * @var MessageHandlerPushInterface|null stack of middleware
+     * @var ConsumeHandlerInterface|null stack of middleware
      */
-    private ?MessageHandlerPushInterface $stack = null;
+    private ?ConsumeHandlerInterface $stack = null;
 
     /**
      * @param Closure[] $middlewares Middlewares.
-     * @param MessageHandlerPushInterface $finishHandler Final handler invoked after all middlewares are processed.
+     * @param ConsumeHandlerInterface $finishHandler Fallback handler
+     * events.
      */
     public function __construct(
         private readonly array $middlewares,
-        private readonly MessageHandlerPushInterface $finishHandler,
+        private readonly ConsumeHandlerInterface $finishHandler,
     ) {}
 
-    public function handlePush(MessageInterface $message): MessageInterface
+    public function handleConsume(ConsumeRequest $request): ConsumeRequest
     {
         if ($this->stack === null) {
             $this->build();
         }
 
         /** @psalm-suppress PossiblyNullReference */
-        return $this->stack->handlePush($message);
+        return $this->stack->handleConsume($request);
     }
 
     private function build(): void
@@ -50,23 +50,23 @@ final class MiddlewarePushStack implements MessageHandlerPushInterface
     /**
      * Wrap handler by middlewares.
      */
-    private function wrap(Closure $middlewareFactory, MessageHandlerPushInterface $handler): MessageHandlerPushInterface
+    private function wrap(Closure $middlewareFactory, ConsumeHandlerInterface $handler): ConsumeHandlerInterface
     {
-        return new class ($middlewareFactory, $handler) implements MessageHandlerPushInterface {
-            private ?MiddlewarePushInterface $middleware = null;
+        return new class ($middlewareFactory, $handler) implements ConsumeHandlerInterface {
+            private ?ConsumeMiddlewareInterface $middleware = null;
 
             public function __construct(
                 private readonly Closure $middlewareFactory,
-                private readonly MessageHandlerPushInterface $handler,
+                private readonly ConsumeHandlerInterface $handler,
             ) {}
 
-            public function handlePush(MessageInterface $message): MessageInterface
+            public function handleConsume(ConsumeRequest $request): ConsumeRequest
             {
                 if ($this->middleware === null) {
                     $this->middleware = ($this->middlewareFactory)();
                 }
 
-                return $this->middleware->processPush($message, $this->handler);
+                return $this->middleware->processConsume($request, $this->handler);
             }
         };
     }

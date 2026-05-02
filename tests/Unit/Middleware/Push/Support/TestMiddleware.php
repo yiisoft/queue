@@ -6,14 +6,14 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\Push\Support;
 
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
+use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
 
-final class TestMiddleware implements MiddlewarePushInterface
+final class TestMiddleware implements PushMiddlewareInterface
 {
     public function __construct(private readonly string $message = 'New middleware test data') {}
 
-    public function processPush(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface
+    public function processPush(MessageInterface $message, PushHandlerInterface $handler): MessageInterface
     {
         return new Message('test', $this->message);
     }

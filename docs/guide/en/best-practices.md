@@ -287,9 +287,9 @@ final class EmailHandler implements MessageHandlerInterface
 #### Good
 
 ```php
-final class MetricsMiddleware implements MiddlewareConsumeInterface
+final class MetricsMiddleware implements ConsumeMiddlewareInterface
 {
-    public function processConsume(ConsumeRequest $request, MessageHandlerConsumeInterface $handler): ConsumeRequest
+    public function processConsume(ConsumeRequest $request, ConsumeHandlerInterface $handler): ConsumeRequest
     {
         $start = microtime(true);
         

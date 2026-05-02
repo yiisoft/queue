@@ -16,12 +16,12 @@ use Yiisoft\Queue\Exception\MessageFailureException;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareFactoryConsumeInterface;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\MiddlewareConsumeInterface;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
-use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFactoryFailureInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeHandler;
@@ -203,22 +203,22 @@ final class WorkerTest extends TestCase
         $queue->method('getName')->willReturn('test-queue');
 
         $originalException = new RuntimeException('Consume failed');
-        /** @var MiddlewareConsumeInterface&MockObject $consumeMiddleware */
-        $consumeMiddleware = $this->createMock(MiddlewareConsumeInterface::class);
+        /** @var ConsumeMiddlewareInterface&MockObject $consumeMiddleware */
+        $consumeMiddleware = $this->createMock(ConsumeMiddlewareInterface::class);
         $consumeMiddleware->method('processConsume')->willThrowException($originalException);
 
-        /** @var MiddlewareFactoryConsumeInterface&MockObject $consumeMiddlewareFactory */
-        $consumeMiddlewareFactory = $this->createMock(MiddlewareFactoryConsumeInterface::class);
+        /** @var ConsumeMiddlewareFactoryInterface&MockObject $consumeMiddlewareFactory */
+        $consumeMiddlewareFactory = $this->createMock(ConsumeMiddlewareFactoryInterface::class);
         $consumeMiddlewareFactory->method('createConsumeMiddleware')->willReturn($consumeMiddleware);
         $consumeDispatcher = new ConsumeMiddlewareDispatcher($consumeMiddlewareFactory, 'simple');
 
         $finalMessage = new Message('final', null);
-        /** @var MiddlewareFailureInterface&MockObject $failureMiddleware */
-        $failureMiddleware = $this->createMock(MiddlewareFailureInterface::class);
+        /** @var FailureMiddlewareInterface&MockObject $failureMiddleware */
+        $failureMiddleware = $this->createMock(FailureMiddlewareInterface::class);
         $failureMiddleware->method('processFailure')->willReturn(new FailureHandlingRequest($finalMessage, $originalException, $queue));
 
-        /** @var MiddlewareFactoryFailureInterface&MockObject $failureMiddlewareFactory */
-        $failureMiddlewareFactory = $this->createMock(MiddlewareFactoryFailureInterface::class);
+        /** @var FailureMiddlewareFactoryInterface&MockObject $failureMiddlewareFactory */
+        $failureMiddlewareFactory = $this->createMock(FailureMiddlewareFactoryInterface::class);
         $failureMiddlewareFactory->method('createFailureMiddleware')->willReturn($failureMiddleware);
         $failureDispatcher = new FailureMiddlewareDispatcher($failureMiddlewareFactory, ['test-queue' => ['simple']]);
 
@@ -260,10 +260,10 @@ final class WorkerTest extends TestCase
         ContainerInterface $container,
         ?LoggerInterface $logger = null,
     ): Worker {
-        /** @var MiddlewareFactoryConsumeInterface&MockObject $consumeMiddlewareFactory */
-        $consumeMiddlewareFactory = $this->createMock(MiddlewareFactoryConsumeInterface::class);
-        /** @var MiddlewareFactoryFailureInterface&MockObject $failureMiddlewareFactory */
-        $failureMiddlewareFactory = $this->createMock(MiddlewareFactoryFailureInterface::class);
+        /** @var ConsumeMiddlewareFactoryInterface&MockObject $consumeMiddlewareFactory */
+        $consumeMiddlewareFactory = $this->createMock(ConsumeMiddlewareFactoryInterface::class);
+        /** @var FailureMiddlewareFactoryInterface&MockObject $failureMiddlewareFactory */
+        $failureMiddlewareFactory = $this->createMock(FailureMiddlewareFactoryInterface::class);
 
         return new Worker(
             $handlers,

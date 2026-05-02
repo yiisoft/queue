@@ -12,8 +12,8 @@ use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\Push\MessageHandlerPushInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewareFactoryPush;
+use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestCallableMiddleware;
@@ -27,7 +27,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static function (MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface {
+                static function (MessageInterface $message, PushHandlerInterface $handler): MessageInterface {
                     return new Message('test', 'New closure test data');
                 },
             ],
@@ -67,10 +67,10 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $message = $this->getMessage();
 
-        $middleware1 = static function (MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface {
+        $middleware1 = static function (MessageInterface $message, PushHandlerInterface $handler): MessageInterface {
             return $handler->handlePush(new Message($message->getType(), 'new test data'));
         };
-        $middleware2 = static function (MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface {
+        $middleware2 = static function (MessageInterface $message, PushHandlerInterface $handler): MessageInterface {
             return $handler->handlePush($message);
         };
 
@@ -84,8 +84,8 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $message = $this->getMessage();
 
-        $middleware1 = static fn(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface => new Message($message->getType(), 'first');
-        $middleware2 = static fn(MessageInterface $message, MessageHandlerPushInterface $handler): MessageInterface => new Message($message->getType(), 'second');
+        $middleware1 = static fn(MessageInterface $message, PushHandlerInterface $handler): MessageInterface => new Message($message->getType(), 'first');
+        $middleware2 = static fn(MessageInterface $message, PushHandlerInterface $handler): MessageInterface => new Message($message->getType(), 'second');
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
@@ -137,9 +137,9 @@ final class MiddlewareDispatcherTest extends TestCase
         self::assertSame('New middleware test data', $result->getData());
     }
 
-    private function getRequestHandler(): MessageHandlerPushInterface
+    private function getRequestHandler(): PushHandlerInterface
     {
-        return new class implements MessageHandlerPushInterface {
+        return new class implements PushHandlerInterface {
             public function handlePush(MessageInterface $message): MessageInterface
             {
                 return $message;
@@ -154,7 +154,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $callableFactory = new CallableFactory($container);
 
         return new PushMiddlewareDispatcher(
-            new MiddlewareFactoryPush($container, $callableFactory),
+            new PushMiddlewareFactory($container, $callableFactory),
         );
     }
 

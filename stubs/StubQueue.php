@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Stubs;
 
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
 use Yiisoft\Queue\QueueInterface;
 
 /**
@@ -40,12 +40,12 @@ final class StubQueue implements QueueInterface
         return $this->name;
     }
 
-    public function withMiddlewares(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
+    public function withMiddlewares(PushMiddlewareInterface|callable|array|string ...$middlewareDefinitions): self
     {
         return $this;
     }
 
-    public function withMiddlewaresAdded(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
+    public function withMiddlewaresAdded(PushMiddlewareInterface|callable|array|string ...$middlewareDefinitions): self
     {
         return $this;
     }

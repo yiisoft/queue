@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Middleware\Push;
 
 use Yiisoft\Queue\Message\MessageInterface;
 
-interface MessageHandlerPushInterface
+interface PushHandlerInterface
 {
     public function handlePush(MessageInterface $message): MessageInterface;
 }
