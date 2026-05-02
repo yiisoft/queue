@@ -3,7 +3,7 @@
 PHP_VERSION ?= 8.4
 -include .env.local
 
-DOCKER_RUN := docker run --rm -it \
+DOCKER_RUN := docker run --rm $(if $(NO_TTY),,-it) \
 	--init \
 	--user $(shell id -u):$(shell id -g) \
 	--env YII_INSIDE_CONTAINER=true \
