@@ -15,15 +15,15 @@ $logger = $DIContainer->get(\Psr\Log\LoggerInterface::class);
 
 $worker = $DIContainer->get(\Yiisoft\Queue\Worker\WorkerInterface::class);
 $loop = $DIContainer->get(\Yiisoft\Queue\Cli\LoopInterface::class);
-$pushMiddlewareDispatcher = $DIContainer->get(
-    \Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher::class
+$pushMiddlewareConfig = $DIContainer->get(
+    \Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig::class
 );
 
 $queue = new Yiisoft\Queue\Queue(
     $worker,
     $loop,
     $logger,
-    $pushMiddlewareDispatcher,
+    $pushMiddlewareConfig,
 );
 ```
 

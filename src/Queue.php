@@ -11,8 +11,9 @@ use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
 use Yiisoft\Queue\Middleware\Push\SynchronousPushHandler;
 use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
@@ -41,10 +42,17 @@ final class Queue implements QueueInterface
     private PushMiddlewareDispatcher $dispatcher;
 
     /**
+     * @var PushMiddlewareDispatcher The base dispatcher created from the {@see PushMiddlewareConfig} provided to
+     * the constructor. Holds the common middleware applied to all queues.
+     */
+    private readonly PushMiddlewareDispatcher $baseDispatcher;
+
+    /**
      * @param WorkerInterface $worker The worker that processes messages.
      * @param LoopInterface $loop The loop for controlling message processing.
      * @param LoggerInterface $logger The logger for debug and informational messages.
-     * @param PushMiddlewareDispatcher $baseDispatcher The middleware dispatcher.
+     * @param PushMiddlewareConfig $middlewareConfig The push middleware configuration: factory and common middleware
+     * definitions.
      * @param AdapterInterface|null $adapter The message adapter (`null` for synchronous mode).
      * @param string|BackedEnum $name The queue name.
      * @param PushMiddlewareInterface|callable|array|string ...$middlewareDefinitions Queue-specific middleware
@@ -54,11 +62,15 @@ final class Queue implements QueueInterface
         private readonly WorkerInterface $worker,
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
-        private readonly PushMiddlewareDispatcher $baseDispatcher,
+        PushMiddlewareConfig $middlewareConfig,
         private readonly ?AdapterInterface $adapter = null,
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
         PushMiddlewareInterface|callable|array|string ...$middlewareDefinitions,
     ) {
+        $this->baseDispatcher = new PushMiddlewareDispatcher(
+            $middlewareConfig->middlewareFactory,
+            ...$middlewareConfig->commonMiddlewareDefinitions,
+        );
         $this->name = StringNormalizer::normalize($name);
         $this->finalPushHandler = $this->createFinalPushHandler();
         $this->setMiddlewaresAndPrepareDispatcher($middlewareDefinitions);

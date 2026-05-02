@@ -18,8 +18,8 @@ use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\Benchmark\Support\VoidAdapter;
@@ -59,7 +59,7 @@ final class QueueBench
             $worker,
             new SimpleLoop(0),
             $logger,
-            new PushMiddlewareDispatcher(new PushMiddlewareFactory($container, $callableFactory)),
+            new PushMiddlewareConfig(new PushMiddlewareFactory($container, $callableFactory)),
             $this->adapter,
         );
     }

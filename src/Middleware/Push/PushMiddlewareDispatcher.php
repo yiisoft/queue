@@ -6,7 +6,11 @@ namespace Yiisoft\Queue\Middleware\Push;
 
 use Closure;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Queue;
 
+/**
+ * @internal Used internally by {@see Queue}.
+ */
 final class PushMiddlewareDispatcher
 {
     /**
