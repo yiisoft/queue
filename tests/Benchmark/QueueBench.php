@@ -6,7 +6,6 @@ namespace Yiisoft\Queue\Tests\Benchmark;
 
 use Generator;
 use PhpBench\Attributes\ParamProviders;
-use PhpBench\Model\Tag;
 use Psr\Log\NullLogger;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Cli\SimpleLoop;
@@ -80,7 +79,6 @@ final class QueueBench
     }
 
     #[ParamProviders('providePush')]
-    #[Tag('queue_push')]
     public function benchPush(array $params): void
     {
         $this->queue->push($params['message']);
@@ -103,7 +101,6 @@ final class QueueBench
     }
 
     #[ParamProviders('provideConsume')]
-    #[Tag('queue_consume')]
     public function benchConsume(array $params): void
     {
         $this->adapter->message = $params['message'];

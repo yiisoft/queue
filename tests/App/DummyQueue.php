@@ -7,6 +7,7 @@ namespace Yiisoft\Queue\Tests\App;
 use Exception;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\Push\MiddlewarePushInterface;
 use Yiisoft\Queue\QueueInterface;
 
 final class DummyQueue implements QueueInterface
@@ -35,5 +36,15 @@ final class DummyQueue implements QueueInterface
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function withMiddlewares(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
+    {
+        throw new Exception('`withMiddlewares()` method is not implemented yet.');
+    }
+
+    public function withMiddlewaresAdded(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
+    {
+        throw new Exception('`withMiddlewaresAdded()` method is not implemented yet.');
     }
 }

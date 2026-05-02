@@ -17,10 +17,9 @@ use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\MessageFailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\MiddlewareFailureInterface;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Stubs\StubDelayMiddleware;
 use Yiisoft\Queue\Tests\TestCase;
 
-class SendAgainMiddlewareTest extends TestCase
+final class SendAgainMiddlewareTest extends TestCase
 {
     final public const KEY_EXPONENTIAL_ATTEMPTS = ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test';
     final public const KEY_EXPONENTIAL_DELAY = ExponentialDelayMiddleware::META_KEY_DELAY . '-test';
@@ -179,7 +178,6 @@ class SendAgainMiddlewareTest extends TestCase
                 self::EXPONENTIAL_STRATEGY_DELAY_INITIAL,
                 self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
                 self::EXPONENTIAL_STRATEGY_EXPONENT,
-                new StubDelayMiddleware(),
                 $queue,
             ),
             default => throw new RuntimeException('Unknown strategy'),

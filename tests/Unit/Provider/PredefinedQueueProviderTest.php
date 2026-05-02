@@ -65,6 +65,8 @@ final class PredefinedQueueProviderTest extends TestCase
                 'stdClass',
             ),
         );
+
+        /** @psalm-suppress InvalidArgument */
         new PredefinedQueueProvider([
             'queue1' => new stdClass(),
         ]);
