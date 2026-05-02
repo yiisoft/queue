@@ -46,13 +46,12 @@ final class PushMiddlewareDispatcher
 
     /**
      * Returns new instance with middleware handlers replaced with the ones provided.
-     * The last specified handler will be executed first.
      *
      * @param array[]|callable[]|MiddlewarePushInterface[]|string[] $middlewareDefinitions Each array element is:
      *
      * - A name of a middleware class. The middleware instance will be obtained from container executed.
-     * - A callable with `function(ServerRequestInterface $request, RequestHandlerInterface $handler):
-     *     ResponseInterface` signature.
+     * - A callable with `function(MessageInterface $message, MessageHandlerPushInterface $handler):
+     *     MessageInterface` signature.
      * - A "callable-like" array in format `[FooMiddleware::class, 'index']`. `FooMiddleware` instance will
      *   be created and `index()` method will be executed.
      * - A function returning a middleware. The middleware returned will be executed.
@@ -71,6 +70,27 @@ final class PushMiddlewareDispatcher
         $instance->stack = null;
 
         return $instance;
+    }
+
+    /**
+     * Returns a new instance with additional middleware handlers added to the existing ones.
+     *
+     * @param array[]|callable[]|MiddlewarePushInterface[]|string[] $middlewareDefinitions Each array element is:
+     *
+     * - A name of a middleware class. The middleware instance will be obtained from container executed.
+     * - A callable with `function(MessageInterface $message, MessageHandlerPushInterface $handler):
+     *     MessageInterface` signature.
+     * - A "callable-like" array in format `[FooMiddleware::class, 'index']`. `FooMiddleware` instance will
+     *   be created and `index()` method will be executed.
+     * - A function returning a middleware. The middleware returned will be executed.
+     *
+     * For callables typed parameters are automatically injected using dependency injection container.
+     *
+     * @return self New instance of the {@see PushMiddlewareDispatcher}
+     */
+    public function withMiddlewaresAdded(array $middlewareDefinitions): self
+    {
+        return $this->withMiddlewares([...array_reverse($this->middlewareDefinitions), ...$middlewareDefinitions]);
     }
 
     /**

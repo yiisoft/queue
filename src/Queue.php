@@ -21,12 +21,12 @@ use Yiisoft\Queue\Provider\QueueProviderInterface;
 final class Queue implements QueueInterface
 {
     /**
-     * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
+     * @var array<array|callable|MiddlewarePushInterface|string> Queue-specific middleware definitions.
      */
     private array $middlewareDefinitions;
 
     /**
-     * @var MessageHandlerPushInterface $finalPushHandler The final push handler in the middleware chain, responsible
+     * @var MessageHandlerPushInterface The final push handler in the middleware chain, responsible
      * for actually sending the message. Uses {@see SynchronousPushHandler} in synchronous mode or
      * {@see AdapterPushHandler} otherwise.
      */
@@ -34,18 +34,34 @@ final class Queue implements QueueInterface
 
     private string $name;
 
+    /**
+     * @var PushMiddlewareDispatcher The dispatcher used for push messages, combining base dispatcher middleware with
+     * queue-specific middleware.
+     */
+    private PushMiddlewareDispatcher $dispatcher;
+
+    /**
+     * @param WorkerInterface $worker The worker that processes messages.
+     * @param LoopInterface $loop The loop for controlling message processing.
+     * @param LoggerInterface $logger The logger for debug and informational messages.
+     * @param PushMiddlewareDispatcher $baseDispatcher The middleware dispatcher.
+     * @param AdapterInterface|null $adapter The message adapter (`null` for synchronous mode).
+     * @param string|BackedEnum $name The queue name.
+     * @param MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions Queue-specific middleware
+     * definitions.
+     */
     public function __construct(
         private readonly WorkerInterface $worker,
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
-        private readonly PushMiddlewareDispatcher $pushMiddlewareDispatcher,
+        private readonly PushMiddlewareDispatcher $baseDispatcher,
         private readonly ?AdapterInterface $adapter = null,
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
         MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions,
     ) {
         $this->name = StringNormalizer::normalize($name);
-        $this->middlewareDefinitions = $middlewareDefinitions;
         $this->finalPushHandler = $this->createFinalPushHandler();
+        $this->setMiddlewaresAndPrepareDispatcher($middlewareDefinitions);
     }
 
     public function __clone()
@@ -65,10 +81,7 @@ final class Queue implements QueueInterface
             ['messageType' => $message->getType()],
         );
 
-        $message = $this->pushMiddlewareDispatcher->dispatch(
-            $message,
-            $this->createPushHandler(),
-        );
+        $message = $this->dispatcher->dispatch($message, $this->finalPushHandler);
 
         if ($this->isSynchronous()) {
             $this->logger->info(
@@ -143,17 +156,24 @@ final class Queue implements QueueInterface
     public function withMiddlewares(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
     {
         $instance = clone $this;
-        $instance->middlewareDefinitions = $middlewareDefinitions;
-
+        $instance->setMiddlewaresAndPrepareDispatcher($middlewareDefinitions);
         return $instance;
     }
 
     public function withMiddlewaresAdded(MiddlewarePushInterface|callable|array|string ...$middlewareDefinitions): self
     {
         $instance = clone $this;
-        $instance->middlewareDefinitions = [...array_values($instance->middlewareDefinitions), ...array_values($middlewareDefinitions)];
-
+        $instance->setMiddlewaresAndPrepareDispatcher([...array_values($instance->middlewareDefinitions), ...array_values($middlewareDefinitions)]);
         return $instance;
+    }
+
+    /**
+     * @param array<MiddlewarePushInterface|callable|array|string> $middlewareDefinitions
+     */
+    private function setMiddlewaresAndPrepareDispatcher(array $middlewareDefinitions): void
+    {
+        $this->middlewareDefinitions = $middlewareDefinitions;
+        $this->dispatcher = $this->baseDispatcher->withMiddlewaresAdded($middlewareDefinitions);
     }
 
     private function handle(MessageInterface $message): bool
@@ -161,35 +181,6 @@ final class Queue implements QueueInterface
         $this->worker->process($message, $this);
 
         return $this->loop->canContinue();
-    }
-
-    private function createPushHandler(): MessageHandlerPushInterface
-    {
-        return new class (
-            $this->finalPushHandler,
-            $this->pushMiddlewareDispatcher,
-            $this->middlewareDefinitions,
-        ) implements MessageHandlerPushInterface {
-            public function __construct(
-                /**
-                 * @var MessageHandlerPushInterface $finishHandler Final handler invoked after all middlewares are
-                 * processed.
-                 */
-                private readonly MessageHandlerPushInterface $finishHandler,
-                private readonly PushMiddlewareDispatcher $dispatcher,
-                /**
-                 * @var array|array[]|callable[]|MiddlewarePushInterface[]|string[]
-                 */
-                private readonly array $middlewares,
-            ) {}
-
-            public function handlePush(MessageInterface $message): MessageInterface
-            {
-                return $this->dispatcher
-                    ->withMiddlewares($this->middlewares)
-                    ->dispatch($message, $this->finishHandler);
-            }
-        };
     }
 
     private function createFinalPushHandler(): MessageHandlerPushInterface
