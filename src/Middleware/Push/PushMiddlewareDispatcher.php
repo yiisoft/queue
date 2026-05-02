@@ -24,7 +24,7 @@ final class PushMiddlewareDispatcher
         private readonly PushMiddlewareFactoryInterface $middlewareFactory,
         array|callable|string|PushMiddlewareInterface ...$middlewareDefinitions,
     ) {
-        $this->middlewareDefinitions = array_reverse($middlewareDefinitions);
+        $this->middlewareDefinitions = $middlewareDefinitions;
     }
 
     /**
@@ -63,7 +63,7 @@ final class PushMiddlewareDispatcher
     public function withMiddlewares(array $middlewareDefinitions): self
     {
         $instance = clone $this;
-        $instance->middlewareDefinitions = array_reverse($middlewareDefinitions);
+        $instance->middlewareDefinitions = $middlewareDefinitions;
 
         // Fixes a memory leak.
         unset($instance->stack);
@@ -90,7 +90,7 @@ final class PushMiddlewareDispatcher
      */
     public function withMiddlewaresAdded(array $middlewareDefinitions): self
     {
-        return $this->withMiddlewares([...array_reverse($this->middlewareDefinitions), ...$middlewareDefinitions]);
+        return $this->withMiddlewares([...$this->middlewareDefinitions, ...$middlewareDefinitions]);
     }
 
     /**
