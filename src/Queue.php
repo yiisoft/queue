@@ -13,7 +13,6 @@ use Yiisoft\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
 use Yiisoft\Queue\Middleware\Push\SynchronousPushHandler;
 use Yiisoft\Queue\Worker\WorkerInterface;
