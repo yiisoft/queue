@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Debug\QueueCollector;
 use Yiisoft\Queue\Debug\QueueWorkerInterfaceProxy;
 use Yiisoft\Queue\Message\Message;
-use Yiisoft\Queue\Tests\App\DummyQueue;
+use Yiisoft\Queue\Stubs\StubQueue;
 use Yiisoft\Queue\Stubs\StubWorker;
 
 final class QueueWorkerInterfaceProxyTest extends TestCase
@@ -20,7 +20,7 @@ final class QueueWorkerInterfaceProxyTest extends TestCase
         $collector->startup();
         $proxy = new QueueWorkerInterfaceProxy(new StubWorker(), $collector);
 
-        $result = $proxy->process($message, new DummyQueue('chan'));
+        $result = $proxy->process($message, new StubQueue('chan'));
 
         self::assertSame($message, $result);
 
