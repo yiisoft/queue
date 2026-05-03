@@ -13,9 +13,7 @@ use Yiisoft\Queue\Message\MessageInterface;
  */
 final class StubAdapter implements AdapterInterface
 {
-    public function runExisting(callable $handlerCallback): void
-    {
-    }
+    public function runExisting(callable $handlerCallback): void {}
 
     public function status(int|string $id): MessageStatus
     {
@@ -27,7 +25,5 @@ final class StubAdapter implements AdapterInterface
         return $message;
     }
 
-    public function subscribe(callable $handlerCallback): void
-    {
-    }
+    public function subscribe(callable $handlerCallback): void {}
 }

@@ -9,6 +9,7 @@ use Yiisoft\CodeStyle\ConfigBuilder;
 $finder = (new Finder())->in([
     __DIR__ . '/config',
     __DIR__ . '/src',
+    __DIR__ . '/stubs',
     __DIR__ . '/tests',
 ]);
 
