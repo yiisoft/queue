@@ -11,8 +11,9 @@ use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
 use Yiisoft\Queue\Middleware\Push\SynchronousPushHandler;
 use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
@@ -25,13 +26,6 @@ final class Queue implements QueueInterface
      */
     private array $middlewareDefinitions;
 
-    /**
-     * @var PushHandlerInterface The final push handler in the middleware chain, responsible
-     * for actually sending the message. Uses {@see SynchronousPushHandler} in synchronous mode or
-     * {@see AdapterPushHandler} otherwise.
-     */
-    private PushHandlerInterface $finalPushHandler;
-
     private string $name;
 
     /**
@@ -41,10 +35,17 @@ final class Queue implements QueueInterface
     private PushMiddlewareDispatcher $dispatcher;
 
     /**
+     * @var PushMiddlewareDispatcher The base dispatcher built from {@see PushMiddlewareConfig}.
+     * Holds the common middleware applied to all queues.
+     */
+    private PushMiddlewareDispatcher $baseDispatcher;
+
+    /**
      * @param WorkerInterface $worker The worker that processes messages.
      * @param LoopInterface $loop The loop for controlling message processing.
      * @param LoggerInterface $logger The logger for debug and informational messages.
-     * @param PushMiddlewareDispatcher $baseDispatcher The middleware dispatcher.
+     * @param PushMiddlewareConfig $middlewareConfig The push middleware configuration: factory and common middleware
+     * definitions.
      * @param AdapterInterface|null $adapter The message adapter (`null` for synchronous mode).
      * @param string|BackedEnum $name The queue name.
      * @param PushMiddlewareInterface|callable|array|string ...$middlewareDefinitions Queue-specific middleware
@@ -54,19 +55,25 @@ final class Queue implements QueueInterface
         private readonly WorkerInterface $worker,
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
-        private readonly PushMiddlewareDispatcher $baseDispatcher,
+        PushMiddlewareConfig $middlewareConfig,
         private readonly ?AdapterInterface $adapter = null,
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
         PushMiddlewareInterface|callable|array|string ...$middlewareDefinitions,
     ) {
         $this->name = StringNormalizer::normalize($name);
-        $this->finalPushHandler = $this->createFinalPushHandler();
+        $this->baseDispatcher = new PushMiddlewareDispatcher(
+            $middlewareConfig->middlewareFactory,
+            $middlewareConfig->commonMiddlewareDefinitions,
+            $this->createFinalPushHandler(),
+        );
         $this->setMiddlewaresAndPrepareDispatcher($middlewareDefinitions);
     }
 
     public function __clone()
     {
-        $this->finalPushHandler = $this->createFinalPushHandler();
+        $finalPushHandler = $this->createFinalPushHandler();
+        $this->baseDispatcher = $this->baseDispatcher->withFinishHandler($finalPushHandler);
+        $this->dispatcher = $this->dispatcher->withFinishHandler($finalPushHandler);
     }
 
     public function getName(): string
@@ -81,7 +88,7 @@ final class Queue implements QueueInterface
             ['messageType' => $message->getType()],
         );
 
-        $message = $this->dispatcher->dispatch($message, $this->finalPushHandler);
+        $message = $this->dispatcher->dispatch($message);
 
         if ($this->isSynchronous()) {
             $this->logger->info(
