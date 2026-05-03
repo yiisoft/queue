@@ -4,7 +4,7 @@ Guidelines for AI agents working in this repository.
 
 ## Commands
 
-All commands are executed via `make`. Do not run `php`, `composer`, `phpunit`, etc. directly.
+All commands are executed via `make`.
 
 ```bash
 make <target> [VARIABLE=value ...]
