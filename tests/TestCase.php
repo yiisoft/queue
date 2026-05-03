@@ -20,8 +20,8 @@ use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -97,7 +97,7 @@ abstract class TestCase extends BaseTestCase
             $this->getWorker(),
             $this->getLoop(),
             new NullLogger(),
-            $this->getPushMiddlewareDispatcher(),
+            $this->getPushMiddlewareConfig(),
             $adapter,
             $name,
         );
@@ -158,9 +158,9 @@ abstract class TestCase extends BaseTestCase
         ];
     }
 
-    protected function getPushMiddlewareDispatcher(): PushMiddlewareDispatcher
+    protected function getPushMiddlewareConfig(): PushMiddlewareConfig
     {
-        return new PushMiddlewareDispatcher(
+        return new PushMiddlewareConfig(
             new PushMiddlewareFactory(
                 $this->getContainer(),
                 new CallableFactory($this->getContainer()),

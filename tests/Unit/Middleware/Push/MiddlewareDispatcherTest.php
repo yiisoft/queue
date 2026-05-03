@@ -33,7 +33,7 @@ final class MiddlewareDispatcherTest extends TestCase
             ],
         );
 
-        $result = $dispatcher->dispatch($message, $this->getRequestHandler());
+        $result = $dispatcher->dispatch($message);
         $this->assertSame('New closure test data', $result->getData());
     }
 
@@ -46,7 +46,7 @@ final class MiddlewareDispatcherTest extends TestCase
             ],
         );
         $dispatcher = $this->createDispatcher($container)->withMiddlewares([[TestCallableMiddleware::class, 'index']]);
-        $result = $dispatcher->dispatch($message, $this->getRequestHandler());
+        $result = $dispatcher->dispatch($message);
         $this->assertSame('New test data', $result->getData());
     }
 
@@ -59,7 +59,7 @@ final class MiddlewareDispatcherTest extends TestCase
             '__construct()' => ['message' => 'New test data from the definition'],
         ];
         $dispatcher = $this->createDispatcher($container)->withMiddlewares([$definition]);
-        $result = $dispatcher->dispatch($message, $this->getRequestHandler());
+        $result = $dispatcher->dispatch($message);
         $this->assertSame('New test data from the definition', $result->getData());
     }
 
@@ -76,7 +76,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
-        $result = $dispatcher->dispatch($message, $this->getRequestHandler());
+        $result = $dispatcher->dispatch($message);
         $this->assertSame('new test data', $result->getData());
     }
 
@@ -89,7 +89,7 @@ final class MiddlewareDispatcherTest extends TestCase
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
-        $result = $dispatcher->dispatch($message, $this->getRequestHandler());
+        $result = $dispatcher->dispatch($message);
         $this->assertSame('first', $result->getData());
     }
 
@@ -129,22 +129,12 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this
             ->createDispatcher($container)
             ->withMiddlewares([[TestCallableMiddleware::class, 'index']]);
-        $dispatcher->dispatch($message, $this->getRequestHandler());
+        $dispatcher->dispatch($message);
 
         $dispatcher = $dispatcher->withMiddlewares([TestMiddleware::class]);
-        $result = $dispatcher->dispatch($message, $this->getRequestHandler());
+        $result = $dispatcher->dispatch($message);
 
         self::assertSame('New middleware test data', $result->getData());
-    }
-
-    private function getRequestHandler(): PushHandlerInterface
-    {
-        return new class implements PushHandlerInterface {
-            public function handlePush(MessageInterface $message): MessageInterface
-            {
-                return $message;
-            }
-        };
     }
 
     private function createDispatcher(
@@ -155,6 +145,13 @@ final class MiddlewareDispatcherTest extends TestCase
 
         return new PushMiddlewareDispatcher(
             new PushMiddlewareFactory($container, $callableFactory),
+            [],
+            new class implements PushHandlerInterface {
+                public function handlePush(MessageInterface $message): MessageInterface
+                {
+                    return $message;
+                }
+            },
         );
     }
 

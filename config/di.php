@@ -14,9 +14,9 @@ use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactoryInterface;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Worker\Worker as QueueWorker;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
@@ -36,8 +36,8 @@ return [
     PushMiddlewareFactoryInterface::class => PushMiddlewareFactory::class,
     ConsumeMiddlewareFactoryInterface::class => ConsumeMiddlewareFactory::class,
     FailureMiddlewareFactoryInterface::class => FailureMiddlewareFactory::class,
-    PushMiddlewareDispatcher::class => [
-        '__construct()' => ['middlewareDefinitions' => $params['yiisoft/queue']['middlewares-push']],
+    PushMiddlewareConfig::class => [
+        '__construct()' => ['commonMiddlewareDefinitions' => $params['yiisoft/queue']['middlewares-push']],
     ],
     ConsumeMiddlewareDispatcher::class => [
         '__construct()' => ['middlewareDefinitions' => $params['yiisoft/queue']['middlewares-consume']],

@@ -6,7 +6,11 @@ namespace Yiisoft\Queue\Middleware\Push;
 
 use Closure;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Queue;
 
+/**
+ * @internal Used internally by {@see Queue}.
+ */
 final class PushMiddlewareDispatcher
 {
     /**
@@ -15,33 +19,42 @@ final class PushMiddlewareDispatcher
      * @var PushMiddlewareStack|null The middleware stack.
      */
     private ?PushMiddlewareStack $stack = null;
-    /**
-     * @var array[]|callable[]|PushMiddlewareInterface[]|string[]
-     */
-    private array $middlewareDefinitions;
 
+    /**
+     * @param PushMiddlewareFactoryInterface $middlewareFactory Factory used to instantiate middleware.
+     * @param array<array|callable|PushMiddlewareInterface|string> $middlewareDefinitions Middleware definitions.
+     * @param PushHandlerInterface $finishHandler Finish message handler.
+     */
     public function __construct(
         private readonly PushMiddlewareFactoryInterface $middlewareFactory,
-        array|callable|string|PushMiddlewareInterface ...$middlewareDefinitions,
-    ) {
-        $this->middlewareDefinitions = $middlewareDefinitions;
-    }
+        private array $middlewareDefinitions,
+        private PushHandlerInterface $finishHandler,
+    ) {}
 
     /**
      * Dispatch message through middleware to get response.
      *
      * @param MessageInterface $message Message to pass to middleware.
-     * @param PushHandlerInterface $finishHandler Handler to use in case no middleware produced a response.
      */
-    public function dispatch(
-        MessageInterface $message,
-        PushHandlerInterface $finishHandler,
-    ): MessageInterface {
+    public function dispatch(MessageInterface $message): MessageInterface
+    {
         if ($this->stack === null) {
-            $this->stack = new PushMiddlewareStack($this->buildMiddlewares(), $finishHandler);
+            $this->stack = new PushMiddlewareStack($this->buildMiddlewares(), $this->finishHandler);
         }
 
         return $this->stack->handlePush($message);
+    }
+
+    public function withFinishHandler(PushHandlerInterface $finishHandler): self
+    {
+        $instance = clone $this;
+        $instance->finishHandler = $finishHandler;
+
+        // Fixes a memory leak.
+        unset($instance->stack);
+        $instance->stack = null;
+
+        return $instance;
     }
 
     /**

@@ -22,8 +22,8 @@ use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\Worker\Worker;
 
@@ -51,7 +51,7 @@ $failureMiddlewareDispatcher = new FailureMiddlewareDispatcher(
     [],
 );
 
-$pushMiddlewareDispatcher = new PushMiddlewareDispatcher(
+$pushMiddlewareConfig = new PushMiddlewareConfig(
     new PushMiddlewareFactory($container, $callableFactory),
 );
 
@@ -75,7 +75,7 @@ $queue = new Queue(
     $worker,
     $loop,
     $logger,
-    $pushMiddlewareDispatcher,
+    $pushMiddlewareConfig,
 );
 
 // Now you can push messages

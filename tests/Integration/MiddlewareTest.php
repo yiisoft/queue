@@ -23,8 +23,8 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Queue;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\Integration\Support\TestMiddleware;
@@ -45,15 +45,17 @@ final class MiddlewareTest extends TestCase
             'channel 4',
         ];
 
-        $pushMiddlewareDispatcher = new PushMiddlewareDispatcher(
+        $pushMiddlewareConfig = new PushMiddlewareConfig(
             new PushMiddlewareFactory(
                 $this->createMock(ContainerInterface::class),
                 new CallableFactory(
                     $this->createMock(ContainerInterface::class),
                 ),
             ),
-            new TestMiddleware('common 1'),
-            new TestMiddleware('common 2'),
+            [
+                new TestMiddleware('common 1'),
+                new TestMiddleware('common 2'),
+            ],
         );
         $worker = $this->createMock(WorkerInterface::class);
         $worker->method('process')->willReturnArgument(0);
@@ -61,7 +63,7 @@ final class MiddlewareTest extends TestCase
             $worker,
             $this->createMock(LoopInterface::class),
             $this->createMock(LoggerInterface::class),
-            $pushMiddlewareDispatcher,
+            $pushMiddlewareConfig,
             name: 'test',
         );
         $queue = $queue
