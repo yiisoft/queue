@@ -4,19 +4,27 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Middleware\Push;
 
+use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
+
 /**
  * Creates a middleware based on the definition provided.
  * You may implement this interface if you want to introduce custom definitions or pass additional data to
  * the middleware created.
+ *
+ * @template T
  */
 interface PushMiddlewareFactoryInterface
 {
     /**
-     * Create a middleware based on definition provided.
+     * Create a middleware based on the definition provided.
      *
-     * @param array|callable|PushMiddlewareInterface|string $middlewareDefinition Middleware definition to use.
+     * @param mixed $middlewareDefinition Middleware definition to use.
+     *
+     * @throws InvalidMiddlewareDefinitionException If the definition is not supported or is invalid.
      *
      * @return PushMiddlewareInterface
+     *
+     * @psalm-param T $middlewareDefinition
      */
-    public function createPushMiddleware(callable|array|string|PushMiddlewareInterface $middlewareDefinition): PushMiddlewareInterface;
+    public function createPushMiddleware(mixed $middlewareDefinition): PushMiddlewareInterface;
 }
