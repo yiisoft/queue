@@ -8,8 +8,8 @@ use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Message;
 use Yiisoft\Queue\MessageStatus;
+use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
-use Yiisoft\Queue\Tests\App\MemoryAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 
 use function extension_loaded;
@@ -73,7 +73,7 @@ final class QueueTest extends TestCase
 
     public function testRunWithAdapter(): void
     {
-        $queue = $this->createQueue(new MemoryAdapter());
+        $queue = $this->createQueue(new InMemoryAdapter());
         $message = new Message('simple', null);
         $queue->push($message);
         $queue->push(clone $message);
@@ -84,7 +84,7 @@ final class QueueTest extends TestCase
 
     public function testRunPartlyWithAdapter(): void
     {
-        $queue = $this->createQueue(new MemoryAdapter());
+        $queue = $this->createQueue(new InMemoryAdapter());
         $message = new Message('simple', null);
         $queue->push($message);
         $queue->push(clone $message);
@@ -95,7 +95,7 @@ final class QueueTest extends TestCase
 
     public function testListenWithAdapter(): void
     {
-        $queue = $this->createQueue(new MemoryAdapter());
+        $queue = $this->createQueue(new InMemoryAdapter());
         $message = new Message('simple', null);
         $queue->push($message);
         $queue->push(clone $message);
@@ -107,7 +107,7 @@ final class QueueTest extends TestCase
 
     public function testStatusWithAdapter(): void
     {
-        $queue = $this->createQueue(new MemoryAdapter());
+        $queue = $this->createQueue(new InMemoryAdapter());
         $envelope = $queue->push(new Message('simple', null));
 
         self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
