@@ -11,7 +11,7 @@ use Yiisoft\Queue\Provider\InvalidQueueConfigException;
 use Yiisoft\Queue\Provider\QueueFactoryProvider;
 use Yiisoft\Queue\Provider\QueueNotFoundException;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Stubs\StubAdapter;
+use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Stubs\StubLoop;
 use Yiisoft\Queue\Stubs\StubQueue;
 use Yiisoft\Queue\Tests\Unit\Support\StringEnum;
@@ -116,9 +116,8 @@ final class QueueFactoryProviderTest extends TestCase
 
     public function testWithContainer(): void
     {
-        $adapter = new StubAdapter();
         $container = new SimpleContainer([
-            AdapterInterface::class => $adapter,
+            AdapterInterface::class => new InMemoryAdapter(),
         ]);
 
         $provider = new QueueFactoryProvider(

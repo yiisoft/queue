@@ -13,8 +13,7 @@ final class StubLoop implements LoopInterface
 {
     public function __construct(
         private readonly bool $canContinue = true,
-    ) {
-    }
+    ) {}
 
     public function canContinue(): bool
     {
