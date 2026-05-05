@@ -88,7 +88,7 @@ final class InMemoryAdapterTest extends TestCase
             static function (MessageInterface $message) use (&$processed): bool {
                 $processed[] = $message->getData();
                 return true;
-            }
+            },
         );
 
         $this->assertSame(['a', 'b', 'c'], $processed);
@@ -106,7 +106,7 @@ final class InMemoryAdapterTest extends TestCase
             static function (MessageInterface $message) use (&$processed): bool {
                 $processed[] = $message->getData();
                 return false;
-            }
+            },
         );
 
         $this->assertSame(['a'], $processed);
@@ -165,7 +165,7 @@ final class InMemoryAdapterTest extends TestCase
             static function (MessageInterface $message) use (&$processed): bool {
                 $processed[] = $message->getData();
                 return true;
-            }
+            },
         );
 
         $this->assertSame(['a', 'b'], $processed);
