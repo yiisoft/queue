@@ -7,6 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit\Stubs;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
 
@@ -83,10 +84,12 @@ final class InMemoryAdapterTest extends TestCase
         $adapter->push(new Message('test', 'c'));
 
         $processed = [];
-        $adapter->runExisting(static function (mixed $message) use (&$processed): bool {
-            $processed[] = $message->getData();
-            return true;
-        });
+        $adapter->runExisting(
+            static function (MessageInterface $message) use (&$processed): bool {
+                $processed[] = $message->getData();
+                return true;
+            }
+        );
 
         $this->assertSame(['a', 'b', 'c'], $processed);
     }
@@ -99,10 +102,12 @@ final class InMemoryAdapterTest extends TestCase
         $adapter->push(new Message('test', 'c'));
 
         $processed = [];
-        $adapter->runExisting(static function (mixed $message) use (&$processed): bool {
-            $processed[] = $message->getData();
-            return false;
-        });
+        $adapter->runExisting(
+            static function (MessageInterface $message) use (&$processed): bool {
+                $processed[] = $message->getData();
+                return false;
+            }
+        );
 
         $this->assertSame(['a'], $processed);
     }
@@ -156,10 +161,12 @@ final class InMemoryAdapterTest extends TestCase
         $adapter->push(new Message('test', 'b'));
 
         $processed = [];
-        $adapter->subscribe(static function (mixed $message) use (&$processed): bool {
-            $processed[] = $message->getData();
-            return true;
-        });
+        $adapter->subscribe(
+            static function (MessageInterface $message) use (&$processed): bool {
+                $processed[] = $message->getData();
+                return true;
+            }
+        );
 
         $this->assertSame(['a', 'b'], $processed);
     }
