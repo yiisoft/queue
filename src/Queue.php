@@ -13,7 +13,6 @@ use Yiisoft\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
 use Yiisoft\Queue\Middleware\Push\SynchronousPushHandler;
 use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
@@ -22,7 +21,7 @@ use Yiisoft\Queue\Provider\QueueProviderInterface;
 final class Queue implements QueueInterface
 {
     /**
-     * @var array<array|callable|PushMiddlewareInterface|string> Queue-specific middleware definitions.
+     * @var mixed[] Queue-specific middleware definitions.
      */
     private array $middlewareDefinitions;
 
@@ -48,8 +47,7 @@ final class Queue implements QueueInterface
      * definitions.
      * @param AdapterInterface|null $adapter The message adapter (`null` for synchronous mode).
      * @param string|BackedEnum $name The queue name.
-     * @param PushMiddlewareInterface|callable|array|string ...$middlewareDefinitions Queue-specific middleware
-     * definitions.
+     * @param mixed ...$middlewareDefinitions Queue-specific middleware definitions.
      */
     public function __construct(
         private readonly WorkerInterface $worker,
@@ -58,7 +56,7 @@ final class Queue implements QueueInterface
         PushMiddlewareConfig $middlewareConfig,
         private readonly ?AdapterInterface $adapter = null,
         string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
-        PushMiddlewareInterface|callable|array|string ...$middlewareDefinitions,
+        mixed ...$middlewareDefinitions,
     ) {
         $this->name = StringNormalizer::normalize($name);
         $this->baseDispatcher = new PushMiddlewareDispatcher(
@@ -160,14 +158,14 @@ final class Queue implements QueueInterface
         return $this->adapter->status($id);
     }
 
-    public function withMiddlewares(PushMiddlewareInterface|callable|array|string ...$middlewareDefinitions): self
+    public function withMiddlewares(mixed ...$middlewareDefinitions): self
     {
         $instance = clone $this;
         $instance->setMiddlewaresAndPrepareDispatcher($middlewareDefinitions);
         return $instance;
     }
 
-    public function withMiddlewaresAdded(PushMiddlewareInterface|callable|array|string ...$middlewareDefinitions): self
+    public function withMiddlewaresAdded(mixed ...$middlewareDefinitions): self
     {
         $instance = clone $this;
         $instance->setMiddlewaresAndPrepareDispatcher([...array_values($instance->middlewareDefinitions), ...array_values($middlewareDefinitions)]);
@@ -175,7 +173,7 @@ final class Queue implements QueueInterface
     }
 
     /**
-     * @param array<PushMiddlewareInterface|callable|array|string> $middlewareDefinitions
+     * @param mixed[] $middlewareDefinitions
      */
     private function setMiddlewaresAndPrepareDispatcher(array $middlewareDefinitions): void
     {

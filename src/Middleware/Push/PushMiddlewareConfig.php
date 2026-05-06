@@ -12,7 +12,7 @@ final class PushMiddlewareConfig
 {
     /**
      * @param PushMiddlewareFactoryInterface $middlewareFactory Factory used to instantiate middleware from definitions.
-     * @param array<array|callable|PushMiddlewareInterface|string> $commonMiddlewareDefinitions Middleware definitions.
+     * @param mixed[] $commonMiddlewareDefinitions Middleware definitions.
      */
     public function __construct(
         public readonly PushMiddlewareFactoryInterface $middlewareFactory,

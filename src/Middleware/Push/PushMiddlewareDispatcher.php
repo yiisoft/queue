@@ -22,7 +22,7 @@ final class PushMiddlewareDispatcher
 
     /**
      * @param PushMiddlewareFactoryInterface $middlewareFactory Factory used to instantiate middleware.
-     * @param array<array|callable|PushMiddlewareInterface|string> $middlewareDefinitions Middleware definitions.
+     * @param mixed[] $middlewareDefinitions Middleware definitions.
      * @param PushHandlerInterface $finishHandler Finish message handler.
      */
     public function __construct(
@@ -60,16 +60,7 @@ final class PushMiddlewareDispatcher
     /**
      * Returns new instance with middleware handlers replaced with the ones provided.
      *
-     * @param array[]|callable[]|PushMiddlewareInterface[]|string[] $middlewareDefinitions Each array element is:
-     *
-     * - A name of a middleware class. The middleware instance will be obtained from container executed.
-     * - A callable with `function(MessageInterface $message, PushHandlerInterface $handler):
-     *     MessageInterface` signature.
-     * - A "callable-like" array in format `[FooMiddleware::class, 'index']`. `FooMiddleware` instance will
-     *   be created and `index()` method will be executed.
-     * - A function returning a middleware. The middleware returned will be executed.
-     *
-     * For callables typed parameters are automatically injected using dependency injection container.
+     * @param mixed[] $middlewareDefinitions Middleware definitions.
      *
      * @return self New instance of the {@see PushMiddlewareDispatcher}
      */
@@ -88,16 +79,7 @@ final class PushMiddlewareDispatcher
     /**
      * Returns a new instance with additional middleware handlers added to the existing ones.
      *
-     * @param array[]|callable[]|PushMiddlewareInterface[]|string[] $middlewareDefinitions Each array element is:
-     *
-     * - A name of a middleware class. The middleware instance will be obtained from container executed.
-     * - A callable with `function(MessageInterface $message, PushHandlerInterface $handler):
-     *     MessageInterface` signature.
-     * - A "callable-like" array in format `[FooMiddleware::class, 'index']`. `FooMiddleware` instance will
-     *   be created and `index()` method will be executed.
-     * - A function returning a middleware. The middleware returned will be executed.
-     *
-     * For callables typed parameters are automatically injected using dependency injection container.
+     * @param mixed[] $middlewareDefinitions Middleware definitions.
      *
      * @return self New instance of the {@see PushMiddlewareDispatcher}
      */

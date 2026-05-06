@@ -10,16 +10,20 @@ use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
 
+use function is_array;
+use function is_callable;
+use function is_string;
+
 /**
  * Creates a middleware based on the definition provided.
  *
  * @template-extends MiddlewareFactory<PushMiddlewareInterface>
+ * @template-implements PushMiddlewareFactoryInterface<PushMiddlewareInterface|array|callable|string>
  */
 final class PushMiddlewareFactory extends MiddlewareFactory implements PushMiddlewareFactoryInterface
 {
     /**
-     * @param PushMiddlewareInterface|callable|array|string $middlewareDefinition Middleware definition in one of
-     * the following formats:
+     * @param mixed $middlewareDefinition Middleware definition in one of the following formats:
      *
      * - A middleware object.
      * - A name of a middleware class. The middleware instance will be obtained from container and executed.
@@ -38,11 +42,14 @@ final class PushMiddlewareFactory extends MiddlewareFactory implements PushMiddl
      *
      * @return PushMiddlewareInterface
      */
-    public function createPushMiddleware(
-        PushMiddlewareInterface|callable|array|string $middlewareDefinition,
-    ): PushMiddlewareInterface {
+    public function createPushMiddleware(mixed $middlewareDefinition): PushMiddlewareInterface
+    {
         if ($middlewareDefinition instanceof PushMiddlewareInterface) {
             return $middlewareDefinition;
+        }
+
+        if (!is_callable($middlewareDefinition) && !is_array($middlewareDefinition) && !is_string($middlewareDefinition)) {
+            throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
         }
 
         $middleware = $this->create($middlewareDefinition);

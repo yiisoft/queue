@@ -61,6 +61,9 @@ You can use any of these formats:
 - A string for your DI container to resolve the middleware, e.g. `FooMiddleware::class`.
 - An [extended callable definition](callable-definitions-extended.md). A callable should either be a middleware itself or return a configured middleware object.
 
+> **Note:** The formats above are supported by the default `PushMiddlewareFactory`. When using a custom
+> `PushMiddlewareFactoryInterface` implementation, it may accept additional definition formats.
+
 The required interface depends on the pipeline:
 
 - Push: `Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface`
