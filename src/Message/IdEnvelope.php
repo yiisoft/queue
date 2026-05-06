@@ -22,13 +22,11 @@ final class IdEnvelope extends Envelope
 
     public static function fromMessage(MessageInterface $message): static
     {
-        /** @var mixed $rawId */
         $rawId = $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
 
-        /** @var int|string|null $id */
         $id = match (true) {
             $rawId === null => null, // don't remove this branch: it's important for compute speed
-            is_string($rawId) => $rawId,
+            is_string($rawId),
             is_int($rawId) => $rawId,
             is_object($rawId) && method_exists($rawId, '__toString') => (string) $rawId,
             default => null,
