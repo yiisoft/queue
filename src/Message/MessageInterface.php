@@ -19,7 +19,9 @@ interface MessageInterface
     public function getData(): mixed;
 
     /**
-     * Returns message metadata: timings, attempts count, metrics, etc.
+     * Returns message metadata: timings, attempts count, metrics, etc. Keys are always strings.
+     *
+     * @return array<string, mixed>
      */
     public function getMetadata(): array;
 }

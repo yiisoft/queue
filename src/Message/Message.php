@@ -10,6 +10,8 @@ final class Message implements MessageInterface
      * @param string $type A message type used to resolve the handler.
      * @param mixed $data Message data, encodable by a queue adapter
      * @param array $metadata Message metadata, encodable by a queue adapter
+     *
+     * @psalm-param array<string, mixed> $metadata
      */
     public function __construct(
         private readonly string $type,

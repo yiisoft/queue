@@ -8,6 +8,9 @@ use function is_array;
 
 abstract class Envelope implements EnvelopeInterface
 {
+    /**
+     * @psalm-var array<string, mixed>|null
+     */
     private ?array $metadata = null;
 
     public function __construct(protected MessageInterface $message) {}

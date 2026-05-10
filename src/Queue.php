@@ -96,7 +96,6 @@ final class Queue implements QueueInterface
             return $message;
         }
 
-        /** @var string $messageId */
         $messageId = $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
         $this->logger->info(
             'Pushed message with message type "{messageType}" to the queue. Assigned ID #{id}.',
