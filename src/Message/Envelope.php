@@ -6,8 +6,11 @@ namespace Yiisoft\Queue\Message;
 
 use function is_array;
 
-abstract class Envelope implements EnvelopeInterface
+abstract class Envelope implements MessageInterface
 {
+    /** @psalm-suppress MissingClassConstType */
+    final public const ENVELOPE_STACK_KEY = 'envelopes';
+
     private readonly MessageInterface $message;
 
     /**
@@ -25,36 +28,36 @@ abstract class Envelope implements EnvelopeInterface
         $this->message = $message;
     }
 
-    /** @psalm-suppress MoreSpecificReturnType */
-    public static function fromData(string $type, mixed $data, array $metadata = []): static
+    final public static function fromData(string $type, mixed $data, array $metadata = []): static
     {
-        /** @psalm-suppress LessSpecificReturnStatement */
         return static::fromMessage(Message::fromData($type, $data, $metadata));
     }
 
-    public function getMessage(): MessageInterface
+    abstract public static function fromMessage(MessageInterface $message): static;
+
+    final public function getMessage(): MessageInterface
     {
         return $this->message;
     }
 
-    public function getType(): string
+    final public function getType(): string
     {
         return $this->message->getType();
     }
 
-    public function getData(): mixed
+    final public function getData(): mixed
     {
         return $this->message->getData();
     }
 
-    public function getMetadata(): array
+    final public function getMetadata(): array
     {
         return $this->metadata;
     }
 
     private function prepareMetadata(array $messageMeta, array $metadata): array
     {
-        $stack = $messageMeta[EnvelopeInterface::ENVELOPE_STACK_KEY] ?? [];
+        $stack = $messageMeta[self::ENVELOPE_STACK_KEY] ?? [];
         if (!is_array($stack)) {
             $stack = [];
         }
@@ -62,7 +65,7 @@ abstract class Envelope implements EnvelopeInterface
         return array_merge(
             $messageMeta,
             [
-                EnvelopeInterface::ENVELOPE_STACK_KEY => array_merge(
+                self::ENVELOPE_STACK_KEY => array_merge(
                     $stack,
                     [static::class],
                 ),
