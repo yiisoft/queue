@@ -22,6 +22,6 @@ final class DelayEnvelope extends Envelope
 
     public function getDelaySeconds(): float
     {
-        return $this->metadata[self::META_DELAY_SECONDS] ?? 0.0;
+        return $this->metadata[self::META_DELAY_SECONDS];
     }
 }
