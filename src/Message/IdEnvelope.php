@@ -37,6 +37,6 @@ final class IdEnvelope extends Envelope
 
     public function getId(): string|int|null
     {
-        return $this->getMetadata()[self::MESSAGE_ID_KEY];
+        return $this->metadata[self::MESSAGE_ID_KEY];
     }
 }

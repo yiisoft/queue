@@ -11,12 +11,12 @@ abstract class Envelope implements MessageInterface
     /** @psalm-suppress MissingClassConstType */
     final public const ENVELOPE_STACK_KEY = 'envelopes';
 
-    private readonly MessageInterface $message;
-
     /**
      * @psalm-var array<string, mixed>
      */
-    private readonly array $metadata;
+    protected readonly array $metadata;
+
+    private readonly MessageInterface $message;
 
     public function __construct(MessageInterface $message, array $metadata)
     {
