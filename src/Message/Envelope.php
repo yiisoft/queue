@@ -8,12 +8,22 @@ use function is_array;
 
 abstract class Envelope implements EnvelopeInterface
 {
-    /**
-     * @psalm-var array<string, mixed>|null
-     */
-    private ?array $metadata = null;
+    private readonly MessageInterface $message;
 
-    public function __construct(protected MessageInterface $message) {}
+    /**
+     * @psalm-var array<string, mixed>
+     */
+    private readonly array $metadata;
+
+    public function __construct(MessageInterface $message, array $metadata)
+    {
+        $this->metadata = $this->prepareMetadata($message->getMetadata(), $metadata);
+
+        while ($message instanceof self) {
+            $message = $message->getMessage();
+        }
+        $this->message = $message;
+    }
 
     /** @psalm-suppress MoreSpecificReturnType */
     public static function fromData(string $type, mixed $data, array $metadata = []): static
@@ -39,28 +49,25 @@ abstract class Envelope implements EnvelopeInterface
 
     public function getMetadata(): array
     {
-        if ($this->metadata === null) {
-            $messageMeta = $this->message->getMetadata();
-
-            $stack = $messageMeta[EnvelopeInterface::ENVELOPE_STACK_KEY] ?? [];
-            if (!is_array($stack)) {
-                $stack = [];
-            }
-
-            $this->metadata = array_merge(
-                $messageMeta,
-                [
-                    EnvelopeInterface::ENVELOPE_STACK_KEY => array_merge(
-                        $stack,
-                        [static::class],
-                    ),
-                ],
-                $this->getEnvelopeMetadata(),
-            );
-        }
-
         return $this->metadata;
     }
 
-    abstract protected function getEnvelopeMetadata(): array;
+    private function prepareMetadata(array $messageMeta, array $metadata): array
+    {
+        $stack = $messageMeta[EnvelopeInterface::ENVELOPE_STACK_KEY] ?? [];
+        if (!is_array($stack)) {
+            $stack = [];
+        }
+
+        return array_merge(
+            $messageMeta,
+            [
+                EnvelopeInterface::ENVELOPE_STACK_KEY => array_merge(
+                    $stack,
+                    [static::class],
+                ),
+            ],
+            $metadata,
+        );
+    }
 }

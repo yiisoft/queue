@@ -8,9 +8,9 @@ final class DelayEnvelope extends Envelope
 {
     public const META_DELAY_SECONDS = 'yii-delay';
 
-    public function __construct(MessageInterface $message, private readonly float $delaySeconds)
+    public function __construct(MessageInterface $message, float $delaySeconds)
     {
-        parent::__construct($message);
+        parent::__construct($message, [self::META_DELAY_SECONDS => $delaySeconds]);
     }
 
     public static function fromMessage(MessageInterface $message): static
@@ -22,11 +22,6 @@ final class DelayEnvelope extends Envelope
 
     public function getDelaySeconds(): float
     {
-        return $this->delaySeconds;
-    }
-
-    protected function getEnvelopeMetadata(): array
-    {
-        return [self::META_DELAY_SECONDS => $this->delaySeconds];
+        return $this->getMetadata()[self::META_DELAY_SECONDS] ?? 0.0;
     }
 }
