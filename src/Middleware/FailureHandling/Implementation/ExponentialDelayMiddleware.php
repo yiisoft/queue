@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Middleware\FailureHandling\Implementation;
 
 use InvalidArgumentException;
+use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
@@ -25,16 +26,16 @@ final class ExponentialDelayMiddleware implements FailureMiddlewareInterface
     /**
      * @param string $id A unique id to differentiate two and more instances of this class
      * @param int $maxAttempts Maximum attempts count for this strategy with the given $id before it will give up
-     * @param float $delayInitial The first delay period
-     * @param float $delayMaximum The maximum delay period
+     * @param int $delayInitial The first delay period
+     * @param int $delayMaximum The maximum delay period
      * @param float $exponent Message handling delay will be increased by this multiplication each time it fails
      * @param QueueInterface|null $queue
      */
     public function __construct(
         private readonly string $id,
         private readonly int $maxAttempts,
-        private readonly float $delayInitial,
-        private readonly float $delayMaximum,
+        private readonly int $delayInitial,
+        private readonly int $delayMaximum,
         private readonly float $exponent,
         private readonly ?QueueInterface $queue = null,
     ) {
@@ -43,7 +44,7 @@ final class ExponentialDelayMiddleware implements FailureMiddlewareInterface
         }
 
         if ($delayInitial <= 0) {
-            throw new InvalidArgumentException("delayInitial parameter must be a positive float, $this->delayInitial given.");
+            throw new InvalidArgumentException("delayInitial parameter must be a positive integer, $this->delayInitial given.");
         }
 
         if ($delayMaximum < $delayInitial) {
@@ -92,18 +93,18 @@ final class ExponentialDelayMiddleware implements FailureMiddlewareInterface
         return $failureMeta[self::META_KEY_ATTEMPTS . "-$this->id"] ?? 0;
     }
 
-    private function getDelay(MessageInterface $message): float
+    private function getDelay(MessageInterface $message): int
     {
-        /** @var array{failure-strategy-exponential-delay-delay?: float} $meta */
+        /** @var array{failure-strategy-exponential-delay-delay?: int} $meta */
         $meta = $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY] ?? [];
         $key = self::META_KEY_DELAY . "-$this->id";
 
-        $delayOriginal = (float) ($meta[$key] ?? 0);
+        $delayOriginal = (int) ($meta[$key] ?? 0);
         if ($delayOriginal <= 0) {
             $delayOriginal = $this->delayInitial;
         }
 
-        $result = $delayOriginal * $this->exponent;
+        $result = (int) ($delayOriginal * $this->exponent);
 
         return min($result, $this->delayMaximum);
     }

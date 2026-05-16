@@ -13,16 +13,16 @@ final class DelayEnvelopeTest extends TestCase
     public function testDelayEnvelope(): void
     {
         $message = new Message('test', ['data' => 'value']);
-        $delayEnvelope = new DelayEnvelope($message, 300.5);
+        $delayEnvelope = new DelayEnvelope($message, 300);
 
         self::assertSame($message, $delayEnvelope->getMessage());
         self::assertSame('test', $delayEnvelope->getType());
         self::assertSame(['data' => 'value'], $delayEnvelope->getData());
-        self::assertSame(300.5, $delayEnvelope->getDelaySeconds());
+        self::assertSame(300, $delayEnvelope->getDelaySeconds());
 
         $metadata = $delayEnvelope->getMetadata();
         self::assertArrayHasKey(DelayEnvelope::META_DELAY_SECONDS, $metadata);
-        self::assertSame(300.5, $metadata[DelayEnvelope::META_DELAY_SECONDS]);
+        self::assertSame(300, $metadata[DelayEnvelope::META_DELAY_SECONDS]);
     }
 
     public function testFromMessage(): void
@@ -30,7 +30,7 @@ final class DelayEnvelopeTest extends TestCase
         $message = new Message('test', ['data' => 'value'], [DelayEnvelope::META_DELAY_SECONDS => 150]);
         $delayEnvelope = DelayEnvelope::fromMessage($message);
 
-        self::assertSame(150.0, $delayEnvelope->getDelaySeconds());
+        self::assertSame(150, $delayEnvelope->getDelaySeconds());
         self::assertSame('test', $delayEnvelope->getType());
         self::assertSame(['data' => 'value'], $delayEnvelope->getData());
     }
@@ -40,6 +40,6 @@ final class DelayEnvelopeTest extends TestCase
         $message = new Message('test', ['data' => 'value']);
         $delayEnvelope = DelayEnvelope::fromMessage($message);
 
-        self::assertSame(0.0, $delayEnvelope->getDelaySeconds());
+        self::assertSame(0, $delayEnvelope->getDelaySeconds());
     }
 }

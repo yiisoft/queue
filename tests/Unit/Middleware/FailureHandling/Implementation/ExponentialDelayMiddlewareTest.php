@@ -28,7 +28,7 @@ final class ExponentialDelayMiddlewareTest extends TestCase
                 [
                     'test',
                     1,
-                    0.001,
+                    1,
                     1,
                     0.01,
                 ],
@@ -79,7 +79,7 @@ final class ExponentialDelayMiddlewareTest extends TestCase
                     'test',
                     1,
                     0,
-                    0.01,
+                    1,
                     0,
                 ],
             ],
