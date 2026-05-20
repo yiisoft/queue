@@ -6,61 +6,71 @@ namespace Yiisoft\Queue\Message;
 
 use function is_array;
 
-abstract class Envelope implements EnvelopeInterface
+abstract class Envelope implements MessageInterface
 {
+    /** @psalm-suppress MissingClassConstType */
+    final public const ENVELOPE_STACK_KEY = 'envelopes';
+
     /**
-     * @psalm-var array<string, mixed>|null
+     * @psalm-var array<string, mixed>
      */
-    private ?array $metadata = null;
+    protected readonly array $metadata;
 
-    public function __construct(protected MessageInterface $message) {}
+    private readonly MessageInterface $message;
 
-    /** @psalm-suppress MoreSpecificReturnType */
-    public static function fromData(string $type, mixed $data, array $metadata = []): static
+    public function __construct(MessageInterface $message, array $metadata)
     {
-        /** @psalm-suppress LessSpecificReturnStatement */
+        $this->metadata = $this->prepareMetadata($message->getMetadata(), $metadata);
+
+        while ($message instanceof self) {
+            $message = $message->getMessage();
+        }
+        $this->message = $message;
+    }
+
+    final public static function fromData(string $type, mixed $data, array $metadata = []): static
+    {
         return static::fromMessage(Message::fromData($type, $data, $metadata));
     }
 
-    public function getMessage(): MessageInterface
+    abstract public static function fromMessage(MessageInterface $message): static;
+
+    final public function getMessage(): MessageInterface
     {
         return $this->message;
     }
 
-    public function getType(): string
+    final public function getType(): string
     {
         return $this->message->getType();
     }
 
-    public function getData(): mixed
+    final public function getData(): mixed
     {
         return $this->message->getData();
     }
 
-    public function getMetadata(): array
+    final public function getMetadata(): array
     {
-        if ($this->metadata === null) {
-            $messageMeta = $this->message->getMetadata();
-
-            $stack = $messageMeta[EnvelopeInterface::ENVELOPE_STACK_KEY] ?? [];
-            if (!is_array($stack)) {
-                $stack = [];
-            }
-
-            $this->metadata = array_merge(
-                $messageMeta,
-                [
-                    EnvelopeInterface::ENVELOPE_STACK_KEY => array_merge(
-                        $stack,
-                        [static::class],
-                    ),
-                ],
-                $this->getEnvelopeMetadata(),
-            );
-        }
-
         return $this->metadata;
     }
 
-    abstract protected function getEnvelopeMetadata(): array;
+    private function prepareMetadata(array $messageMeta, array $metadata): array
+    {
+        $stack = $messageMeta[self::ENVELOPE_STACK_KEY] ?? [];
+        if (!is_array($stack)) {
+            $stack = [];
+        }
+
+        return array_merge(
+            $messageMeta,
+            [
+                self::ENVELOPE_STACK_KEY => array_merge(
+                    $stack,
+                    [static::class],
+                ),
+            ],
+            $metadata,
+        );
+    }
 }

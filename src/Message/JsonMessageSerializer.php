@@ -25,7 +25,7 @@ final class JsonMessageSerializer implements MessageSerializerInterface
             'meta' => $message->getMetadata(),
         ];
         if (!isset($payload['meta']['message-class'])) {
-            $payload['meta']['message-class'] = $message instanceof EnvelopeInterface
+            $payload['meta']['message-class'] = $message instanceof Envelope
                 ? $message->getMessage()::class
                 : $message::class;
         }
@@ -55,10 +55,10 @@ final class JsonMessageSerializer implements MessageSerializerInterface
         }
 
         $envelopes = [];
-        if (isset($meta[EnvelopeInterface::ENVELOPE_STACK_KEY]) && is_array($meta[EnvelopeInterface::ENVELOPE_STACK_KEY])) {
-            $envelopes = $meta[EnvelopeInterface::ENVELOPE_STACK_KEY];
+        if (isset($meta[Envelope::ENVELOPE_STACK_KEY]) && is_array($meta[Envelope::ENVELOPE_STACK_KEY])) {
+            $envelopes = $meta[Envelope::ENVELOPE_STACK_KEY];
         }
-        $meta[EnvelopeInterface::ENVELOPE_STACK_KEY] = [];
+        $meta[Envelope::ENVELOPE_STACK_KEY] = [];
 
         $class = $meta['message-class'] ?? Message::class;
         // Don't check subclasses when it's a default class: that's faster
@@ -72,7 +72,7 @@ final class JsonMessageSerializer implements MessageSerializerInterface
         $message = $class::fromData($type, $payload['data'] ?? null, $meta);
 
         foreach ($envelopes as $envelope) {
-            if (is_string($envelope) && class_exists($envelope) && is_subclass_of($envelope, EnvelopeInterface::class)) {
+            if (is_string($envelope) && class_exists($envelope) && is_subclass_of($envelope, Envelope::class)) {
                 $message = $envelope::fromMessage($message);
             }
         }

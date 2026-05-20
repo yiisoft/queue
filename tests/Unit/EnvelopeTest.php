@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Queue\Message\EnvelopeInterface;
+use Yiisoft\Queue\Message\Envelope;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Message;
 
@@ -18,7 +18,7 @@ final class EnvelopeTest extends TestCase
 
         $this->assertEquals('test', $message->getMessage()->getData());
 
-        $stack = $message->getMetadata()[EnvelopeInterface::ENVELOPE_STACK_KEY];
+        $stack = $message->getMetadata()[Envelope::ENVELOPE_STACK_KEY];
         $this->assertIsArray($stack);
 
         $this->assertEquals([
@@ -37,7 +37,7 @@ final class EnvelopeTest extends TestCase
 
         $this->assertEquals('test', $message->getMessage()->getData());
 
-        $stack = $message->getMetadata()[EnvelopeInterface::ENVELOPE_STACK_KEY];
+        $stack = $message->getMetadata()[Envelope::ENVELOPE_STACK_KEY];
         $this->assertIsArray($stack);
         $this->assertEquals([
             IdEnvelope::class,

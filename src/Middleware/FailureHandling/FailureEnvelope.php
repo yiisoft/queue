@@ -12,10 +12,12 @@ final class FailureEnvelope extends Envelope
 {
     public const FAILURE_META_KEY = 'failure-meta';
 
-    public function __construct(
-        protected MessageInterface $message,
-        private readonly array $metadata = [],
-    ) {}
+    public function __construct(MessageInterface $message, array $metadata = [])
+    {
+        parent::__construct($message, [
+            self::FAILURE_META_KEY => ArrayHelper::merge($message->getMetadata()[self::FAILURE_META_KEY] ?? [], $metadata),
+        ]);
+    }
 
     public static function fromMessage(MessageInterface $message): static
     {
@@ -23,13 +25,5 @@ final class FailureEnvelope extends Envelope
         $metadata = $message->getMetadata()[self::FAILURE_META_KEY] ?? [];
 
         return new self($message, $metadata);
-    }
-
-    protected function getEnvelopeMetadata(): array
-    {
-        /** @var array $metadata */
-        $metadata = $this->message->getMetadata()[self::FAILURE_META_KEY] ?? [];
-
-        return [self::FAILURE_META_KEY => ArrayHelper::merge($metadata, $this->metadata)];
     }
 }

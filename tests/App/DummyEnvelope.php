@@ -9,13 +9,13 @@ use Yiisoft\Queue\Message\MessageInterface;
 
 final class DummyEnvelope extends Envelope
 {
+    public function __construct(MessageInterface $message)
+    {
+        parent::__construct($message, []);
+    }
+
     public static function fromMessage(MessageInterface $message): static
     {
         return new self($message);
-    }
-
-    protected function getEnvelopeMetadata(): array
-    {
-        return [];
     }
 }
