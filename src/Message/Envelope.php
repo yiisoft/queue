@@ -4,13 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
-use function is_array;
-
 abstract class Envelope implements MessageInterface
 {
-    /** @psalm-suppress MissingClassConstType */
-    final public const ENVELOPE_STACK_KEY = 'envelopes';
-
     /**
      * @psalm-var array<string, mixed>
      */
@@ -20,7 +15,7 @@ abstract class Envelope implements MessageInterface
 
     public function __construct(MessageInterface $message, array $metadata)
     {
-        $this->metadata = $this->prepareMetadata($message->getMetadata(), $metadata);
+        $this->metadata = array_merge($message->getMetadata(), $metadata);
 
         while ($message instanceof self) {
             $message = $message->getMessage();
@@ -53,24 +48,5 @@ abstract class Envelope implements MessageInterface
     final public function getMetadata(): array
     {
         return $this->metadata;
-    }
-
-    private function prepareMetadata(array $messageMeta, array $metadata): array
-    {
-        $stack = $messageMeta[self::ENVELOPE_STACK_KEY] ?? [];
-        if (!is_array($stack)) {
-            $stack = [];
-        }
-
-        return array_merge(
-            $messageMeta,
-            [
-                self::ENVELOPE_STACK_KEY => array_merge(
-                    $stack,
-                    [static::class],
-                ),
-            ],
-            $metadata,
-        );
     }
 }

@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Message;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Queue\Message\Envelope;
 use Yiisoft\Queue\Tests\App\DummyEnvelope;
-use Yiisoft\Queue\Message\Message;
 
 final class EnvelopeTest extends TestCase
 {
@@ -24,15 +22,5 @@ final class EnvelopeTest extends TestCase
         $this->assertSame($data, $envelope->getData());
         $this->assertArrayHasKey('meta', $envelope->getMetadata());
         $this->assertSame('data', $envelope->getMetadata()['meta']);
-    }
-
-    public function testNonArrayStackIsNormalized(): void
-    {
-        $base = new Message('handler', 'data', [Envelope::ENVELOPE_STACK_KEY => 'oops']);
-        $wrapped = new DummyEnvelope($base);
-
-        $meta = $wrapped->getMetadata();
-        self::assertIsArray($meta[Envelope::ENVELOPE_STACK_KEY]);
-        self::assertSame([DummyEnvelope::class], $meta[Envelope::ENVELOPE_STACK_KEY]);
     }
 }
