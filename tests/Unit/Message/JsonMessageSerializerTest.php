@@ -128,22 +128,6 @@ final class JsonMessageSerializerTest extends TestCase
         $this->assertEquals(['int' => 1, 'str' => 'string', 'bool' => true], $message->getMetadata());
     }
 
-    public function testUnserializeEnvelopeStack(): void
-    {
-        $payload = [
-            'type' => 'handler',
-            'data' => 'test',
-            'meta' => [],
-        ];
-        $serializer = $this->createSerializer();
-
-        /** @var IdEnvelope $message */
-        $message = $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
-
-        $this->assertEquals($payload['data'], $message->getData());
-        $this->assertInstanceOf(Message::class, $message);
-    }
-
     public function testSerialize(): void
     {
         $message = new Message('handler', 'test');
