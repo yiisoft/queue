@@ -7,7 +7,6 @@ namespace Yiisoft\Queue\Tests\Unit\Message;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Queue\Message\Envelope;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\Message;
@@ -115,7 +114,7 @@ final class JsonMessageSerializerTest extends TestCase
         $message = $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
 
         $this->assertEquals($payload['data'], $message->getData());
-        $this->assertEquals([Envelope::ENVELOPE_STACK_KEY => []], $message->getMetadata());
+        $this->assertEquals([], $message->getMetadata());
     }
 
     public function testUnserializeWithMetadata(): void
@@ -126,31 +125,7 @@ final class JsonMessageSerializerTest extends TestCase
         $message = $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
 
         $this->assertEquals($payload['data'], $message->getData());
-        $this->assertEquals(['int' => 1, 'str' => 'string', 'bool' => true, Envelope::ENVELOPE_STACK_KEY => []], $message->getMetadata());
-    }
-
-    public function testUnserializeEnvelopeStack(): void
-    {
-        $payload = [
-            'type' => 'handler',
-            'data' => 'test',
-            'meta' => [
-                Envelope::ENVELOPE_STACK_KEY => [
-                    IdEnvelope::class,
-                ],
-            ],
-        ];
-        $serializer = $this->createSerializer();
-
-        /** @var IdEnvelope $message */
-        $message = $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
-
-        $this->assertEquals($payload['data'], $message->getData());
-        $this->assertEquals([IdEnvelope::class], $message->getMetadata()[Envelope::ENVELOPE_STACK_KEY]);
-
-        $this->assertInstanceOf(IdEnvelope::class, $message);
-        $this->assertNull($message->getId());
-        $this->assertInstanceOf(Message::class, $message->getMessage());
+        $this->assertEquals(['int' => 1, 'str' => 'string', 'bool' => true], $message->getMetadata());
     }
 
     public function testSerialize(): void
@@ -178,32 +153,20 @@ final class JsonMessageSerializerTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '{"type":"handler","data":"test","meta":{"envelopes":["%s"],"%s":"test-id","message-class":"%s"}}',
-                str_replace('\\', '\\\\', IdEnvelope::class),
+                '{"type":"handler","data":"test","meta":{"%s":"test-id","message-class":"%s"}}',
                 IdEnvelope::MESSAGE_ID_KEY,
                 str_replace('\\', '\\\\', Message::class),
             ),
             $json,
         );
 
-        /** @var IdEnvelope $message */
         $message = $serializer->unserialize($json);
 
-        $this->assertInstanceOf(IdEnvelope::class, $message);
-        $this->assertEquals('test-id', $message->getId());
+        $this->assertInstanceOf(Message::class, $message);
         $this->assertEquals([
-            Envelope::ENVELOPE_STACK_KEY => [
-                IdEnvelope::class,
-            ],
             IdEnvelope::MESSAGE_ID_KEY => 'test-id',
             'message-class' => Message::class,
         ], $message->getMetadata());
-
-        $this->assertEquals([
-            Envelope::ENVELOPE_STACK_KEY => [],
-            IdEnvelope::MESSAGE_ID_KEY => 'test-id',
-            'message-class' => Message::class,
-        ], $message->getMessage()->getMetadata());
     }
 
     public function testRestoreOriginalMessageClass(): void
