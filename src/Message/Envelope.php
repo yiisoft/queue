@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
+use LogicException;
+
 abstract class Envelope implements MessageInterface
 {
     /**
@@ -25,10 +27,10 @@ abstract class Envelope implements MessageInterface
 
     final public static function fromData(string $type, mixed $data, array $metadata = []): static
     {
-        return static::fromMessage(Message::fromData($type, $data, $metadata));
+        throw new LogicException(
+            'Envelopes cannot be created via "fromData()". Wrap an existing "MessageInterface" instance instead.',
+        );
     }
-
-    abstract public static function fromMessage(MessageInterface $message): static;
 
     final public function getMessage(): MessageInterface
     {

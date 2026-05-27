@@ -18,12 +18,4 @@ final class FailureEnvelope extends Envelope
             self::FAILURE_META_KEY => ArrayHelper::merge($message->getMetadata()[self::FAILURE_META_KEY] ?? [], $metadata),
         ]);
     }
-
-    public static function fromMessage(MessageInterface $message): static
-    {
-        /** @var array $metadata */
-        $metadata = $message->getMetadata()[self::FAILURE_META_KEY] ?? [];
-
-        return new self($message, $metadata);
-    }
 }

@@ -13,9 +13,4 @@ final class DummyEnvelope extends Envelope
     {
         parent::__construct($message, []);
     }
-
-    public static function fromMessage(MessageInterface $message): static
-    {
-        return new self($message);
-    }
 }

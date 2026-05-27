@@ -24,22 +24,4 @@ final class DelayEnvelopeTest extends TestCase
         self::assertArrayHasKey(DelayEnvelope::META_DELAY_SECONDS, $metadata);
         self::assertSame(300.5, $metadata[DelayEnvelope::META_DELAY_SECONDS]);
     }
-
-    public function testFromMessage(): void
-    {
-        $message = new Message('test', ['data' => 'value'], [DelayEnvelope::META_DELAY_SECONDS => 150]);
-        $delayEnvelope = DelayEnvelope::fromMessage($message);
-
-        self::assertSame(150.0, $delayEnvelope->getDelaySeconds());
-        self::assertSame('test', $delayEnvelope->getType());
-        self::assertSame(['data' => 'value'], $delayEnvelope->getData());
-    }
-
-    public function testFromMessageWithoutDelay(): void
-    {
-        $message = new Message('test', ['data' => 'value']);
-        $delayEnvelope = DelayEnvelope::fromMessage($message);
-
-        self::assertSame(0.0, $delayEnvelope->getDelaySeconds());
-    }
 }

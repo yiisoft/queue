@@ -23,26 +23,6 @@ final class FailureEnvelopeTest extends TestCase
         $this->assertSame($metadata, $envelope->getMetadata()[FailureEnvelope::FAILURE_META_KEY]);
     }
 
-    public function testFromMessageWithExistingMetadata(): void
-    {
-        $existingMetadata = ['attempt' => 1];
-        $message = $this->createMessage([FailureEnvelope::FAILURE_META_KEY => $existingMetadata]);
-
-        $envelope = FailureEnvelope::fromMessage($message);
-
-        $this->assertSame($existingMetadata, $envelope->getMetadata()[FailureEnvelope::FAILURE_META_KEY]);
-    }
-
-    public function testFromMessageWithoutMetadata(): void
-    {
-        $message = $this->createMessage();
-
-        $envelope = FailureEnvelope::fromMessage($message);
-
-        $this->assertArrayHasKey(FailureEnvelope::FAILURE_META_KEY, $envelope->getMetadata());
-        $this->assertSame([], $envelope->getMetadata()[FailureEnvelope::FAILURE_META_KEY]);
-    }
-
     public function testMetadataMerging(): void
     {
         $existingMetadata = ['attempt' => 1, 'firstError' => 'First error'];
@@ -55,25 +35,6 @@ final class FailureEnvelopeTest extends TestCase
         $this->assertSame(2, $mergedMetadata['attempt']);
         $this->assertSame('First error', $mergedMetadata['firstError']);
         $this->assertSame('Last error', $mergedMetadata['lastError']);
-    }
-
-    public function testFromData(): void
-    {
-        $type = 'test-handler';
-        $data = ['key' => 'value'];
-        $metadata = [
-            'meta' => 'data',
-            FailureEnvelope::FAILURE_META_KEY => ['attempt' => 1],
-        ];
-
-        $envelope = FailureEnvelope::fromData($type, $data, $metadata);
-
-        $this->assertInstanceOf(FailureEnvelope::class, $envelope);
-        $this->assertSame($type, $envelope->getType());
-        $this->assertSame($data, $envelope->getData());
-        $this->assertArrayHasKey('meta', $envelope->getMetadata());
-        $this->assertSame('data', $envelope->getMetadata()['meta']);
-        $this->assertSame(['attempt' => 1], $envelope->getMetadata()[FailureEnvelope::FAILURE_META_KEY]);
     }
 
     private function createMessage(array $metadata = []): MessageInterface

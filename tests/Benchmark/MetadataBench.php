@@ -31,39 +31,6 @@ final class MetadataBench
         $id = $message->getId();
     }
 
-    /**
-     * Create metadata as an array and read its value from an envelope object.
-     */
-    public function benchEnvelopeReadRestored(): void
-    {
-        $message = IdEnvelope::fromMessage(new Message('foo', 'bar', ['id' => 1]));
-        $id = $message->getId();
-    }
-
-    public function provideEnvelopeStack(): Generator
-    {
-        $config = [1 => 'one', 5 => 'five', 15 => 'fifteen'];
-        $message = new IdEnvelope(new Message('foo', 'bar'), 1);
-
-        for ($i = 1; $i <= max(...array_keys($config)); $i++) {
-            if (isset($config[$i])) {
-                yield $config[$i] => ['message' => $message];
-            }
-            $message = new FailureEnvelope($message, ["fail$i" => "fail$i"]);
-        }
-    }
-
-    /**
-     * Read metadata value from an envelope object restored from an envelope stacks of different depth
-     *
-     * @psalm-param array{message: MessageInterface} $params
-     */
-    #[ParamProviders('provideEnvelopeStack')]
-    public function benchEnvelopeReadFromStack(array $params): void
-    {
-        $id = IdEnvelope::fromMessage($params['message'])->getId();
-    }
-
     public function provideEnvelopeStackCounts(): Generator
     {
         yield 'one' => [1];

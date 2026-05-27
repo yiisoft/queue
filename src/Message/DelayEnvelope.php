@@ -13,13 +13,6 @@ final class DelayEnvelope extends Envelope
         parent::__construct($message, [self::META_DELAY_SECONDS => $delaySeconds]);
     }
 
-    public static function fromMessage(MessageInterface $message): static
-    {
-        /** @var float|int|string $delaySeconds */
-        $delaySeconds = $message->getMetadata()[self::META_DELAY_SECONDS] ?? 0.0;
-        return new self($message, (float) $delaySeconds);
-    }
-
     public function getDelaySeconds(): float
     {
         return $this->metadata[self::META_DELAY_SECONDS];
