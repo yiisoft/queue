@@ -17,9 +17,9 @@ Handler definitions are configured in:
 Use a short stable message type when pushing a `Message` instead of a PHP class name:
 
 ```php
-use Yiisoft\Queue\Message\SimpleMessage;
+use Yiisoft\Queue\Message\GenericMessage;
 
-new SimpleMessage('send-email', ['data' => '...']); // "send-email" is the message type here
+new GenericMessage('send-email', ['data' => '...']); // "send-email" is the message type here
 ```
 
 **Config**:

@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
 use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Yiisoft\Queue\Message\SimpleMessage;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
@@ -131,7 +131,7 @@ final class ExponentialDelayMiddlewareTest extends TestCase
 
     public function testPipelineSuccess(): void
     {
-        $message = new SimpleMessage('test', null);
+        $message = new GenericMessage('test', null);
         $queue = $this->createMock(QueueInterface::class);
         $queue->method('push')->willReturnArgument(0);
         $middleware = new ExponentialDelayMiddleware(
@@ -162,7 +162,7 @@ final class ExponentialDelayMiddlewareTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('test');
 
-        $message = (new SimpleMessage(
+        $message = (new GenericMessage(
             'test',
             null,
         ))->withMetadata([FailureEnvelope::FAILURE_META_KEY => [ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test' => 2]]);

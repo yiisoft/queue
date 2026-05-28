@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Tests\Benchmark;
 use Generator;
 use PhpBench\Attributes\ParamProviders;
 use Yiisoft\Queue\Message\IdEnvelope;
-use Yiisoft\Queue\Message\SimpleMessage;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 
@@ -18,7 +18,7 @@ final class MetadataBench
      */
     public function benchArrayRead(): void
     {
-        $message = (new SimpleMessage('foo', 'bar'))->withMetadata(['id' => 1]);
+        $message = (new GenericMessage('foo', 'bar'))->withMetadata(['id' => 1]);
         $id = $message->getMetadata()['id'];
     }
 
@@ -27,7 +27,7 @@ final class MetadataBench
      */
     public function benchEnvelopeRead(): void
     {
-        $message = new IdEnvelope(new SimpleMessage('foo', 'bar'), 1);
+        $message = new IdEnvelope(new GenericMessage('foo', 'bar'), 1);
         $id = $message->getId();
     }
 
@@ -36,14 +36,14 @@ final class MetadataBench
      */
     public function benchEnvelopeReadRestored(): void
     {
-        $message = IdEnvelope::fromMessage((new SimpleMessage('foo', 'bar'))->withMetadata(['id' => 1]));
+        $message = IdEnvelope::fromMessage((new GenericMessage('foo', 'bar'))->withMetadata(['id' => 1]));
         $id = $message->getId();
     }
 
     public function provideEnvelopeStack(): Generator
     {
         $config = [1 => 'one', 5 => 'five', 15 => 'fifteen'];
-        $message = new IdEnvelope(new SimpleMessage('foo', 'bar'), 1);
+        $message = new IdEnvelope(new GenericMessage('foo', 'bar'), 1);
 
         for ($i = 1; $i <= max(...array_keys($config)); $i++) {
             if (isset($config[$i])) {
@@ -79,7 +79,7 @@ final class MetadataBench
     #[ParamProviders('provideEnvelopeStackCounts')]
     public function benchEnvelopeStackCreation(array $params): void
     {
-        $message = new SimpleMessage('foo', 'bar');
+        $message = new GenericMessage('foo', 'bar');
         for ($i = 0; $i < $params[0]; $i++) {
             $message = new FailureEnvelope($message, ["fail$i" => "fail$i"]);
         }
@@ -97,6 +97,6 @@ final class MetadataBench
         for ($i = 0; $i < $params[0]; $i++) {
             $metadata['failure-meta']["fail$i"] = "fail$i";
         }
-        $message = (new SimpleMessage('foo', 'bar'))->withMetadata($metadata);
+        $message = (new GenericMessage('foo', 'bar'))->withMetadata($metadata);
     }
 }

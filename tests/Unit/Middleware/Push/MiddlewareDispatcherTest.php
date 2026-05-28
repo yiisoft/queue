@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Message\SimpleMessage;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
@@ -28,7 +28,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
                 static function (MessageInterface $message, PushHandlerInterface $handler): MessageInterface {
-                    return new SimpleMessage('test', 'New closure test data');
+                    return new GenericMessage('test', 'New closure test data');
                 },
             ],
         );
@@ -68,7 +68,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $message = $this->getMessage();
 
         $middleware1 = static function (MessageInterface $message, PushHandlerInterface $handler): MessageInterface {
-            return $handler->handlePush(new SimpleMessage($message->getType(), 'new test data'));
+            return $handler->handlePush(new GenericMessage($message->getType(), 'new test data'));
         };
         $middleware2 = static function (MessageInterface $message, PushHandlerInterface $handler): MessageInterface {
             return $handler->handlePush($message);
@@ -84,8 +84,8 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $message = $this->getMessage();
 
-        $middleware1 = static fn(MessageInterface $message, PushHandlerInterface $handler): MessageInterface => new SimpleMessage($message->getType(), 'first');
-        $middleware2 = static fn(MessageInterface $message, PushHandlerInterface $handler): MessageInterface => new SimpleMessage($message->getType(), 'second');
+        $middleware1 = static fn(MessageInterface $message, PushHandlerInterface $handler): MessageInterface => new GenericMessage($message->getType(), 'first');
+        $middleware2 = static fn(MessageInterface $message, PushHandlerInterface $handler): MessageInterface => new GenericMessage($message->getType(), 'second');
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
@@ -162,6 +162,6 @@ final class MiddlewareDispatcherTest extends TestCase
 
     private function getMessage(): MessageInterface
     {
-        return new SimpleMessage('handler', 'data');
+        return new GenericMessage('handler', 'data');
     }
 }

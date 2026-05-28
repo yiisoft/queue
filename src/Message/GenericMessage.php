@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
-final class SimpleMessage extends Message
+final class GenericMessage extends Message
 {
     /**
      * @param string $type A message type used to resolve the handler.

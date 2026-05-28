@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Message\SimpleMessage;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
@@ -30,7 +30,7 @@ final class MiddlewareDispatcherTest extends TestCase
             [
                 FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [
                     static function (FailureHandlingRequest $request): FailureHandlingRequest {
-                        return $request->withMessage(new SimpleMessage('test', 'New closure test data'));
+                        return $request->withMessage(new GenericMessage('test', 'New closure test data'));
                     },
                 ],
             ],
@@ -77,12 +77,12 @@ final class MiddlewareDispatcherTest extends TestCase
         $request = $this->getFailureHandlingRequest();
 
         $middleware1 = static function (FailureHandlingRequest $request, FailureHandlerInterface $handler): FailureHandlingRequest {
-            $request = $request->withMessage(new SimpleMessage($request->getMessage()->getType(), 'new test data'));
+            $request = $request->withMessage(new GenericMessage($request->getMessage()->getType(), 'new test data'));
 
             return $handler->handleFailure($request);
         };
         $middleware2 = static function (FailureHandlingRequest $request, FailureHandlerInterface $handler): FailureHandlingRequest {
-            $request = $request->withMessage(new SimpleMessage('new handler', $request->getMessage()->getData()));
+            $request = $request->withMessage(new GenericMessage('new handler', $request->getMessage()->getData()));
 
             return $handler->handleFailure($request);
         };
@@ -99,10 +99,10 @@ final class MiddlewareDispatcherTest extends TestCase
         $request = $this->getFailureHandlingRequest();
 
         $middleware1 = static function (FailureHandlingRequest $request, FailureHandlerInterface $handler): FailureHandlingRequest {
-            return $request->withMessage(new SimpleMessage($request->getMessage()->getType(), 'first'));
+            return $request->withMessage(new GenericMessage($request->getMessage()->getType(), 'first'));
         };
         $middleware2 = static function (FailureHandlingRequest $request, FailureHandlerInterface $handler): FailureHandlingRequest {
-            return $request->withMessage(new SimpleMessage($request->getMessage()->getType(), 'second'));
+            return $request->withMessage(new GenericMessage($request->getMessage()->getType(), 'second'));
         };
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [$middleware1, $middleware2]]);
@@ -173,7 +173,7 @@ final class MiddlewareDispatcherTest extends TestCase
     private function getFailureHandlingRequest(): FailureHandlingRequest
     {
         return new FailureHandlingRequest(
-            new SimpleMessage('handler', 'data'),
+            new GenericMessage('handler', 'data'),
             new Exception('Test exception.'),
             $this->createMock(QueueInterface::class),
         );

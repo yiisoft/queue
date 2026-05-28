@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling;
 
 use Exception;
-use Yiisoft\Queue\Message\SimpleMessage;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\TestCase;
@@ -16,13 +16,13 @@ final class FailureHandlingRequestTest extends TestCase
     {
         $queue = $this->createMock(QueueInterface::class);
         $request1 = new FailureHandlingRequest(
-            new SimpleMessage('test', null),
+            new GenericMessage('test', null),
             new Exception('exception 1'),
             $queue,
         );
         $request2 = $request1->withQueue($queue);
         $request3 = $request1->withException(new Exception('exception 2'));
-        $request4 = $request1->withMessage(new SimpleMessage('test2', null));
+        $request4 = $request1->withMessage(new GenericMessage('test2', null));
 
         $this->assertNotSame($request1, $request2);
 

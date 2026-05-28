@@ -5,7 +5,7 @@
 For example, if you need to download and save a file, you can create a message like this:
 
 ```php
-$message = new \Yiisoft\Queue\Message\SimpleMessage(
+$message = new \Yiisoft\Queue\Message\GenericMessage(
     RemoteFileHandler::class,
     ['url' => $url, 'destinationFile' => $filename]
 );

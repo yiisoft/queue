@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
-use Yiisoft\Queue\Message\SimpleMessage;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Tests\Unit\Support\TestMessage;
 
 use function sprintf;
@@ -55,7 +55,7 @@ final class JsonMessageSerializerTest extends TestCase
         ];
 
         $message = $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
-        $this->assertInstanceOf(SimpleMessage::class, $message);
+        $this->assertInstanceOf(GenericMessage::class, $message);
     }
 
     public function testDefaultMessageClassFallbackClassNotSet(): void
@@ -67,7 +67,7 @@ final class JsonMessageSerializerTest extends TestCase
             'meta' => [],
         ];
         $message = $serializer->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
-        $this->assertInstanceOf(SimpleMessage::class, $message);
+        $this->assertInstanceOf(GenericMessage::class, $message);
     }
 
     #[DataProvider('dataUnsupportedPayloadFormat')]
@@ -130,7 +130,7 @@ final class JsonMessageSerializerTest extends TestCase
 
     public function testSerialize(): void
     {
-        $message = new SimpleMessage('handler', 'test');
+        $message = new GenericMessage('handler', 'test');
 
         $serializer = $this->createSerializer();
 
@@ -144,7 +144,7 @@ final class JsonMessageSerializerTest extends TestCase
 
     public function testSerializeEnvelopeStack(): void
     {
-        $message = new SimpleMessage('handler', 'test');
+        $message = new GenericMessage('handler', 'test');
         $message = new IdEnvelope($message, 'test-id');
 
         $serializer = $this->createSerializer();
@@ -155,17 +155,17 @@ final class JsonMessageSerializerTest extends TestCase
             sprintf(
                 '{"type":"handler","data":"test","meta":{"%s":"test-id","message-class":"%s"}}',
                 IdEnvelope::MESSAGE_ID_KEY,
-                str_replace('\\', '\\\\', SimpleMessage::class),
+                str_replace('\\', '\\\\', GenericMessage::class),
             ),
             $json,
         );
 
         $message = $serializer->unserialize($json);
 
-        $this->assertInstanceOf(SimpleMessage::class, $message);
+        $this->assertInstanceOf(GenericMessage::class, $message);
         $this->assertEquals([
             IdEnvelope::MESSAGE_ID_KEY => 'test-id',
-            'message-class' => SimpleMessage::class,
+            'message-class' => GenericMessage::class,
         ], $message->getMetadata());
     }
 

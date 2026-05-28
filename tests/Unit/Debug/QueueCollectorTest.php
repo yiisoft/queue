@@ -8,17 +8,17 @@ use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Yii\Debug\Collector\CollectorInterface;
 use Yiisoft\Yii\Debug\Tests\Shared\AbstractCollectorTestCase;
 use Yiisoft\Queue\Debug\QueueCollector;
-use Yiisoft\Queue\Message\SimpleMessage;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Stubs\StubQueue;
 
 final class QueueCollectorTest extends AbstractCollectorTestCase
 {
-    private SimpleMessage $pushMessage;
+    private GenericMessage $pushMessage;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->pushMessage = new SimpleMessage('task', ['id' => 500]);
+        $this->pushMessage = new GenericMessage('task', ['id' => 500]);
     }
 
     /**

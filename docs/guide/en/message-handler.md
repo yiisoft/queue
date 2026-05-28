@@ -13,7 +13,7 @@ If your handler implements `Yiisoft\Queue\Message\MessageHandlerInterface`, you 
 **Message**:
 
 ```php
-new \Yiisoft\Queue\Message\SimpleMessage(\App\Queue\RemoteFileHandler::class, ['url' => '...']);
+new \Yiisoft\Queue\Message\GenericMessage(\App\Queue\RemoteFileHandler::class, ['url' => '...']);
 ```
 
 **Handler**:

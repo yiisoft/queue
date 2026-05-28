@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Message;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
-use Yiisoft\Queue\Message\SimpleMessage;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 
 final class IdEnvelopeTest extends TestCase
@@ -88,6 +88,6 @@ final class IdEnvelopeTest extends TestCase
 
     private function createMessage(array $metadata = []): MessageInterface
     {
-        return (new SimpleMessage('test-handler', ['test-data']))->withMetadata($metadata);
+        return (new GenericMessage('test-handler', ['test-data']))->withMetadata($metadata);
     }
 }

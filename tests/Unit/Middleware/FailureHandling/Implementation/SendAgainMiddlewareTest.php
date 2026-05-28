@@ -8,7 +8,7 @@ use Exception;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
-use Yiisoft\Queue\Message\SimpleMessage;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
@@ -155,7 +155,7 @@ final class SendAgainMiddlewareTest extends TestCase
 
         $strategy = $this->getStrategy($strategyName, $queue);
         $request = new FailureHandlingRequest(
-            (new SimpleMessage(
+            (new GenericMessage(
                 'test',
                 null,
             ))->withMetadata([FailureEnvelope::FAILURE_META_KEY => $metaInitial]),

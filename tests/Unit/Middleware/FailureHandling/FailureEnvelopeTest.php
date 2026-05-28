@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Queue\Message\SimpleMessage;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 
@@ -59,6 +59,6 @@ final class FailureEnvelopeTest extends TestCase
 
     private function createMessage(array $metadata = []): MessageInterface
     {
-        return (new SimpleMessage('test-handler', ['test-data']))->withMetadata($metadata);
+        return (new GenericMessage('test-handler', ['test-data']))->withMetadata($metadata);
     }
 }
