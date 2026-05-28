@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\Push\Implementation;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\SimpleMessage;
 use Yiisoft\Queue\Middleware\Push\Implementation\IdMiddleware;
 use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
 
@@ -14,7 +14,7 @@ final class IdMiddlewareTest extends TestCase
 {
     public function testWithId(): void
     {
-        $message = new Message('test', null, [IdEnvelope::MESSAGE_ID_KEY => 'test-id']);
+        $message = (new SimpleMessage('test', null))->withMetadata([IdEnvelope::MESSAGE_ID_KEY => 'test-id']);
         $handler = $this->createMock(PushHandlerInterface::class);
 
         $handler->expects($this->once())
@@ -33,7 +33,7 @@ final class IdMiddlewareTest extends TestCase
 
     public function testWithoutId(): void
     {
-        $message = new Message('test', null);
+        $message = new SimpleMessage('test', null);
         $handler = $this->createMock(PushHandlerInterface::class);
 
         $handler->expects($this->once())

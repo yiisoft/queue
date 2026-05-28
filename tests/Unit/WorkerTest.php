@@ -13,7 +13,7 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Exception\MessageFailureException;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\SimpleMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
@@ -35,7 +35,7 @@ final class WorkerTest extends TestCase
     #[DataProvider('messageHandledDataProvider')]
     public function testMessageHandled(mixed $handler, array $containerServices): void
     {
-        $message = new Message('simple', ['test-data']);
+        $message = new SimpleMessage('simple', ['test-data']);
         $logger = new SimpleLogger();
         $container = new SimpleContainer($containerServices);
         $handlers = ['simple' => $handler];
@@ -90,7 +90,7 @@ final class WorkerTest extends TestCase
     {
         $this->expectExceptionMessage('Queue handler for message type "simple" does not exist');
 
-        $message = new Message('simple', ['test-data']);
+        $message = new SimpleMessage('simple', ['test-data']);
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => [FakeHandler::class, 'undefinedMethod']];
@@ -106,7 +106,7 @@ final class WorkerTest extends TestCase
     {
         $this->expectExceptionMessage('Queue handler for message type "simple" does not exist');
 
-        $message = new Message('simple', ['test-data']);
+        $message = new SimpleMessage('simple', ['test-data']);
         $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
@@ -122,7 +122,7 @@ final class WorkerTest extends TestCase
     public function testMessageFailWithDefinitionClassNotFoundInContainerHandler(): void
     {
         $this->expectExceptionMessage('Queue handler for message type "simple" does not exist');
-        $message = new Message('simple', ['test-data']);
+        $message = new SimpleMessage('simple', ['test-data']);
         $container = new SimpleContainer();
         $handlers = ['simple' => [FakeHandler::class, 'handle']];
 
@@ -135,7 +135,7 @@ final class WorkerTest extends TestCase
 
     public function testMessageFailWithDefinitionHandlerException(): void
     {
-        $message = new Message('simple', ['test-data']);
+        $message = new SimpleMessage('simple', ['test-data']);
         $logger = new SimpleLogger();
         $handler = new FakeHandler();
         $container = new SimpleContainer([FakeHandler::class => $handler]);
@@ -163,7 +163,7 @@ final class WorkerTest extends TestCase
 
     public function testHandlerNotFoundInContainer(): void
     {
-        $message = new Message('nonexistent', ['test-data']);
+        $message = new SimpleMessage('nonexistent', ['test-data']);
         $container = new SimpleContainer();
         $handlers = [];
 
@@ -178,7 +178,7 @@ final class WorkerTest extends TestCase
 
     public function testHandlerInContainerNotImplementingInterface(): void
     {
-        $message = new Message('invalid', ['test-data']);
+        $message = new SimpleMessage('invalid', ['test-data']);
         $container = new SimpleContainer([
             'invalid' => new class {
                 public function handle(): void {}
@@ -197,7 +197,7 @@ final class WorkerTest extends TestCase
 
     public function testMessageFailureIsHandledSuccessfully(): void
     {
-        $message = new Message('simple', null);
+        $message = new SimpleMessage('simple', null);
         /** @var MockObject&QueueInterface $queue */
         $queue = $this->createMock(QueueInterface::class);
         $queue->method('getName')->willReturn('test-queue');
@@ -212,7 +212,7 @@ final class WorkerTest extends TestCase
         $consumeMiddlewareFactory->method('createConsumeMiddleware')->willReturn($consumeMiddleware);
         $consumeDispatcher = new ConsumeMiddlewareDispatcher($consumeMiddlewareFactory, 'simple');
 
-        $finalMessage = new Message('final', null);
+        $finalMessage = new SimpleMessage('final', null);
         /** @var FailureMiddlewareInterface&MockObject $failureMiddleware */
         $failureMiddleware = $this->createMock(FailureMiddlewareInterface::class);
         $failureMiddleware->method('processFailure')->willReturn(new FailureHandlingRequest($finalMessage, $originalException, $queue));
@@ -240,7 +240,7 @@ final class WorkerTest extends TestCase
 
     public function testStaticMethodHandler(): void
     {
-        $message = new Message('static-handler', ['test-data']);
+        $message = new SimpleMessage('static-handler', ['test-data']);
         $container = new SimpleContainer();
         $handlers = [
             'static-handler' => StaticMessageHandler::handle(...),

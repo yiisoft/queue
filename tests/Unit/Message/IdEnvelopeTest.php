@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Message;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\SimpleMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 
 final class IdEnvelopeTest extends TestCase
@@ -86,24 +86,8 @@ final class IdEnvelopeTest extends TestCase
         $this->assertSame($id, $metadata[IdEnvelope::MESSAGE_ID_KEY]);
     }
 
-    public function testFromData(): void
-    {
-        $type = 'test-handler';
-        $data = ['key' => 'value'];
-        $metadata = ['meta' => 'data', IdEnvelope::MESSAGE_ID_KEY => 'test-id'];
-
-        $envelope = IdEnvelope::fromData($type, $data, $metadata);
-
-        $this->assertInstanceOf(IdEnvelope::class, $envelope);
-        $this->assertSame($type, $envelope->getType());
-        $this->assertSame($data, $envelope->getData());
-        $this->assertArrayHasKey('meta', $envelope->getMetadata());
-        $this->assertSame('data', $envelope->getMetadata()['meta']);
-        $this->assertSame('test-id', $envelope->getId());
-    }
-
     private function createMessage(array $metadata = []): MessageInterface
     {
-        return new Message('test-handler', ['test-data'], $metadata);
+        return (new SimpleMessage('test-handler', ['test-data']))->withMetadata($metadata);
     }
 }

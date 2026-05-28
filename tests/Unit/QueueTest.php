@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit;
 
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Message\IdEnvelope;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\SimpleMessage;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\App\FakeAdapter;
@@ -27,7 +27,7 @@ final class QueueTest extends TestCase
     {
         $adapter = new FakeAdapter();
         $queue = $this->createQueue($adapter);
-        $message = new Message('simple', null);
+        $message = new SimpleMessage('simple', null);
         $queue->push($message);
 
         self::assertSame([$message], $adapter->pushMessages);
@@ -36,7 +36,7 @@ final class QueueTest extends TestCase
     public function testPushSynchronouslyProcessesMessage(): void
     {
         $queue = $this->createQueue();
-        $message = new Message('simple', null);
+        $message = new SimpleMessage('simple', null);
 
         $queue->push($message);
         $queue->push(clone $message);
@@ -47,7 +47,7 @@ final class QueueTest extends TestCase
     public function testRunWithoutAdapterReturnsZero(): void
     {
         $queue = $this->createQueue();
-        $message = new Message('simple', null);
+        $message = new SimpleMessage('simple', null);
         $queue->push($message);
         $queue->push(clone $message);
 
@@ -74,7 +74,7 @@ final class QueueTest extends TestCase
     public function testRunWithAdapter(): void
     {
         $queue = $this->createQueue(new InMemoryAdapter());
-        $message = new Message('simple', null);
+        $message = new SimpleMessage('simple', null);
         $queue->push($message);
         $queue->push(clone $message);
 
@@ -85,7 +85,7 @@ final class QueueTest extends TestCase
     public function testRunPartlyWithAdapter(): void
     {
         $queue = $this->createQueue(new InMemoryAdapter());
-        $message = new Message('simple', null);
+        $message = new SimpleMessage('simple', null);
         $queue->push($message);
         $queue->push(clone $message);
 
@@ -96,7 +96,7 @@ final class QueueTest extends TestCase
     public function testListenWithAdapter(): void
     {
         $queue = $this->createQueue(new InMemoryAdapter());
-        $message = new Message('simple', null);
+        $message = new SimpleMessage('simple', null);
         $queue->push($message);
         $queue->push(clone $message);
 
@@ -108,7 +108,7 @@ final class QueueTest extends TestCase
     public function testStatusWithAdapter(): void
     {
         $queue = $this->createQueue(new InMemoryAdapter());
-        $envelope = $queue->push(new Message('simple', null));
+        $envelope = $queue->push(new SimpleMessage('simple', null));
 
         self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
         /** @var int|string $id */
@@ -128,7 +128,7 @@ final class QueueTest extends TestCase
 
         $this->loop = new SignalLoop();
         $queue = $this->createQueue();
-        $message = new Message('simple', null);
+        $message = new SimpleMessage('simple', null);
         $queue->push($message);
         $queue->push(clone $message);
 

@@ -4,38 +4,22 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
-final class Message implements MessageInterface
+abstract class Message implements MessageInterface
 {
     /**
-     * @param string $type A message type used to resolve the handler.
-     * @param mixed $data Message data, encodable by a queue adapter
-     * @param array $metadata Message metadata, encodable by a queue adapter
-     *
-     * @psalm-param array<string, mixed> $metadata
+     * @psalm-var array<string, mixed>
      */
-    public function __construct(
-        private readonly string $type,
-        private readonly mixed $data,
-        private array $metadata = [],
-    ) {}
+    private array $metadata = [];
 
-    public static function fromData(string $type, mixed $data, array $metadata = []): MessageInterface
-    {
-        return new self($type, $data, $metadata);
-    }
-
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    public function getData(): mixed
-    {
-        return $this->data;
-    }
-
-    public function getMetadata(): array
+    final public function getMetadata(): array
     {
         return $this->metadata;
+    }
+
+    final public function withMetadata(array $metadata): static
+    {
+        $new = clone $this;
+        $new->metadata = $metadata;
+        return $new;
     }
 }

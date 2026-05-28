@@ -33,7 +33,7 @@ This means the producer and consumer can be:
 A message carries just enough data to perform the work:
 
 ```php
-new \Yiisoft\Queue\Message\Message('send-email', [
+new \Yiisoft\Queue\Message\SimpleMessage('send-email', [
     'to'      => 'user@example.com',
     'subject' => 'Welcome',
 ]);

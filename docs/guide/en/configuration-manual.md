@@ -79,7 +79,7 @@ $queue = new Queue(
 );
 
 // Now you can push messages
-$message = new \Yiisoft\Queue\Message\Message('file-download', ['url' => 'https://example.com/file.pdf']);
+$message = new \Yiisoft\Queue\Message\SimpleMessage('file-download', ['url' => 'https://example.com/file.pdf']);
 $queue->push($message);
 ```
 

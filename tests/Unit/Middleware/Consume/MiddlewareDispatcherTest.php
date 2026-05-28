@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\SimpleMessage;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
@@ -30,7 +30,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
                 static function (ConsumeRequest $request) use ($queue): ConsumeRequest {
-                    return $request->withMessage(new Message('test', 'New closure test data'))->withQueue($queue);
+                    return $request->withMessage(new SimpleMessage('test', 'New closure test data'))->withQueue($queue);
                 },
             ],
         );
@@ -70,12 +70,12 @@ final class MiddlewareDispatcherTest extends TestCase
         $request = $this->getConsumeRequest();
 
         $middleware1 = static function (ConsumeRequest $request, ConsumeHandlerInterface $handler): ConsumeRequest {
-            $request = $request->withMessage(new Message($request->getMessage()->getType(), 'new test data'));
+            $request = $request->withMessage(new SimpleMessage($request->getMessage()->getType(), 'new test data'));
 
             return $handler->handleConsume($request);
         };
         $middleware2 = static function (ConsumeRequest $request, ConsumeHandlerInterface $handler): ConsumeRequest {
-            $request = $request->withMessage(new Message('new handler', $request->getMessage()->getData()));
+            $request = $request->withMessage(new SimpleMessage('new handler', $request->getMessage()->getData()));
 
             return $handler->handleConsume($request);
         };
@@ -92,10 +92,10 @@ final class MiddlewareDispatcherTest extends TestCase
         $request = $this->getConsumeRequest();
 
         $middleware1 = static function (ConsumeRequest $request, ConsumeHandlerInterface $handler): ConsumeRequest {
-            return $request->withMessage(new Message($request->getMessage()->getType(), 'first'));
+            return $request->withMessage(new SimpleMessage($request->getMessage()->getType(), 'first'));
         };
         $middleware2 = static function (ConsumeRequest $request, ConsumeHandlerInterface $handler): ConsumeRequest {
-            return $request->withMessage(new Message($request->getMessage()->getType(), 'second'));
+            return $request->withMessage(new SimpleMessage($request->getMessage()->getType(), 'second'));
         };
 
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
@@ -177,7 +177,7 @@ final class MiddlewareDispatcherTest extends TestCase
     private function getConsumeRequest(): ConsumeRequest
     {
         return new ConsumeRequest(
-            new Message('handler', 'data'),
+            new SimpleMessage('handler', 'data'),
             $this->createMock(QueueInterface::class),
         );
     }

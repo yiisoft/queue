@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit\Debug;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Debug\QueueCollector;
 use Yiisoft\Queue\Debug\QueueWorkerInterfaceProxy;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\SimpleMessage;
 use Yiisoft\Queue\Stubs\StubQueue;
 use Yiisoft\Queue\Stubs\StubWorker;
 
@@ -15,7 +15,7 @@ final class QueueWorkerInterfaceProxyTest extends TestCase
 {
     public function testProcessDelegatesToWorker(): void
     {
-        $message = new Message('handler', 'data');
+        $message = new SimpleMessage('handler', 'data');
         $collector = new QueueCollector();
         $collector->startup();
         $proxy = new QueueWorkerInterfaceProxy(new StubWorker(), $collector);

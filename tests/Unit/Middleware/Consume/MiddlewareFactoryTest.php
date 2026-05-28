@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\SimpleMessage;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Queue\Middleware\Consume\ConsumeHandlerInterface;
@@ -61,7 +61,7 @@ final class MiddlewareFactoryTest extends TestCase
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
             fn(): ConsumeRequest => new ConsumeRequest(
-                new Message('test', 'test data'),
+                new SimpleMessage('test', 'test data'),
                 $this->createMock(QueueInterface::class),
             ),
         );
@@ -222,7 +222,7 @@ final class MiddlewareFactoryTest extends TestCase
     private function getConsumeRequest(): ConsumeRequest
     {
         return new ConsumeRequest(
-            new Message('handler', 'data'),
+            new SimpleMessage('handler', 'data'),
             $this->createMock(QueueInterface::class),
         );
     }

@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\SimpleMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
@@ -51,7 +51,7 @@ final class MiddlewareFactoryTest extends TestCase
         $container = $this->getContainer([TestCallableMiddleware::class => new TestCallableMiddleware()]);
         $middleware = $this->getMiddlewareFactory($container)->createPushMiddleware(
             static function (): MessageInterface {
-                return new Message('test', 'test data');
+                return new SimpleMessage('test', 'test data');
             },
         );
         self::assertSame(
@@ -195,6 +195,6 @@ final class MiddlewareFactoryTest extends TestCase
 
     private function getMessage(): MessageInterface
     {
-        return new Message('handler', 'data');
+        return new SimpleMessage('handler', 'data');
     }
 }
