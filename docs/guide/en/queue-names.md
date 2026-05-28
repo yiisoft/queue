@@ -68,7 +68,6 @@ Pushing a message via DI:
 
 ```php
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Message\GenericMessage;
 
 final readonly class SendWelcomeEmail
 {
@@ -78,7 +77,7 @@ final readonly class SendWelcomeEmail
 
     public function run(string $email): void
     {
-        $this->queue->push(new GenericMessage('send-email', ['to' => $email]));
+        $this->queue->push(new SendEmailMessage(to: $email, subject: 'Welcome!', body: 'Thank you for registering.'));
     }
 }
 ```
@@ -105,7 +104,6 @@ If you have multiple queue names, inject `QueueProviderInterface` and call `get(
 
 ```php
 use Yiisoft\Queue\Provider\QueueProviderInterface;
-use Yiisoft\Queue\Message\GenericMessage;
 
 final readonly class SendTransactionalEmail
 {
@@ -117,7 +115,7 @@ final readonly class SendTransactionalEmail
     {
         $this->queueProvider
             ->get('emails')
-            ->push(new GenericMessage('send-email', ['to' => $email]));
+            ->push(new SendEmailMessage(to: $email, subject: 'Welcome!', body: 'Thank you for registering.'));
     }
 }
 ```

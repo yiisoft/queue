@@ -42,7 +42,71 @@ See the [adapter list](docs/guide/en/adapter-list.md) and follow the adapter-spe
 > In this mode messages are processed immediately in the same process, so it won't provide true
 > async execution, but the code stays the same when you switch to a real adapter.
 
-### 2. Configure the queue
+### 2. Prepare a message and handler
+
+Define a message class for the work to be done — a simple value object with typed properties:
+
+```php
+use Yiisoft\Queue\Message\Message;
+
+final class DownloadFileMessage extends Message
+{
+    public const TYPE = 'download-file';
+
+    public function __construct(
+        public readonly string $url,
+        public readonly string $destinationPath,
+    ) {}
+
+    public static function fromData(string $type, mixed $data): static
+    {
+        if ($type !== self::TYPE) {
+            throw new \InvalidArgumentException("Expected type \"" . self::TYPE . "\", got \"$type\".");
+        }
+        if (!is_array($data)
+            || !is_string($data['url'] ?? null)
+            || !is_string($data['destinationPath'] ?? null)
+        ) {
+            throw new \InvalidArgumentException('Invalid data for ' . self::class . '.');
+        }
+        return new self($data['url'], $data['destinationPath']);
+    }
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
+    public function getData(): array
+    {
+        return ['url' => $this->url, 'destinationPath' => $this->destinationPath];
+    }
+}
+```
+
+Then create a handler that processes it:
+
+```php
+use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Message\MessageHandlerInterface;
+
+final readonly class RemoteFileHandler implements MessageHandlerInterface
+{
+    public function __construct(
+        private FileDownloader $downloader,
+        private FileProcessor $processor,
+    ) {}
+
+    public function handle(MessageInterface $message): void
+    {
+        assert($message instanceof DownloadFileMessage);
+        $localPath = $this->downloader->download($message->url, $message->destinationPath);
+        $this->processor->process($localPath);
+    }
+}
+```
+
+### 3. Configure the queue
 
 #### Configuration with [yiisoft/config](https://github.com/yiisoft/config)
 
@@ -57,7 +121,7 @@ Minimal configuration example:
 return [
     'yiisoft/queue' => [
         'handlers' => [
-            'message-type' => [FooHandler::class, 'handle'],
+            DownloadFileMessage::TYPE => RemoteFileHandler::class,
         ],
     ],
 ];
@@ -69,49 +133,20 @@ return [
 
 For setting up all classes manually, see the [Manual configuration](docs/guide/en/configuration-manual.md) guide.
 
-### 3. Prepare a handler
-
-You need to create a handler class that will process the queue messages. The most simple way is to implement the `MessageHandlerInterface`. Let's create an example for remote file processing:
-
-```php
-use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Message\MessageHandlerInterface;
-
-final readonly class RemoteFileHandler implements MessageHandlerInterface
-{
-    // These dependencies will be resolved on handler creation by the DI container
-    public function __construct(
-        private FileDownloader $downloader,
-        private FileProcessor $processor,
-    ) {}
-
-    // Every received message will be processed by this method
-    public function handle(MessageInterface $downloadMessage): void
-    {
-        $url = $downloadMessage->getData()['url'];
-        $localPath = $this->downloader->download($url);
-        $this->processor->process($localPath);
-    }
-}
-```
-
 ### 4. Send (produce/push) a message to a queue
 
-To send a message to the queue, you need to get the queue instance and call the `push()` method. Typically, with Yii Framework you'll get a `Queue` instance as a dependency of a service.
+To send a message to the queue, get the queue instance and call `push()`. Typically the queue is injected as a dependency:
 
 ```php
-
-final readonly class Foo {
+final readonly class Foo
+{
     public function __construct(private QueueInterface $queue) {}
 
     public function bar(): void
     {
-        $this->queue->push(new Message(
-            // The first parameter is the message type used to resolve the handler which will process the message
-            RemoteFileHandler::class,
-            // The second parameter is the data that will be passed to the handler.
-            // It should be serializable to JSON format
-            ['url' => 'https://example.com/file-path.csv'],
+        $this->queue->push(new DownloadFileMessage(
+            url: 'https://example.com/file-path.csv',
+            destinationPath: '/tmp/file-path.csv',
         ));
     }
 }

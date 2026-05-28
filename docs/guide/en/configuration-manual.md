@@ -35,8 +35,7 @@ $logger = new NullLogger(); // replace with your PSR-3 logger in production
 
 // Define message handlers
 $handlers = [
-    'file-download' => [FileDownloader::class, 'handle'],
-    FileDownloader::class => [FileDownloader::class, 'handle'],
+    DownloadFileMessage::TYPE => [FileDownloader::class, 'handle'],
 ];
 
 $callableFactory = new CallableFactory($container);
@@ -79,7 +78,7 @@ $queue = new Queue(
 );
 
 // Now you can push messages
-$message = new \Yiisoft\Queue\Message\GenericMessage('file-download', ['url' => 'https://example.com/file.pdf']);
+$message = new DownloadFileMessage(url: 'https://example.com/file.pdf', destinationPath: '/tmp/file.pdf');
 $queue->push($message);
 ```
 

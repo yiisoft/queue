@@ -12,10 +12,10 @@ This separation is intentional and important. Understanding it will save you fro
 A *producer* creates messages and pushes them onto the queue. A *consumer* (worker) pulls messages from the queue and invokes the matching handler.
 
 ```
-Producer side                      Consumer side
-─────────────────────────────      ──────────────────────────────────
-new Message('send-email', …)  →→→  Worker resolves handler → handles
-         (payload only)                     (logic only)
+Producer side                       Consumer side
+──────────────────────────────      ──────────────────────────────────
+new SendEmailMessage(…)        →→→  Worker resolves handler → handles
+         (payload only)                      (logic only)
 ```
 
 The producer only needs to know the message type and its data. It does not need to know anything about how the message will be processed, or even in which application.
@@ -30,21 +30,61 @@ This means the producer and consumer can be:
 
 ## Message: payload only
 
-A message carries just enough data to perform the work:
+A message carries just enough data to perform the work. Defining a dedicated class for each message type makes your code
+self-documenting and type-safe:
 
 ```php
-new \Yiisoft\Queue\Message\GenericMessage('send-email', [
-    'to'      => 'user@example.com',
-    'subject' => 'Welcome',
-]);
+use Yiisoft\Queue\Message\Message;
+
+final class SendEmailMessage extends Message
+{
+    public const TYPE = 'send-email';
+
+    public function __construct(
+        public readonly string $to,
+        public readonly string $subject,
+        public readonly string $body,
+    ) {}
+
+    public static function fromData(string $type, mixed $data): static
+    {
+        if ($type !== self::TYPE) {
+            throw new \InvalidArgumentException("Expected type \"" . self::TYPE . "\", got \"$type\".");
+        }
+        if (!is_array($data)
+            || !is_string($data['to'] ?? null)
+            || !is_string($data['subject'] ?? null)
+            || !is_string($data['body'] ?? null)
+        ) {
+            throw new \InvalidArgumentException('Invalid data for ' . self::class . '.');
+        }
+        return new self($data['to'], $data['subject'], $data['body']);
+    }
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
+    public function getData(): array
+    {
+        return ['to' => $this->to, 'subject' => $this->subject, 'body' => $this->body];
+    }
+}
+```
+
+Usage:
+
+```php
+new SendEmailMessage('user@example.com', 'Welcome', 'Thank you for registering.');
 ```
 
 The message has:
 
 - A **message type** — a string used by the worker to look up the correct handler.
-- A **data payload** — arbitrary data the handler needs. Must be serializable.
+- A **data payload** — typed properties serialized to JSON via `getData()`. Must be JSON-encodable.
 
-The message has no methods, no business logic, no dependencies. It is a value object — a data wrapper.
+The message has no business logic, no dependencies. It is a value object — a typed data wrapper.
 
 ## Handler: logic only
 
@@ -57,8 +97,8 @@ final class SendEmailHandler implements \Yiisoft\Queue\Message\MessageHandlerInt
 
     public function handle(\Yiisoft\Queue\Message\MessageInterface $message): void
     {
-        $data = $message->getData();
-        $this->mailer->send($data['to'], $data['subject']);
+        assert($message instanceof SendEmailMessage);
+        $this->mailer->send($message->to, $message->subject, $message->body);
     }
 }
 ```

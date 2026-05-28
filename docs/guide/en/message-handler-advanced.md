@@ -14,12 +14,51 @@ Handler definitions are configured in:
 
 ### Handlers mapped by short message type
 
-Use a short stable message type when pushing a `Message` instead of a PHP class name:
+Use a short stable message type instead of a PHP class name. Define a dedicated message class where `getType()` returns that type:
 
 ```php
-use Yiisoft\Queue\Message\GenericMessage;
+use Yiisoft\Queue\Message\Message;
 
-new GenericMessage('send-email', ['data' => '...']); // "send-email" is the message type here
+final class SendEmailMessage extends Message
+{
+    public const TYPE = 'send-email';
+
+    public function __construct(
+        public readonly string $to,
+        public readonly string $subject,
+        public readonly string $body,
+    ) {}
+
+    public static function fromData(string $type, mixed $data): static
+    {
+        if ($type !== self::TYPE) {
+            throw new \InvalidArgumentException("Expected type \"" . self::TYPE . "\", got \"$type\".");
+        }
+        if (!is_array($data)
+            || !is_string($data['to'] ?? null)
+            || !is_string($data['subject'] ?? null)
+            || !is_string($data['body'] ?? null)
+        ) {
+            throw new \InvalidArgumentException('Invalid data for ' . self::class . '.');
+        }
+        return new self($data['to'], $data['subject'], $data['body']);
+    }
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
+    public function getData(): array
+    {
+        return ['to' => $this->to, 'subject' => $this->subject, 'body' => $this->body];
+    }
+}
+```
+
+```php
+new SendEmailMessage('user@example.com', 'Welcome', 'Thank you for registering.');
+// getType() returns "send-email" — used by the worker to look up the handler
 ```
 
 **Config**:

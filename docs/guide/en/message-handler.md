@@ -13,7 +13,34 @@ If your handler implements `Yiisoft\Queue\Message\MessageHandlerInterface`, you 
 **Message**:
 
 ```php
-new \Yiisoft\Queue\Message\GenericMessage(\App\Queue\RemoteFileHandler::class, ['url' => '...']);
+use Yiisoft\Queue\Message\Message;
+
+final class RemoteFileMessage extends Message
+{
+    public function __construct(public readonly string $url) {}
+
+    public static function fromData(string $type, mixed $data): static
+    {
+        if (!is_array($data) || !is_string($data['url'] ?? null)) {
+            throw new \InvalidArgumentException('Invalid data for ' . self::class . '.');
+        }
+        return new self($data['url']);
+    }
+
+    public function getType(): string
+    {
+        return \App\Queue\RemoteFileHandler::class;
+    }
+
+    public function getData(): array
+    {
+        return ['url' => $this->url];
+    }
+}
+```
+
+```php
+new RemoteFileMessage('https://...');
 ```
 
 **Handler**:
