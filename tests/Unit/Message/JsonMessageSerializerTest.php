@@ -137,7 +137,7 @@ final class JsonMessageSerializerTest extends TestCase
         $json = $serializer->serialize($message);
 
         $this->assertEquals(
-            '{"type":"handler","data":"test","meta":{"message-class":"Yiisoft\\\\Queue\\\\Message\\\\SimpleMessage"}}',
+            '{"type":"handler","data":"test","meta":{"message-class":"Yiisoft\\\\Queue\\\\Message\\\\GenericMessage"}}',
             $json,
         );
     }
