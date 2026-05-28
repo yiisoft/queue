@@ -9,7 +9,7 @@ use Yiisoft\Queue\Message\MessageInterface;
 
 final class TestMessage extends Message
 {
-    public static function fromData(string $type, mixed $data, array $metadata = []): MessageInterface
+    public static function fromData(string $type, mixed $data): MessageInterface
     {
         return new self();
     }
