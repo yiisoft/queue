@@ -124,7 +124,7 @@ final class MiddlewareTest extends TestCase
         $exception = new InvalidArgumentException('test');
         $this->expectExceptionObject($exception);
 
-        $message = new GenericMessage('simple', null, []);
+        $message = new GenericMessage('simple', null);
         $queueCallback = static fn(MessageInterface $message): MessageInterface => $message;
         $queue = $this->createMock(QueueInterface::class);
         $container = new SimpleContainer([SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queue)]);
