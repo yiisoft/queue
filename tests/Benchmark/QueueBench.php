@@ -11,7 +11,7 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\JsonMessageSerializer;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
@@ -66,11 +66,11 @@ final class QueueBench
 
     public function providePush(): Generator
     {
-        yield 'simple' => ['message' => new Message('foo', 'bar')];
+        yield 'simple' => ['message' => new GenericMessage('foo', 'bar')];
         yield 'with envelopes' => [
             'message' => new FailureEnvelope(
                 new IdEnvelope(
-                    new Message('foo', 'bar'),
+                    new GenericMessage('foo', 'bar'),
                     'test id',
                 ),
                 ['failure-1' => ['a', 'b', 'c']],
@@ -86,12 +86,12 @@ final class QueueBench
 
     public function provideConsume(): Generator
     {
-        yield 'simple mapping' => ['message' => $this->serializer->serialize(new Message('foo', 'bar'))];
+        yield 'simple mapping' => ['message' => $this->serializer->serialize(new GenericMessage('foo', 'bar'))];
         yield 'with envelopes mapping' => [
             'message' => $this->serializer->serialize(
                 new FailureEnvelope(
                     new IdEnvelope(
-                        new Message('foo', 'bar'),
+                        new GenericMessage('foo', 'bar'),
                         'test id',
                     ),
                     ['failure-1' => ['a', 'b', 'c']],

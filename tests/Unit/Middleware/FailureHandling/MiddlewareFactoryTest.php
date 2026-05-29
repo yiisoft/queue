@@ -11,7 +11,7 @@ use Psr\Container\ContainerInterface;
 use RuntimeException;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
@@ -55,7 +55,7 @@ final class MiddlewareFactoryTest extends TestCase
         $middleware = $this->getMiddlewareFactory($container)->createFailureMiddleware(
             function (): FailureHandlingRequest {
                 return new FailureHandlingRequest(
-                    new Message('test', 'test data'),
+                    new GenericMessage('test', 'test data'),
                     new RuntimeException('test exception'),
                     $this->createMock(QueueInterface::class),
                 );
@@ -206,7 +206,7 @@ final class MiddlewareFactoryTest extends TestCase
     private function getConsumeRequest(): FailureHandlingRequest
     {
         return new FailureHandlingRequest(
-            new Message('handler', 'data'),
+            new GenericMessage('handler', 'data'),
             new Exception('test exception'),
             $this->createMock(QueueInterface::class),
         );

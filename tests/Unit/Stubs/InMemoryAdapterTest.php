@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Stubs;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
@@ -17,9 +17,9 @@ final class InMemoryAdapterTest extends TestCase
     {
         $adapter = new InMemoryAdapter();
 
-        $envelope1 = $adapter->push(new Message('test', 'a'));
-        $envelope2 = $adapter->push(new Message('test', 'b'));
-        $envelope3 = $adapter->push(new Message('test', 'c'));
+        $envelope1 = $adapter->push(new GenericMessage('test', 'a'));
+        $envelope2 = $adapter->push(new GenericMessage('test', 'b'));
+        $envelope3 = $adapter->push(new GenericMessage('test', 'c'));
 
         $this->assertInstanceOf(IdEnvelope::class, $envelope1);
         $this->assertInstanceOf(IdEnvelope::class, $envelope2);
@@ -36,7 +36,7 @@ final class InMemoryAdapterTest extends TestCase
     public function testStatusWaitingForPushedMessage(): void
     {
         $adapter = new InMemoryAdapter();
-        $envelope = $adapter->push(new Message('test', null));
+        $envelope = $adapter->push(new GenericMessage('test', null));
 
         $this->assertInstanceOf(IdEnvelope::class, $envelope);
         $this->assertSame(MessageStatus::WAITING, $adapter->status($envelope->getId()));
@@ -45,7 +45,7 @@ final class InMemoryAdapterTest extends TestCase
     public function testStatusDoneAfterProcessing(): void
     {
         $adapter = new InMemoryAdapter();
-        $envelope = $adapter->push(new Message('test', null));
+        $envelope = $adapter->push(new GenericMessage('test', null));
 
         $adapter->runExisting(static fn() => true);
 
@@ -70,7 +70,7 @@ final class InMemoryAdapterTest extends TestCase
     public function testStatusAcceptsStringId(): void
     {
         $adapter = new InMemoryAdapter();
-        $envelope = $adapter->push(new Message('test', null));
+        $envelope = $adapter->push(new GenericMessage('test', null));
 
         $this->assertInstanceOf(IdEnvelope::class, $envelope);
         $this->assertSame(MessageStatus::WAITING, $adapter->status((string) $envelope->getId()));
@@ -79,9 +79,9 @@ final class InMemoryAdapterTest extends TestCase
     public function testRunExistingProcessesAllMessages(): void
     {
         $adapter = new InMemoryAdapter();
-        $adapter->push(new Message('test', 'a'));
-        $adapter->push(new Message('test', 'b'));
-        $adapter->push(new Message('test', 'c'));
+        $adapter->push(new GenericMessage('test', 'a'));
+        $adapter->push(new GenericMessage('test', 'b'));
+        $adapter->push(new GenericMessage('test', 'c'));
 
         $processed = [];
         $adapter->runExisting(
@@ -97,9 +97,9 @@ final class InMemoryAdapterTest extends TestCase
     public function testRunExistingStopsWhenHandlerReturnsFalse(): void
     {
         $adapter = new InMemoryAdapter();
-        $adapter->push(new Message('test', 'a'));
-        $adapter->push(new Message('test', 'b'));
-        $adapter->push(new Message('test', 'c'));
+        $adapter->push(new GenericMessage('test', 'a'));
+        $adapter->push(new GenericMessage('test', 'b'));
+        $adapter->push(new GenericMessage('test', 'c'));
 
         $processed = [];
         $adapter->runExisting(
@@ -128,7 +128,7 @@ final class InMemoryAdapterTest extends TestCase
     public function testRunExistingDoesNotReprocessMessages(): void
     {
         $adapter = new InMemoryAdapter();
-        $adapter->push(new Message('test', 'x'));
+        $adapter->push(new GenericMessage('test', 'x'));
 
         $count = 0;
         $handler = static function () use (&$count): bool {
@@ -144,10 +144,10 @@ final class InMemoryAdapterTest extends TestCase
     public function testIdContinuesAfterProcessing(): void
     {
         $adapter = new InMemoryAdapter();
-        $adapter->push(new Message('test', null));
+        $adapter->push(new GenericMessage('test', null));
         $adapter->runExisting(static fn() => true);
 
-        $envelope = $adapter->push(new Message('test', null));
+        $envelope = $adapter->push(new GenericMessage('test', null));
 
         $this->assertInstanceOf(IdEnvelope::class, $envelope);
         $this->assertSame(1, $envelope->getId());
@@ -157,8 +157,8 @@ final class InMemoryAdapterTest extends TestCase
     public function testSubscribeProcessesExistingMessages(): void
     {
         $adapter = new InMemoryAdapter();
-        $adapter->push(new Message('test', 'a'));
-        $adapter->push(new Message('test', 'b'));
+        $adapter->push(new GenericMessage('test', 'a'));
+        $adapter->push(new GenericMessage('test', 'b'));
 
         $processed = [];
         $adapter->subscribe(

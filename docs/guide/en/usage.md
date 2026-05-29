@@ -2,13 +2,48 @@
 
 ## Usage
 
-For example, if you need to download and save a file, you can create a message like this:
+For example, if you need to download and save a file, define a message class and push it:
 
 ```php
-$message = new \Yiisoft\Queue\Message\Message(
-    RemoteFileHandler::class,
-    ['url' => $url, 'destinationFile' => $filename]
-);
+use Yiisoft\Queue\Message\Message;
+
+final class DownloadFileMessage extends Message
+{
+    public const TYPE = 'download-file';
+
+    public function __construct(
+        public readonly string $url,
+        public readonly string $destinationPath,
+    ) {}
+
+    public static function fromData(string $type, mixed $data): static
+    {
+        if ($type !== self::TYPE) {
+            throw new \InvalidArgumentException("Expected type \"" . self::TYPE . "\", got \"$type\".");
+        }
+        if (!is_array($data)
+            || !is_string($data['url'] ?? null)
+            || !is_string($data['destinationPath'] ?? null)
+        ) {
+            throw new \InvalidArgumentException('Invalid data for ' . self::class . '.');
+        }
+        return new self($data['url'], $data['destinationPath']);
+    }
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
+    public function getData(): array
+    {
+        return ['url' => $this->url, 'destinationPath' => $this->destinationPath];
+    }
+}
+```
+
+```php
+$message = new DownloadFileMessage(url: $url, destinationPath: $filename);
 ```
 
 Here's how to push a message to the queue:

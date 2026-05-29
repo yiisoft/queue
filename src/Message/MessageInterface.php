@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Message;
 
 interface MessageInterface
 {
-    public static function fromData(string $type, mixed $data, array $metadata = []): self;
+    public static function fromData(string $type, mixed $data): self;
 
     /**
      * Returns message type.
@@ -24,4 +24,11 @@ interface MessageInterface
      * @return array<string, mixed>
      */
     public function getMetadata(): array;
+
+    /**
+     * Returns a new instance with the given message metadata.
+     *
+     * @param array<string, mixed> $metadata
+     */
+    public function withMetadata(array $metadata): static;
 }

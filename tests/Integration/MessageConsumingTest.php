@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Tests\Integration;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
@@ -45,8 +45,8 @@ final class MessageConsumingTest extends TestCase
 
         $messages = [1, 'foo', 'bar-baz'];
         foreach ($messages as $message) {
-            $worker->process(new Message('test', $message), $this->getQueue());
-            $worker->process(new Message('test2', $message), $this->getQueue());
+            $worker->process(new GenericMessage('test', $message), $this->getQueue());
+            $worker->process(new GenericMessage('test2', $message), $this->getQueue());
         }
 
         $this->assertEquals($messages, $this->messagesProcessed);
@@ -72,7 +72,7 @@ final class MessageConsumingTest extends TestCase
 
         $messages = [1, 'foo', 'bar-baz'];
         foreach ($messages as $message) {
-            $worker->process(new Message(TestHandler::class, $message), $this->getQueue());
+            $worker->process(new GenericMessage(TestHandler::class, $message), $this->getQueue());
         }
 
         $this->assertEquals($messages, $handler->messagesProcessed);

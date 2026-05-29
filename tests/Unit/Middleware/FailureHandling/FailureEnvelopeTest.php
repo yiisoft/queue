@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 
@@ -57,27 +57,8 @@ final class FailureEnvelopeTest extends TestCase
         $this->assertSame('Last error', $mergedMetadata['lastError']);
     }
 
-    public function testFromData(): void
-    {
-        $type = 'test-handler';
-        $data = ['key' => 'value'];
-        $metadata = [
-            'meta' => 'data',
-            FailureEnvelope::FAILURE_META_KEY => ['attempt' => 1],
-        ];
-
-        $envelope = FailureEnvelope::fromData($type, $data, $metadata);
-
-        $this->assertInstanceOf(FailureEnvelope::class, $envelope);
-        $this->assertSame($type, $envelope->getType());
-        $this->assertSame($data, $envelope->getData());
-        $this->assertArrayHasKey('meta', $envelope->getMetadata());
-        $this->assertSame('data', $envelope->getMetadata()['meta']);
-        $this->assertSame(['attempt' => 1], $envelope->getMetadata()[FailureEnvelope::FAILURE_META_KEY]);
-    }
-
     private function createMessage(array $metadata = []): MessageInterface
     {
-        return new Message('test-handler', ['test-data'], $metadata);
+        return (new GenericMessage('test-handler', ['test-data']))->withMetadata($metadata);
     }
 }

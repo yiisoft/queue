@@ -54,15 +54,15 @@ final class JsonMessageSerializer implements MessageSerializerInterface
             throw new InvalidArgumentException('Metadata must be an array. Got ' . get_debug_type($meta) . '.');
         }
 
-        $class = $meta['message-class'] ?? Message::class;
+        $class = $meta['message-class'] ?? GenericMessage::class;
         // Don't check subclasses when it's a default class: that's faster
-        if ($class !== Message::class && !is_subclass_of($class, MessageInterface::class)) {
-            $class = Message::class;
+        if ($class !== GenericMessage::class && !is_subclass_of($class, MessageInterface::class)) {
+            $class = GenericMessage::class;
         }
 
         /**
          * @var class-string<MessageInterface> $class
          */
-        return $class::fromData($type, $payload['data'] ?? null, $meta);
+        return $class::fromData($type, $payload['data'] ?? null)->withMetadata($meta);
     }
 }
