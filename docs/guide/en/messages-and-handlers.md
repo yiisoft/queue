@@ -30,7 +30,8 @@ This means the producer and consumer can be:
 
 ## Message: payload only
 
-A message carries just enough data to perform the work. Defining a dedicated class for each message type makes your code
+A message carries just enough data to perform the work. Usually data has some parameters but not the full context to process. Getting full context is better to be moved to the handler unless processing is done in another application that doesn't have access to data storage. 
+Defining a dedicated class for each message type makes your code
 self-documenting and type-safe:
 
 ```php
