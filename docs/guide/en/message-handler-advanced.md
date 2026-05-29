@@ -14,7 +14,8 @@ Handler definitions are configured in:
 
 ### Handlers mapped by short message type
 
-Use a short stable message type instead of a PHP class name. Define a dedicated message class where `getType()` returns that type:
+Use a short stable message type instead of a PHP class name. That decoupling would allow you to refactor the code and handle the message with external handler.
+Define a dedicated message class where `getType()` returns that type:
 
 ```php
 use Yiisoft\Queue\Message\Message;
