@@ -11,11 +11,18 @@ This separation is intentional and important. Understanding it will save you fro
 
 A *producer* creates messages and pushes them onto the queue. A *consumer* (worker) pulls messages from the queue and invokes the matching handler.
 
-```
-Producer side                       Consumer side
-──────────────────────────────      ──────────────────────────────────
-new SendEmailMessage(…)        →→→  Worker resolves handler → handles
-         (payload only)                      (logic only)
+```mermaid
+flowchart LR
+      subgraph Producer["Producer side"]
+          Message["new SendEmailMessage(...)\n(payload only)"]
+      end
+
+      subgraph Consumer["Consumer side"]
+          Worker["Worker resolves handler"]
+          Handler["Handler handles\n(logic only)"]
+      end
+
+      Message --> Worker --> Handler
 ```
 
 The producer only needs to know the message type and its data. It does not need to know anything about how the message will be processed, or even in which application.
