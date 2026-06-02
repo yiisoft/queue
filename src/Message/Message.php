@@ -18,10 +18,8 @@ abstract class Message implements MessageInterface
 
     final public function withMetadata(array $metadata): static
     {
-        $this->metadata = $metadata;
-        return $this;
-//        $new = clone $this;
-//        $new->metadata = $metadata;
-//        return $new;
+        $new = clone $this;
+        $new->metadata = $metadata;
+        return $new;
     }
 }
