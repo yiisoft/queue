@@ -25,6 +25,11 @@ abstract class Envelope implements MessageInterface
         $this->message = $message;
     }
 
+    /**
+     * Envelopes cannot be created from raw data. Use {@see fromMessage()} to wrap an existing message instead.
+     *
+     * @throws LogicException Always, since this method is not supported for envelopes.
+     */
     final public static function fromData(string $type, mixed $data): static
     {
         throw new LogicException(
@@ -32,6 +37,11 @@ abstract class Envelope implements MessageInterface
         );
     }
 
+    /**
+     * Creates an envelope for the given message, restoring the envelope's own parameters from the message metadata.
+     *
+     * @param MessageInterface $message The message to create an envelope for.
+     */
     abstract public static function fromMessage(MessageInterface $message): static;
 
     final public function getMessage(): MessageInterface
