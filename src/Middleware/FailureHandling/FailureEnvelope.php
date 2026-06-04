@@ -10,19 +10,19 @@ use Yiisoft\Queue\Message\MessageInterface;
 
 final class FailureEnvelope extends Envelope
 {
-    public const FAILURE_META_KEY = 'failure-meta';
+    public const META_FAILURE_METADATA = 'yii-failure-metadata';
 
-    public function __construct(MessageInterface $message, array $metadata = [])
+    public function __construct(MessageInterface $message, array $failureMetadata = [])
     {
         parent::__construct($message, [
-            self::FAILURE_META_KEY => ArrayHelper::merge($message->getMetadata()[self::FAILURE_META_KEY] ?? [], $metadata),
+            self::META_FAILURE_METADATA => ArrayHelper::merge($message->getMetadata()[self::META_FAILURE_METADATA] ?? [], $failureMetadata),
         ]);
     }
 
     public static function fromMessage(MessageInterface $message): static
     {
         /** @var array $metadata */
-        $metadata = $message->getMetadata()[self::FAILURE_META_KEY] ?? [];
+        $metadata = $message->getMetadata()[self::META_FAILURE_METADATA] ?? [];
 
         return new self($message, $metadata);
     }

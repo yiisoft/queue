@@ -88,14 +88,14 @@ final class ExponentialDelayMiddleware implements FailureMiddlewareInterface
     private function getAttempts(MessageInterface $message): int
     {
         /** @var array{failure-strategy-exponential-delay-attempts?: int} $failureMeta */
-        $failureMeta = $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY] ?? [];
+        $failureMeta = $message->getMetadata()[FailureEnvelope::META_FAILURE_METADATA] ?? [];
         return $failureMeta[self::META_KEY_ATTEMPTS . "-$this->id"] ?? 0;
     }
 
     private function getDelay(MessageInterface $message): float
     {
         /** @var array{failure-strategy-exponential-delay-delay?: float} $meta */
-        $meta = $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY] ?? [];
+        $meta = $message->getMetadata()[FailureEnvelope::META_FAILURE_METADATA] ?? [];
         $key = self::META_KEY_DELAY . "-$this->id";
 
         $delayOriginal = (float) ($meta[$key] ?? 0);
