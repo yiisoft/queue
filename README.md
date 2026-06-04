@@ -14,7 +14,7 @@
 [![Static analysis](https://github.com/yiisoft/queue/actions/workflows/static.yml/badge.svg?branch=master)](https://github.com/yiisoft/queue/actions/workflows/static.yml?query=branch%3Amaster)
 [![type-coverage](https://shepherd.dev/github/yiisoft/queue/coverage.svg)](https://shepherd.dev/github/yiisoft/queue)
 
-An extension for running tasks asynchronously via queues.
+A framework-agnostic PHP queue library for running tasks asynchronously, best used with Yii 3 applications.
 
 ## Requirements
 
