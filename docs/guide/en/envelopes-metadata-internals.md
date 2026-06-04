@@ -30,6 +30,6 @@ During this process:
 
 ## FailureEnvelope metadata merging
 
-`Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope` stores failure-handling metadata under the `FailureEnvelope::META_FAILURE_METADATA` key (`"yii-failure-metadata"`).
+`Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope` stores failure-handling metadata under the `FailureEnvelope::META_FAILURE` key (`"yii-failure"`).
 
 The envelope performs special deep-merge logic when building `getMetadata()` to combine failure metadata from nested envelopes.

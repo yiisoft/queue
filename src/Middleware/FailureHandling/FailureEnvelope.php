@@ -13,7 +13,7 @@ use function is_array;
 
 final class FailureEnvelope extends Envelope
 {
-    public const META_FAILURE_METADATA = 'yii-failure-metadata';
+    public const META_FAILURE = 'yii-failure';
 
     private array $failureMetadata;
 
@@ -26,7 +26,7 @@ final class FailureEnvelope extends Envelope
                 $failureMetadata,
             );
         parent::__construct($message, [
-            self::META_FAILURE_METADATA => $this->failureMetadata,
+            self::META_FAILURE => $this->failureMetadata,
         ]);
     }
 
@@ -51,8 +51,8 @@ final class FailureEnvelope extends Envelope
     private static function getFailureMetadataFromMessage(MessageInterface $message): array
     {
         $metadata = $message->getMetadata();
-        if (array_key_exists(self::META_FAILURE_METADATA, $metadata)) {
-            $result = $metadata[self::META_FAILURE_METADATA];
+        if (array_key_exists(self::META_FAILURE, $metadata)) {
+            $result = $metadata[self::META_FAILURE];
             return is_array($result) ? $result : [];
         }
         return [];

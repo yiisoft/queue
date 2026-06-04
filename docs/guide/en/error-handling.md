@@ -87,7 +87,7 @@ Failures of messages that arrived in the `failed-messages` queue directly (bypas
 
  State tracking:
 
- - Uses `FailureEnvelope` metadata (`FailureEnvelope::META_FAILURE_METADATA`) to store the per-middleware attempt counter.
+ - Uses `FailureEnvelope` metadata (`FailureEnvelope::META_FAILURE`) to store the per-middleware attempt counter.
  - The counter key is `failure-strategy-resend-attempts-{id}`.
  
  ### ExponentialDelayMiddleware
@@ -109,7 +109,7 @@ It's configured via constructor parameters, too. Here they are:
 
  State tracking:
 
- - Uses `FailureEnvelope` metadata (`FailureEnvelope::META_FAILURE_METADATA`) to store attempts and the previous delay.
+ - Uses `FailureEnvelope` metadata (`FailureEnvelope::META_FAILURE`) to store attempts and the previous delay.
  - The per-middleware keys are:
 
    - `failure-strategy-exponential-delay-attempts-{id}`

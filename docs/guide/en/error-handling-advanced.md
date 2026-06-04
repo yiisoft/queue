@@ -55,7 +55,7 @@ Class: `Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope`
 
 Behavior:
 
-- An envelope that stores failure-related metadata under the `yii-failure-metadata` key.
+- An envelope that stores failure-related metadata under the `yii-failure` key.
 - Built-in failure middlewares use it to persist retry counters / delay parameters across retries.
 
 ### FailureFinalHandler

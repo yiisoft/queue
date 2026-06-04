@@ -19,18 +19,18 @@ final class FailureEnvelopeTest extends TestCase
         $envelope = new FailureEnvelope($message, $metadata);
 
         $this->assertSame($message, $envelope->getMessage());
-        $this->assertArrayHasKey(FailureEnvelope::META_FAILURE_METADATA, $envelope->getMetadata());
-        $this->assertSame($metadata, $envelope->getMetadata()[FailureEnvelope::META_FAILURE_METADATA]);
+        $this->assertArrayHasKey(FailureEnvelope::META_FAILURE, $envelope->getMetadata());
+        $this->assertSame($metadata, $envelope->getMetadata()[FailureEnvelope::META_FAILURE]);
     }
 
     public function testFromMessageWithExistingMetadata(): void
     {
         $existingMetadata = ['attempt' => 1];
-        $message = $this->createMessage([FailureEnvelope::META_FAILURE_METADATA => $existingMetadata]);
+        $message = $this->createMessage([FailureEnvelope::META_FAILURE => $existingMetadata]);
 
         $envelope = FailureEnvelope::fromMessage($message);
 
-        $this->assertSame($existingMetadata, $envelope->getMetadata()[FailureEnvelope::META_FAILURE_METADATA]);
+        $this->assertSame($existingMetadata, $envelope->getMetadata()[FailureEnvelope::META_FAILURE]);
     }
 
     public function testFromMessageWithoutMetadata(): void
@@ -39,19 +39,19 @@ final class FailureEnvelopeTest extends TestCase
 
         $envelope = FailureEnvelope::fromMessage($message);
 
-        $this->assertArrayHasKey(FailureEnvelope::META_FAILURE_METADATA, $envelope->getMetadata());
-        $this->assertSame([], $envelope->getMetadata()[FailureEnvelope::META_FAILURE_METADATA]);
+        $this->assertArrayHasKey(FailureEnvelope::META_FAILURE, $envelope->getMetadata());
+        $this->assertSame([], $envelope->getMetadata()[FailureEnvelope::META_FAILURE]);
     }
 
     public function testMetadataMerging(): void
     {
         $existingMetadata = ['attempt' => 1, 'firstError' => 'First error'];
-        $message = $this->createMessage([FailureEnvelope::META_FAILURE_METADATA => $existingMetadata]);
+        $message = $this->createMessage([FailureEnvelope::META_FAILURE => $existingMetadata]);
         $newMetadata = ['attempt' => 2, 'lastError' => 'Last error'];
 
         $envelope = new FailureEnvelope($message, $newMetadata);
 
-        $mergedMetadata = $envelope->getMetadata()[FailureEnvelope::META_FAILURE_METADATA];
+        $mergedMetadata = $envelope->getMetadata()[FailureEnvelope::META_FAILURE];
         $this->assertSame(2, $mergedMetadata['attempt']);
         $this->assertSame('First error', $mergedMetadata['firstError']);
         $this->assertSame('Last error', $mergedMetadata['lastError']);

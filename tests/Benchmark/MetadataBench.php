@@ -93,9 +93,9 @@ final class MetadataBench
     #[ParamProviders('provideEnvelopeStackCounts')]
     public function benchMetadataArrayCreation(array $params): void
     {
-        $metadata = [FailureEnvelope::META_FAILURE_METADATA => []];
+        $metadata = [FailureEnvelope::META_FAILURE => []];
         for ($i = 0; $i < $params[0]; $i++) {
-            $metadata[FailureEnvelope::META_FAILURE_METADATA]["fail$i"] = "fail$i";
+            $metadata[FailureEnvelope::META_FAILURE]["fail$i"] = "fail$i";
         }
         $message = (new GenericMessage('foo', 'bar'))->withMetadata($metadata);
     }
