@@ -19,10 +19,12 @@ final class FailureEnvelope extends Envelope
 
     public function __construct(MessageInterface $message, array $failureMetadata = [])
     {
-        $this->failureMetadata = ArrayHelper::merge(
-            self::getFailureMetadataFromMessage($message),
-            $failureMetadata,
-        );
+        $this->failureMetadata = $failureMetadata === []
+            ? self::getFailureMetadataFromMessage($message)
+            : ArrayHelper::merge(
+                self::getFailureMetadataFromMessage($message),
+                $failureMetadata,
+            );
         parent::__construct($message, [
             self::META_FAILURE_METADATA => $this->failureMetadata,
         ]);
