@@ -6,6 +6,7 @@ If you don't need (or don't yet have) a real broker, the queue can be used in
 For asynchronous processing pick one of the adapters below.
 
 * [AMQP](https://github.com/yiisoft/queue-amqp) - adapter over AMQP protocol via [amqplib](https://github.com/php-amqplib/php-amqplib)
+* [Redis](https://github.com/yiisoft/queue-redis) - [Redis](https://redis.io/) adapter
 
 There are other queue adapters contributed and maintained by the community and available on GitHub, such as:
 * [NATS](https://github.com/g41797/queue-nats) - [NATS](https://nats.io/) JetStream adapter
