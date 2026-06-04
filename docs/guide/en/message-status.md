@@ -19,7 +19,7 @@ To read the ID:
 use Yiisoft\Queue\Message\IdEnvelope;
 
 $pushedMessage = $queue->push($message);
-$id = $pushedMessage->getMetadata()[IdEnvelope::META_ID] ?? null;
+$id = IdEnvelope::fromMessage($pushedMessage)->getId();
 ```
 
 If `$id` is `null`, the current adapter didn't provide an ID and you can't query a status.
@@ -55,7 +55,7 @@ use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
 
 $pushedMessage = $queue->push($message);
-$id = $pushedMessage->getMetadata()[IdEnvelope::META_ID] ?? null;
+$id = IdEnvelope::fromMessage($pushedMessage)->getId();
 
 if ($id === null) {
     throw new \RuntimeException('The adapter did not provide a message ID, status tracking is unavailable.');

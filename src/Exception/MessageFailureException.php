@@ -9,17 +9,22 @@ use Throwable;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
+use function sprintf;
+
 final class MessageFailureException extends RuntimeException
 {
     public function __construct(
         private readonly MessageInterface $queueMessage,
         Throwable $previous,
     ) {
-        $error = $previous->getMessage();
-        $messageId = $queueMessage->getMetadata()[IdEnvelope::META_ID] ?? 'null';
-        $messageText = "Processing of message #$messageId is stopped because of an exception:\n$error.";
+        $messageId = IdEnvelope::fromMessage($queueMessage)->getId();
+        $exceptionMessage = sprintf(
+            "Processing of message %s is stopped because of an exception:\n%s.",
+            $messageId === null ? 'without ID' : "#$messageId",
+            $previous->getMessage(),
+        );
 
-        parent::__construct($messageText, 0, $previous);
+        parent::__construct($exceptionMessage, 0, $previous);
     }
 
     public function getQueueMessage(): MessageInterface
