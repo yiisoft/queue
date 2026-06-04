@@ -17,7 +17,7 @@ final class IdMiddleware implements PushMiddlewareInterface
     public function processPush(MessageInterface $message, PushHandlerInterface $handler): MessageInterface
     {
         $meta = $message->getMetadata();
-        if (empty($meta[IdEnvelope::MESSAGE_ID_KEY])) {
+        if (empty($meta[IdEnvelope::META_ID])) {
             $message = new IdEnvelope($message, uniqid('yii3-message-', true));
         }
 

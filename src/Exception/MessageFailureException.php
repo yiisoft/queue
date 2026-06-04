@@ -16,7 +16,7 @@ final class MessageFailureException extends RuntimeException
         Throwable $previous,
     ) {
         $error = $previous->getMessage();
-        $messageId = $queueMessage->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null';
+        $messageId = $queueMessage->getMetadata()[IdEnvelope::META_ID] ?? 'null';
         $messageText = "Processing of message #$messageId is stopped because of an exception:\n$error.";
 
         parent::__construct($messageText, 0, $previous);

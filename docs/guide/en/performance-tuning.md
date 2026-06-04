@@ -211,7 +211,7 @@ public function processConsume(ConsumeRequest $request, ConsumeHandlerInterface 
 {
     // Lightweight logging
     $this->logger->debug('Processing message', [
-        'id' => $request->getMessage()->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? null,
+        'id' => $request->getMessage()->getMetadata()[IdEnvelope::META_ID] ?? null,
     ]);
     
     return $handler->handleConsume($request);

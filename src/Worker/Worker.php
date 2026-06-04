@@ -51,7 +51,7 @@ final class Worker implements WorkerInterface
      */
     public function process(MessageInterface $message, QueueInterface $queue): MessageInterface
     {
-        $this->logger->info('Processing message #{message}.', ['message' => $message->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? 'null']);
+        $this->logger->info('Processing message #{message}.', ['message' => $message->getMetadata()[IdEnvelope::META_ID] ?? 'null']);
 
         $messageType = $message->getType();
         try {

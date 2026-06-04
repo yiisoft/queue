@@ -86,7 +86,7 @@ use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
 
 $pushedMessage = $queue->push($message);
-$id = $pushedMessage->getMetadata()[IdEnvelope::MESSAGE_ID_KEY] ?? null;
+$id = $pushedMessage->getMetadata()[IdEnvelope::META_ID] ?? null;
 
 if ($id === null) {
     throw new \RuntimeException('The adapter did not provide a message ID, status tracking is unavailable.');
