@@ -12,7 +12,7 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Cli\LoopInterface;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
@@ -71,7 +71,7 @@ final class MiddlewareTest extends TestCase
             ->withMiddlewares(new TestMiddleware('channel 1'), new TestMiddleware('channel 2'))
             ->withMiddlewaresAdded(new TestMiddleware('channel 3'), new TestMiddleware('channel 4'));
 
-        $message = new Message('test', ['initial']);
+        $message = new GenericMessage('test', ['initial']);
         $messagePushed = $queue->push($message);
 
         self::assertEquals($stack, $messagePushed->getData());
@@ -113,7 +113,7 @@ final class MiddlewareTest extends TestCase
             $callableFactory,
         );
 
-        $message = new Message('test', ['initial']);
+        $message = new GenericMessage('test', ['initial']);
         $messageConsumed = $worker->process($message, $this->createMock(QueueInterface::class));
 
         self::assertEquals($stack, $messageConsumed->getData());
@@ -124,7 +124,7 @@ final class MiddlewareTest extends TestCase
         $exception = new InvalidArgumentException('test');
         $this->expectExceptionObject($exception);
 
-        $message = new Message('simple', null, []);
+        $message = new GenericMessage('simple', null);
         $queueCallback = static fn(MessageInterface $message): MessageInterface => $message;
         $queue = $this->createMock(QueueInterface::class);
         $container = new SimpleContainer([SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queue)]);

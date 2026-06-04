@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
+use LogicException;
+
 abstract class Envelope implements MessageInterface
 {
     /**
@@ -23,11 +25,23 @@ abstract class Envelope implements MessageInterface
         $this->message = $message;
     }
 
-    final public static function fromData(string $type, mixed $data, array $metadata = []): static
+    /**
+     * Envelopes cannot be created from raw data. Use {@see fromMessage()} to wrap an existing message instead.
+     *
+     * @throws LogicException Always, since this method is not supported for envelopes.
+     */
+    final public static function fromData(string $type, mixed $data): static
     {
-        return static::fromMessage(Message::fromData($type, $data, $metadata));
+        throw new LogicException(
+            'Envelopes cannot be created via "fromData()". Wrap an existing "MessageInterface" instance instead.',
+        );
     }
 
+    /**
+     * Creates an envelope for the given message, restoring the envelope's own parameters from the message metadata.
+     *
+     * @param MessageInterface $message The message to create an envelope for.
+     */
     abstract public static function fromMessage(MessageInterface $message): static;
 
     final public function getMessage(): MessageInterface
@@ -48,5 +62,10 @@ abstract class Envelope implements MessageInterface
     final public function getMetadata(): array
     {
         return $this->metadata;
+    }
+
+    final public function withMetadata(array $metadata): static
+    {
+        return static::fromMessage($this->message->withMetadata($metadata));
     }
 }

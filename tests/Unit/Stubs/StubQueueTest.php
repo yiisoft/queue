@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Stubs;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\MessageStatus;
-use Yiisoft\Queue\Message\Message;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Stubs\StubQueue;
 
 final class StubQueueTest extends TestCase
@@ -14,7 +14,7 @@ final class StubQueueTest extends TestCase
     public function testBase(): void
     {
         $queue = new StubQueue();
-        $message = new Message('test', 42);
+        $message = new GenericMessage('test', 42);
 
         $this->assertSame($message, $queue->push($message));
         $this->assertSame(0, $queue->run());
