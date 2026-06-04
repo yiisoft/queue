@@ -1,5 +1,7 @@
 # Yii Queue documentation
 
+Yii Queue is a framework-agnostic PHP queue library for running tasks asynchronously, best used with Yii 3 applications.
+
 ## Install and configure
 
 - [Prerequisites and installation](prerequisites-and-installation.md)

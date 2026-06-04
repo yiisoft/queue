@@ -1,6 +1,6 @@
 {
     "name": "yiisoft/queue",
-    "description": "Queue Extension which supported DB, Redis, RabbitMQ, Beanstalk, SQS and Gearman",
+    "description": "Framework-agnostic PHP queue library for asynchronous tasks, best used with Yii 3",
     "type": "library",
     "keywords": [
         "yii",
