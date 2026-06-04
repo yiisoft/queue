@@ -149,10 +149,10 @@ final class ExponentialDelayMiddlewareTest extends TestCase
 
         self::assertNotEquals($request, $result);
         $message = $result->getMessage();
-        self::assertArrayHasKey(FailureEnvelope::FAILURE_META_KEY, $message->getMetadata());
+        self::assertArrayHasKey(FailureEnvelope::META_FAILURE, $message->getMetadata());
         self::assertArrayHasKey(DelayEnvelope::META_DELAY_SECONDS, $message->getMetadata());
 
-        $meta = $message->getMetadata()[FailureEnvelope::FAILURE_META_KEY];
+        $meta = $message->getMetadata()[FailureEnvelope::META_FAILURE];
         self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test', $meta);
         self::assertArrayHasKey(ExponentialDelayMiddleware::META_KEY_DELAY . '-test', $meta);
     }
@@ -165,7 +165,7 @@ final class ExponentialDelayMiddlewareTest extends TestCase
         $message = (new GenericMessage(
             'test',
             null,
-        ))->withMetadata([FailureEnvelope::FAILURE_META_KEY => [ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test' => 2]]);
+        ))->withMetadata([FailureEnvelope::META_FAILURE => [ExponentialDelayMiddleware::META_KEY_ATTEMPTS . '-test' => 2]]);
         $queue = $this->createMock(QueueInterface::class);
         $middleware = new ExponentialDelayMiddleware(
             'test',

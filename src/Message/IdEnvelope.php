@@ -13,16 +13,16 @@ use function is_string;
  */
 final class IdEnvelope extends Envelope
 {
-    public const MESSAGE_ID_KEY = 'yii-message-id';
+    public const META_ID = 'yii-id';
 
     public function __construct(MessageInterface $message, string|int|null $id)
     {
-        parent::__construct($message, [self::MESSAGE_ID_KEY => $id]);
+        parent::__construct($message, [self::META_ID => $id]);
     }
 
     public static function fromMessage(MessageInterface $message): static
     {
-        $rawId = $message->getMetadata()[self::MESSAGE_ID_KEY] ?? null;
+        $rawId = $message->getMetadata()[self::META_ID] ?? null;
 
         $id = match (true) {
             $rawId === null => null, // don't remove this branch: it's important for compute speed
@@ -37,6 +37,6 @@ final class IdEnvelope extends Envelope
 
     public function getId(): string|int|null
     {
-        return $this->metadata[self::MESSAGE_ID_KEY];
+        return $this->metadata[self::META_ID];
     }
 }

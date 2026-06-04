@@ -110,9 +110,9 @@ final class QueueTest extends TestCase
         $queue = $this->createQueue(new InMemoryAdapter());
         $envelope = $queue->push(new GenericMessage('simple', null));
 
-        self::assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $envelope->getMetadata());
+        self::assertArrayHasKey(IdEnvelope::META_ID, $envelope->getMetadata());
         /** @var int|string $id */
-        $id = $envelope->getMetadata()[IdEnvelope::MESSAGE_ID_KEY];
+        $id = $envelope->getMetadata()[IdEnvelope::META_ID];
 
         self::assertSame(MessageStatus::WAITING, $queue->status($id));
 

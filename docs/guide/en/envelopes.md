@@ -27,7 +27,7 @@ and, via `MessageInterface` inheritance, also support:
 
 ### IdEnvelope
 
-`Yiisoft\Queue\Message\IdEnvelope` adds a message identifier into metadata under the `IdEnvelope::MESSAGE_ID_KEY` key (`"yii-message-id"`).
+`Yiisoft\Queue\Message\IdEnvelope` adds a message identifier into metadata under the `IdEnvelope::META_ID` key (`"yii-id"`).
 
 This envelope is used to carry the adapter-provided message ID through the message lifecycle.
 

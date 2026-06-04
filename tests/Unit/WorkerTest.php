@@ -53,7 +53,7 @@ final class WorkerTest extends TestCase
 
         $messages = $logger->getMessages();
         $this->assertNotEmpty($messages);
-        $this->assertStringContainsString('Processing message #null.', $messages[0]['message']);
+        $this->assertStringContainsString('Processing message without ID.', $messages[0]['message']);
     }
 
     public static function messageHandledDataProvider(): iterable
@@ -149,13 +149,13 @@ final class WorkerTest extends TestCase
             $worker->process($message, $queue);
         } catch (MessageFailureException $exception) {
             self::assertSame($exception::class, MessageFailureException::class);
-            self::assertSame($exception->getMessage(), "Processing of message #null is stopped because of an exception:\nTest exception.");
+            self::assertSame($exception->getMessage(), "Processing of message without ID is stopped because of an exception:\nTest exception.");
             self::assertEquals(['test-data'], $exception->getQueueMessage()->getData());
         } finally {
             $messages = $logger->getMessages();
             $this->assertNotEmpty($messages);
             $this->assertStringContainsString(
-                "Processing of message #null is stopped because of an exception:\nTest exception.",
+                "Processing of message without ID is stopped because of an exception:\nTest exception.",
                 $messages[1]['message'],
             );
         }

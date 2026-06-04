@@ -25,7 +25,7 @@ final class IdEnvelopeTest extends TestCase
     public function testFromMessageWithStringId(): void
     {
         $id = 'test-id';
-        $message = $this->createMessage([IdEnvelope::MESSAGE_ID_KEY => $id]);
+        $message = $this->createMessage([IdEnvelope::META_ID => $id]);
 
         $envelope = IdEnvelope::fromMessage($message);
 
@@ -35,7 +35,7 @@ final class IdEnvelopeTest extends TestCase
     public function testFromMessageWithIntId(): void
     {
         $id = 123;
-        $message = $this->createMessage([IdEnvelope::MESSAGE_ID_KEY => $id]);
+        $message = $this->createMessage([IdEnvelope::META_ID => $id]);
 
         $envelope = IdEnvelope::fromMessage($message);
 
@@ -59,7 +59,7 @@ final class IdEnvelopeTest extends TestCase
                 return 'object-id';
             }
         };
-        $message = $this->createMessage([IdEnvelope::MESSAGE_ID_KEY => $stringableObject]);
+        $message = $this->createMessage([IdEnvelope::META_ID => $stringableObject]);
         $envelope = IdEnvelope::fromMessage($message);
 
         $this->assertSame('object-id', $envelope->getId());
@@ -68,7 +68,7 @@ final class IdEnvelopeTest extends TestCase
     public function testFromMessageWithInvalidIdType(): void
     {
         $invalidId = ['array-cannot-be-id'];
-        $message = $this->createMessage([IdEnvelope::MESSAGE_ID_KEY => $invalidId]);
+        $message = $this->createMessage([IdEnvelope::META_ID => $invalidId]);
         $message = IdEnvelope::fromMessage($message);
 
         $this->assertNull($message->getId());
@@ -82,8 +82,8 @@ final class IdEnvelopeTest extends TestCase
 
         $metadata = $envelope->getMetadata();
 
-        $this->assertArrayHasKey(IdEnvelope::MESSAGE_ID_KEY, $metadata);
-        $this->assertSame($id, $metadata[IdEnvelope::MESSAGE_ID_KEY]);
+        $this->assertArrayHasKey(IdEnvelope::META_ID, $metadata);
+        $this->assertSame($id, $metadata[IdEnvelope::META_ID]);
     }
 
     private function createMessage(array $metadata = []): MessageInterface

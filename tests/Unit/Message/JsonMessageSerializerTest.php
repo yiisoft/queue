@@ -154,7 +154,7 @@ final class JsonMessageSerializerTest extends TestCase
         $this->assertEquals(
             sprintf(
                 '{"type":"handler","data":"test","meta":{"%s":"test-id","message-class":"%s"}}',
-                IdEnvelope::MESSAGE_ID_KEY,
+                IdEnvelope::META_ID,
                 str_replace('\\', '\\\\', GenericMessage::class),
             ),
             $json,
@@ -164,7 +164,7 @@ final class JsonMessageSerializerTest extends TestCase
 
         $this->assertInstanceOf(GenericMessage::class, $message);
         $this->assertEquals([
-            IdEnvelope::MESSAGE_ID_KEY => 'test-id',
+            IdEnvelope::META_ID => 'test-id',
             'message-class' => GenericMessage::class,
         ], $message->getMetadata());
     }
