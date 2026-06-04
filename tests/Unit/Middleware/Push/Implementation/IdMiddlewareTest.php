@@ -49,4 +49,24 @@ final class IdMiddlewareTest extends TestCase
         $this->assertSame($message->getData(), $result->getData());
         $this->assertSame($message->getType(), $result->getType());
     }
+
+    public function testWithEmptyId(): void
+    {
+        $message = (new GenericMessage('test', null))->withMetadata([IdEnvelope::META_ID => '']);
+        $handler = $this->createMock(PushHandlerInterface::class);
+
+        $handler->expects($this->once())
+            ->method('handlePush')
+            ->willReturnArgument(0);
+
+        $middleware = new IdMiddleware();
+        $result = $middleware->processPush($message, $handler);
+
+        $this->assertInstanceOf(IdEnvelope::class, $result);
+        $this->assertNotSame($message, $result);
+        $this->assertNotEmpty($result->getMetadata()[IdEnvelope::META_ID] ?? null);
+        $this->assertNotSame('', $result->getMetadata()[IdEnvelope::META_ID]);
+        $this->assertSame($message->getData(), $result->getData());
+        $this->assertSame($message->getType(), $result->getType());
+    }
 }
