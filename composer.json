@@ -1,6 +1,6 @@
 {
     "name": "yiisoft/queue",
-    "description": "Framework-agnostic PHP queue library for asynchronous tasks, best used with Yii 3",
+    "description": "Framework-agnostic PHP queue library for asynchronous tasks, best used with Yii3",
     "type": "library",
     "keywords": [
         "yii",
