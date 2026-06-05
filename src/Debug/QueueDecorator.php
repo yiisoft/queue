@@ -17,16 +17,22 @@ final class QueueDecorator implements QueueInterface
 
     public function status(string|int $id): MessageStatus
     {
+        /** @psalm-var array{file: string, line: int} $callStack */
+        $callStack = debug_backtrace()[0];
+
         $result = $this->queue->status($id);
-        $this->collector->collectStatus((string) $id, $result);
+        $this->collector->collectStatus((string) $id, $result, $callStack['file'] . ':' . $callStack['line']);
 
         return $result;
     }
 
     public function push(MessageInterface $message): MessageInterface
     {
+        /** @psalm-var array{file: string, line: int} $callStack */
+        $callStack = debug_backtrace()[0];
+
         $message = $this->queue->push($message);
-        $this->collector->collectPush($this->queue->getName(), $message);
+        $this->collector->collectPush($this->queue->getName(), $message, $callStack['file'] . ':' . $callStack['line']);
         return $message;
     }
 
