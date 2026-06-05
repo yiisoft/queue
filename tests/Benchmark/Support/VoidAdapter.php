@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Benchmark\Support;
 
-use InvalidArgumentException;
 use RuntimeException;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\MessageStatus;
@@ -28,7 +27,7 @@ final class VoidAdapter implements AdapterInterface
 
     public function status(int|string $id): MessageStatus
     {
-        throw new InvalidArgumentException();
+        return MessageStatus::NOT_FOUND;
     }
 
     public function hasStatusSupport(): bool

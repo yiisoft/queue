@@ -30,7 +30,7 @@ final class FakeAdapter implements AdapterInterface
 
     public function status(string|int $id): MessageStatus
     {
-        throw new Exception('`status()` method is not implemented yet.');
+        return MessageStatus::NOT_FOUND;
     }
 
     public function hasStatusSupport(): bool
