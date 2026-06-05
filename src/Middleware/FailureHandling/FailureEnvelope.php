@@ -11,6 +11,12 @@ use Yiisoft\Queue\Message\MessageInterface;
 use function array_key_exists;
 use function is_array;
 
+/**
+ * @extends Envelope<array{
+ *      yii-failure: array,
+ *      ...<string, mixed>
+ *  }>
+ */
 final class FailureEnvelope extends Envelope
 {
     public const META_FAILURE = 'yii-failure';
