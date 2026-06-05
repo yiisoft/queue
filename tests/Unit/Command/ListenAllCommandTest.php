@@ -40,7 +40,7 @@ final class ListenAllCommandTest extends TestCase
         $this->assertEquals(0, $exitCode);
     }
 
-    public function testNegativePauseIsNormalizedToOne(): void
+    public function testRunsWithNegativePause(): void
     {
         $queue = $this->createMock(QueueInterface::class);
         $queue->method('run')->willReturn(1);
