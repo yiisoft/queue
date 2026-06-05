@@ -31,6 +31,11 @@ final class VoidAdapter implements AdapterInterface
         throw new InvalidArgumentException();
     }
 
+    public function hasStatusSupport(): bool
+    {
+        return false;
+    }
+
     public function push(MessageInterface $message): MessageInterface
     {
         $this->serializer->serialize($message);

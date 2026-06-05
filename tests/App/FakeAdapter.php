@@ -33,6 +33,11 @@ final class FakeAdapter implements AdapterInterface
         throw new Exception('`status()` method is not implemented yet.');
     }
 
+    public function hasStatusSupport(): bool
+    {
+        return false;
+    }
+
     public function subscribe(callable $handlerCallback): void
     {
         throw new Exception('`subscribe()` method is not implemented yet.');

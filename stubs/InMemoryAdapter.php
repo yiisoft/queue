@@ -70,4 +70,9 @@ final class InMemoryAdapter implements AdapterInterface
 
         return MessageStatus::NOT_FOUND;
     }
+
+    public function hasStatusSupport(): bool
+    {
+        return true;
+    }
 }
