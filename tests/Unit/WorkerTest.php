@@ -14,6 +14,7 @@ use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Exception\MessageFailureException;
 use Yiisoft\Queue\Message\GenericMessage;
+use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
@@ -84,6 +85,39 @@ final class WorkerTest extends TestCase
             },
             [],
         ];
+    }
+
+    public function testProcessLogsMessageId(): void
+    {
+        $message = new IdEnvelope(new GenericMessage('simple', ['test-data']), 'message-id-123');
+        $logger = new SimpleLogger();
+        $container = new SimpleContainer([FakeHandler::class => new FakeHandler()]);
+        $handlers = ['simple' => FakeHandler::class];
+
+        /** @var MockObject&QueueInterface $queue */
+        $queue = $this->createMock(QueueInterface::class);
+        $worker = $this->createWorkerByParams($handlers, $container, $logger);
+
+        $worker->process($message, $queue);
+        FakeHandler::$processedMessages = [];
+
+        $messages = $logger->getMessages();
+        $this->assertSame('Processing message #message-id-123.', $messages[0]['message']);
+    }
+
+    public function testProcessFailsForEmptyMessageType(): void
+    {
+        $message = new GenericMessage('', ['test-data']);
+        $container = new SimpleContainer();
+        $handlers = [];
+
+        /** @var MockObject&QueueInterface $queue */
+        $queue = $this->createMock(QueueInterface::class);
+        $worker = $this->createWorkerByParams($handlers, $container);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Queue handler for message type "" does not exist.');
+        $worker->process($message, $queue);
     }
 
     public function testMessageFailWithDefinitionUndefinedMethodHandler(): void

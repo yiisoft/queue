@@ -39,4 +39,26 @@ final class ListenAllCommandTest extends TestCase
 
         $this->assertEquals(0, $exitCode);
     }
+
+    public function testNegativePauseIsNormalizedToOne(): void
+    {
+        $queue = $this->createMock(QueueInterface::class);
+        $queue->method('run')->willReturn(1);
+
+        $queueProvider = new PredefinedQueueProvider([
+            'queue1' => $queue,
+        ]);
+
+        $loop = $this->createMock(LoopInterface::class);
+        $loop->method('canContinue')->willReturn(true, false);
+
+        $command = new ListenAllCommand(
+            $queueProvider,
+            $loop,
+        );
+        $input = new ArrayInput(['--pause' => -1], $command->getNativeDefinition());
+        $exitCode = $command->run($input, $this->createMock(OutputInterface::class));
+
+        $this->assertSame(0, $exitCode);
+    }
 }

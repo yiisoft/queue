@@ -48,7 +48,11 @@ abstract class MiddlewareFactory
                 ?? throw new InvalidMiddlewareDefinitionException($definition);
         }
 
+        // A non-string, non-array value of type callable|array|string is always callable and handled above,
+        // so this is unreachable at runtime and kept only for completeness.
+        // @codeCoverageIgnoreStart
         throw new InvalidMiddlewareDefinitionException($definition);
+        // @codeCoverageIgnoreEnd
     }
 
     /**

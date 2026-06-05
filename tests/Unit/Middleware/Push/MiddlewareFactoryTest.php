@@ -147,6 +147,7 @@ final class MiddlewareFactoryTest extends TestCase
             'wrong array with int items' => [[7, 42]],
             'array with wrong method name' => [[TestCallableMiddleware::class, 'notExists']],
             'array wrong class' => [['class' => TestCallableMiddleware::class]],
+            'non-callable scalar' => [42],
         ];
     }
 

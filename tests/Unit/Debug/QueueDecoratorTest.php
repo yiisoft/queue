@@ -80,4 +80,48 @@ final class QueueDecoratorTest extends TestCase
 
         $this->assertEquals('hello', $decorator->getName());
     }
+
+    public function testWithMiddlewares(): void
+    {
+        $newQueue = $this->createMock(QueueInterface::class);
+        $newQueue->method('getName')->willReturn('new');
+        $queue = $this->createMock(QueueInterface::class);
+        $queue->expects($this->once())
+            ->method('withMiddlewares')
+            ->with('m1', 'm2')
+            ->willReturn($newQueue);
+        $collector = new QueueCollector();
+        $decorator = new QueueDecorator(
+            $queue,
+            $collector,
+        );
+
+        $result = $decorator->withMiddlewares('m1', 'm2');
+
+        $this->assertInstanceOf(QueueDecorator::class, $result);
+        $this->assertNotSame($decorator, $result);
+        $this->assertSame('new', $result->getName());
+    }
+
+    public function testWithMiddlewaresAdded(): void
+    {
+        $newQueue = $this->createMock(QueueInterface::class);
+        $newQueue->method('getName')->willReturn('new');
+        $queue = $this->createMock(QueueInterface::class);
+        $queue->expects($this->once())
+            ->method('withMiddlewaresAdded')
+            ->with('m1', 'm2')
+            ->willReturn($newQueue);
+        $collector = new QueueCollector();
+        $decorator = new QueueDecorator(
+            $queue,
+            $collector,
+        );
+
+        $result = $decorator->withMiddlewaresAdded('m1', 'm2');
+
+        $this->assertInstanceOf(QueueDecorator::class, $result);
+        $this->assertNotSame($decorator, $result);
+        $this->assertSame('new', $result->getName());
+    }
 }

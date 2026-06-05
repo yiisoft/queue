@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
 
 use Exception;
+use InvalidArgumentException;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
@@ -165,6 +166,22 @@ final class SendAgainMiddlewareTest extends TestCase
         $result = $strategy->processFailure($request, $handler);
 
         self::assertInstanceOf(FailureHandlingRequest::class, $result);
+    }
+
+    public static function nonPositiveMaxAttemptsProvider(): array
+    {
+        return [
+            [0, 'maxAttempts parameter must be a positive integer, 0 given.'],
+            [-5, 'maxAttempts parameter must be a positive integer, -5 given.'],
+        ];
+    }
+
+    #[DataProvider('nonPositiveMaxAttemptsProvider')]
+    public function testThrowsOnNonPositiveMaxAttempts(int $maxAttempts, string $expectedMessage): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedMessage);
+        new SendAgainMiddleware('', $maxAttempts);
     }
 
     private function getStrategy(string $strategyName, QueueInterface $queue): FailureMiddlewareInterface

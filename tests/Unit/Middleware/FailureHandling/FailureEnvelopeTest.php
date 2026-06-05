@@ -23,6 +23,16 @@ final class FailureEnvelopeTest extends TestCase
         $this->assertSame($metadata, $envelope->getMetadata()[FailureEnvelope::META_FAILURE]);
     }
 
+    public function testGetFailureMetadata(): void
+    {
+        $message = $this->createMessage();
+        $metadata = ['attempt' => 1, 'error' => 'Test error'];
+
+        $envelope = new FailureEnvelope($message, $metadata);
+
+        $this->assertSame($metadata, $envelope->getFailureMetadata());
+    }
+
     public function testFromMessageWithExistingMetadata(): void
     {
         $existingMetadata = ['attempt' => 1];
