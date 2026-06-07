@@ -15,7 +15,7 @@ use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
-use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestCallableMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\TestMiddleware;
 
@@ -140,7 +140,7 @@ final class MiddlewareDispatcherTest extends TestCase
     private function createDispatcher(
         ?ContainerInterface $container = null,
     ): PushMiddlewareDispatcher {
-        $container ??= $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->createContainer([AdapterInterface::class => new InMemoryAdapter()]);
         $callableFactory = new CallableFactory($container);
 
         return new PushMiddlewareDispatcher(

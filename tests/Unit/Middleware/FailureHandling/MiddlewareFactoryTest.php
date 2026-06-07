@@ -20,7 +20,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support\CallableObjectMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support\InvalidController;
 use Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support\StringCallableMiddleware;
@@ -183,7 +183,7 @@ final class MiddlewareFactoryTest extends TestCase
 
     private function getMiddlewareFactory(?ContainerInterface $container = null): FailureMiddlewareFactoryInterface
     {
-        $container ??= $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->getContainer([AdapterInterface::class => new InMemoryAdapter()]);
 
         return new FailureMiddlewareFactory($container, new CallableFactory($container));
     }

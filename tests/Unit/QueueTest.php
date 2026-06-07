@@ -9,7 +9,6 @@ use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
-use Yiisoft\Queue\Tests\App\FakeAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 
 use function extension_loaded;
@@ -25,12 +24,12 @@ final class QueueTest extends TestCase
 {
     public function testPushSuccessful(): void
     {
-        $adapter = new FakeAdapter();
+        $adapter = new InMemoryAdapter();
         $queue = $this->createQueue($adapter);
         $message = new GenericMessage('simple', null);
         $queue->push($message);
 
-        self::assertSame([$message], $adapter->pushMessages);
+        self::assertSame([$message], $adapter->getMessagesList());
     }
 
     public function testPushSynchronouslyProcessesMessage(): void
