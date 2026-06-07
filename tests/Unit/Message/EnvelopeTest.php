@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Message;
 
 use LogicException;
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Queue\Tests\App\DummyEnvelope;
+use Yiisoft\Queue\Stubs\DummyEnvelope;
 
 final class EnvelopeTest extends TestCase
 {
