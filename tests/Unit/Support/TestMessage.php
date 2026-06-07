@@ -19,7 +19,7 @@ final class TestMessage extends Message
         return 'test';
     }
 
-    public function getData(): mixed
+    public function getData(): bool|int|float|string|array|null
     {
         return null;
     }
