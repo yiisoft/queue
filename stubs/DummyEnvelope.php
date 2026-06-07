@@ -9,6 +9,8 @@ use Yiisoft\Queue\Message\MessageInterface;
 
 /**
  * Dummy envelope stub for testing purposes.
+ *
+ * @extends Envelope<array<string, mixed>>
  */
 final class DummyEnvelope extends Envelope
 {
