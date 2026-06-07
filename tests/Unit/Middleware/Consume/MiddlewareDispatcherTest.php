@@ -16,7 +16,7 @@ use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Queue\Middleware\Consume\ConsumeHandlerInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestMiddleware;
 
@@ -161,7 +161,7 @@ final class MiddlewareDispatcherTest extends TestCase
     private function createDispatcher(
         ?ContainerInterface $container = null,
     ): ConsumeMiddlewareDispatcher {
-        $container ??= $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->createContainer([AdapterInterface::class => new InMemoryAdapter()]);
         $callableFactory = new CallableFactory($container);
 
         return new ConsumeMiddlewareDispatcher(

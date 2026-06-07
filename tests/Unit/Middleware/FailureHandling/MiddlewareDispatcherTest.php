@@ -16,7 +16,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support\TestCallableMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support\TestMiddleware;
 
@@ -159,7 +159,7 @@ final class MiddlewareDispatcherTest extends TestCase
     private function createDispatcher(
         ?ContainerInterface $container = null,
     ): FailureMiddlewareDispatcher {
-        $container ??= $this->createContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->createContainer([AdapterInterface::class => new InMemoryAdapter()]);
         $callableFactory = new CallableFactory($container);
 
         return new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container, $callableFactory), []);

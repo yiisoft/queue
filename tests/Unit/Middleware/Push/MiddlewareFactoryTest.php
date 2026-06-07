@@ -17,7 +17,7 @@ use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
-use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\CallableObjectMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\InvalidController;
 use Yiisoft\Queue\Tests\Unit\Middleware\Push\Support\StringCallableMiddleware;
@@ -173,7 +173,7 @@ final class MiddlewareFactoryTest extends TestCase
 
     private function getMiddlewareFactory(?ContainerInterface $container = null): PushMiddlewareFactoryInterface
     {
-        $container ??= $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->getContainer([AdapterInterface::class => new InMemoryAdapter()]);
 
         return new PushMiddlewareFactory($container, new CallableFactory($container));
     }
