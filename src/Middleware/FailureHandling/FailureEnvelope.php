@@ -13,8 +13,8 @@ use function is_array;
 
 /**
  * @extends Envelope<array{
- *      yii-failure: array,
- *      ...<string, mixed>
+ *      yii-failure: array<string, scalar|null|array<scalar|null|array>>,
+ *      ...<string, scalar|null|array<scalar|null|array>>
  *  }>
  */
 final class FailureEnvelope extends Envelope
