@@ -10,6 +10,11 @@ use function is_string;
 
 /**
  * ID envelope allows to identify a message.
+ *
+ * @extends Envelope<array{
+ *     yii-id: non-empty-string|int|null,
+ *     ...<string, mixed>
+ * }>
  */
 final class IdEnvelope extends Envelope
 {
@@ -17,6 +22,10 @@ final class IdEnvelope extends Envelope
 
     public function __construct(MessageInterface $message, string|int|null $id)
     {
+        if ($id === '') {
+            $id = null;
+        }
+
         parent::__construct($message, [self::META_ID => $id]);
     }
 
@@ -35,6 +44,9 @@ final class IdEnvelope extends Envelope
         return new self($message, $id);
     }
 
+    /**
+     * @psalm-return non-empty-string|int|null
+     */
     public function getId(): string|int|null
     {
         return $this->metadata[self::META_ID];
