@@ -7,6 +7,9 @@ namespace Yiisoft\Queue\Stubs;
 use Yiisoft\Queue\Message\Envelope;
 use Yiisoft\Queue\Message\MessageInterface;
 
+/**
+ * Dummy envelope stub for testing purposes.
+ */
 final class DummyEnvelope extends Envelope
 {
     public function __construct(MessageInterface $message)
