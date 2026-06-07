@@ -27,9 +27,9 @@ final class QueueCollectorTest extends AbstractCollectorTestCase
      */
     protected function collectTestData(CollectorInterface $collector): void
     {
-        $collector->collectStatus('12345', MessageStatus::DONE);
-        $collector->collectPush('chan1', $this->pushMessage);
-        $collector->collectPush('chan2', $this->pushMessage);
+        $collector->collectStatus('12345', MessageStatus::DONE, 'status.php:11');
+        $collector->collectPush('chan1', $this->pushMessage, 'push.php:21');
+        $collector->collectPush('chan2', $this->pushMessage, 'push.php:31');
         $collector->collectWorkerProcessing(
             $this->pushMessage,
             new StubQueue('chan1'),
@@ -62,11 +62,13 @@ final class QueueCollectorTest extends AbstractCollectorTestCase
             'chan1' => [
                 [
                     'message' => $this->pushMessage,
+                    'line' => 'push.php:21',
                 ],
             ],
             'chan2' => [
                 [
                     'message' => $this->pushMessage,
+                    'line' => 'push.php:31',
                 ],
             ],
         ], $pushes);
@@ -74,6 +76,7 @@ final class QueueCollectorTest extends AbstractCollectorTestCase
             [
                 'id' => '12345',
                 'status' => 'done',
+                'line' => 'status.php:11',
             ],
         ], $statuses);
         $this->assertEquals(
