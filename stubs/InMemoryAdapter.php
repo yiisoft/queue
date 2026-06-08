@@ -29,6 +29,15 @@ final class InMemoryAdapter implements AdapterInterface
     private array $messages = [];
     private int $current = 0;
 
+    /**
+     * @return MessageInterface[]
+     * @psalm-return list<MessageInterface>
+     */
+    public function getMessagesList(): array
+    {
+        return array_values($this->messages);
+    }
+
     public function push(MessageInterface $message): MessageInterface
     {
         $id = count($this->messages) + $this->current;
