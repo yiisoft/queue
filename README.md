@@ -58,7 +58,7 @@ final class DownloadFileMessage extends Message
         public readonly string $destinationPath,
     ) {}
 
-    public static function fromData(string $type, mixed $data): static
+    public static function fromData(string $type, bool|int|float|string|array|null $data): static
     {
         if ($type !== self::TYPE) {
             throw new \InvalidArgumentException("Expected type \"" . self::TYPE . "\", got \"$type\".");
