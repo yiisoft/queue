@@ -174,6 +174,13 @@ See [Console commands](docs/guide/en/console-commands.md) for more details.
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
 You may also check out other [Yii Community Resources](https://www.yiiframework.com/community).
 
+## Versioning
+
+This package follows [semantic versioning](https://semver.org/).
+
+The `/stubs` directory is intended for testing purposes only and must not be used in production code.
+Any changes there, including breaking ones, are always released as a patch version.
+
 ## License
 
 The Yii Queue is free software. It is released under the terms of the BSD License.

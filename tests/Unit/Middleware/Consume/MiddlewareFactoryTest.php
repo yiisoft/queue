@@ -18,7 +18,7 @@ use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Tests\App\FakeAdapter;
+use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\CallableObjectMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\InvalidController;
 use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\StringCallableMiddleware;
@@ -199,7 +199,7 @@ final class MiddlewareFactoryTest extends TestCase
 
     private function getMiddlewareFactory(?ContainerInterface $container = null): ConsumeMiddlewareFactoryInterface
     {
-        $container ??= $this->getContainer([AdapterInterface::class => new FakeAdapter()]);
+        $container ??= $this->getContainer([AdapterInterface::class => new InMemoryAdapter()]);
 
         return new ConsumeMiddlewareFactory($container, new CallableFactory($container));
     }

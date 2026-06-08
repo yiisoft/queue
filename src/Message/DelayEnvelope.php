@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
+/**
+ * @extends Envelope<array{
+ *      yii-delay: float,
+ *      ...<string, mixed>
+ *  }>
+ */
 final class DelayEnvelope extends Envelope
 {
     public const META_DELAY_SECONDS = 'yii-delay';
@@ -15,7 +21,6 @@ final class DelayEnvelope extends Envelope
 
     public static function fromMessage(MessageInterface $message): static
     {
-        /** @var float|int|string $delaySeconds */
         $delaySeconds = $message->getMetadata()[self::META_DELAY_SECONDS] ?? 0.0;
         return new self($message, (float) $delaySeconds);
     }

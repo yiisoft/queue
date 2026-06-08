@@ -6,17 +6,24 @@ namespace Yiisoft\Queue\Message;
 
 use LogicException;
 
+/**
+ * @template TMetadata of array<string, mixed>
+ */
 abstract class Envelope implements MessageInterface
 {
     /**
-     * @psalm-var array<string, mixed>
+     * @psalm-var TMetadata
      */
     protected readonly array $metadata;
 
     private readonly MessageInterface $message;
 
+    /**
+     * @psalm-param TMetadata $metadata
+     */
     public function __construct(MessageInterface $message, array $metadata)
     {
+        /** @var TMetadata */
         $this->metadata = array_merge($message->getMetadata(), $metadata);
 
         while ($message instanceof self) {
@@ -59,6 +66,9 @@ abstract class Envelope implements MessageInterface
         return $this->message->getData();
     }
 
+    /**
+     * @psalm-return TMetadata
+     */
     final public function getMetadata(): array
     {
         return $this->metadata;
