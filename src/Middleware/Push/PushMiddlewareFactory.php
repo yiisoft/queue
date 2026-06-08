@@ -54,14 +54,6 @@ final class PushMiddlewareFactory extends MiddlewareFactory implements PushMiddl
 
         $middleware = $this->create($middlewareDefinition);
 
-        if (!$middleware instanceof PushMiddlewareInterface) {
-            // self::create() always returns an instance of the required interface or throws,
-            // so this is unreachable at runtime and kept only for the static analyzer.
-            // @codeCoverageIgnoreStart
-            throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
-            // @codeCoverageIgnoreEnd
-        }
-
         return $middleware;
     }
 

@@ -50,14 +50,6 @@ final class FailureMiddlewareFactory extends MiddlewareFactory implements Failur
 
         $middleware = $this->create($middlewareDefinition);
 
-        if (!$middleware instanceof FailureMiddlewareInterface) {
-            // self::create() always returns an instance of the required interface or throws,
-            // so this is unreachable at runtime and kept only for the static analyzer.
-            // @codeCoverageIgnoreStart
-            throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
-            // @codeCoverageIgnoreEnd
-        }
-
         return $middleware;
     }
 

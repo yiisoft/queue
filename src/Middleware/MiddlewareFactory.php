@@ -31,28 +31,22 @@ abstract class MiddlewareFactory
      */
     protected function create(callable|array|string $definition): object
     {
-        try {
-            $callable = $this->callableFactory->create($definition);
+        if (is_string($definition) || is_array($definition)) {
+            try {
+                return $this->wrapMiddleware($this->callableFactory->create($definition));
+            } catch (InvalidCallableConfigurationException) {
+                // Not a callable, try internal checks
+            }
 
-            return $this->wrapMiddleware($callable);
-        } catch (InvalidCallableConfigurationException) {
-            // Not a callable, try internal checks
-        }
+            if (is_string($definition)) {
+                return $this->getFromContainer($definition);
+            }
 
-        if (is_string($definition)) {
-            return $this->getFromContainer($definition);
-        }
-
-        if (is_array($definition)) {
             return $this->tryGetFromArrayDefinition($definition)
                 ?? throw new InvalidMiddlewareDefinitionException($definition);
         }
 
-        // A non-string, non-array value of type callable|array|string is always callable and handled above,
-        // so this is unreachable at runtime and kept only for completeness.
-        // @codeCoverageIgnoreStart
-        throw new InvalidMiddlewareDefinitionException($definition);
-        // @codeCoverageIgnoreEnd
+        return $this->wrapMiddleware($this->callableFactory->create($definition));
     }
 
     /**
