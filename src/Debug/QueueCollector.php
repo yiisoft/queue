@@ -33,7 +33,7 @@ final class QueueCollector implements SummaryCollectorInterface
         ];
     }
 
-    public function collectStatus(string $id, MessageStatus $status): void
+    public function collectStatus(string $id, MessageStatus $status, string $line): void
     {
         if (!$this->isActive()) {
             return;
@@ -42,10 +42,11 @@ final class QueueCollector implements SummaryCollectorInterface
         $this->statuses[] = [
             'id' => $id,
             'status' => $status->key(),
+            'line' => $line,
         ];
     }
 
-    public function collectPush(string $queueName, MessageInterface $message): void
+    public function collectPush(string $queueName, MessageInterface $message, string $line): void
     {
         if (!$this->isActive()) {
             return;
@@ -53,6 +54,7 @@ final class QueueCollector implements SummaryCollectorInterface
 
         $this->pushes[$queueName][] = [
             'message' => $message,
+            'line' => $line,
         ];
     }
 

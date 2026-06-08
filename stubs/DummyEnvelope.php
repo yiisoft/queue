@@ -2,11 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Tests\App;
+namespace Yiisoft\Queue\Stubs;
 
 use Yiisoft\Queue\Message\Envelope;
 use Yiisoft\Queue\Message\MessageInterface;
 
+/**
+ * Dummy envelope stub for testing purposes.
+ *
+ * @extends Envelope<array<string, mixed>>
+ */
 final class DummyEnvelope extends Envelope
 {
     public function __construct(MessageInterface $message)
