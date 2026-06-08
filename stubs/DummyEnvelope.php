@@ -10,7 +10,9 @@ use Yiisoft\Queue\Message\MessageInterface;
 /**
  * Dummy envelope stub for testing purposes.
  *
- * @extends Envelope<array<string, mixed>>
+ * @extends Envelope<MessageMetadata>
+ *
+ * @psalm-import-type MessageMetadata from MessageInterface
  */
 final class DummyEnvelope extends Envelope
 {
