@@ -16,8 +16,8 @@ interface MessageInterface
      * Creates a new message instance from the given type and payload data.
      *
      * @param string $type Message type.
-     * @param mixed $data Message payload data. Must contain only `null`, scalars (`bool`, `int`, `float`, `string`),
-     * or arrays composed of the same types recursively.
+     * @param bool|int|float|string|array|null $data Message payload data. Must contain only `null`, scalars (`bool`,
+     * `int`, `float`, `string`), or arrays composed of the same types recursively.
      *
      * @psalm-param MessageData $data
      */
