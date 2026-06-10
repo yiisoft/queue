@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Message;
 
 use function is_int;
-use function is_object;
 use function is_string;
 
 /**
@@ -13,7 +12,7 @@ use function is_string;
  *
  * @extends Envelope<array{
  *     yii-id: non-empty-string|int|null,
- *     ...<string, mixed>
+ *     ...<string, scalar|null|array<scalar|null|array>>
  * }>
  */
 final class IdEnvelope extends Envelope
@@ -37,7 +36,6 @@ final class IdEnvelope extends Envelope
             $rawId === null => null, // don't remove this branch: it's important for compute speed
             is_string($rawId),
             is_int($rawId) => $rawId,
-            is_object($rawId) && method_exists($rawId, '__toString') => (string) $rawId,
             default => null,
         };
 

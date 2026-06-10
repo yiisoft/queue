@@ -7,7 +7,9 @@ namespace Yiisoft\Queue\Message;
 use LogicException;
 
 /**
- * @template TMetadata of array<string, mixed>
+ * @template TMetadata of MessageMetadata
+ *
+ * @psalm-import-type MessageMetadata from MessageInterface
  */
 abstract class Envelope implements MessageInterface
 {
@@ -61,7 +63,7 @@ abstract class Envelope implements MessageInterface
         return $this->message->getType();
     }
 
-    final public function getData(): mixed
+    final public function getData(): bool|int|float|string|array|null
     {
         return $this->message->getData();
     }

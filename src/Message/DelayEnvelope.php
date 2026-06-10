@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
+use function is_array;
+
 /**
  * @extends Envelope<array{
  *      yii-delay: float,
- *      ...<string, mixed>
+ *      ...<string, scalar|null|array<scalar|null|array>>
  *  }>
  */
 final class DelayEnvelope extends Envelope
@@ -21,8 +23,8 @@ final class DelayEnvelope extends Envelope
 
     public static function fromMessage(MessageInterface $message): static
     {
-        $delaySeconds = $message->getMetadata()[self::META_DELAY_SECONDS] ?? 0.0;
-        return new self($message, (float) $delaySeconds);
+        $raw = $message->getMetadata()[self::META_DELAY_SECONDS] ?? null;
+        return new self($message, is_array($raw) ? 0.0 : (float) $raw);
     }
 
     public function getDelaySeconds(): float

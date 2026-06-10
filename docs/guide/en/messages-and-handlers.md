@@ -54,7 +54,7 @@ final class SendEmailMessage extends Message
         public readonly string $body,
     ) {}
 
-    public static function fromData(string $type, mixed $data): static
+    public static function fromData(string $type, bool|int|float|string|array|null $data): static
     {
         if ($type !== self::TYPE) {
             throw new \InvalidArgumentException("Expected type \"" . self::TYPE . "\", got \"$type\".");
@@ -90,7 +90,7 @@ new SendEmailMessage('user@example.com', 'Welcome', 'Thank you for registering.'
 The message has:
 
 - A **message type** — a string used by the worker to look up the correct handler.
-- A **data payload** — typed properties serialized to JSON via `getData()`. Must be JSON-encodable.
+- A **data payload** — typed properties serialized via `getData()`. Must contain only `null`, scalars (`bool`, `int`, `float`, `string`), or arrays composed of the same types recursively.
 
 The message has no business logic, no dependencies. It is a value object — a typed data wrapper.
 

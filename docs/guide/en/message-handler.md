@@ -19,7 +19,7 @@ final class RemoteFileMessage extends Message
 {
     public function __construct(public readonly string $url) {}
 
-    public static function fromData(string $type, mixed $data): static
+    public static function fromData(string $type, bool|int|float|string|array|null $data): static
     {
         if (!is_array($data) || !is_string($data['url'] ?? null)) {
             throw new \InvalidArgumentException('Invalid data for ' . self::class . '.');

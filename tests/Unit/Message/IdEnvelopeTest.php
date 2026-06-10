@@ -51,20 +51,6 @@ final class IdEnvelopeTest extends TestCase
         $this->assertNull($envelope->getId());
     }
 
-    public function testFromMessageWithObjectHavingToString(): void
-    {
-        $stringableObject = new class {
-            public function __toString(): string
-            {
-                return 'object-id';
-            }
-        };
-        $message = $this->createMessage([IdEnvelope::META_ID => $stringableObject]);
-        $envelope = IdEnvelope::fromMessage($message);
-
-        $this->assertSame('object-id', $envelope->getId());
-    }
-
     public function testFromMessageWithInvalidIdType(): void
     {
         $invalidId = ['array-cannot-be-id'];

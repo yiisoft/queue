@@ -8,43 +8,34 @@ namespace Yiisoft\Queue\Message;
  * A general-purpose immutable {@see MessageInterface} implementation that holds a message type and its payload data.
  *
  * Prefer creating custom message classes that better express your domain.
+ *
+ * @psalm-import-type MessageData from MessageInterface
  */
 final class GenericMessage extends Message
 {
     /**
      * @param string $type A message type used to resolve the handler.
-     * @param mixed $data Message payload data.
+     * @param bool|int|float|string|array|null $data Message payload data. Must contain only `null`, scalars (`bool`,
+     * `int`, `float`, `string`), or arrays composed of the same types recursively.
+     *
+     * @psalm-param MessageData $data
      */
     public function __construct(
         private readonly string $type,
-        private readonly mixed $data,
+        private readonly bool|int|float|string|array|null $data,
     ) {}
 
-    /**
-     * Creates a new message instance from the given type and payload data.
-     *
-     * @param string $type A message type used to resolve the handler.
-     * @param mixed $data Message payload data.
-     *
-     * @return MessageInterface The created message instance.
-     */
-    public static function fromData(string $type, mixed $data): MessageInterface
+    public static function fromData(string $type, bool|int|float|string|array|null $data): MessageInterface
     {
         return new self($type, $data);
     }
 
-    /**
-     * Returns the message type used to resolve the handler.
-     */
     public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * Returns the message payload data.
-     */
-    public function getData(): mixed
+    public function getData(): bool|int|float|string|array|null
     {
         return $this->data;
     }
