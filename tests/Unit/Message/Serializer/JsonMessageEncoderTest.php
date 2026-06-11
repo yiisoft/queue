@@ -13,7 +13,7 @@ use function sprintf;
 
 use const JSON_THROW_ON_ERROR;
 
-final class JsonMessageSerializerTest extends TestCase
+final class JsonMessageEncoderTest extends TestCase
 {
     #[TestWith([''])]
     #[TestWith([1])]
