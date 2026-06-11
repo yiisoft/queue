@@ -25,9 +25,7 @@ final class JsonMessageSerializer implements MessageSerializerInterface
             'meta' => $message->getMetadata(),
         ];
         if (!isset($payload['meta']['message-class'])) {
-            $payload['meta']['message-class'] = $message instanceof Envelope
-                ? $message->getMessage()::class
-                : $message::class;
+            $payload['meta']['message-class'] = $message::class;
         }
 
         return json_encode($payload, JSON_THROW_ON_ERROR);

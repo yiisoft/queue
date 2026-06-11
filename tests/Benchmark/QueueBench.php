@@ -89,13 +89,10 @@ final class QueueBench
         yield 'simple mapping' => ['message' => $this->serializer->serialize(new GenericMessage('foo', 'bar'))];
         yield 'with envelopes mapping' => [
             'message' => $this->serializer->serialize(
-                new FailureEnvelope(
-                    new IdEnvelope(
-                        new GenericMessage('foo', 'bar'),
-                        'test id',
-                    ),
-                    ['failure-1' => ['a', 'b', 'c']],
-                ),
+                (new GenericMessage('foo', 'bar'))->withMetadata([
+                    IdEnvelope::META_ID => 'test id',
+                    FailureEnvelope::META_FAILURE => ['failure-1' => ['a', 'b', 'c']],
+                ]),
             ),
         ];
     }

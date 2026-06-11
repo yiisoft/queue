@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Middleware\Push;
 
 use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Message\Envelope;
 use Yiisoft\Queue\Message\MessageInterface;
 
 /**
@@ -18,6 +19,8 @@ final class AdapterPushHandler implements PushHandlerInterface
 
     public function handlePush(MessageInterface $message): MessageInterface
     {
-        return $this->adapter->push($message);
+        return $this->adapter->push(
+            $message instanceof Envelope ? $message->getMessage() : $message,
+        );
     }
 }

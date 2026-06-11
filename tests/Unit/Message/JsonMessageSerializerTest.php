@@ -142,10 +142,10 @@ final class JsonMessageSerializerTest extends TestCase
         );
     }
 
-    public function testSerializeEnvelopeStack(): void
+    public function testSerializeWithMetadata(): void
     {
-        $message = new GenericMessage('handler', 'test');
-        $message = new IdEnvelope($message, 'test-id');
+        $message = (new GenericMessage('handler', 'test'))
+            ->withMetadata([IdEnvelope::META_ID => 'test-id']);
 
         $serializer = $this->createSerializer();
 
@@ -178,14 +178,15 @@ final class JsonMessageSerializerTest extends TestCase
         $this->assertInstanceOf(TestMessage::class, $message);
     }
 
-    public function testRestoreOriginalMessageClassWithEnvelope(): void
+    public function testRestoreOriginalMessageClassWithMetadata(): void
     {
-        $message = new IdEnvelope(new TestMessage(), 1);
+        $message = (new TestMessage())
+            ->withMetadata(['id' => 1]);
         $serializer = $this->createSerializer();
-        $serializer->unserialize($serializer->serialize($message));
+        $unserialized = $serializer->unserialize($serializer->serialize($message));
 
-        $this->assertInstanceOf(IdEnvelope::class, $message);
-        $this->assertInstanceOf(TestMessage::class, $message->getMessage());
+        $this->assertInstanceOf(TestMessage::class, $unserialized);
+        $this->assertEquals(['id' => 1, 'message-class' => TestMessage::class], $unserialized->getMetadata());
     }
 
     private function createSerializer(): JsonMessageSerializer
