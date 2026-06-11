@@ -5,12 +5,13 @@ This guide explains how to publish messages to a queue backend (RabbitMQ, Kafka,
 The key idea is simple:
 
 - The queue adapter reads a *raw payload* (usually a string) from the broker.
-- The adapter passes that payload to a `Yiisoft\Queue\Message\MessageSerializerInterface` implementation.
-- By default, `yiisoft/queue` config binds `MessageSerializerInterface` to `Yiisoft\Queue\Message\JsonMessageSerializer`.
+- The adapter passes that payload to a `Yiisoft\Queue\Message\Serializer\MessageSerializer`.
+- `MessageSerializer` delegates wire encoding to a `Yiisoft\Queue\Message\Serializer\MessageEncoderInterface` implementation.
+- By default, `yiisoft/queue` config binds `MessageEncoderInterface` to `Yiisoft\Queue\Message\Serializer\JsonMessageEncoder`.
 
-`JsonMessageSerializer` is only the default implementation. You can replace it with your own serializer by rebinding `Yiisoft\Queue\Message\MessageSerializerInterface` in your DI configuration.
+`JsonMessageEncoder` is only the default implementation. You can replace it with your own encoder by rebinding `Yiisoft\Queue\Message\Serializer\MessageEncoderInterface` in your DI configuration.
 
-So, external systems should produce the **same payload format** that your consumer-side serializer expects (JSON described below is for the default `JsonMessageSerializer`).
+So, external systems should produce the **same payload format** that your consumer-side encoder expects (JSON described below is for the default `JsonMessageEncoder`).
 
 ## 1. Message type contract (most important part)
 
@@ -32,9 +33,9 @@ return [
 
 External producer then always publishes `"type": "file-download"`.
 
-## 2. JSON payload format (JsonMessageSerializer)
+## 2. JSON payload format (JsonMessageEncoder)
 
-`Yiisoft\Queue\Message\JsonMessageSerializer` expects the message body to be a JSON object with these keys:
+`Yiisoft\Queue\Message\Serializer\JsonMessageEncoder` expects the message body to be a JSON object with these keys:
 
 - `type` (string, required)
 - `data` (any JSON value, optional; defaults to `null`)

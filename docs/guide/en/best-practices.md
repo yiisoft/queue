@@ -190,7 +190,7 @@ new Message(SendEmailHandler::class, [
 
 #### Why
 
-- Message data must be JSON-serializable when using the default `JsonMessageSerializer`.
+- Message data must be JSON-serializable when using the default `JsonMessageEncoder`.
 - Resources (file handles, database connections, sockets) cannot be serialized.
 - Closures and anonymous functions cannot be serialized.
 - Objects with circular references or without proper serialization support will fail.

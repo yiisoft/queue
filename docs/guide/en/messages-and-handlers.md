@@ -129,14 +129,14 @@ Because the payload is just data, any language can produce or consume it. A Pyth
 
 ## Why JSON is the default serialization
 
-By default, `yiisoft/queue` serializes message payloads as JSON (`JsonMessageSerializer`). JSON was chosen intentionally:
+By default, `yiisoft/queue` serializes message payloads as JSON (`JsonMessageEncoder`). JSON was chosen intentionally:
 
 - **Human-readable** — you can inspect a message in a broker dashboard without any tools.
 - **Language-agnostic** — every language and runtime can produce and parse JSON.
 - **Fast and lightweight** — no class metadata, no object graphs, no PHP-specific format.
 - **Forces payload discipline** — if your data cannot be expressed as a JSON-encodable value (strings, numbers, booleans, null, arrays, and objects), it is a sign the payload carries too much. Keep payloads simple: IDs, strings, primitive values.
 
-You can replace `JsonMessageSerializer` with your own implementation by rebinding `MessageSerializerInterface` in DI, but the default works for the vast majority of use cases.
+You can replace `JsonMessageEncoder` with your own implementation by rebinding `MessageEncoderInterface` in DI, but the default works for the vast majority of use cases.
 
 ## Migration note: Yii2 queue
 

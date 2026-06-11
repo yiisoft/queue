@@ -7,10 +7,10 @@ namespace Yiisoft\Queue\Tests\Benchmark\Support;
 use InvalidArgumentException;
 use RuntimeException;
 use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Message\Serializer\MessageSerializer;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Message\MessageSerializerInterface;
 
 final class VoidAdapter implements AdapterInterface
 {
@@ -19,7 +19,7 @@ final class VoidAdapter implements AdapterInterface
      */
     public string $message;
 
-    public function __construct(private readonly MessageSerializerInterface $serializer) {}
+    public function __construct(private readonly MessageSerializer $serializer) {}
 
     public function runExisting(callable $handlerCallback): void
     {
