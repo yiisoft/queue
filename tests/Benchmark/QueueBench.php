@@ -87,9 +87,9 @@ final class QueueBench
 
     public function provideConsume(): Generator
     {
-        yield 'simple mapping' => ['message' => $this->serializer->encode(new GenericMessage('foo', 'bar'))];
+        yield 'simple mapping' => ['message' => $this->serializer->serialize(new GenericMessage('foo', 'bar'))];
         yield 'with envelopes mapping' => [
-            'message' => $this->serializer->encode(
+            'message' => $this->serializer->serialize(
                 new FailureEnvelope(
                     new IdEnvelope(
                         new GenericMessage('foo', 'bar'),
