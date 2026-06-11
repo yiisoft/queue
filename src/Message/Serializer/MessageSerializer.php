@@ -22,8 +22,7 @@ final class MessageSerializer
 
     public function __construct(
         private readonly MessageEncoderInterface $encoder,
-    ) {
-    }
+    ) {}
 
     /**
      * Serializes a message to a string.
