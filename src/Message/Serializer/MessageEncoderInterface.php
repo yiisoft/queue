@@ -12,7 +12,7 @@ interface MessageEncoderInterface
     /**
      * Encodes a data array into a string representation.
      *
-     * @param array $data Data to encode. Contains only scalars, nulls, and arrays — no objects or resources.
+     * @param array $data Data to encode. Contains only scalars, nulls, and arrays — no objects or resources including array contents.
      *
      * @throws MessageSerializerException If encoding fails.
      */
