@@ -9,8 +9,6 @@ use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\Serializer\JsonMessageEncoder;
 use Yiisoft\Queue\Message\Serializer\MessageEncoderException;
 
-use const JSON_THROW_ON_ERROR;
-
 final class JsonMessageEncoderTest extends TestCase
 {
     #[TestWith([[], '[]'])]

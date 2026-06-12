@@ -6,8 +6,6 @@ namespace Yiisoft\Queue\Message\Serializer;
 
 use JsonException;
 
-use function is_array;
-
 use const JSON_THROW_ON_ERROR;
 
 /**
