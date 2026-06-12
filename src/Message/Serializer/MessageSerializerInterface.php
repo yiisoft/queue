@@ -16,7 +16,7 @@ interface MessageSerializerInterface
      *
      * @param MessageInterface $message Message to serialize.
      *
-     * @throws MessageSerializerException If encoding fails.
+     * @throws MessageSerializerException If serialization fails.
      */
     public function serialize(MessageInterface $message): string;
 
@@ -25,7 +25,7 @@ interface MessageSerializerInterface
      *
      * @param string $value Encoded message string.
      *
-     * @throws MessageSerializerException If decoding fails or the decoded payload has an invalid format.
+     * @throws MessageSerializerException If unserialization fails.
      */
     public function unserialize(string $value): MessageInterface;
 }
