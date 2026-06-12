@@ -8,6 +8,7 @@ use Yiisoft\Queue\Message\Envelope;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 
+use function is_array;
 use function is_string;
 
 /**
@@ -41,7 +42,11 @@ final class MessageSerializer
                 : $message::class;
         }
 
-        return $this->encoder->encode($message->getType(), $message->getData(), $metadata);
+        return $this->encoder->encode([
+            'type' => $message->getType(),
+            'data' => $message->getData(),
+            'meta' => $metadata,
+        ]);
     }
 
     /**
@@ -53,7 +58,21 @@ final class MessageSerializer
      */
     public function unserialize(string $value): MessageInterface
     {
-        [$type, $data, $metadata] = $this->encoder->decode($value);
+        $data = $this->encoder->decode($value);
+
+        if (!is_array($data)) {
+            throw new MessageEncoderException('Decoded data must be array. Got ' . get_debug_type($data) . '.');
+        }
+
+        $type = $data['type'] ?? null;
+        if (!isset($type) || !is_string($type)) {
+            throw new MessageEncoderException('Message type must be a string. Got ' . get_debug_type($type) . '.');
+        }
+
+        $metadata = $data['meta'] ?? [];
+        if (!is_array($metadata)) {
+            throw new MessageEncoderException('Metadata must be an array. Got ' . get_debug_type($metadata) . '.');
+        }
 
         $class = $metadata[self::META_MESSAGE_CLASS] ?? GenericMessage::class;
 
@@ -65,6 +84,6 @@ final class MessageSerializer
         }
         /** @var class-string<MessageInterface> $class */
 
-        return $class::fromData($type, $data)->withMetadata($metadata);
+        return $class::fromData($type, $data['data'] ?? null)->withMetadata($metadata);
     }
 }

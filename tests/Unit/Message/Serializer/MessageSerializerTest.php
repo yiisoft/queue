@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit\Message\Serializer;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Serializer\JsonMessageEncoder;
+use Yiisoft\Queue\Message\Serializer\MessageEncoderException;
 use Yiisoft\Queue\Message\Serializer\MessageSerializer;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Tests\Unit\Support\TestMessage;
@@ -17,6 +19,48 @@ use const JSON_THROW_ON_ERROR;
 
 final class MessageSerializerTest extends TestCase
 {
+    #[TestWith(['"string"'])]
+    #[TestWith(['42'])]
+    #[TestWith(['true'])]
+    #[TestWith(['null'])]
+    public function testNonArrayPayload(string $json): void
+    {
+        $this->expectException(MessageEncoderException::class);
+        $this->expectExceptionMessage('Decoded data must be array.');
+        $this->createSerializer()->unserialize($json);
+    }
+
+    #[TestWith([1])]
+    #[TestWith([true])]
+    #[TestWith([null])]
+    #[TestWith([[]])]
+    public function testUnsupportedType(mixed $type): void
+    {
+        $value = json_encode(
+            ['type' => $type, 'data' => 'test', 'meta' => []],
+            JSON_THROW_ON_ERROR,
+        );
+
+        $this->expectException(MessageEncoderException::class);
+        $this->expectExceptionMessage(sprintf('Message type must be a string. Got %s.', get_debug_type($type)));
+        $this->createSerializer()->unserialize($value);
+    }
+
+    #[TestWith([''])]
+    #[TestWith([1])]
+    #[TestWith([true])]
+    public function testUnsupportedMetadata(mixed $metadata): void
+    {
+        $value = json_encode(
+            ['type' => 'test', 'data' => 'test', 'meta' => $metadata],
+            JSON_THROW_ON_ERROR,
+        );
+
+        $this->expectException(MessageEncoderException::class);
+        $this->expectExceptionMessage(sprintf('Metadata must be an array. Got %s.', get_debug_type($metadata)));
+        $this->createSerializer()->unserialize($value);
+    }
+
     public function testDefaultMessageClassFallbackWrongClass(): void
     {
         $payload = [

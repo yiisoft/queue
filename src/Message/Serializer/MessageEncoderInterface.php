@@ -4,40 +4,28 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message\Serializer;
 
-use Yiisoft\Queue\Message\MessageInterface;
-
 /**
- * Encodes and decodes raw message parts (type, data, metadata) to and from a string.
- *
- * @psalm-import-type MessageData from MessageInterface
- * @psalm-import-type MessageMetadata from MessageInterface
+ * Encodes and decodes a data array to and from a string.
  */
 interface MessageEncoderInterface
 {
     /**
-     * Encodes a message into a string representation.
+     * Encodes a data array into a string representation.
      *
-     * @param string $type Message type.
-     * @param bool|int|float|string|array|null $data Message payload data.
-     * @param array $metadata Message metadata.
+     * @param array $data Data to encode. Contains only scalars, nulls, and arrays — no objects or resources.
      *
      * @throws MessageEncoderException If encoding fails.
-     *
-     * @psalm-param MessageData $data
-     * @psalm-param MessageMetadata $metadata
      */
-    public function encode(string $type, bool|int|float|string|array|null $data, array $metadata): string;
+    public function encode(array $data): string;
 
     /**
-     * Decodes a string representation back into message parts.
+     * Decodes a string representation back into a value.
      *
-     * @param string $value Encoded message string.
+     * @param string $value Encoded string.
      *
-     * @return array Tuple of type, data, and metadata.
+     * @return mixed Decoded data.
      *
      * @throws MessageEncoderException If decoding fails.
-     *
-     * @psalm-return list{string, MessageData, MessageMetadata}
      */
-    public function decode(string $value): array;
+    public function decode(string $value): mixed;
 }
