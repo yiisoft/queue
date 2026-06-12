@@ -7,6 +7,6 @@ namespace Yiisoft\Queue\Message\Serializer;
 use RuntimeException;
 
 /**
- * Thrown when a {@see MessageEncoderInterface} implementation fails to encode or decode a message.
+ * Thrown when message encoding/decoding fails, or when a decoded message has an invalid format.
  */
 final class MessageEncoderException extends RuntimeException {}
