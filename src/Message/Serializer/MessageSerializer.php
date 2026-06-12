@@ -14,7 +14,7 @@ use function is_string;
 /**
  * Serializes and unserializes queue messages, preserving the original message class in metadata.
  *
- * Delegates the wire format to {@see MessageEncoderInterface}. When unserializing, restores the original message class
+ * Delegates encoding to {@see MessageEncoderInterface}. When unserializing, restores the original message class
  * from metadata, falling back to {@see GenericMessage} if the class is missing or invalid.
  */
 final class MessageSerializer implements MessageSerializerInterface
