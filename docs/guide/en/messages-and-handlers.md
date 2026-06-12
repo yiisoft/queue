@@ -129,7 +129,7 @@ Because the payload is just data, any language can produce or consume it. A Pyth
 
 ## Why JSON is the default serialization
 
-By default, `yiisoft/queue` serializes message payloads as JSON (`JsonMessageEncoder`). JSON was chosen intentionally:
+By default, `yiisoft/queue` serializes messages using `MessageSerializer` with JSON (`JsonMessageEncoder`). JSON was chosen intentionally:
 
 - **Human-readable** — you can inspect a message in a broker dashboard without any tools.
 - **Language-agnostic** — every language and runtime can produce and parse JSON.
