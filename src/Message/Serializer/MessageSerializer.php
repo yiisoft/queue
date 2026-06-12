@@ -54,7 +54,7 @@ final class MessageSerializer
      *
      * @param string $value Encoded message string.
      *
-     * @throws MessageEncoderException If decoding fails.
+     * @throws MessageEncoderException If decoding fails or the decoded payload has an invalid format.
      */
     public function unserialize(string $value): MessageInterface
     {
