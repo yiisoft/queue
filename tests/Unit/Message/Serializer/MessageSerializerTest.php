@@ -19,14 +19,14 @@ use const JSON_THROW_ON_ERROR;
 
 final class MessageSerializerTest extends TestCase
 {
-    #[TestWith(['"string"'])]
-    #[TestWith(['42'])]
-    #[TestWith(['true'])]
-    #[TestWith(['null'])]
-    public function testNonArrayPayload(string $json): void
+    #[TestWith(['"string"', 'string'])]
+    #[TestWith(['42', 'int'])]
+    #[TestWith(['true', 'bool'])]
+    #[TestWith(['null', 'null'])]
+    public function testNonArrayPayload(string $json, string $type): void
     {
         $this->expectException(MessageEncoderException::class);
-        $this->expectExceptionMessage('Decoded data must be array.');
+        $this->expectExceptionMessage(sprintf('Decoded data must be array. Got %s.', $type));
         $this->createSerializer()->unserialize($json);
     }
 
