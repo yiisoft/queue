@@ -14,8 +14,10 @@ use function is_string;
 /**
  * Serializes and unserializes queue messages, preserving the original message class in metadata.
  *
- * Delegates encoding to {@see MessageEncoderInterface}. When unserializing, restores the original message class
- * from metadata, falling back to {@see GenericMessage} if the class is missing or invalid.
+ * When serializing, assembles an array with `type`, `data`, and `meta` keys and passes it as a single array to
+ * {@see MessageEncoderInterface}, which encodes it to a string. When unserializing, decodes the string back to an
+ * array and reconstructs the original message class from the `meta` key, falling back to {@see GenericMessage}
+ * if the class is missing or invalid.
  */
 final class MessageSerializer implements MessageSerializerInterface
 {
