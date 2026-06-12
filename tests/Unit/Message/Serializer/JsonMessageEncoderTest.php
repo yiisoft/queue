@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit\Message\Serializer;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\Serializer\JsonMessageEncoder;
-use Yiisoft\Queue\Message\Serializer\MessageEncoderException;
+use Yiisoft\Queue\Message\Serializer\MessageSerializerException;
 
 final class JsonMessageEncoderTest extends TestCase
 {
@@ -35,7 +35,7 @@ final class JsonMessageEncoderTest extends TestCase
 
     public function testDecodeInvalidJson(): void
     {
-        $this->expectException(MessageEncoderException::class);
+        $this->expectException(MessageSerializerException::class);
         (new JsonMessageEncoder())->decode('{invalid}');
     }
 }

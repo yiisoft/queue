@@ -14,7 +14,7 @@ interface MessageEncoderInterface
      *
      * @param array $data Data to encode. Contains only scalars, nulls, and arrays — no objects or resources.
      *
-     * @throws MessageEncoderException If encoding fails.
+     * @throws MessageSerializerException If encoding fails.
      */
     public function encode(array $data): string;
 
@@ -25,7 +25,7 @@ interface MessageEncoderInterface
      *
      * @return mixed Decoded data.
      *
-     * @throws MessageEncoderException If decoding fails.
+     * @throws MessageSerializerException If decoding fails.
      */
     public function decode(string $value): mixed;
 }

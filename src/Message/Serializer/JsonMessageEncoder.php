@@ -18,7 +18,7 @@ final class JsonMessageEncoder implements MessageEncoderInterface
         try {
             return json_encode($data, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
-            throw new MessageEncoderException($e->getMessage(), previous: $e);
+            throw new MessageSerializerException($e->getMessage(), previous: $e);
         }
     }
 
@@ -27,7 +27,7 @@ final class JsonMessageEncoder implements MessageEncoderInterface
         try {
             return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
-            throw new MessageEncoderException($e->getMessage(), previous: $e);
+            throw new MessageSerializerException($e->getMessage(), previous: $e);
         }
     }
 }

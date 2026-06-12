@@ -136,7 +136,7 @@ By default, `yiisoft/queue` serializes messages using `MessageSerializer` with J
 - **Fast and lightweight** — no class metadata, no object graphs, no PHP-specific format.
 - **Forces payload discipline** — if your data cannot be expressed as a JSON-encodable value (strings, numbers, booleans, null, arrays, and objects), it is a sign the payload carries too much. Keep payloads simple: IDs, strings, primitive values.
 
-You can replace `JsonMessageEncoder` with your own implementation by rebinding `MessageEncoderInterface` in DI, but the default works for the vast majority of use cases.
+You can replace `JsonMessageEncoder` with your own implementation by rebinding `MessageEncoderInterface` in DI, but the default works for the vast majority of use cases. To replace the entire serialization strategy (not just the wire format), bind `MessageSerializerInterface` to your own implementation.
 
 ## Migration note: Yii2 queue
 

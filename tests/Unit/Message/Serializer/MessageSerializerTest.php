@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\Serializer\JsonMessageEncoder;
-use Yiisoft\Queue\Message\Serializer\MessageEncoderException;
+use Yiisoft\Queue\Message\Serializer\MessageSerializerException;
 use Yiisoft\Queue\Message\Serializer\MessageSerializer;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Tests\Unit\Support\TestMessage;
@@ -25,7 +25,7 @@ final class MessageSerializerTest extends TestCase
     #[TestWith(['null', 'null'])]
     public function testNonArrayPayload(string $json, string $type): void
     {
-        $this->expectException(MessageEncoderException::class);
+        $this->expectException(MessageSerializerException::class);
         $this->expectExceptionMessage(sprintf('Decoded data must be array. Got %s.', $type));
         $this->createSerializer()->unserialize($json);
     }
@@ -41,7 +41,7 @@ final class MessageSerializerTest extends TestCase
             JSON_THROW_ON_ERROR,
         );
 
-        $this->expectException(MessageEncoderException::class);
+        $this->expectException(MessageSerializerException::class);
         $this->expectExceptionMessage(sprintf('Message type must be a string. Got %s.', get_debug_type($type)));
         $this->createSerializer()->unserialize($value);
     }
@@ -56,7 +56,7 @@ final class MessageSerializerTest extends TestCase
             JSON_THROW_ON_ERROR,
         );
 
-        $this->expectException(MessageEncoderException::class);
+        $this->expectException(MessageSerializerException::class);
         $this->expectExceptionMessage(sprintf('Metadata must be an array. Got %s.', get_debug_type($metadata)));
         $this->createSerializer()->unserialize($value);
     }

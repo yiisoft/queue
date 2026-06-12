@@ -8,6 +8,8 @@ use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Message\Serializer\JsonMessageEncoder;
 use Yiisoft\Queue\Message\Serializer\MessageEncoderInterface;
+use Yiisoft\Queue\Message\Serializer\MessageSerializer;
+use Yiisoft\Queue\Message\Serializer\MessageSerializerInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
@@ -46,4 +48,5 @@ return [
         '__construct()' => ['middlewareDefinitions' => $params['yiisoft/queue']['middlewares-fail']],
     ],
     MessageEncoderInterface::class => JsonMessageEncoder::class,
+    MessageSerializerInterface::class => MessageSerializer::class,
 ];
