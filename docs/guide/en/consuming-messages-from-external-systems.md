@@ -6,7 +6,7 @@ The key idea is simple:
 
 - The queue adapter reads a *raw payload* (usually a string) from the broker.
 - The adapter passes that payload to a `Yiisoft\Queue\Message\Serializer\MessageSerializerInterface` implementation (by default `MessageSerializer`).
-- `MessageSerializer` delegates encoding to a `Yiisoft\Queue\Message\Serializer\MessageEncoderInterface` implementation.
+- `MessageSerializer` assembles the message into an array and delegates encoding it to/from a string to a `Yiisoft\Queue\Message\Serializer\MessageEncoderInterface` implementation.
 - By default, `yiisoft/queue` config binds `MessageEncoderInterface` to `Yiisoft\Queue\Message\Serializer\JsonMessageEncoder`.
 
 `JsonMessageEncoder` is only the default implementation. You can replace it with your own encoder by rebinding `Yiisoft\Queue\Message\Serializer\MessageEncoderInterface` in your DI configuration.
