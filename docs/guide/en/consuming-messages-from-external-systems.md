@@ -11,7 +11,7 @@ The key idea is simple:
 
 `JsonMessageEncoder` is only the default implementation. You can replace it with your own encoder by rebinding `Yiisoft\Queue\Message\Serializer\MessageEncoderInterface` in your DI configuration.
 
-So, external systems should produce the **same payload format** that `MessageSerializer` expects. The payload **shape** (`type`, `data`, `meta` keys) is defined by `MessageSerializer` regardless of the encoder; the encoder only converts between the raw string and an associative array (JSON ↔ array by default).
+External systems should produce the **same payload format** that `MessageSerializer` expects. The payload **shape** (`type`, `data`, `meta` keys) is defined by `MessageSerializer` regardless of the encoder; the encoder only converts between the raw string and an associative array (JSON ↔ array by default).
 
 ## 1. Message type contract (most important part)
 
