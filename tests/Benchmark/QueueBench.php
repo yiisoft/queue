@@ -10,8 +10,9 @@ use Psr\Log\NullLogger;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Message\IdEnvelope;
-use Yiisoft\Queue\Message\JsonMessageSerializer;
 use Yiisoft\Queue\Message\GenericMessage;
+use Yiisoft\Queue\Message\Serializer\JsonMessageEncoder;
+use Yiisoft\Queue\Message\Serializer\MessageSerializer;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
@@ -29,7 +30,7 @@ use Yiisoft\Test\Support\Container\SimpleContainer;
 final class QueueBench
 {
     private readonly QueueInterface $queue;
-    private readonly JsonMessageSerializer $serializer;
+    private readonly MessageSerializer $serializer;
     private readonly VoidAdapter $adapter;
 
     public function __construct()
@@ -52,7 +53,7 @@ final class QueueBench
             ),
             $callableFactory,
         );
-        $this->serializer = new JsonMessageSerializer();
+        $this->serializer = new MessageSerializer(new JsonMessageEncoder());
         $this->adapter = new VoidAdapter($this->serializer);
 
         $this->queue = new Queue(
