@@ -24,6 +24,7 @@ return [
         'middlewares-push' => [],
         'middlewares-consume' => [],
         'middlewares-fail' => [],
+        'message-class-map' => [],
     ],
     'yiisoft/yii-debug' => [
         'collectors' => [

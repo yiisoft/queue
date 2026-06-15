@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message\Serializer;
 
-use Yiisoft\Queue\Message\Envelope;
+use Yiisoft\Queue\Message\ClassResolver\ArrayMessageClassResolver;
+use Yiisoft\Queue\Message\ClassResolver\MessageClassResolverInterface;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 
@@ -12,35 +13,39 @@ use function is_array;
 use function is_string;
 
 /**
- * Serializes and unserializes queue messages, preserving the original message class in metadata.
+ * Serializes and unserializes queue messages, resolving the message class via a {@see MessageClassResolverInterface}.
  *
  * When serializing, assembles an array with `type`, `data`, and `meta` keys and passes it as a single array to
  * {@see MessageEncoderInterface}, which encodes it to a string. When unserializing, decodes the string back to an
- * array and reconstructs the original message class from the `meta` key, falling back to {@see GenericMessage}
- * if the class is missing or invalid.
+ * array and resolves the message class from the type via the resolver, falling back to {@see GenericMessage}
+ * if the type is not registered.
  */
 final class MessageSerializer implements MessageSerializerInterface
 {
-    private const META_MESSAGE_CLASS = 'message-class';
+    private readonly MessageClassResolverInterface $resolver;
 
+    /**
+     * @param MessageEncoderInterface $encoder Encoder used to encode and decode message data.
+     * @param MessageClassResolverInterface|array $classResolver Resolver for message classes, or a map of type to
+     * class.
+     *
+     * @psalm-param MessageClassResolverInterface|array<string, class-string<MessageInterface>> $classResolver
+     */
     public function __construct(
         private readonly MessageEncoderInterface $encoder,
-    ) {}
+        MessageClassResolverInterface|array $classResolver = [],
+    ) {
+        $this->resolver = is_array($classResolver)
+            ? new ArrayMessageClassResolver($classResolver)
+            : $classResolver;
+    }
 
     public function serialize(MessageInterface $message): string
     {
-        $metadata = $message->getMetadata();
-
-        if (!isset($metadata[self::META_MESSAGE_CLASS])) {
-            $metadata[self::META_MESSAGE_CLASS] = $message instanceof Envelope
-                ? $message->getMessage()::class
-                : $message::class;
-        }
-
         return $this->encoder->encode([
             'type' => $message->getType(),
             'data' => $message->getData(),
-            'meta' => $metadata,
+            'meta' => $message->getMetadata(),
         ]);
     }
 
@@ -62,15 +67,7 @@ final class MessageSerializer implements MessageSerializerInterface
             throw new MessageSerializerException('Metadata must be an array. Got ' . get_debug_type($metadata) . '.');
         }
 
-        $class = $metadata[self::META_MESSAGE_CLASS] ?? GenericMessage::class;
-
-        // Don't check subclasses when it's a default class: that's faster
-        if ($class !== GenericMessage::class
-            && (!is_string($class) || !is_subclass_of($class, MessageInterface::class))
-        ) {
-            $class = GenericMessage::class;
-        }
-        /** @var class-string<MessageInterface> $class */
+        $class = $this->resolver->resolve($type) ?? GenericMessage::class;
 
         return $class::fromData($type, $data['data'] ?? null)->withMetadata($metadata);
     }
