@@ -61,22 +61,7 @@ final class MessageSerializerTest extends TestCase
         $this->createSerializer()->unserialize($value);
     }
 
-    public function testDefaultMessageClassFallbackWrongClass(): void
-    {
-        $payload = [
-            'type' => 'handler',
-            'data' => 'test',
-            'meta' => [
-                'message-class' => 'NonExistentClass',
-            ],
-        ];
-
-        $message = $this->createSerializer()->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
-
-        $this->assertInstanceOf(GenericMessage::class, $message);
-    }
-
-    public function testDefaultMessageClassFallbackClassNotSet(): void
+    public function testFallbackToGenericMessageForUnknownType(): void
     {
         $payload = [
             'type' => 'handler',
@@ -84,7 +69,7 @@ final class MessageSerializerTest extends TestCase
             'meta' => [],
         ];
 
-        $message = $this->createSerializer()->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
+        $message = $this->createSerializer()->unserialize(json_encode($payload));
 
         $this->assertInstanceOf(GenericMessage::class, $message);
     }
@@ -116,7 +101,7 @@ final class MessageSerializerTest extends TestCase
         $json = $this->createSerializer()->serialize($message);
 
         $this->assertEquals(
-            '{"type":"handler","data":"test","meta":{"message-class":"Yiisoft\\\\Queue\\\\Message\\\\GenericMessage"}}',
+            '{"type":"handler","data":"test","meta":[]}',
             $json,
         );
     }
@@ -129,11 +114,7 @@ final class MessageSerializerTest extends TestCase
         $json = $serializer->serialize($message);
 
         $this->assertEquals(
-            sprintf(
-                '{"type":"handler","data":"test","meta":{"%s":"test-id","message-class":"%s"}}',
-                IdEnvelope::META_ID,
-                str_replace('\\', '\\\\', GenericMessage::class),
-            ),
+            sprintf('{"type":"handler","data":"test","meta":{"%s":"test-id"}}', IdEnvelope::META_ID),
             $json,
         );
 
@@ -142,14 +123,13 @@ final class MessageSerializerTest extends TestCase
         $this->assertInstanceOf(GenericMessage::class, $restored);
         $this->assertEquals([
             IdEnvelope::META_ID => 'test-id',
-            'message-class' => GenericMessage::class,
         ], $restored->getMetadata());
     }
 
     public function testRestoreOriginalMessageClass(): void
     {
         $message = new TestMessage();
-        $serializer = $this->createSerializer();
+        $serializer = $this->createSerializer(['test' => TestMessage::class]);
 
         $restored = $serializer->unserialize($serializer->serialize($message));
 
@@ -159,15 +139,15 @@ final class MessageSerializerTest extends TestCase
     public function testRestoreOriginalMessageClassWithEnvelope(): void
     {
         $message = new IdEnvelope(new TestMessage(), 1);
-        $serializer = $this->createSerializer();
+        $serializer = $this->createSerializer(['test' => TestMessage::class]);
 
         $restored = $serializer->unserialize($serializer->serialize($message));
 
         $this->assertInstanceOf(TestMessage::class, $restored);
     }
 
-    private function createSerializer(): MessageSerializer
+    private function createSerializer(array $classResolver = []): MessageSerializer
     {
-        return new MessageSerializer(new JsonMessageEncoder());
+        return new MessageSerializer(new JsonMessageEncoder(), $classResolver);
     }
 }

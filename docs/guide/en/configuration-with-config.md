@@ -13,6 +13,23 @@ Advanced applications eventually need the following tweaks:
 
 - **Queue names** — configure queue/back-end per logical queue name via [`yiisoft/queue.queues` config](queue-names.md) when you need to parallelize message handling or send some of them to a different application.
 - **Named handlers or callable definitions** — map a short message type to a callable in [`yiisoft/queue.handlers` config](message-handler-advanced.md) when another application is the message producer and you cannot use FQCN as message type.
+- **Message class map** — map message types to specific message classes so that
+  `MessageSerializerInterface::unserialize()` reconstructs the original typed object instead of falling back
+  to `GenericMessage`. Configure via `yiisoft/queue.messages`:
+
+  ```php
+  return [
+      'yiisoft/queue' => [
+          'messages' => [
+              'send-email' => SendEmailMessage::class,
+              'download-file' => DownloadFileMessage::class,
+          ],
+      ],
+  ];
+  ```
+
+  When a type is not present in the map, `GenericMessage` is used as a fallback.
+
 - **Middleware pipelines** — adjust push/consume/failure behavior: collect metrics, modify messages, and so on. See [Middleware pipelines](middleware-pipelines.md) for details.
 
 If you don't have a broker yet (for development, testing, or as a stepping stone before introducing
