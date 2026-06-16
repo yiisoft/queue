@@ -54,7 +54,7 @@ return [
     MessageClassResolverInterface::class => [
         'class' => ArrayMessageClassResolver::class,
         '__construct()' => [
-            'map' => $params['yiisoft/queue']['message-class-map'],
+            'map' => $params['yiisoft/queue']['messages'],
         ],
     ],
 ];

@@ -14,12 +14,12 @@ Advanced applications eventually need the following tweaks:
 - **Queue names** — configure queue/back-end per logical queue name via [`yiisoft/queue.queues` config](queue-names.md) when you need to parallelize message handling or send some of them to a different application.
 - **Named handlers or callable definitions** — map a short message type to a callable in [`yiisoft/queue.handlers` config](message-handler-advanced.md) when another application is the message producer and you cannot use FQCN as message type.
 - **Message class map** — map message types to specific message classes so that `unserialize()` reconstructs the
-  original typed object instead of falling back to `GenericMessage`. Configure via `yiisoft/queue.message-class-map`:
+  original typed object instead of falling back to `GenericMessage`. Configure via `yiisoft/queue.messages`:
 
   ```php
   return [
       'yiisoft/queue' => [
-          'message-class-map' => [
+          'messages' => [
               'send-email' => SendEmailMessage::class,
               'download-file' => DownloadFileMessage::class,
           ],
