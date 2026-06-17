@@ -21,7 +21,7 @@ To wrap a message into an envelope, envelope classes provide:
 
 and, via `MessageInterface` inheritance, also support:
 
-- `Envelope::fromPayload(string $type, mixed $payload, array $metadata = []): static`
+- `Envelope::fromPayload(string $type, mixed $payload): static`
 
 ## Built-in envelopes
 
