@@ -42,7 +42,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processPush(
                 $this->getMessage(),
                 $this->createMock(PushHandlerInterface::class),
-            )->getData(),
+            )->getPayload(),
         );
     }
 
@@ -59,7 +59,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processPush(
                 $this->getMessage(),
                 $this->createMock(PushHandlerInterface::class),
-            )->getData(),
+            )->getPayload(),
         );
     }
 
@@ -76,7 +76,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processPush(
                 $this->getMessage(),
                 $this->createMock(PushHandlerInterface::class),
-            )->getData(),
+            )->getPayload(),
         );
     }
 
@@ -90,7 +90,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processPush(
                 $this->getMessage(),
                 $this->getRequestHandler(),
-            )->getData(),
+            )->getPayload(),
         );
     }
 
@@ -104,7 +104,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processPush(
                 $this->getMessage(),
                 $this->getRequestHandler(),
-            )->getData(),
+            )->getPayload(),
         );
     }
 
@@ -118,7 +118,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processPush(
                 $this->getMessage(),
                 $this->createMock(PushHandlerInterface::class),
-            )->getData(),
+            )->getPayload(),
         );
     }
 
@@ -132,7 +132,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processPush(
                 $this->getMessage(),
                 $this->createMock(PushHandlerInterface::class),
-            )->getData(),
+            )->getPayload(),
         );
     }
 

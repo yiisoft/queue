@@ -19,9 +19,9 @@ being consumed. In the new package, it is divided into two different concepts: a
 
 - A `Message` is a class implementing `MessageInterface`. It contains two types of data:
     - Type. The worker uses it to find the right handler for a message.
-    - Data. Any serializable data that should be used by the message handler.
+    - Payload. Any serializable data that should be used by the message handler.
     
-    All the message data is fully serializable (that means message `data` must be serializable too). It allows you to
+    All the message payload is fully serializable (that means message `payload` must be serializable too). It allows you to
     freely choose where and how to send and process messages. Both can be implemented in a single application, or
     separated into multiple applications, or you can do sending/processing only, leaving part of the work to another
     system including non-PHP ones (for example, a Go service handling CPU-intensive jobs).

@@ -35,14 +35,14 @@ abstract class Envelope implements MessageInterface
     }
 
     /**
-     * Envelopes cannot be created from raw data. Use {@see fromMessage()} to wrap an existing message instead.
+     * Envelopes cannot be created from a raw payload. Use {@see fromMessage()} to wrap an existing message instead.
      *
      * @throws LogicException Always, since this method is not supported for envelopes.
      */
-    final public static function fromData(string $type, mixed $data): static
+    final public static function fromPayload(string $type, mixed $payload): static
     {
         throw new LogicException(
-            'Envelopes cannot be created via "fromData()". Wrap an existing "MessageInterface" instance instead.',
+            'Envelopes cannot be created via "fromPayload()". Wrap an existing "MessageInterface" instance instead.',
         );
     }
 
@@ -63,9 +63,9 @@ abstract class Envelope implements MessageInterface
         return $this->message->getType();
     }
 
-    final public function getData(): bool|int|float|string|array|null
+    final public function getPayload(): bool|int|float|string|array|null
     {
-        return $this->message->getData();
+        return $this->message->getPayload();
     }
 
     /**

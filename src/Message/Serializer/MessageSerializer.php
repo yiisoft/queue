@@ -15,7 +15,7 @@ use function is_string;
 /**
  * Serializes and unserializes queue messages, resolving the message class via a {@see MessageClassResolverInterface}.
  *
- * When serializing, assembles an array with `type`, `data`, and `meta` keys and passes it as a single array to
+ * When serializing, assembles an array with `type`, `payload`, and `meta` keys and passes it as a single array to
  * {@see MessageEncoderInterface}, which encodes it to a string. When unserializing, decodes the string back to an
  * array and resolves the message class from the type via the resolver, falling back to {@see GenericMessage}
  * if the type is not registered.
@@ -44,7 +44,7 @@ final class MessageSerializer implements MessageSerializerInterface
     {
         return $this->encoder->encode([
             'type' => $message->getType(),
-            'data' => $message->getData(),
+            'payload' => $message->getPayload(),
             'meta' => $message->getMetadata(),
         ]);
     }
@@ -69,6 +69,6 @@ final class MessageSerializer implements MessageSerializerInterface
 
         $class = $this->resolver->resolve($type) ?? GenericMessage::class;
 
-        return $class::fromData($type, $data['data'] ?? null)->withMetadata($metadata);
+        return $class::fromPayload($type, $data['payload'] ?? null)->withMetadata($metadata);
     }
 }

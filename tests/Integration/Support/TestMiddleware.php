@@ -18,7 +18,7 @@ final class TestMiddleware implements PushMiddlewareInterface, ConsumeMiddleware
 
     public function processPush(MessageInterface $message, PushHandlerInterface $handler): MessageInterface
     {
-        $stack = $message->getData();
+        $stack = $message->getPayload();
         $stack[] = $this->stage;
 
         return $handler->handlePush(new GenericMessage($message->getType(), $stack));
@@ -27,7 +27,7 @@ final class TestMiddleware implements PushMiddlewareInterface, ConsumeMiddleware
     public function processConsume(ConsumeRequest $request, ConsumeHandlerInterface $handler): ConsumeRequest
     {
         $message = $request->getMessage();
-        $stack = $message->getData();
+        $stack = $message->getPayload();
         $stack[] = $this->stage;
         $messageNew = new GenericMessage($message->getType(), $stack);
 

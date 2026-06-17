@@ -34,7 +34,7 @@ final class MiddlewareDispatcherTest extends TestCase
         );
 
         $result = $dispatcher->dispatch($message);
-        $this->assertSame('New closure test data', $result->getData());
+        $this->assertSame('New closure test data', $result->getPayload());
     }
 
     public function testArrayMiddlewareCallableDefinition(): void
@@ -47,7 +47,7 @@ final class MiddlewareDispatcherTest extends TestCase
         );
         $dispatcher = $this->createDispatcher($container)->withMiddlewares([[TestCallableMiddleware::class, 'index']]);
         $result = $dispatcher->dispatch($message);
-        $this->assertSame('New test data', $result->getData());
+        $this->assertSame('New test data', $result->getPayload());
     }
 
     public function testFactoryArrayDefinition(): void
@@ -60,7 +60,7 @@ final class MiddlewareDispatcherTest extends TestCase
         ];
         $dispatcher = $this->createDispatcher($container)->withMiddlewares([$definition]);
         $result = $dispatcher->dispatch($message);
-        $this->assertSame('New test data from the definition', $result->getData());
+        $this->assertSame('New test data from the definition', $result->getPayload());
     }
 
     public function testMiddlewareFullStackCalled(): void
@@ -77,7 +77,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
         $result = $dispatcher->dispatch($message);
-        $this->assertSame('new test data', $result->getData());
+        $this->assertSame('new test data', $result->getPayload());
     }
 
     public function testMiddlewareStackInterrupted(): void
@@ -90,7 +90,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
         $result = $dispatcher->dispatch($message);
-        $this->assertSame('first', $result->getData());
+        $this->assertSame('first', $result->getPayload());
     }
 
     public static function dataHasMiddlewares(): array
@@ -134,7 +134,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $dispatcher->withMiddlewares([TestMiddleware::class]);
         $result = $dispatcher->dispatch($message);
 
-        self::assertSame('New middleware test data', $result->getData());
+        self::assertSame('New middleware test data', $result->getPayload());
     }
 
     private function createDispatcher(

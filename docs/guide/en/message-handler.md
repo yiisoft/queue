@@ -19,12 +19,12 @@ final class RemoteFileMessage extends Message
 {
     public function __construct(public readonly string $url) {}
 
-    public static function fromData(string $type, bool|int|float|string|array|null $data): static
+    public static function fromPayload(string $type, bool|int|float|string|array|null $payload): static
     {
-        if (!is_array($data) || !is_string($data['url'] ?? null)) {
+        if (!is_array($payload) || !is_string($payload['url'] ?? null)) {
             throw new \InvalidArgumentException('Invalid data for ' . self::class . '.');
         }
-        return new self($data['url']);
+        return new self($payload['url']);
     }
 
     public function getType(): string
@@ -32,7 +32,7 @@ final class RemoteFileMessage extends Message
         return \App\Queue\RemoteFileHandler::class;
     }
 
-    public function getData(): array
+    public function getPayload(): array
     {
         return ['url' => $this->url];
     }

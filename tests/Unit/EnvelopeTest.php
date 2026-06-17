@@ -15,7 +15,7 @@ final class EnvelopeTest extends TestCase
         $message = new GenericMessage('handler', 'test');
         $message = new IdEnvelope($message, 'test-id');
 
-        $this->assertEquals('test', $message->getMessage()->getData());
+        $this->assertEquals('test', $message->getMessage()->getPayload());
         $this->assertEquals('test-id', $message->getMetadata()[IdEnvelope::META_ID]);
     }
 
@@ -26,7 +26,7 @@ final class EnvelopeTest extends TestCase
         $message = new IdEnvelope($message, 'test-id-2');
         $message = new IdEnvelope($message, 'test-id-3');
 
-        $this->assertEquals('test', $message->getMessage()->getData());
+        $this->assertEquals('test', $message->getMessage()->getPayload());
         $this->assertEquals('test-id-3', $message->getMetadata()[IdEnvelope::META_ID]);
     }
 }

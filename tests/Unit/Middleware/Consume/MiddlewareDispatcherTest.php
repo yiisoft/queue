@@ -36,7 +36,7 @@ final class MiddlewareDispatcherTest extends TestCase
         );
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
-        $this->assertSame('New closure test data', $request->getMessage()->getData());
+        $this->assertSame('New closure test data', $request->getMessage()->getPayload());
     }
 
     public function testArrayMiddlewareCallableDefinition(): void
@@ -49,7 +49,7 @@ final class MiddlewareDispatcherTest extends TestCase
         );
         $dispatcher = $this->createDispatcher($container)->withMiddlewares([[TestCallableMiddleware::class, 'index']]);
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
-        $this->assertSame('New test data', $request->getMessage()->getData());
+        $this->assertSame('New test data', $request->getMessage()->getPayload());
     }
 
     public function testFactoryArrayDefinition(): void
@@ -62,7 +62,7 @@ final class MiddlewareDispatcherTest extends TestCase
         ];
         $dispatcher = $this->createDispatcher($container)->withMiddlewares([$definition]);
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
-        $this->assertSame('New test data from the definition', $request->getMessage()->getData());
+        $this->assertSame('New test data from the definition', $request->getMessage()->getPayload());
     }
 
     public function testMiddlewareFullStackCalled(): void
@@ -75,7 +75,7 @@ final class MiddlewareDispatcherTest extends TestCase
             return $handler->handleConsume($request);
         };
         $middleware2 = static function (ConsumeRequest $request, ConsumeHandlerInterface $handler): ConsumeRequest {
-            $request = $request->withMessage(new GenericMessage('new handler', $request->getMessage()->getData()));
+            $request = $request->withMessage(new GenericMessage('new handler', $request->getMessage()->getPayload()));
 
             return $handler->handleConsume($request);
         };
@@ -83,7 +83,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
-        $this->assertSame('new test data', $request->getMessage()->getData());
+        $this->assertSame('new test data', $request->getMessage()->getPayload());
         $this->assertSame('new handler', $request->getMessage()->getType());
     }
 
@@ -101,7 +101,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
-        $this->assertSame('first', $request->getMessage()->getData());
+        $this->assertSame('first', $request->getMessage()->getPayload());
     }
 
     public static function dataHasMiddlewares(): array
@@ -145,7 +145,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $dispatcher->withMiddlewares([TestMiddleware::class]);
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
 
-        self::assertSame('New middleware test data', $request->getMessage()->getData());
+        self::assertSame('New middleware test data', $request->getMessage()->getPayload());
     }
 
     private function getRequestHandler(): ConsumeHandlerInterface

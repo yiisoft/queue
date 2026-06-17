@@ -27,7 +27,7 @@ final class IdMiddlewareTest extends TestCase
         $this->assertSame($message, $result);
         $this->assertNotInstanceOf(IdEnvelope::class, $result);
         $this->assertEquals('test-id', $result->getMetadata()[IdEnvelope::META_ID]);
-        $this->assertSame($message->getData(), $result->getData());
+        $this->assertSame($message->getPayload(), $result->getPayload());
         $this->assertSame($message->getType(), $result->getType());
     }
 
@@ -46,7 +46,7 @@ final class IdMiddlewareTest extends TestCase
         $this->assertInstanceOf(IdEnvelope::class, $result);
         $this->assertNotSame($message, $result);
         $this->assertNotEmpty($result->getMetadata()[IdEnvelope::META_ID] ?? null);
-        $this->assertSame($message->getData(), $result->getData());
+        $this->assertSame($message->getPayload(), $result->getPayload());
         $this->assertSame($message->getType(), $result->getType());
     }
 
@@ -66,7 +66,7 @@ final class IdMiddlewareTest extends TestCase
         $this->assertNotSame($message, $result);
         $this->assertNotEmpty($result->getMetadata()[IdEnvelope::META_ID] ?? null);
         $this->assertNotSame('', $result->getMetadata()[IdEnvelope::META_ID]);
-        $this->assertSame($message->getData(), $result->getData());
+        $this->assertSame($message->getPayload(), $result->getPayload());
         $this->assertSame($message->getType(), $result->getType());
     }
 }

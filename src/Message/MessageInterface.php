@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Message;
 /**
  * Represents a queue message with a type identifier, payload data, and metadata.
  *
- * @psalm-type MessageData = scalar|null|array<scalar|null|array>
+ * @psalm-type MessagePayload = scalar|null|array<scalar|null|array>
  * @psalm-type MessageMetadata = array<string, scalar|null|array<scalar|null|array>>
  */
 interface MessageInterface
@@ -16,12 +16,12 @@ interface MessageInterface
      * Creates a new message instance from the given type and payload data.
      *
      * @param string $type Message type.
-     * @param bool|int|float|string|array|null $data Message payload data. Must contain only `null`, scalars (`bool`,
+     * @param bool|int|float|string|array|null $payload Message payload data. Must contain only `null`, scalars (`bool`,
      * `int`, `float`, `string`), or arrays composed of the same types recursively.
      *
-     * @psalm-param MessageData $data
+     * @psalm-param MessagePayload $payload
      */
-    public static function fromData(string $type, bool|int|float|string|array|null $data): self;
+    public static function fromPayload(string $type, bool|int|float|string|array|null $payload): self;
 
     /**
      * Returns message type.
@@ -36,9 +36,9 @@ interface MessageInterface
      * @return bool|int|float|string|array|null Payload data containing only `null`, scalars (`bool`, `int`, `float`,
      * `string`), or arrays composed of the same types recursively.
      *
-     * @psalm-return MessageData
+     * @psalm-return MessagePayload
      */
-    public function getData(): bool|int|float|string|array|null;
+    public function getPayload(): bool|int|float|string|array|null;
 
     /**
      * Returns message metadata: timings, attempt count, metrics, etc. Keys are always strings.

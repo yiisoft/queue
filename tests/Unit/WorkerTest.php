@@ -150,7 +150,7 @@ final class WorkerTest extends TestCase
         } catch (MessageFailureException $exception) {
             self::assertSame($exception::class, MessageFailureException::class);
             self::assertSame($exception->getMessage(), "Processing of message without ID is stopped because of an exception:\nTest exception.");
-            self::assertEquals(['test-data'], $exception->getQueueMessage()->getData());
+            self::assertEquals(['test-data'], $exception->getQueueMessage()->getPayload());
         } finally {
             $messages = $logger->getMessages();
             $this->assertNotEmpty($messages);

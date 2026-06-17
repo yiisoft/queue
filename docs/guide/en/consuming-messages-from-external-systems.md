@@ -38,7 +38,7 @@ External producer then always publishes `"type": "file-download"`.
 `Yiisoft\Queue\Message\Serializer\MessageSerializer` expects the decoded payload to be an object with these keys (with the default `JsonMessageEncoder`, the message is a JSON string):
 
 - `type` (string, required)
-- `data` (any JSON value, optional; defaults to `null`)
+- `payload` (any JSON value, optional; defaults to `null`)
 - `meta` (object, optional; defaults to `{}`)
 
 Minimal example:
@@ -46,7 +46,7 @@ Minimal example:
 ```json
 {
   "type": "file-download",
-  "data": {
+  "payload": {
     "url": "https://example.com/file.pdf",
     "destinationFile": "/tmp/file.pdf"
   }
@@ -58,7 +58,7 @@ Full example:
 ```json
 {
   "type": "file-download",
-  "data": {
+  "payload": {
     "url": "https://example.com/file.pdf",
     "destinationFile": "/tmp/file.pdf"
   },
@@ -76,7 +76,7 @@ The `meta` key is a general-purpose metadata container (for example, tracing, co
 ## 3. Data encoding rules
 
 - The payload must be UTF-8 JSON.
-- `data` and `meta` must contain only JSON-encodable values:
+- `payload` and `meta` must contain only JSON-encodable values:
   - strings, numbers, booleans, null
   - arrays
   - objects (maps)
@@ -106,7 +106,7 @@ import json
 
 payload = {
     "type": "file-download",
-    "data": {"url": "https://example.com/file.pdf"}
+    "payload": {"url": "https://example.com/file.pdf"}
 }
 
 body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -117,7 +117,7 @@ body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
 ```js
 const payload = {
   type: 'file-download',
-  data: { url: 'https://example.com/file.pdf' },
+  payload: { url: 'https://example.com/file.pdf' },
 };
 
 const body = Buffer.from(JSON.stringify(payload), 'utf8');
@@ -128,6 +128,6 @@ const body = Buffer.from(JSON.stringify(payload), 'utf8');
 ```sh
 curl -X POST \
   -H 'Content-Type: application/json' \
-  --data '{"type":"file-download","data":{"url":"https://example.com/file.pdf"}}' \
+  --data '{"type":"file-download","payload":{"url":"https://example.com/file.pdf"}}' \
   https://your-broker-gateway.example.com/publish
 ```

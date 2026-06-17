@@ -16,18 +16,18 @@ final class DownloadFileMessage extends Message
         public readonly string $destinationPath,
     ) {}
 
-    public static function fromData(string $type, bool|int|float|string|array|null $data): static
+    public static function fromPayload(string $type, bool|int|float|string|array|null $payload): static
     {
         if ($type !== self::TYPE) {
             throw new \InvalidArgumentException("Expected type \"" . self::TYPE . "\", got \"$type\".");
         }
-        if (!is_array($data)
-            || !is_string($data['url'] ?? null)
-            || !is_string($data['destinationPath'] ?? null)
+        if (!is_array($payload)
+            || !is_string($payload['url'] ?? null)
+            || !is_string($payload['destinationPath'] ?? null)
         ) {
             throw new \InvalidArgumentException('Invalid data for ' . self::class . '.');
         }
-        return new self($data['url'], $data['destinationPath']);
+        return new self($payload['url'], $payload['destinationPath']);
     }
 
     public function getType(): string
@@ -35,7 +35,7 @@ final class DownloadFileMessage extends Message
         return self::TYPE;
     }
 
-    public function getData(): array
+    public function getPayload(): array
     {
         return ['url' => $this->url, 'destinationPath' => $this->destinationPath];
     }
@@ -110,4 +110,4 @@ For details and edge cases, see [Message status](message-status.md).
 
 Messages are pushed in one process and consumed in another. Avoid relying on in-process state (open connections, cached objects, etc.) that may not be available in the worker process.
 
-All data needed to handle a message must be included in the payload passed to `getData()`.
+All data needed to handle a message must be included in the payload passed to `getPayload()`.
