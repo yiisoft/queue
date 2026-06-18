@@ -74,7 +74,7 @@ final class MiddlewareTest extends TestCase
         $message = new GenericMessage('test', ['initial']);
         $messagePushed = $queue->push($message);
 
-        self::assertEquals($stack, $messagePushed->getData());
+        self::assertEquals($stack, $messagePushed->getPayload());
     }
 
     public function testFullStackConsume(): void
@@ -116,7 +116,7 @@ final class MiddlewareTest extends TestCase
         $message = new GenericMessage('test', ['initial']);
         $messageConsumed = $worker->process($message, $this->createMock(QueueInterface::class));
 
-        self::assertEquals($stack, $messageConsumed->getData());
+        self::assertEquals($stack, $messageConsumed->getPayload());
     }
 
     public function testFullStackFailure(): void

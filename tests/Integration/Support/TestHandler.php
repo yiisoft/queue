@@ -13,6 +13,6 @@ final class TestHandler implements MessageHandlerInterface
 
     public function handle(MessageInterface $message): void
     {
-        $this->messagesProcessed[] = $message->getData();
+        $this->messagesProcessed[] = $message->getPayload();
     }
 }

@@ -9,25 +9,25 @@ namespace Yiisoft\Queue\Message;
  *
  * Prefer creating custom message classes that better express your domain.
  *
- * @psalm-import-type MessageData from MessageInterface
+ * @psalm-import-type MessagePayload from MessageInterface
  */
 final class GenericMessage extends Message
 {
     /**
      * @param string $type A message type used to resolve the handler.
-     * @param bool|int|float|string|array|null $data Message payload data. Must contain only `null`, scalars (`bool`,
+     * @param bool|int|float|string|array|null $payload Message payload data. Must contain only `null`, scalars (`bool`,
      * `int`, `float`, `string`), or arrays composed of the same types recursively.
      *
-     * @psalm-param MessageData $data
+     * @psalm-param MessagePayload $payload
      */
     public function __construct(
         private readonly string $type,
-        private readonly bool|int|float|string|array|null $data,
+        private readonly bool|int|float|string|array|null $payload,
     ) {}
 
-    public static function fromData(string $type, bool|int|float|string|array|null $data): MessageInterface
+    public static function fromPayload(string $type, bool|int|float|string|array|null $payload): MessageInterface
     {
-        return new self($type, $data);
+        return new self($type, $payload);
     }
 
     public function getType(): string
@@ -35,8 +35,8 @@ final class GenericMessage extends Message
         return $this->type;
     }
 
-    public function getData(): bool|int|float|string|array|null
+    public function getPayload(): bool|int|float|string|array|null
     {
-        return $this->data;
+        return $this->payload;
     }
 }

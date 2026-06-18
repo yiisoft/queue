@@ -26,11 +26,11 @@ final class InMemoryAdapterTest extends TestCase
         $this->assertInstanceOf(IdEnvelope::class, $envelope3);
 
         $this->assertSame(0, $envelope1->getId());
-        $this->assertSame('a', $envelope1->getMessage()->getData());
+        $this->assertSame('a', $envelope1->getMessage()->getPayload());
         $this->assertSame(1, $envelope2->getId());
-        $this->assertSame('b', $envelope2->getMessage()->getData());
+        $this->assertSame('b', $envelope2->getMessage()->getPayload());
         $this->assertSame(2, $envelope3->getId());
-        $this->assertSame('c', $envelope3->getMessage()->getData());
+        $this->assertSame('c', $envelope3->getMessage()->getPayload());
     }
 
     public function testStatusWaitingForPushedMessage(): void
@@ -86,7 +86,7 @@ final class InMemoryAdapterTest extends TestCase
         $processed = [];
         $adapter->runExisting(
             static function (MessageInterface $message) use (&$processed): bool {
-                $processed[] = $message->getData();
+                $processed[] = $message->getPayload();
                 return true;
             },
         );
@@ -104,7 +104,7 @@ final class InMemoryAdapterTest extends TestCase
         $processed = [];
         $adapter->runExisting(
             static function (MessageInterface $message) use (&$processed): bool {
-                $processed[] = $message->getData();
+                $processed[] = $message->getPayload();
                 return false;
             },
         );
@@ -163,7 +163,7 @@ final class InMemoryAdapterTest extends TestCase
         $processed = [];
         $adapter->subscribe(
             static function (MessageInterface $message) use (&$processed): bool {
-                $processed[] = $message->getData();
+                $processed[] = $message->getPayload();
                 return true;
             },
         );

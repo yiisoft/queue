@@ -17,7 +17,7 @@ final class DelayEnvelopeTest extends TestCase
 
         self::assertSame($message, $delayEnvelope->getMessage());
         self::assertSame('test', $delayEnvelope->getType());
-        self::assertSame(['data' => 'value'], $delayEnvelope->getData());
+        self::assertSame(['data' => 'value'], $delayEnvelope->getPayload());
         self::assertSame(300.5, $delayEnvelope->getDelaySeconds());
         self::assertSame(
             [DelayEnvelope::META_DELAY_SECONDS => 300.5],
@@ -34,7 +34,7 @@ final class DelayEnvelopeTest extends TestCase
 
         self::assertSame(150.0, $delayEnvelope->getDelaySeconds());
         self::assertSame('test', $delayEnvelope->getType());
-        self::assertSame(['data' => 'value'], $delayEnvelope->getData());
+        self::assertSame(['data' => 'value'], $delayEnvelope->getPayload());
     }
 
     public function testFromMessageWithoutDelay(): void

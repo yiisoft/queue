@@ -81,7 +81,7 @@ See [Best practices](best-practices.md) for general message handler design guide
 ```php
 public function handle(MessageInterface $message): void
 {
-    $largeData = $this->loadLargeDataset($message->getData()['id']);
+    $largeData = $this->loadLargeDataset($message->getPayload()['id']);
     
     $this->processData($largeData);
     
@@ -99,7 +99,7 @@ class Handler implements MessageHandlerInterface
     
     public function handle(MessageInterface $message): void
     {
-        self::$cache[$message->getData()['id']] = $this->load(...);
+        self::$cache[$message->getPayload()['id']] = $this->load(...);
         // Cache grows indefinitely
     }
 }
@@ -111,7 +111,7 @@ class Handler implements MessageHandlerInterface
     
     public function handle(MessageInterface $message): void
     {
-        $this->cache->set($message->getData()['id'], $this->load(...));
+        $this->cache->set($message->getPayload()['id'], $this->load(...));
     }
 }
 ```
@@ -247,7 +247,7 @@ $queue->push(new Message(SendBulkEmailHandler::class, [
 ```php
 public function handle(MessageInterface $message): void
 {
-    $userIds = $message->getData()['userIds'];
+    $userIds = $message->getPayload()['userIds'];
     
     // Process in chunks to avoid memory issues
     foreach (array_chunk($userIds, 100) as $chunk) {
@@ -287,7 +287,7 @@ Combine multiple operations into fewer queries:
 ```php
 public function handle(MessageInterface $message): void
 {
-    foreach ($message->getData()['items'] as $item) {
+    foreach ($message->getPayload()['items'] as $item) {
         $this->db->insert('items', $item); // N queries
     }
 }
@@ -298,7 +298,7 @@ public function handle(MessageInterface $message): void
 ```php
 public function handle(MessageInterface $message): void
 {
-    $this->db->batchInsert('items', $message->getData()['items']); // 1 query
+    $this->db->batchInsert('items', $message->getPayload()['items']); // 1 query
 }
 ```
 
@@ -360,7 +360,7 @@ public function handle(MessageInterface $message): void
     $profiler = new Profiler();
     
     $profiler->start('database');
-    $data = $this->loadData($message->getData()['id']);
+    $data = $this->loadData($message->getPayload()['id']);
     $profiler->stop('database');
     
     $profiler->start('processing');

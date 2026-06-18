@@ -14,8 +14,8 @@ final class EnvelopeTest extends TestCase
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
-            'Envelopes cannot be created via "fromData()". Wrap an existing "MessageInterface" instance instead.',
+            'Envelopes cannot be created via "fromPayload()". Wrap an existing "MessageInterface" instance instead.',
         );
-        DummyEnvelope::fromData('test', []);
+        DummyEnvelope::fromPayload('test', []);
     }
 }

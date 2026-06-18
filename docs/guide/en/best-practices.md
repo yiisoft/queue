@@ -13,7 +13,7 @@ final class ProcessPaymentHandler implements MessageHandlerInterface
 {
     public function handle(MessageInterface $message): void
     {
-        $paymentId = $message->getData()['paymentId'];
+        $paymentId = $message->getPayload()['paymentId'];
         
         // Always processes payment, even if already done
         $this->paymentService->process($paymentId);
@@ -28,7 +28,7 @@ final class ProcessPaymentHandler implements MessageHandlerInterface
 {
     public function handle(MessageInterface $message): void
     {
-        $paymentId = $message->getData()['paymentId'];
+        $paymentId = $message->getPayload()['paymentId'];
         
         // Check if already processed
         if ($this->paymentRepository->isProcessed($paymentId)) {
@@ -64,7 +64,7 @@ final class ProcessPaymentHandler implements MessageHandlerInterface
 
     public function handle(MessageInterface $message): void
     {
-        $paymentId = $message->getData()['paymentId'];
+        $paymentId = $message->getPayload()['paymentId'];
 
         // State leaks between messages and grows over time
         if (isset($this->processedIds[$paymentId])) {
@@ -84,7 +84,7 @@ final class ProcessPaymentHandler implements MessageHandlerInterface
 {
     public function handle(MessageInterface $message): void
     {
-        $paymentId = $message->getData()['paymentId'];
+        $paymentId = $message->getPayload()['paymentId'];
 
         // Use persistent storage for deduplication/idempotency
         if ($this->paymentRepository->isProcessed($paymentId)) {
@@ -113,7 +113,7 @@ final class ProcessPaymentHandler implements MessageHandlerInterface
 public function handle(MessageInterface $message): void
 {
     try {
-        $this->service->process($message->getData());
+        $this->service->process($message->getPayload());
     } catch (\Throwable $e) {
         // Message is marked as processed but actually failed
     }
@@ -125,7 +125,7 @@ public function handle(MessageInterface $message): void
 ```php
 public function handle(MessageInterface $message): void
 {
-    $this->service->process($message->getData());
+    $this->service->process($message->getPayload());
     // Exception will trigger failure handling
 }
 ```
@@ -278,7 +278,7 @@ final class EmailHandler implements MessageHandlerInterface
     public function handle(MessageInterface $message): void
     {
         $start = microtime(true);
-        $this->sendEmail($message->getData());
+        $this->sendEmail($message->getPayload());
         $this->metrics->timing('email.duration', microtime(true) - $start);
     }
 }
@@ -522,10 +522,10 @@ final class ProcessPaymentHandlerTest extends TestCase
 ```php
 public function handle(MessageInterface $message): void
 {
-    $data = $message->getData();
+    $payload = $message->getPayload();
     
     // No validation - trusts all input
-    $this->processUser($data['userId']);
+    $this->processUser($payload['userId']);
 }
 ```
 
@@ -534,13 +534,13 @@ public function handle(MessageInterface $message): void
 ```php
 public function handle(MessageInterface $message): void
 {
-    $data = $message->getData();
+    $payload = $message->getPayload();
     
-    if (!isset($data['userId']) || !is_int($data['userId'])) {
+    if (!isset($payload['userId']) || !is_int($payload['userId'])) {
         throw new InvalidArgumentException('Invalid userId');
     }
     
-    $this->processUser($data['userId']);
+    $this->processUser($payload['userId']);
 }
 ```
 
@@ -558,10 +558,10 @@ public function handle(MessageInterface $message): void
 ```php
 public function handle(MessageInterface $message): void
 {
-    $data = $message->getData();
+    $payload = $message->getPayload();
     
     // Directly using external data in SQL
-    $this->db->query("DELETE FROM users WHERE id = {$data['userId']}");
+    $this->db->query("DELETE FROM users WHERE id = {$payload['userId']}");
 }
 ```
 
@@ -570,15 +570,15 @@ public function handle(MessageInterface $message): void
 ```php
 public function handle(MessageInterface $message): void
 {
-    $data = $message->getData();
+    $payload = $message->getPayload();
     
     // Validate and sanitize
-    if (!isset($data['userId']) || !is_int($data['userId']) || $data['userId'] <= 0) {
+    if (!isset($payload['userId']) || !is_int($payload['userId']) || $payload['userId'] <= 0) {
         throw new InvalidArgumentException('Invalid userId');
     }
     
     // Use parameterized query
-    $this->db->query('DELETE FROM users WHERE id = :id', ['id' => $data['userId']]);
+    $this->db->query('DELETE FROM users WHERE id = :id', ['id' => $payload['userId']]);
 }
 ```
 

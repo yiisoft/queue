@@ -37,7 +37,7 @@ final class MessageSerializerTest extends TestCase
     public function testUnsupportedType(mixed $type): void
     {
         $value = json_encode(
-            ['type' => $type, 'data' => 'test', 'meta' => []],
+            ['type' => $type, 'payload' => 'test', 'meta' => []],
             JSON_THROW_ON_ERROR,
         );
 
@@ -52,7 +52,7 @@ final class MessageSerializerTest extends TestCase
     public function testUnsupportedMetadata(mixed $metadata): void
     {
         $value = json_encode(
-            ['type' => 'test', 'data' => 'test', 'meta' => $metadata],
+            ['type' => 'test', 'payload' => 'test', 'meta' => $metadata],
             JSON_THROW_ON_ERROR,
         );
 
@@ -65,7 +65,7 @@ final class MessageSerializerTest extends TestCase
     {
         $payload = [
             'type' => 'handler',
-            'data' => 'test',
+            'payload' => 'test',
             'meta' => [],
         ];
 
@@ -74,23 +74,23 @@ final class MessageSerializerTest extends TestCase
         $this->assertInstanceOf(GenericMessage::class, $message);
     }
 
-    public function testUnserializeFromData(): void
+    public function testUnserializeFromPayload(): void
     {
-        $payload = ['type' => 'handler', 'data' => 'test'];
+        $payload = ['type' => 'handler', 'payload' => 'test'];
 
         $message = $this->createSerializer()->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
 
-        $this->assertEquals($payload['data'], $message->getData());
+        $this->assertEquals($payload['payload'], $message->getPayload());
         $this->assertEquals([], $message->getMetadata());
     }
 
     public function testUnserializeWithMetadata(): void
     {
-        $payload = ['type' => 'handler', 'data' => 'test', 'meta' => ['int' => 1, 'str' => 'string', 'bool' => true]];
+        $payload = ['type' => 'handler', 'payload' => 'test', 'meta' => ['int' => 1, 'str' => 'string', 'bool' => true]];
 
         $message = $this->createSerializer()->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
 
-        $this->assertEquals($payload['data'], $message->getData());
+        $this->assertEquals($payload['payload'], $message->getPayload());
         $this->assertEquals(['int' => 1, 'str' => 'string', 'bool' => true], $message->getMetadata());
     }
 
@@ -101,7 +101,7 @@ final class MessageSerializerTest extends TestCase
         $json = $this->createSerializer()->serialize($message);
 
         $this->assertEquals(
-            '{"type":"handler","data":"test","meta":[]}',
+            '{"type":"handler","payload":"test","meta":[]}',
             $json,
         );
     }
@@ -114,7 +114,7 @@ final class MessageSerializerTest extends TestCase
         $json = $serializer->serialize($message);
 
         $this->assertEquals(
-            sprintf('{"type":"handler","data":"test","meta":{"%s":"test-id"}}', IdEnvelope::META_ID),
+            sprintf('{"type":"handler","payload":"test","meta":{"%s":"test-id"}}', IdEnvelope::META_ID),
             $json,
         );
 

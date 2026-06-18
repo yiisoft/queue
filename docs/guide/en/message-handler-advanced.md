@@ -30,19 +30,19 @@ final class SendEmailMessage extends Message
         public readonly string $body,
     ) {}
 
-    public static function fromData(string $type, bool|int|float|string|array|null $data): static
+    public static function fromPayload(string $type, bool|int|float|string|array|null $payload): static
     {
         if ($type !== self::TYPE) {
             throw new \InvalidArgumentException("Expected type \"" . self::TYPE . "\", got \"$type\".");
         }
-        if (!is_array($data)
-            || !is_string($data['to'] ?? null)
-            || !is_string($data['subject'] ?? null)
-            || !is_string($data['body'] ?? null)
+        if (!is_array($payload)
+            || !is_string($payload['to'] ?? null)
+            || !is_string($payload['subject'] ?? null)
+            || !is_string($payload['body'] ?? null)
         ) {
             throw new \InvalidArgumentException('Invalid data for ' . self::class . '.');
         }
-        return new self($data['to'], $data['subject'], $data['body']);
+        return new self($payload['to'], $payload['subject'], $payload['body']);
     }
 
     public function getType(): string
@@ -50,7 +50,7 @@ final class SendEmailMessage extends Message
         return self::TYPE;
     }
 
-    public function getData(): array
+    public function getPayload(): array
     {
         return ['to' => $this->to, 'subject' => $this->subject, 'body' => $this->body];
     }

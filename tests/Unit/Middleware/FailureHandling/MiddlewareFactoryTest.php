@@ -45,7 +45,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processFailure(
                 $this->getConsumeRequest(),
                 $this->createMock(FailureHandlerInterface::class),
-            )->getMessage()->getData(),
+            )->getMessage()->getPayload(),
         );
     }
 
@@ -66,7 +66,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processFailure(
                 $this->getConsumeRequest(),
                 $this->createMock(FailureHandlerInterface::class),
-            )->getMessage()->getData(),
+            )->getMessage()->getPayload(),
         );
     }
 
@@ -83,7 +83,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processFailure(
                 $this->getConsumeRequest(),
                 $this->createMock(FailureHandlerInterface::class),
-            )->getMessage()->getData(),
+            )->getMessage()->getPayload(),
         );
     }
 
@@ -97,7 +97,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processFailure(
                 $this->getConsumeRequest(),
                 $this->getRequestHandler(),
-            )->getMessage()->getData(),
+            )->getMessage()->getPayload(),
         );
     }
 
@@ -114,7 +114,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processFailure(
                 $request,
                 $this->getRequestHandler(),
-            )->getMessage()->getData(),
+            )->getMessage()->getPayload(),
         );
     }
 
@@ -128,7 +128,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processFailure(
                 $this->getConsumeRequest(),
                 $this->createMock(FailureHandlerInterface::class),
-            )->getMessage()->getData(),
+            )->getMessage()->getPayload(),
         );
     }
 
@@ -142,7 +142,7 @@ final class MiddlewareFactoryTest extends TestCase
             $middleware->processFailure(
                 $this->getConsumeRequest(),
                 $this->createMock(FailureHandlerInterface::class),
-            )->getMessage()->getData(),
+            )->getMessage()->getPayload(),
         );
     }
 
