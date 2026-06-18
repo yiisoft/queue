@@ -9,17 +9,17 @@ abstract class Message implements MessageInterface
     /**
      * @psalm-var array<string, mixed>
      */
-    private array $metadata = [];
+    private array $meta = [];
 
-    final public function getMetadata(): array
+    final public function getMeta(): array
     {
-        return $this->metadata;
+        return $this->meta;
     }
 
-    final public function withMetadata(array $metadata): static
+    final public function withMeta(array $meta): static
     {
         $new = clone $this;
-        $new->metadata = $metadata;
+        $new->meta = $meta;
         return $new;
     }
 }

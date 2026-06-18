@@ -158,7 +158,7 @@ final class SendAgainMiddlewareTest extends TestCase
             (new GenericMessage(
                 'test',
                 null,
-            ))->withMetadata([FailureEnvelope::META_FAILURE => $metaInitial]),
+            ))->withMeta([FailureEnvelope::META_FAILURE => $metaInitial]),
             new Exception('testException'),
             $queue,
         );
@@ -188,7 +188,7 @@ final class SendAgainMiddlewareTest extends TestCase
         $pipelineAssertion = static function (FailureHandlingRequest $request) use (
             $metaResult
         ): FailureHandlingRequest {
-            Assert::assertEquals($metaResult, $request->getMessage()->getMetadata()[FailureEnvelope::META_FAILURE] ?? []);
+            Assert::assertEquals($metaResult, $request->getMessage()->getMeta()[FailureEnvelope::META_FAILURE] ?? []);
 
             throw $request->getException();
         };
@@ -203,7 +203,7 @@ final class SendAgainMiddlewareTest extends TestCase
     private function getPreparedQueue(array $metaResult, bool $suites): QueueInterface
     {
         $queueAssertion = static function (MessageInterface $message) use ($metaResult): MessageInterface {
-            Assert::assertEquals($metaResult, $message->getMetadata()[FailureEnvelope::META_FAILURE] ?? []);
+            Assert::assertEquals($metaResult, $message->getMeta()[FailureEnvelope::META_FAILURE] ?? []);
 
             return $message;
         };

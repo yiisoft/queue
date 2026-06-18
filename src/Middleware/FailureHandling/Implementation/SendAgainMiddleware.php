@@ -63,7 +63,7 @@ final class SendAgainMiddleware implements FailureMiddlewareInterface
 
     private function getAttempts(MessageInterface $message): int
     {
-        $result = FailureEnvelope::fromMessage($message)->getFailureMetadataValue($this->getMetaKey(), 0);
+        $result = FailureEnvelope::fromMessage($message)->getFailureMetaValue($this->getMetaKey(), 0);
         if ($result < 0) {
             $result = 0;
         }

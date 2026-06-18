@@ -21,7 +21,7 @@ final class DelayEnvelopeTest extends TestCase
         self::assertSame(300.5, $delayEnvelope->getDelaySeconds());
         self::assertSame(
             [DelayEnvelope::META_DELAY_SECONDS => 300.5],
-            $delayEnvelope->getMetadata(),
+            $delayEnvelope->getMeta(),
         );
     }
 
@@ -29,7 +29,7 @@ final class DelayEnvelopeTest extends TestCase
     {
         $delayEnvelope = DelayEnvelope::fromMessage(
             (new GenericMessage('test', ['data' => 'value']))
-                ->withMetadata([DelayEnvelope::META_DELAY_SECONDS => 150]),
+                ->withMeta([DelayEnvelope::META_DELAY_SECONDS => 150]),
         );
 
         self::assertSame(150.0, $delayEnvelope->getDelaySeconds());
