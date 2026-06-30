@@ -30,15 +30,11 @@ final class FailureMiddlewareStack implements FailureHandlerInterface
 
     public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
     {
-        if ($this->stack === null) {
-            $this->build();
-        }
-
-        /** @psalm-suppress PossiblyNullReference */
+        $this->stack ??= $this->build();
         return $this->stack->handleFailure($request);
     }
 
-    private function build(): void
+    private function build(): FailureHandlerInterface
     {
         $handler = $this->finishHandler;
 
@@ -46,7 +42,7 @@ final class FailureMiddlewareStack implements FailureHandlerInterface
             $handler = $this->wrap($middleware, $handler);
         }
 
-        $this->stack = $handler;
+        return $handler;
     }
 
     /**

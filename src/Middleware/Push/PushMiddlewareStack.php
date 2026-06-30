@@ -33,15 +33,11 @@ final class PushMiddlewareStack implements PushHandlerInterface
 
     public function handlePush(MessageInterface $message): MessageInterface
     {
-        if ($this->stack === null) {
-            $this->build();
-        }
-
-        /** @psalm-suppress PossiblyNullReference */
+        $this->stack ??= $this->build();
         return $this->stack->handlePush($message);
     }
 
-    private function build(): void
+    private function build(): PushHandlerInterface
     {
         $handler = $this->finishHandler;
 
@@ -49,7 +45,7 @@ final class PushMiddlewareStack implements PushHandlerInterface
             $handler = $this->wrap($middleware, $handler);
         }
 
-        $this->stack = $handler;
+        return $handler;
     }
 
     /**

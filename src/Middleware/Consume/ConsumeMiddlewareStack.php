@@ -30,15 +30,11 @@ final class ConsumeMiddlewareStack implements ConsumeHandlerInterface
 
     public function handleConsume(ConsumeRequest $request): ConsumeRequest
     {
-        if ($this->stack === null) {
-            $this->build();
-        }
-
-        /** @psalm-suppress PossiblyNullReference */
+        $this->stack ??= $this->build();
         return $this->stack->handleConsume($request);
     }
 
-    private function build(): void
+    private function build(): ConsumeHandlerInterface
     {
         $handler = $this->finishHandler;
 
@@ -46,7 +42,7 @@ final class ConsumeMiddlewareStack implements ConsumeHandlerInterface
             $handler = $this->wrap($middleware, $handler);
         }
 
-        $this->stack = $handler;
+        return $handler;
     }
 
     /**
