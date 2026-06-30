@@ -50,10 +50,6 @@ final class FailureMiddlewareFactory extends MiddlewareFactory implements Failur
 
         $middleware = $this->create($middlewareDefinition);
 
-        if (!$middleware instanceof FailureMiddlewareInterface) {
-            throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
-        }
-
         return $middleware;
     }
 

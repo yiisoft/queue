@@ -46,10 +46,6 @@ final class ConsumeMiddlewareFactory extends MiddlewareFactory implements Consum
 
         $middleware = $this->create($middlewareDefinition);
 
-        if (!$middleware instanceof ConsumeMiddlewareInterface) {
-            throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
-        }
-
         return $middleware;
     }
 

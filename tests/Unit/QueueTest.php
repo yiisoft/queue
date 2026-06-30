@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit;
 
+use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\GenericMessage;
@@ -30,6 +31,18 @@ final class QueueTest extends TestCase
         $queue->push($message);
 
         self::assertSame([$message], $adapter->getMessagesList());
+    }
+
+    public function testPushLogsWhenIdNotAssigned(): void
+    {
+        $message = new GenericMessage('simple', null);
+        $adapter = $this->createMock(AdapterInterface::class);
+        $adapter->method('push')->willReturn($message);
+        $queue = $this->createQueue($adapter);
+
+        $result = $queue->push($message);
+
+        self::assertNull(IdEnvelope::fromMessage($result)->getId());
     }
 
     public function testPushSynchronouslyProcessesMessage(): void

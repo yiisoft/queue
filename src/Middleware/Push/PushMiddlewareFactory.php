@@ -54,10 +54,6 @@ final class PushMiddlewareFactory extends MiddlewareFactory implements PushMiddl
 
         $middleware = $this->create($middlewareDefinition);
 
-        if (!$middleware instanceof PushMiddlewareInterface) {
-            throw new InvalidMiddlewareDefinitionException($middlewareDefinition);
-        }
-
         return $middleware;
     }
 

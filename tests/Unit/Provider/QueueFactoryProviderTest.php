@@ -99,6 +99,20 @@ final class QueueFactoryProviderTest extends TestCase
         $provider->get('queue1');
     }
 
+    public function testInvalidQueueConfigThrownOnCreate(): void
+    {
+        $provider = new QueueFactoryProvider(
+            [
+                'queue1' => 42,
+            ],
+            validate: false,
+        );
+
+        $this->expectException(InvalidQueueConfigException::class);
+        $this->expectExceptionMessage('Invalid definition: 42');
+        $provider->get('queue1');
+    }
+
     public function testGetHasByStringEnum(): void
     {
         $provider = new QueueFactoryProvider(
