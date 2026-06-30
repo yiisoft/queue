@@ -23,6 +23,8 @@ final class PushMiddlewareStack implements PushHandlerInterface
     /**
      * @param Closure[] $middlewares Middlewares.
      * @param PushHandlerInterface $finishHandler Final handler invoked after all middlewares are processed.
+     *
+     * @psalm-param list<Closure():PushMiddlewareInterface> $middlewares
      */
     public function __construct(
         private readonly array $middlewares,
@@ -52,12 +54,17 @@ final class PushMiddlewareStack implements PushHandlerInterface
 
     /**
      * Wrap handler by middlewares.
+     *
+     * @psalm-param Closure():PushMiddlewareInterface $middlewareFactory
      */
     private function wrap(Closure $middlewareFactory, PushHandlerInterface $handler): PushHandlerInterface
     {
         return new class ($middlewareFactory, $handler) implements PushHandlerInterface {
             private ?PushMiddlewareInterface $middleware = null;
 
+            /**
+             * @psalm-param Closure():PushMiddlewareInterface $middlewareFactory
+             */
             public function __construct(
                 private readonly Closure $middlewareFactory,
                 private readonly PushHandlerInterface $handler,

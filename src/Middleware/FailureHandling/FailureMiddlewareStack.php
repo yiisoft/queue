@@ -20,6 +20,8 @@ final class FailureMiddlewareStack implements FailureHandlerInterface
      * @param Closure[] $middlewares Middlewares.
      * @param FailureHandlerInterface $finishHandler Fallback handler
      * events.
+     *
+     * @psalm-param list<Closure():FailureMiddlewareInterface> $middlewares
      */
     public function __construct(
         private readonly array $middlewares,
@@ -49,12 +51,16 @@ final class FailureMiddlewareStack implements FailureHandlerInterface
 
     /**
      * Wrap handler by middlewares.
+     * @psalm-param Closure():FailureMiddlewareInterface $middlewareFactory
      */
     private function wrap(Closure $middlewareFactory, FailureHandlerInterface $handler): FailureHandlerInterface
     {
         return new class ($middlewareFactory, $handler) implements FailureHandlerInterface {
             private ?FailureMiddlewareInterface $middleware = null;
 
+            /**
+             * @psalm-param Closure():FailureMiddlewareInterface $middlewareFactory
+             */
             public function __construct(
                 private readonly Closure $middlewareFactory,
                 private readonly FailureHandlerInterface $handler,

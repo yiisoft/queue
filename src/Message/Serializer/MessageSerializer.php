@@ -19,6 +19,9 @@ use function is_string;
  * {@see MessageEncoderInterface}, which encodes it to a string. When unserializing, decodes the string back to an
  * array and resolves the message class from the type via the resolver, falling back to {@see GenericMessage}
  * if the type is not registered.
+ *
+ * @psalm-import-type MessagePayload from MessageInterface
+ * @psalm-import-type MessageMeta from MessageInterface
  */
 final class MessageSerializer implements MessageSerializerInterface
 {
@@ -66,9 +69,13 @@ final class MessageSerializer implements MessageSerializerInterface
         if (!is_array($meta)) {
             throw new MessageSerializerException('Metadata must be an array. Got ' . get_debug_type($meta) . '.');
         }
+        /** @psalm-var MessageMeta $meta */
 
         $class = $this->resolver->resolve($type) ?? GenericMessage::class;
 
-        return $class::fromPayload($type, $data['payload'] ?? null)->withMeta($meta);
+        /** @psalm-var MessagePayload $payload */
+        $payload = $data['payload'] ?? null;
+
+        return $class::fromPayload($type, $payload)->withMeta($meta);
     }
 }

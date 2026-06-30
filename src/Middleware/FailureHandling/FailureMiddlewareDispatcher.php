@@ -89,7 +89,7 @@ final class FailureMiddlewareDispatcher
     }
 
     /**
-     * @return Closure[]
+     * @psalm-return list<Closure():FailureMiddlewareInterface>
      */
     private function buildMiddlewares(array|callable|string|FailureMiddlewareInterface ...$definitions): array
     {

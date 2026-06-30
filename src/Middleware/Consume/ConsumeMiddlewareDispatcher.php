@@ -85,7 +85,7 @@ final class ConsumeMiddlewareDispatcher
     }
 
     /**
-     * @return Closure[]
+     * @psalm-return list<Closure():ConsumeMiddlewareInterface>
      */
     private function buildMiddlewares(): array
     {
