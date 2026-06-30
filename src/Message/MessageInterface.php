@@ -20,8 +20,10 @@ interface MessageInterface
      * `int`, `float`, `string`), or arrays composed of the same types recursively.
      *
      * @psalm-param MessagePayload $payload
+     *
+     * @return static Instance of the called class with the given type and payload.
      */
-    public static function fromPayload(string $type, bool|int|float|string|array|null $payload): self;
+    public static function fromPayload(string $type, bool|int|float|string|array|null $payload): static;
 
     /**
      * Returns message type.
@@ -55,6 +57,8 @@ interface MessageInterface
      *
      * @param array<string, bool|int|float|string|array|null> $meta Metadata containing only `null`, scalars (`bool`,
      * `int`, `float`, `string`), or arrays composed of the same types recursively.
+     *
+     * @return static New instance with the given metadata.
      *
      * @psalm-param MessageMeta $meta
      */

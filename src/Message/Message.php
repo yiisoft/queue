@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message;
 
+/**
+ * Base implementation of {@see MessageInterface} providing metadata storage.
+ *
+ * @psalm-import-type MessageMeta from MessageInterface
+ */
 abstract class Message implements MessageInterface
 {
     /**
-     * @psalm-var array<string, mixed>
+     * @psalm-var MessageMeta
      */
     private array $meta = [];
 

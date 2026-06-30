@@ -14,6 +14,9 @@ use function is_string;
 
 /**
  * @template T of object
+ *
+ * @psalm-import-type ArrayDefinitionConfig from ArrayDefinition
+ *
  * @internal
  */
 abstract class MiddlewareFactory
@@ -83,8 +86,9 @@ abstract class MiddlewareFactory
     }
 
     /**
-     * @return T|null
      * @throws InvalidMiddlewareDefinitionException
+     *
+     * @psalm-return T|null
      */
     private function tryGetFromArrayDefinition(array $definition): ?object
     {
@@ -92,17 +96,18 @@ abstract class MiddlewareFactory
 
         try {
             DefinitionValidator::validateArrayDefinition($definition);
+            /** @psalm-var ArrayDefinitionConfig $definition */
 
             $middleware = ArrayDefinition::fromConfig($definition)->resolve($this->container);
             if (is_subclass_of($middleware, $interface)) {
-                /** @var T */
+                /** @psalm-var T */
                 return $middleware;
             }
 
-            throw new InvalidMiddlewareDefinitionException($definition);
+            return null;
         } catch (InvalidConfigException) {
         }
 
-        throw new InvalidMiddlewareDefinitionException($definition);
+        return null;
     }
 }

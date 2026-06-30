@@ -12,8 +12,10 @@ use Yiisoft\Queue\QueueInterface;
  */
 interface QueueProviderInterface
 {
-    /** @psalm-suppress MissingClassConstType */
-    public const DEFAULT_QUEUE = 'yii-queue';
+    /**
+     * @psalm-suppress MissingClassConstType
+     */
+    final public const DEFAULT_QUEUE = 'yii-queue';
 
     /**
      * Finds a queue by name and returns it.

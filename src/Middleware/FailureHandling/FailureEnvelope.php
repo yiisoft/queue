@@ -12,8 +12,9 @@ use function array_key_exists;
 use function is_array;
 
 /**
+ * @psalm-type FailureMeta = array<string, scalar|null|array<scalar|null|array>>
  * @extends Envelope<array{
- *      yii-failure: array<string, scalar|null|array<scalar|null|array>>,
+ *      yii-failure: FailureMeta,
  *      ...<string, scalar|null|array<scalar|null|array>>
  *  }>
  */
@@ -21,10 +22,14 @@ final class FailureEnvelope extends Envelope
 {
     public const META_FAILURE = 'yii-failure';
 
+    /**
+     * @psalm-var FailureMeta
+     */
     private array $failureMeta;
 
     public function __construct(MessageInterface $message, array $failureMeta = [])
     {
+        /** @psalm-var FailureMeta */
         $this->failureMeta = $failureMeta === []
             ? self::getFailureMetaFromMessage($message)
             : ArrayHelper::merge(
@@ -54,11 +59,15 @@ final class FailureEnvelope extends Envelope
         );
     }
 
+    /**
+     * @psalm-return FailureMeta
+     */
     private static function getFailureMetaFromMessage(MessageInterface $message): array
     {
         $meta = $message->getMeta();
         if (array_key_exists(self::META_FAILURE, $meta)) {
             $result = $meta[self::META_FAILURE];
+            /** @psalm-var FailureMeta */
             return is_array($result) ? $result : [];
         }
         return [];

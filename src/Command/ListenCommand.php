@@ -35,10 +35,10 @@ final class ListenCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->queueProvider
-            ->get($input->getArgument('queue'))
-            ->listen();
+        $queueName = (string) $input->getArgument('queue');
 
-        return 0;
+        $this->queueProvider->get($queueName)->listen();
+
+        return Command::SUCCESS;
     }
 }

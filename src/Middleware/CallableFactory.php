@@ -57,6 +57,8 @@ final class CallableFactory
             && array_keys($definition) === [0, 1]
             && is_string($definition[1])
         ) {
+            /** @psalm-var array{0:mixed,1:string} $definition */
+
             if (is_object($definition[0])) {
                 $callable = $this->fromObjectDefinition($definition[0], $definition[1]);
                 if ($callable !== null) {
@@ -64,7 +66,6 @@ final class CallableFactory
                 }
             }
 
-            /** @psalm-suppress PossiblyUndefinedArrayOffset array_keys($definition) === [0, 1] was checked above */
             if (is_string($definition[0])) {
                 $callable = $this->fromDefinition($definition[0], $definition[1]);
                 if ($callable !== null) {
