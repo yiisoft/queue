@@ -16,7 +16,7 @@ final class EnvelopeTest extends TestCase
         $message = new IdEnvelope($message, 'test-id');
 
         $this->assertEquals('test', $message->getMessage()->getPayload());
-        $this->assertEquals('test-id', $message->getMetadata()[IdEnvelope::META_ID]);
+        $this->assertEquals('test-id', $message->getMeta()[IdEnvelope::META_ID]);
     }
 
     public function testEnvelopeDuplicates(): void
@@ -27,6 +27,6 @@ final class EnvelopeTest extends TestCase
         $message = new IdEnvelope($message, 'test-id-3');
 
         $this->assertEquals('test', $message->getMessage()->getPayload());
-        $this->assertEquals('test-id-3', $message->getMetadata()[IdEnvelope::META_ID]);
+        $this->assertEquals('test-id-3', $message->getMeta()[IdEnvelope::META_ID]);
     }
 }

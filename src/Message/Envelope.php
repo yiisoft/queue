@@ -7,26 +7,26 @@ namespace Yiisoft\Queue\Message;
 use LogicException;
 
 /**
- * @template TMetadata of MessageMetadata
+ * @template TMeta of MessageMeta
  *
- * @psalm-import-type MessageMetadata from MessageInterface
+ * @psalm-import-type MessageMeta from MessageInterface
  */
 abstract class Envelope implements MessageInterface
 {
     /**
-     * @psalm-var TMetadata
+     * @psalm-var TMeta
      */
-    protected readonly array $metadata;
+    protected readonly array $meta;
 
     private readonly MessageInterface $message;
 
     /**
-     * @psalm-param TMetadata $metadata
+     * @psalm-param TMeta $meta
      */
-    public function __construct(MessageInterface $message, array $metadata)
+    public function __construct(MessageInterface $message, array $meta)
     {
-        /** @var TMetadata */
-        $this->metadata = array_merge($message->getMetadata(), $metadata);
+        /** @var TMeta */
+        $this->meta = array_merge($message->getMeta(), $meta);
 
         while ($message instanceof self) {
             $message = $message->getMessage();
@@ -69,15 +69,15 @@ abstract class Envelope implements MessageInterface
     }
 
     /**
-     * @psalm-return TMetadata
+     * @psalm-return TMeta
      */
-    final public function getMetadata(): array
+    final public function getMeta(): array
     {
-        return $this->metadata;
+        return $this->meta;
     }
 
-    final public function withMetadata(array $metadata): static
+    final public function withMeta(array $meta): static
     {
-        return static::fromMessage($this->message->withMetadata($metadata));
+        return static::fromMessage($this->message->withMeta($meta));
     }
 }

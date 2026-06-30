@@ -60,20 +60,20 @@ final class IdEnvelopeTest extends TestCase
         $this->assertNull($message->getId());
     }
 
-    public function testGetEnvelopeMetadata(): void
+    public function testGetEnvelopeMeta(): void
     {
         $id = 'test-id';
         $message = $this->createMessage();
         $envelope = new IdEnvelope($message, $id);
 
-        $metadata = $envelope->getMetadata();
+        $meta = $envelope->getMeta();
 
-        $this->assertArrayHasKey(IdEnvelope::META_ID, $metadata);
-        $this->assertSame($id, $metadata[IdEnvelope::META_ID]);
+        $this->assertArrayHasKey(IdEnvelope::META_ID, $meta);
+        $this->assertSame($id, $meta[IdEnvelope::META_ID]);
     }
 
-    private function createMessage(array $metadata = []): MessageInterface
+    private function createMessage(array $meta = []): MessageInterface
     {
-        return (new GenericMessage('test-handler', ['test-data']))->withMetadata($metadata);
+        return (new GenericMessage('test-handler', ['test-data']))->withMeta($meta);
     }
 }

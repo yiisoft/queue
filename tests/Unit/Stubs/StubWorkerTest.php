@@ -22,6 +22,6 @@ final class StubWorkerTest extends TestCase
         $this->assertSame($sourceMessage, $message);
         $this->assertSame('test', $message->getType());
         $this->assertSame(42, $message->getPayload());
-        $this->assertSame([], $message->getMetadata());
+        $this->assertSame([], $message->getMeta());
     }
 }

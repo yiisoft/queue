@@ -45,7 +45,7 @@ final class MessageSerializer implements MessageSerializerInterface
         return $this->encoder->encode([
             'type' => $message->getType(),
             'payload' => $message->getPayload(),
-            'meta' => $message->getMetadata(),
+            'meta' => $message->getMeta(),
         ]);
     }
 
@@ -62,13 +62,13 @@ final class MessageSerializer implements MessageSerializerInterface
             throw new MessageSerializerException('Message type must be a string. Got ' . get_debug_type($type) . '.');
         }
 
-        $metadata = $data['meta'] ?? [];
-        if (!is_array($metadata)) {
-            throw new MessageSerializerException('Metadata must be an array. Got ' . get_debug_type($metadata) . '.');
+        $meta = $data['meta'] ?? [];
+        if (!is_array($meta)) {
+            throw new MessageSerializerException('Metadata must be an array. Got ' . get_debug_type($meta) . '.');
         }
 
         $class = $this->resolver->resolve($type) ?? GenericMessage::class;
 
-        return $class::fromPayload($type, $data['payload'] ?? null)->withMetadata($metadata);
+        return $class::fromPayload($type, $data['payload'] ?? null)->withMeta($meta);
     }
 }

@@ -11,15 +11,15 @@ use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 
-final class MetadataBench
+final class MetaBench
 {
     /**
      * Create metadata as an array and read its value from an array.
      */
     public function benchArrayRead(): void
     {
-        $message = (new GenericMessage('foo', 'bar'))->withMetadata(['id' => 1]);
-        $id = $message->getMetadata()['id'];
+        $message = (new GenericMessage('foo', 'bar'))->withMeta(['id' => 1]);
+        $id = $message->getMeta()['id'];
     }
 
     /**
@@ -36,7 +36,7 @@ final class MetadataBench
      */
     public function benchEnvelopeReadRestored(): void
     {
-        $message = IdEnvelope::fromMessage((new GenericMessage('foo', 'bar'))->withMetadata(['id' => 1]));
+        $message = IdEnvelope::fromMessage((new GenericMessage('foo', 'bar'))->withMeta(['id' => 1]));
         $id = $message->getId();
     }
 
@@ -91,12 +91,12 @@ final class MetadataBench
      * @psalm-param array{0: int} $params
      */
     #[ParamProviders('provideEnvelopeStackCounts')]
-    public function benchMetadataArrayCreation(array $params): void
+    public function benchMetaArrayCreation(array $params): void
     {
-        $metadata = [FailureEnvelope::META_FAILURE => []];
+        $meta = [FailureEnvelope::META_FAILURE => []];
         for ($i = 0; $i < $params[0]; $i++) {
-            $metadata[FailureEnvelope::META_FAILURE]["fail$i"] = "fail$i";
+            $meta[FailureEnvelope::META_FAILURE]["fail$i"] = "fail$i";
         }
-        $message = (new GenericMessage('foo', 'bar'))->withMetadata($metadata);
+        $message = (new GenericMessage('foo', 'bar'))->withMeta($meta);
     }
 }

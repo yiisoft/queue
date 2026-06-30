@@ -21,44 +21,44 @@ final class FailureEnvelope extends Envelope
 {
     public const META_FAILURE = 'yii-failure';
 
-    private array $failureMetadata;
+    private array $failureMeta;
 
-    public function __construct(MessageInterface $message, array $failureMetadata = [])
+    public function __construct(MessageInterface $message, array $failureMeta = [])
     {
-        $this->failureMetadata = $failureMetadata === []
-            ? self::getFailureMetadataFromMessage($message)
+        $this->failureMeta = $failureMeta === []
+            ? self::getFailureMetaFromMessage($message)
             : ArrayHelper::merge(
-                self::getFailureMetadataFromMessage($message),
-                $failureMetadata,
+                self::getFailureMetaFromMessage($message),
+                $failureMeta,
             );
         parent::__construct($message, [
-            self::META_FAILURE => $this->failureMetadata,
+            self::META_FAILURE => $this->failureMeta,
         ]);
     }
 
-    public function getFailureMetadata(): array
+    public function getFailureMeta(): array
     {
-        return $this->failureMetadata;
+        return $this->failureMeta;
     }
 
-    public function getFailureMetadataValue(string $key, mixed $default = null): mixed
+    public function getFailureMetaValue(string $key, mixed $default = null): mixed
     {
-        return $this->failureMetadata[$key] ?? $default;
+        return $this->failureMeta[$key] ?? $default;
     }
 
     public static function fromMessage(MessageInterface $message): static
     {
         return new self(
             $message,
-            self::getFailureMetadataFromMessage($message),
+            self::getFailureMetaFromMessage($message),
         );
     }
 
-    private static function getFailureMetadataFromMessage(MessageInterface $message): array
+    private static function getFailureMetaFromMessage(MessageInterface $message): array
     {
-        $metadata = $message->getMetadata();
-        if (array_key_exists(self::META_FAILURE, $metadata)) {
-            $result = $metadata[self::META_FAILURE];
+        $meta = $message->getMeta();
+        if (array_key_exists(self::META_FAILURE, $meta)) {
+            $result = $meta[self::META_FAILURE];
             return is_array($result) ? $result : [];
         }
         return [];

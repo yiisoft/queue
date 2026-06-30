@@ -49,15 +49,15 @@ final class MessageSerializerTest extends TestCase
     #[TestWith([''])]
     #[TestWith([1])]
     #[TestWith([true])]
-    public function testUnsupportedMetadata(mixed $metadata): void
+    public function testUnsupportedMeta(mixed $meta): void
     {
         $value = json_encode(
-            ['type' => 'test', 'payload' => 'test', 'meta' => $metadata],
+            ['type' => 'test', 'payload' => 'test', 'meta' => $meta],
             JSON_THROW_ON_ERROR,
         );
 
         $this->expectException(MessageSerializerException::class);
-        $this->expectExceptionMessage(sprintf('Metadata must be an array. Got %s.', get_debug_type($metadata)));
+        $this->expectExceptionMessage(sprintf('Metadata must be an array. Got %s.', get_debug_type($meta)));
         $this->createSerializer()->unserialize($value);
     }
 
@@ -81,17 +81,17 @@ final class MessageSerializerTest extends TestCase
         $message = $this->createSerializer()->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
 
         $this->assertEquals($payload['payload'], $message->getPayload());
-        $this->assertEquals([], $message->getMetadata());
+        $this->assertEquals([], $message->getMeta());
     }
 
-    public function testUnserializeWithMetadata(): void
+    public function testUnserializeWithMeta(): void
     {
         $payload = ['type' => 'handler', 'payload' => 'test', 'meta' => ['int' => 1, 'str' => 'string', 'bool' => true]];
 
         $message = $this->createSerializer()->unserialize(json_encode($payload, JSON_THROW_ON_ERROR));
 
         $this->assertEquals($payload['payload'], $message->getPayload());
-        $this->assertEquals(['int' => 1, 'str' => 'string', 'bool' => true], $message->getMetadata());
+        $this->assertEquals(['int' => 1, 'str' => 'string', 'bool' => true], $message->getMeta());
     }
 
     public function testSerialize(): void
@@ -123,7 +123,7 @@ final class MessageSerializerTest extends TestCase
         $this->assertInstanceOf(GenericMessage::class, $restored);
         $this->assertEquals([
             IdEnvelope::META_ID => 'test-id',
-        ], $restored->getMetadata());
+        ], $restored->getMeta());
     }
 
     public function testRestoreOriginalMessageClass(): void

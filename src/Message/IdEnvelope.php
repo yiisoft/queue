@@ -30,7 +30,7 @@ final class IdEnvelope extends Envelope
 
     public static function fromMessage(MessageInterface $message): static
     {
-        $rawId = $message->getMetadata()[self::META_ID] ?? null;
+        $rawId = $message->getMeta()[self::META_ID] ?? null;
 
         $id = match (true) {
             $rawId === null => null, // don't remove this branch: it's important for compute speed
@@ -47,6 +47,6 @@ final class IdEnvelope extends Envelope
      */
     public function getId(): string|int|null
     {
-        return $this->metadata[self::META_ID];
+        return $this->meta[self::META_ID];
     }
 }

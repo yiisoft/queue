@@ -8,7 +8,7 @@ namespace Yiisoft\Queue\Message;
  * Represents a queue message with a type identifier, payload data, and metadata.
  *
  * @psalm-type MessagePayload = scalar|null|array<scalar|null|array>
- * @psalm-type MessageMetadata = array<string, scalar|null|array<scalar|null|array>>
+ * @psalm-type MessageMeta = array<string, scalar|null|array<scalar|null|array>>
  */
 interface MessageInterface
 {
@@ -46,17 +46,17 @@ interface MessageInterface
      * @return array<string, bool|int|float|string|array|null> Metadata containing only `null`, scalars (`bool`, `int`,
      * `float`, `string`), or arrays composed of the same types recursively.
      *
-     * @psalm-return MessageMetadata
+     * @psalm-return MessageMeta
      */
-    public function getMetadata(): array;
+    public function getMeta(): array;
 
     /**
      * Returns a new instance with the given message metadata.
      *
-     * @param array<string, bool|int|float|string|array|null> $metadata Metadata containing only `null`, scalars (`bool`,
+     * @param array<string, bool|int|float|string|array|null> $meta Metadata containing only `null`, scalars (`bool`,
      * `int`, `float`, `string`), or arrays composed of the same types recursively.
      *
-     * @psalm-param MessageMetadata $metadata
+     * @psalm-param MessageMeta $meta
      */
-    public function withMetadata(array $metadata): static;
+    public function withMeta(array $meta): static;
 }
