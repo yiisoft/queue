@@ -81,14 +81,14 @@ final class QueueCollector implements SummaryCollectorInterface
 
         $countPushes = array_sum(
             array_map(
-                static fn($messages) => count($messages),
+                count(...),
                 $this->pushes,
             ),
         );
         $countStatuses = count($this->statuses);
         $countProcessingMessages = array_sum(
             array_map(
-                static fn($messages) => count($messages),
+                count(...),
                 $this->processingMessages,
             ),
         );

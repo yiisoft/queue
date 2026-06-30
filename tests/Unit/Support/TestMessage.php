@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Support;
 
 use Yiisoft\Queue\Message\Message;
-use Yiisoft\Queue\Message\MessageInterface;
 
 final class TestMessage extends Message
 {
