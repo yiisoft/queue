@@ -22,6 +22,6 @@ jobs:
   rector:
     permissions:
       contents: write # Required to push PHP CS Fixer and Rector changes back to the branch.
-    uses: yiisoft/actions/.github/workflows/rector-cs.yml@50fd83c8ee9febc41032b8b97139dd89ba1c2f48
+    uses: yiisoft/actions/.github/workflows/rector-cs.yml@master
     with:
       php: '8.1'
