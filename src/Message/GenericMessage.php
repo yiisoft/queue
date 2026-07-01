@@ -25,7 +25,7 @@ final class GenericMessage extends Message
         private readonly bool|int|float|string|array|null $payload,
     ) {}
 
-    public static function fromPayload(string $type, bool|int|float|string|array|null $payload): MessageInterface
+    public static function fromPayload(string $type, bool|int|float|string|array|null $payload): static
     {
         return new self($type, $payload);
     }

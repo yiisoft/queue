@@ -20,6 +20,8 @@ final class ConsumeMiddlewareStack implements ConsumeHandlerInterface
      * @param Closure[] $middlewares Middlewares.
      * @param ConsumeHandlerInterface $finishHandler Fallback handler
      * events.
+     *
+     * @psalm-param list<Closure():ConsumeMiddlewareInterface> $middlewares
      */
     public function __construct(
         private readonly array $middlewares,
@@ -28,15 +30,11 @@ final class ConsumeMiddlewareStack implements ConsumeHandlerInterface
 
     public function handleConsume(ConsumeRequest $request): ConsumeRequest
     {
-        if ($this->stack === null) {
-            $this->build();
-        }
-
-        /** @psalm-suppress PossiblyNullReference */
+        $this->stack ??= $this->build();
         return $this->stack->handleConsume($request);
     }
 
-    private function build(): void
+    private function build(): ConsumeHandlerInterface
     {
         $handler = $this->finishHandler;
 
@@ -44,17 +42,22 @@ final class ConsumeMiddlewareStack implements ConsumeHandlerInterface
             $handler = $this->wrap($middleware, $handler);
         }
 
-        $this->stack = $handler;
+        return $handler;
     }
 
     /**
      * Wrap handler by middlewares.
+     *
+     * @psalm-param Closure():ConsumeMiddlewareInterface $middlewareFactory
      */
     private function wrap(Closure $middlewareFactory, ConsumeHandlerInterface $handler): ConsumeHandlerInterface
     {
         return new class ($middlewareFactory, $handler) implements ConsumeHandlerInterface {
             private ?ConsumeMiddlewareInterface $middleware = null;
 
+            /**
+             * @psalm-param Closure():ConsumeMiddlewareInterface $middlewareFactory
+             */
             public function __construct(
                 private readonly Closure $middlewareFactory,
                 private readonly ConsumeHandlerInterface $handler,

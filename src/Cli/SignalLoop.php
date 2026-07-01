@@ -14,20 +14,8 @@ final class SignalLoop implements LoopInterface
 {
     use SoftLimitTrait;
 
-    /**
-     * @psalm-suppress UndefinedConstant
-     * @psalm-suppress MissingClassConstType
-     */
     protected const SIGNALS_EXIT = [SIGHUP, SIGINT, SIGTERM];
-    /**
-     * @psalm-suppress UndefinedConstant
-     * @psalm-suppress MissingClassConstType
-     */
     protected const SIGNALS_SUSPEND = [SIGTSTP];
-    /**
-     * @psalm-suppress UndefinedConstant
-     * @psalm-suppress MissingClassConstType
-     */
     protected const SIGNALS_RESUME = [SIGCONT];
     protected bool $pause = false;
     protected bool $exit = false;

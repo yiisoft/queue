@@ -97,7 +97,7 @@ final class PushMiddlewareDispatcher
     }
 
     /**
-     * @return Closure[]
+     * @psalm-return list<Closure():PushMiddlewareInterface>
      */
     private function buildMiddlewares(): array
     {

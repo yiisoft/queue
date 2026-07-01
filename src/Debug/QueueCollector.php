@@ -16,8 +16,15 @@ final class QueueCollector implements SummaryCollectorInterface
 {
     use CollectorTrait;
 
+    /**
+     * @var array[]
+     */
     private array $pushes = [];
     private array $statuses = [];
+
+    /**
+     * @var array[]
+     */
     private array $processingMessages = [];
 
     public function getCollected(): array
@@ -72,9 +79,19 @@ final class QueueCollector implements SummaryCollectorInterface
             return [];
         }
 
-        $countPushes = array_sum(array_map(static fn($messages) => is_countable($messages) ? count($messages) : 0, $this->pushes));
+        $countPushes = array_sum(
+            array_map(
+                count(...),
+                $this->pushes,
+            ),
+        );
         $countStatuses = count($this->statuses);
-        $countProcessingMessages = array_sum(array_map(static fn($messages) => is_countable($messages) ? count($messages) : 0, $this->processingMessages));
+        $countProcessingMessages = array_sum(
+            array_map(
+                count(...),
+                $this->processingMessages,
+            ),
+        );
 
         return [
             'countPushes' => $countPushes,
