@@ -33,6 +33,13 @@ final class InMemoryAdapterTest extends TestCase
         $this->assertSame('c', $envelope3->getMessage()->getPayload());
     }
 
+    public function testHasStatusSupport(): void
+    {
+        $adapter = new InMemoryAdapter();
+
+        $this->assertTrue($adapter->hasStatusSupport());
+    }
+
     public function testStatusWaitingForPushedMessage(): void
     {
         $adapter = new InMemoryAdapter();
