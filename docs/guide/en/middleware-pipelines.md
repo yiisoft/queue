@@ -152,12 +152,3 @@ See [Configuration with yiisoft/config](configuration-with-config.md) for exampl
 When configuring the component manually, you instantiate the middleware dispatchers and pass them to `Queue` / `Worker`.
 
 See [Manual configuration](configuration-manual.md) for a full runnable example.
-
-## Runtime overrides
-
-You can override middleware stacks at runtime:
-
-- `Queue::withMiddlewares(...)` replaces the whole push middleware stack for that queue instance.
-- `Queue::withMiddlewaresAdded(...)` appends middlewares to the existing stack.
-
-These methods affect only the push pipeline of the `Queue` instance they are called on.

@@ -40,18 +40,4 @@ interface QueueInterface
      * Returns the logical name of the queue.
      */
     public function getName(): string;
-
-    /**
-     * Creates a new instance with the specified middlewares. All the existing middlewares are replaced.
-     *
-     * @param mixed ...$middlewareDefinitions The middleware definitions.
-     */
-    public function withMiddlewares(mixed ...$middlewareDefinitions): self;
-
-    /**
-     * Creates a new instance with the specified middlewares added after the existing ones.
-     *
-     * @param mixed ...$middlewareDefinitions The middleware definitions.
-     */
-    public function withMiddlewaresAdded(mixed ...$middlewareDefinitions): self;
 }
