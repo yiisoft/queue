@@ -13,6 +13,6 @@ final class StringNormalizer
 {
     public static function normalize(string|BackedEnum $value): string
     {
-        return $value instanceof BackedEnum ? (string)$value->value : $value;
+        return $value instanceof BackedEnum ? (string) $value->value : $value;
     }
 }
