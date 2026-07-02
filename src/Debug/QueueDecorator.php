@@ -50,14 +50,4 @@ final class QueueDecorator implements QueueInterface
     {
         return $this->queue->getName();
     }
-
-    public function withMiddlewares(mixed ...$middlewareDefinitions): self
-    {
-        return new self($this->queue->withMiddlewares(...$middlewareDefinitions), $this->collector);
-    }
-
-    public function withMiddlewaresAdded(mixed ...$middlewareDefinitions): self
-    {
-        return new self($this->queue->withMiddlewaresAdded(...$middlewareDefinitions), $this->collector);
-    }
 }

@@ -38,14 +38,4 @@ final class StubQueue implements QueueInterface
     {
         return $this->name;
     }
-
-    public function withMiddlewares(mixed ...$middlewareDefinitions): self
-    {
-        return $this;
-    }
-
-    public function withMiddlewaresAdded(mixed ...$middlewareDefinitions): self
-    {
-        return $this;
-    }
 }
