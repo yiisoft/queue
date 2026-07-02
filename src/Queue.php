@@ -20,24 +20,13 @@ use Yiisoft\Queue\Provider\QueueProviderInterface;
 
 final class Queue implements QueueInterface
 {
-    /**
-     * @var mixed[] Queue-specific middleware definitions.
-     */
-    private array $middlewareDefinitions;
-
     private string $name;
 
     /**
-     * @var PushMiddlewareDispatcher The dispatcher used for push messages, combining base dispatcher middleware with
-     * queue-specific middleware.
+     * @var PushMiddlewareDispatcher The dispatcher used for push messages, combining common middleware from
+     * {@see PushMiddlewareConfig} with queue-specific middleware.
      */
     private PushMiddlewareDispatcher $dispatcher;
-
-    /**
-     * @var PushMiddlewareDispatcher The base dispatcher built from {@see PushMiddlewareConfig}.
-     * Holds the common middleware applied to all queues.
-     */
-    private PushMiddlewareDispatcher $baseDispatcher;
 
     /**
      * @param WorkerInterface $worker The worker that processes messages.
@@ -59,19 +48,16 @@ final class Queue implements QueueInterface
         mixed ...$middlewareDefinitions,
     ) {
         $this->name = StringNormalizer::normalize($name);
-        $this->baseDispatcher = new PushMiddlewareDispatcher(
+        $this->dispatcher = (new PushMiddlewareDispatcher(
             $middlewareConfig->middlewareFactory,
             $middlewareConfig->commonMiddlewareDefinitions,
             $this->createFinalPushHandler(),
-        );
-        $this->setMiddlewaresAndPrepareDispatcher($middlewareDefinitions);
+        ))->withMiddlewaresAdded($middlewareDefinitions);
     }
 
     public function __clone()
     {
-        $finalPushHandler = $this->createFinalPushHandler();
-        $this->baseDispatcher = $this->baseDispatcher->withFinishHandler($finalPushHandler);
-        $this->dispatcher = $this->dispatcher->withFinishHandler($finalPushHandler);
+        $this->dispatcher = $this->dispatcher->withFinishHandler($this->createFinalPushHandler());
     }
 
     public function getName(): string
@@ -162,29 +148,6 @@ final class Queue implements QueueInterface
         }
 
         return $this->adapter->status($id);
-    }
-
-    public function withMiddlewares(mixed ...$middlewareDefinitions): self
-    {
-        $instance = clone $this;
-        $instance->setMiddlewaresAndPrepareDispatcher($middlewareDefinitions);
-        return $instance;
-    }
-
-    public function withMiddlewaresAdded(mixed ...$middlewareDefinitions): self
-    {
-        $instance = clone $this;
-        $instance->setMiddlewaresAndPrepareDispatcher([...array_values($instance->middlewareDefinitions), ...array_values($middlewareDefinitions)]);
-        return $instance;
-    }
-
-    /**
-     * @param mixed[] $middlewareDefinitions
-     */
-    private function setMiddlewaresAndPrepareDispatcher(array $middlewareDefinitions): void
-    {
-        $this->middlewareDefinitions = $middlewareDefinitions;
-        $this->dispatcher = $this->baseDispatcher->withMiddlewaresAdded($middlewareDefinitions);
     }
 
     private function handle(MessageInterface $message): bool

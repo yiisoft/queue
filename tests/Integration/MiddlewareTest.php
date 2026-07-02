@@ -64,12 +64,13 @@ final class MiddlewareTest extends TestCase
             $this->createMock(LoopInterface::class),
             $this->createMock(LoggerInterface::class),
             $pushMiddlewareConfig,
-            name: 'test',
+            null,
+            'test',
+            new TestMiddleware('channel 1'),
+            new TestMiddleware('channel 2'),
+            new TestMiddleware('channel 3'),
+            new TestMiddleware('channel 4'),
         );
-        $queue = $queue
-            ->withMiddlewares(new TestMiddleware('Won\'t be executed'))
-            ->withMiddlewares(new TestMiddleware('channel 1'), new TestMiddleware('channel 2'))
-            ->withMiddlewaresAdded(new TestMiddleware('channel 3'), new TestMiddleware('channel 4'));
 
         $message = new GenericMessage('test', ['initial']);
         $messagePushed = $queue->push($message);
