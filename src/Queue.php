@@ -48,16 +48,13 @@ final class Queue implements QueueInterface
         mixed ...$middlewareDefinitions,
     ) {
         $this->name = StringNormalizer::normalize($name);
-        $this->dispatcher = (new PushMiddlewareDispatcher(
-            $middlewareConfig->middlewareFactory,
-            $middlewareConfig->commonMiddlewareDefinitions,
-            $this->createFinalPushHandler(),
-        ))->withMiddlewaresAdded($middlewareDefinitions);
-    }
-
-    public function __clone()
-    {
-        $this->dispatcher = $this->dispatcher->withFinishHandler($this->createFinalPushHandler());
+        $this->dispatcher = new PushMiddlewareDispatcher(
+            middlewareFactory: $middlewareConfig->middlewareFactory,
+            middlewareDefinitions: [...$middlewareConfig->commonMiddlewareDefinitions, ...$middlewareDefinitions],
+            finishHandler: $this->isSynchronous()
+                ? new SynchronousPushHandler($this->worker, $this)
+                : new AdapterPushHandler($this->adapter),
+        );
     }
 
     public function getName(): string
@@ -155,13 +152,6 @@ final class Queue implements QueueInterface
         $this->worker->process($message, $this);
 
         return $this->loop->canContinue();
-    }
-
-    private function createFinalPushHandler(): PushHandlerInterface
-    {
-        return $this->isSynchronous()
-            ? new SynchronousPushHandler($this->worker, $this)
-            : new AdapterPushHandler($this->adapter);
     }
 
     /**
