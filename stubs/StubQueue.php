@@ -6,12 +6,13 @@ namespace Yiisoft\Queue\Stubs;
 
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueInterface;
 
 /**
  * Stub queue that does nothing. Message status is always "done".
  */
-final class StubQueue implements QueueInterface
+final class StubQueue implements QueueInterface, QueueConsumerInterface
 {
     public function __construct(
         private string $name = 'default',

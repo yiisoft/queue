@@ -18,18 +18,6 @@ interface QueueInterface
     public function push(MessageInterface $message): MessageInterface;
 
     /**
-     * Handle all existing messages and exit
-     *
-     * @return int Number of messages processed.
-     */
-    public function run(int $max = 0): int;
-
-    /**
-     * Listen to the queue and handle messages as they come
-     */
-    public function listen(): void;
-
-    /**
      * @param int|string $id A message ID.
      *
      * @return MessageStatus

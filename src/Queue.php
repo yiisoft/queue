@@ -17,7 +17,7 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
 
-final class Queue implements QueueInterface
+final class Queue implements QueueInterface, QueueConsumerInterface
 {
     private string $name;
 

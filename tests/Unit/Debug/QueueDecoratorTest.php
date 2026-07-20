@@ -6,9 +6,11 @@ namespace Yiisoft\Queue\Tests\Unit\Debug;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Debug\QueueCollector;
+use Yiisoft\Queue\Debug\QueueConsumerDecorator;
 use Yiisoft\Queue\Debug\QueueDecorator;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueInterface;
 
 final class QueueDecoratorTest extends TestCase
@@ -88,10 +90,10 @@ final class QueueDecoratorTest extends TestCase
 
     public function testRun(): void
     {
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = $this->createMockForIntersectionOfInterfaces([QueueInterface::class, QueueConsumerInterface::class]);
         $queue->expects($this->once())->method('run');
         $collector = new QueueCollector();
-        $decorator = new QueueDecorator(
+        $decorator = new QueueConsumerDecorator(
             $queue,
             $collector,
         );
@@ -101,10 +103,10 @@ final class QueueDecoratorTest extends TestCase
 
     public function testListen(): void
     {
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = $this->createMockForIntersectionOfInterfaces([QueueInterface::class, QueueConsumerInterface::class]);
         $queue->expects($this->once())->method('listen');
         $collector = new QueueCollector();
-        $decorator = new QueueDecorator(
+        $decorator = new QueueConsumerDecorator(
             $queue,
             $collector,
         );

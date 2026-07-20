@@ -7,6 +7,7 @@ Use this reference when you need to understand how queue names map to adapters, 
 - A queue name (string or `BackedEnum`) is passed to `Yiisoft\Queue\Provider\QueueProviderInterface::get($queueName)`.
 - The provider returns a `Yiisoft\Queue\QueueInterface` instance configured for that name.
 - `QueueInterface::getName()` can be used for introspection; it returns the logical name the queue was created with.
+- Queues that can consume messages also implement `Yiisoft\Queue\QueueConsumerInterface`.
 
 ## Provider implementations
 

@@ -8,15 +8,17 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Command\RunCommand;
+use Yiisoft\Queue\Provider\InvalidQueueConfigException;
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueInterface;
 
 final class RunCommandTest extends TestCase
 {
     public function testExecuteWithSingleQueue(): void
     {
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = $this->createMockForIntersectionOfInterfaces([QueueInterface::class, QueueConsumerInterface::class]);
         $queue->expects($this->once())
             ->method('run')
             ->with($this->equalTo(0))
@@ -43,13 +45,13 @@ final class RunCommandTest extends TestCase
 
     public function testExecuteWithMultipleQueues(): void
     {
-        $queue1 = $this->createMock(QueueInterface::class);
+        $queue1 = $this->createMockForIntersectionOfInterfaces([QueueInterface::class, QueueConsumerInterface::class]);
         $queue1->expects($this->once())
             ->method('run')
             ->with($this->equalTo(0))
             ->willReturn(3);
 
-        $queue2 = $this->createMock(QueueInterface::class);
+        $queue2 = $this->createMockForIntersectionOfInterfaces([QueueInterface::class, QueueConsumerInterface::class]);
         $queue2->expects($this->once())
             ->method('run')
             ->with($this->equalTo(0))
@@ -75,7 +77,7 @@ final class RunCommandTest extends TestCase
 
     public function testExecuteWithLimitOption(): void
     {
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = $this->createMockForIntersectionOfInterfaces([QueueInterface::class, QueueConsumerInterface::class]);
         $queue->expects($this->once())
             ->method('run')
             ->with($this->equalTo(100))
@@ -102,7 +104,7 @@ final class RunCommandTest extends TestCase
 
     public function testExecuteWithDefaultQueues(): void
     {
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = $this->createMockForIntersectionOfInterfaces([QueueInterface::class, QueueConsumerInterface::class]);
         $queue->expects($this->once())
             ->method('run')
             ->with($this->equalTo(0))
@@ -125,5 +127,18 @@ final class RunCommandTest extends TestCase
         $exitCode = $command->run($input, $output);
 
         $this->assertEquals(0, $exitCode);
+    }
+
+    public function testExecuteRequiresConsumerQueue(): void
+    {
+        $queueProvider = new PredefinedQueueProvider([
+            'producer-only' => $this->createMock(QueueInterface::class),
+        ]);
+
+        $this->expectException(InvalidQueueConfigException::class);
+        $this->expectExceptionMessage('Queue "producer-only" must implement');
+
+        $command = new RunCommand($queueProvider);
+        $command->run(new StringInput('producer-only'), $this->createMock(OutputInterface::class));
     }
 }

@@ -8,6 +8,8 @@ use Yiisoft\Queue\Cli\SignalLoop;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\MessageStatus;
+use Yiisoft\Queue\QueueConsumerInterface;
+use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\TestCase;
 
@@ -22,6 +24,16 @@ enum TestQueue: string
 
 final class QueueTest extends TestCase
 {
+    public function testContracts(): void
+    {
+        $queue = $this->createQueue();
+
+        self::assertInstanceOf(QueueInterface::class, $queue);
+        self::assertInstanceOf(QueueConsumerInterface::class, $queue);
+        self::assertFalse(method_exists(QueueInterface::class, 'run'));
+        self::assertFalse(method_exists(QueueInterface::class, 'listen'));
+    }
+
     public function testPushSuccessful(): void
     {
         $adapter = new InMemoryAdapter();

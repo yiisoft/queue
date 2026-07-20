@@ -11,7 +11,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
+use Yiisoft\Queue\Provider\InvalidQueueConfigException;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\QueueConsumerInterface;
+
+use function get_debug_type;
+use function sprintf;
 
 #[AsCommand(
     'queue:listen-all',
@@ -64,7 +69,7 @@ final class ListenAllCommand extends Command
         $queues = [];
         /** @var string $queue */
         foreach ($input->getArgument('queue') as $queue) {
-            $queues[] = $this->queueProvider->get($queue);
+            $queues[] = $this->getQueueConsumer($queue);
         }
 
         $pauseSeconds = (int) $input->getOption('pause');
@@ -85,5 +90,23 @@ final class ListenAllCommand extends Command
         }
 
         return 0;
+    }
+
+    private function getQueueConsumer(string $name): QueueConsumerInterface
+    {
+        $queue = $this->queueProvider->get($name);
+
+        if (!$queue instanceof QueueConsumerInterface) {
+            throw new InvalidQueueConfigException(
+                sprintf(
+                    'Queue "%s" must implement "%s" to consume messages. Got "%s" instead.',
+                    $name,
+                    QueueConsumerInterface::class,
+                    get_debug_type($queue),
+                ),
+            );
+        }
+
+        return $queue;
     }
 }

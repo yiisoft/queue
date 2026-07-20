@@ -6,9 +6,11 @@ namespace Yiisoft\Queue\Tests\Unit\Debug;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Debug\QueueCollector;
+use Yiisoft\Queue\Debug\QueueConsumerDecorator;
 use Yiisoft\Queue\Debug\QueueDecorator;
 use Yiisoft\Queue\Debug\QueueProviderInterfaceProxy;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueInterface;
 
 final class QueueProviderInterfaceProxyTest extends TestCase
@@ -22,6 +24,20 @@ final class QueueProviderInterfaceProxyTest extends TestCase
         $factory = new QueueProviderInterfaceProxy($queueFactory, $collector);
 
         $this->assertInstanceOf(QueueDecorator::class, $factory->get('test'));
+    }
+
+    public function testGetConsumerQueue(): void
+    {
+        $queueFactory = $this->createMock(QueueProviderInterface::class);
+        $queue = $this->createMockForIntersectionOfInterfaces([QueueInterface::class, QueueConsumerInterface::class]);
+        $queueFactory->expects($this->once())->method('get')->willReturn($queue);
+        $collector = new QueueCollector();
+        $factory = new QueueProviderInterfaceProxy($queueFactory, $collector);
+
+        $decoratedQueue = $factory->get('test');
+
+        $this->assertInstanceOf(QueueConsumerDecorator::class, $decoratedQueue);
+        $this->assertInstanceOf(QueueConsumerInterface::class, $decoratedQueue);
     }
 
     public function testHas(): void

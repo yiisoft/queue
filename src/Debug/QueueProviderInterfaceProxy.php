@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Debug;
 
 use BackedEnum;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueInterface;
 
 final class QueueProviderInterfaceProxy implements QueueProviderInterface
@@ -19,7 +20,9 @@ final class QueueProviderInterfaceProxy implements QueueProviderInterface
     {
         $queue = $this->queueProvider->get($name);
 
-        return new QueueDecorator($queue, $this->collector);
+        return $queue instanceof QueueConsumerInterface
+            ? new QueueConsumerDecorator($queue, $this->collector)
+            : new QueueDecorator($queue, $this->collector);
     }
 
     public function has(string|BackedEnum $name): bool

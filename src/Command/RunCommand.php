@@ -10,7 +10,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Yiisoft\Queue\Provider\InvalidQueueConfigException;
 use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\QueueConsumerInterface;
+
+use function get_debug_type;
+use function sprintf;
 
 #[AsCommand(
     'queue:run',
@@ -47,13 +52,29 @@ final class RunCommand extends Command
         /** @var string $queue */
         foreach ($input->getArgument('queue') as $queue) {
             $output->write("Processing queue $queue... ");
-            $count = $this->queueProvider
-                ->get($queue)
-                ->run((int) $input->getOption('limit'));
+            $count = $this->getQueueConsumer($queue)->run((int) $input->getOption('limit'));
 
             $output->writeln("Messages processed: $count.");
         }
 
         return 0;
+    }
+
+    private function getQueueConsumer(string $name): QueueConsumerInterface
+    {
+        $queue = $this->queueProvider->get($name);
+
+        if (!$queue instanceof QueueConsumerInterface) {
+            throw new InvalidQueueConfigException(
+                sprintf(
+                    'Queue "%s" must implement "%s" to consume messages. Got "%s" instead.',
+                    $name,
+                    QueueConsumerInterface::class,
+                    get_debug_type($queue),
+                ),
+            );
+        }
+
+        return $queue;
     }
 }

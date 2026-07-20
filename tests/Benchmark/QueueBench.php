@@ -22,14 +22,13 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Queue;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\Benchmark\Support\VoidAdapter;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 
 final class QueueBench
 {
-    private readonly QueueInterface $queue;
+    private readonly Queue $queue;
     private readonly MessageSerializer $serializer;
     private readonly VoidAdapter $adapter;
 

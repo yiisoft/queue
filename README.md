@@ -138,6 +138,8 @@ For setting up all classes manually, see the [Manual configuration](docs/guide/e
 To send a message to the queue, get the queue instance and call `push()`. Typically the queue is injected as a dependency:
 
 ```php
+use Yiisoft\Queue\QueueInterface;
+
 final readonly class Foo
 {
     public function __construct(private QueueInterface $queue) {}
@@ -163,6 +165,8 @@ By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/
 ```
 
 See [Console commands](docs/guide/en/console-commands.md) for more details.
+
+Consumers are represented by `Yiisoft\Queue\QueueConsumerInterface`; it contains `run()` and `listen()`.
 
 > In case you're running the queue in synchronous mode (no adapter), `queue:listen` logs an info message and exits. The messages are processed immediately when pushed.
 
