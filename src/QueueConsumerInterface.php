@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue;
 
+/**
+ * Consumes messages from a queue.
+ *
+ * This interface complements {@see QueueInterface}, which is responsible for producing messages and checking their
+ * status.
+ */
 interface QueueConsumerInterface
 {
     /**

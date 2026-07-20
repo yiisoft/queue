@@ -6,6 +6,11 @@ namespace Yiisoft\Queue;
 
 use Yiisoft\Queue\Message\MessageInterface;
 
+/**
+ * Produces messages by pushing them into a queue.
+ *
+ * For consuming messages from a queue, use {@see QueueConsumerInterface}.
+ */
 interface QueueInterface
 {
     /**
