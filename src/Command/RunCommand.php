@@ -35,7 +35,7 @@ final class RunCommand extends Command
             'queue',
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
             'Queue name list to connect to.',
-            $this->queueProvider->getNames(),
+            [],
         )
             ->addOption(
                 'limit',
@@ -49,10 +49,22 @@ final class RunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var string[] $queueNames */
+        $queueNames = $input->getArgument('queue');
+        $queueIsRequired = $queueNames !== [];
+        if (!$queueIsRequired) {
+            $queueNames = $this->queueProvider->getNames();
+        }
+
         /** @var string $queue */
-        foreach ($input->getArgument('queue') as $queue) {
+        foreach ($queueNames as $queue) {
+            $queueConsumer = $this->getQueueConsumer($queue, $queueIsRequired);
+            if ($queueConsumer === null) {
+                continue;
+            }
+
             $output->write("Processing queue $queue... ");
-            $count = $this->getQueueConsumer($queue)->run((int) $input->getOption('limit'));
+            $count = $queueConsumer->run((int) $input->getOption('limit'));
 
             $output->writeln("Messages processed: $count.");
         }
@@ -60,11 +72,15 @@ final class RunCommand extends Command
         return 0;
     }
 
-    private function getQueueConsumer(string $name): QueueConsumerInterface
+    private function getQueueConsumer(string $name, bool $required): ?QueueConsumerInterface
     {
         $queue = $this->queueProvider->get($name);
 
         if (!$queue instanceof QueueConsumerInterface) {
+            if (!$required) {
+                return null;
+            }
+
             throw new InvalidQueueConfigException(
                 sprintf(
                     'Queue "%s" must implement "%s" to consume messages. Got "%s" instead.',

@@ -129,6 +129,34 @@ final class RunCommandTest extends TestCase
         $this->assertEquals(0, $exitCode);
     }
 
+    public function testExecuteWithDefaultQueuesSkipsProducerOnlyQueues(): void
+    {
+        $queue = $this->createMockForIntersectionOfInterfaces([QueueInterface::class, QueueConsumerInterface::class]);
+        $queue->expects($this->once())
+            ->method('run')
+            ->with($this->equalTo(0))
+            ->willReturn(2);
+
+        $queueProvider = new PredefinedQueueProvider([
+            'producer-only' => $this->createMock(QueueInterface::class),
+            'consumer' => $queue,
+        ]);
+
+        $input = new StringInput('');
+        $output = $this->createMock(OutputInterface::class);
+        $output->expects($this->once())
+            ->method('write')
+            ->with($this->equalTo('Processing queue consumer... '));
+        $output->expects($this->once())
+            ->method('writeln')
+            ->with($this->equalTo('Messages processed: 2.'));
+
+        $command = new RunCommand($queueProvider);
+        $exitCode = $command->run($input, $output);
+
+        $this->assertEquals(0, $exitCode);
+    }
+
     public function testExecuteRequiresConsumerQueue(): void
     {
         $queueProvider = new PredefinedQueueProvider([

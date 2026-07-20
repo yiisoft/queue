@@ -42,6 +42,30 @@ final class ListenAllCommandTest extends TestCase
         $this->assertEquals(0, $exitCode);
     }
 
+    public function testExecuteSkipsProducerOnlyQueuesByDefault(): void
+    {
+        $queue = $this->createMockForIntersectionOfInterfaces([QueueInterface::class, QueueConsumerInterface::class]);
+        $queue->expects($this->once())->method('run');
+
+        $queueFactory = new PredefinedQueueProvider([
+            'producer-only' => $this->createMock(QueueInterface::class),
+            'consumer' => $queue,
+        ]);
+
+        $loop = $this->createMock(LoopInterface::class);
+        $loop->method('canContinue')->willReturn(true, false);
+
+        $command = new ListenAllCommand(
+            $queueFactory,
+            $loop,
+        );
+        $input = new ArrayInput([], $command->getNativeDefinition());
+        $input->setOption('pause', 0);
+        $exitCode = $command->run($input, $this->createMock(OutputInterface::class));
+
+        $this->assertEquals(0, $exitCode);
+    }
+
     public function testExecuteRequiresConsumerQueues(): void
     {
         $queueFactory = new PredefinedQueueProvider([

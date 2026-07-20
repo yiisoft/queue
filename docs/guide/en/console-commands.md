@@ -6,7 +6,7 @@ If you are using [yiisoft/config](https://github.com/yiisoft/config) and [yiisof
 
 If you are using [symfony/console](https://github.com/symfony/console) directly, you should register the commands manually.
 
-> **Note:** The default queue name list (used when no queue names are passed to a command) is only available when using [yiisoft/config](https://github.com/yiisoft/config) and [yiisoft/yii-console](https://github.com/yiisoft/yii-console). Without them, you must pass the queue name list explicitly to the command constructor.
+> **Note:** When no queue names are passed to `queue:run` or `queue:listen-all`, the commands use the queue names provided by `QueueProviderInterface::getNames()` and skip queues that don't implement `QueueConsumerInterface`. Explicitly passed queue names must be consumer-capable.
 
 In [yiisoft/app](https://github.com/yiisoft/app) the `yii` console binary is provided out of the box.
 If you are using [yiisoft/yii-console](https://github.com/yiisoft/yii-console) or `symfony/console` without that template, invoke these commands the same way you invoke other console commands in your application.
@@ -17,7 +17,7 @@ The command `queue:run` obtains and handles messages until the queue is empty, t
 
 You can also narrow the scope of processed messages by specifying queue name(s) and maximum number of messages to process:
 
-- Specify one or more queue names to process. Messages from other queues will be ignored. Defaults to all registered queue names.
+- Specify one or more queue names to process. Messages from other queues will be ignored. Defaults to all registered consumer-capable queue names.
 - Use `--limit` to limit the number of messages processed. When set, command will exit either when all the messages are processed or when the maximum count is reached.
 
 The full command signature is:
@@ -39,7 +39,7 @@ yii queue:listen [queueName]
 
 The following command iterates through multiple queues and is meant to be used in development environment only, as it consumes a lot of CPU for iterating through queues. You can pass to it:
 
-- `queueName` argument(s). Specify one or more queue names to process. Messages from other queues will be ignored. Defaults to all registered queue names.
+- `queueName` argument(s). Specify one or more queue names to process. Messages from other queues will be ignored. Defaults to all registered consumer-capable queue names.
 - `--limit` option to limit the number of messages processed before switching to another queue. E.g. you set `--limit` to 500 and right now you have 1000 messages in `queue1`. This command will consume only 500 of them, then it will switch to `queue2` to see if there are any messages there. Defaults to `0` (no limit).
 - `--pause` option to specify the number of seconds to pause between checking queues when no messages are found. Defaults to `1`.
 

@@ -22,7 +22,7 @@ use function sprintf;
     'queue:listen-all',
     'Listens the all the given queues and executes messages as they come. '
         . 'Meant to be used in development environment only. '
-        . 'Listens all configured queues by default in case you\'re using yiisoft/config. '
+        . 'Listens all consumer-capable configured queues by default. '
         . 'Needs to be stopped manually.',
 )]
 final class ListenAllCommand extends Command
@@ -43,7 +43,7 @@ final class ListenAllCommand extends Command
             'queue',
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
             'Queue name list to connect to',
-            $this->queueProvider->getNames(),
+            [],
         )
             ->addOption(
                 'pause',
@@ -66,10 +66,24 @@ final class ListenAllCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var string[] $queueNames */
+        $queueNames = $input->getArgument('queue');
+        $queueIsRequired = $queueNames !== [];
+        if (!$queueIsRequired) {
+            $queueNames = $this->queueProvider->getNames();
+        }
+
         $queues = [];
         /** @var string $queue */
-        foreach ($input->getArgument('queue') as $queue) {
-            $queues[] = $this->getQueueConsumer($queue);
+        foreach ($queueNames as $queue) {
+            $queueConsumer = $this->getQueueConsumer($queue, $queueIsRequired);
+            if ($queueConsumer !== null) {
+                $queues[] = $queueConsumer;
+            }
+        }
+
+        if ($queues === []) {
+            return Command::SUCCESS;
         }
 
         $pauseSeconds = (int) $input->getOption('pause');
@@ -92,11 +106,15 @@ final class ListenAllCommand extends Command
         return 0;
     }
 
-    private function getQueueConsumer(string $name): QueueConsumerInterface
+    private function getQueueConsumer(string $name, bool $required): ?QueueConsumerInterface
     {
         $queue = $this->queueProvider->get($name);
 
         if (!$queue instanceof QueueConsumerInterface) {
+            if (!$required) {
+                return null;
+            }
+
             throw new InvalidQueueConfigException(
                 sprintf(
                     'Queue "%s" must implement "%s" to consume messages. Got "%s" instead.',
