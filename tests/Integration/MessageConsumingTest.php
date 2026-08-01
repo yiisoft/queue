@@ -45,8 +45,8 @@ final class MessageConsumingTest extends TestCase
 
         $messages = [1, 'foo', 'bar-baz'];
         foreach ($messages as $message) {
-            $worker->process(new GenericMessage('test', $message), $this->getQueue());
-            $worker->process(new GenericMessage('test2', $message), $this->getQueue());
+            $worker->process(new GenericMessage('test', $message), 'yii-queue');
+            $worker->process(new GenericMessage('test2', $message), 'yii-queue');
         }
 
         $this->assertEquals($messages, $this->messagesProcessed);
@@ -72,7 +72,7 @@ final class MessageConsumingTest extends TestCase
 
         $messages = [1, 'foo', 'bar-baz'];
         foreach ($messages as $message) {
-            $worker->process(new GenericMessage(TestHandler::class, $message), $this->getQueue());
+            $worker->process(new GenericMessage(TestHandler::class, $message), 'yii-queue');
         }
 
         $this->assertEquals($messages, $handler->messagesProcessed);

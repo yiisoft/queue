@@ -15,7 +15,6 @@ use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Queue\Middleware\Consume\ConsumeHandlerInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestCallableMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\TestMiddleware;
@@ -25,12 +24,11 @@ final class MiddlewareDispatcherTest extends TestCase
     public function testCallableMiddlewareCalled(): void
     {
         $request = $this->getConsumeRequest();
-        $queue = $this->createMock(QueueInterface::class);
 
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
-                static function (ConsumeRequest $request) use ($queue): ConsumeRequest {
-                    return $request->withMessage(new GenericMessage('test', 'New closure test data'))->withQueue($queue);
+                static function (ConsumeRequest $request): ConsumeRequest {
+                    return $request->withMessage(new GenericMessage('test', 'New closure test data'))->withQueueName('other-queue');
                 },
             ],
         );
@@ -178,7 +176,7 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         return new ConsumeRequest(
             new GenericMessage('handler', 'data'),
-            $this->createMock(QueueInterface::class),
+            'test-queue',
         );
     }
 }

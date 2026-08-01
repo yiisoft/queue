@@ -37,7 +37,7 @@ final class FailureMiddlewareDispatcher
         FailureHandlingRequest $request,
         FailureHandlerInterface $finishHandler,
     ): FailureHandlingRequest {
-        $queueName = $request->getQueue()->getName();
+        $queueName = $request->getQueueName();
         if (!isset($this->middlewareDefinitions[$queueName]) || $this->middlewareDefinitions[$queueName] === []) {
             $queueName = self::DEFAULT_PIPELINE;
         }

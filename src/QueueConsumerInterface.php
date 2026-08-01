@@ -7,8 +7,7 @@ namespace Yiisoft\Queue;
 /**
  * Consumes messages from a queue.
  *
- * This interface complements {@see QueueInterface}, which is responsible for producing messages and checking their
- * status.
+ * This interface complements {@see QueueProducerInterface}, which produces messages and checks their status.
  */
 interface QueueConsumerInterface
 {

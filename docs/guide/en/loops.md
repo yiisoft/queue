@@ -4,7 +4,7 @@ Yii Queue uses `\Yiisoft\Queue\Cli\LoopInterface` to control long-running execut
 
 The loop is evaluated to determine whether it can continue:
 
-- After each processed message (via `Queue::run()` / `Queue::listen()`).
+- After each processed message (via `QueueConsumer::run()` / `QueueConsumer::listen()`).
 - On each iteration of `queue:listen-all`.
 
 When `canContinue()` returns `false`, consuming stops gracefully (as soon as the current message is finished).
@@ -82,7 +82,7 @@ return [
 
 ### Manual configuration (without `yiisoft/config`)
 
-Instantiate the loop you want and pass it to `Queue` (and, depending on adapter, to adapter constructor as well):
+Instantiate the loop you want and pass it to `QueueConsumer` (and, depending on adapter, to the adapter constructor as well):
 
 ```php
 use Yiisoft\Queue\Cli\SignalLoop;

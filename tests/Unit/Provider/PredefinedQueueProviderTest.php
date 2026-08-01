@@ -6,105 +6,50 @@ namespace Yiisoft\Queue\Tests\Unit\Provider;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Provider\InvalidQueueConfigException;
-use Yiisoft\Queue\Provider\QueueNotFoundException;
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;
-use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Stubs\StubQueue;
+use Yiisoft\Queue\Provider\QueueNotFoundException;
+use Yiisoft\Queue\Stubs\StubQueueConsumer;
+use Yiisoft\Queue\Stubs\StubQueueProducer;
 use Yiisoft\Queue\Tests\Unit\Support\StringEnum;
-
-use stdClass;
-
-use function sprintf;
 
 final class PredefinedQueueProviderTest extends TestCase
 {
-    public function testBase(): void
+    public function testProvidesIndependentRoles(): void
     {
-        $queue = new StubQueue();
-        $provider = new PredefinedQueueProvider([
-            'queue1' => $queue,
-        ]);
+        $producer = new StubQueueProducer();
+        $consumer = new StubQueueConsumer();
+        $provider = new PredefinedQueueProvider(['queue1' => ['producer' => $producer, 'consumer' => $consumer]]);
 
-        $this->assertSame($queue, $provider->get('queue1'));
-        $this->assertTrue($provider->has('queue1'));
-        $this->assertFalse($provider->has('not-exist-queue'));
+        self::assertSame($producer, $provider->getProducer('queue1'));
+        self::assertSame($consumer, $provider->getConsumer('queue1'));
+        self::assertSame(['queue1'], $provider->getProducerNames());
+        self::assertSame(['queue1'], $provider->getConsumerNames());
     }
 
-    public function testGetTwice(): void
+    public function testCapabilityIsolationAndEnumNames(): void
     {
-        $queue = new StubQueue();
-        $provider = new PredefinedQueueProvider([
-            'queue1' => $queue,
-        ]);
-
-        $queue1 = $provider->get('queue1');
-        $queue2 = $provider->get('queue1');
-
-        $this->assertSame($queue1, $queue2);
-    }
-
-    public function testGetNotExistQueue(): void
-    {
-        $provider = new PredefinedQueueProvider([
-            'queue1' => new StubQueue(),
-        ]);
-
+        $provider = new PredefinedQueueProvider(['red' => ['producer' => new StubQueueProducer()]]);
+        self::assertTrue($provider->hasProducer(StringEnum::RED));
+        self::assertFalse($provider->hasConsumer(StringEnum::RED));
         $this->expectException(QueueNotFoundException::class);
-        $this->expectExceptionMessage('Queue with name "not-exist-queue" not found.');
-        $provider->get('not-exist-queue');
+        $provider->getConsumer(StringEnum::RED);
     }
 
-    public function testInvalidQueueConfig(): void
+    public function testRejectsFlatAndInvalidRoleMaps(): void
+    {
+        foreach ([['queue' => new StubQueueProducer()], ['queue' => []], ['queue' => ['unknown' => new StubQueueProducer()]]] as $queues) {
+            try {
+                new PredefinedQueueProvider($queues);
+                self::fail('Invalid role maps must be rejected.');
+            } catch (InvalidQueueConfigException) {
+                self::addToAssertionCount(1);
+            }
+        }
+    }
+
+    public function testRejectsWrongRoleInstance(): void
     {
         $this->expectException(InvalidQueueConfigException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'Queue must implement "%s". For queue "%s" got "%s" instead.',
-                QueueInterface::class,
-                'queue1',
-                'stdClass',
-            ),
-        );
-
-        /** @psalm-suppress InvalidArgument */
-        new PredefinedQueueProvider([
-            'queue1' => new stdClass(),
-        ]);
-    }
-
-    public function testGetHasByStringEnum(): void
-    {
-        $queue = new StubQueue();
-        $provider = new PredefinedQueueProvider([
-            'red' => $queue,
-        ]);
-
-        $this->assertSame($queue, $provider->get(StringEnum::RED));
-        $this->assertTrue($provider->has(StringEnum::RED));
-        $this->assertFalse($provider->has(StringEnum::GREEN));
-    }
-
-    public function testEmpty(): void
-    {
-        $provider = new PredefinedQueueProvider([]);
-
-        $this->assertFalse($provider->has('any'));
-    }
-
-    public function testGetNames(): void
-    {
-        $provider = new PredefinedQueueProvider([
-            'queue1' => new StubQueue(),
-            'queue2' => new StubQueue(),
-        ]);
-
-        $this->assertSame(['queue1', 'queue2'], $provider->getNames());
-    }
-
-    public function testGetNamesEmpty(): void
-    {
-        $provider = new PredefinedQueueProvider([]);
-
-        $this->assertSame([], $provider->getNames());
+        new PredefinedQueueProvider(['queue' => ['producer' => new StubQueueConsumer()]]);
     }
 }

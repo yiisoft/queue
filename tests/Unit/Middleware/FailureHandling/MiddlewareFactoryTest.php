@@ -19,7 +19,6 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support\CallableObjectMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support\InvalidController;
@@ -57,7 +56,7 @@ final class MiddlewareFactoryTest extends TestCase
                 return new FailureHandlingRequest(
                     new GenericMessage('test', 'test data'),
                     new RuntimeException('test exception'),
-                    $this->createMock(QueueInterface::class),
+                    'test-queue',
                 );
             },
         );
@@ -208,7 +207,7 @@ final class MiddlewareFactoryTest extends TestCase
         return new FailureHandlingRequest(
             new GenericMessage('handler', 'data'),
             new Exception('test exception'),
-            $this->createMock(QueueInterface::class),
+            'test-queue',
         );
     }
 }

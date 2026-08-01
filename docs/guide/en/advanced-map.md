@@ -33,12 +33,9 @@ Use this index when you need to customize internals: custom middleware, adapters
 
 ## Queue provider registry
 
-When multiple queue names share infrastructure, rely on `QueueProviderInterface`:
+When multiple queue names share infrastructure, use typed providers and a strict `queues[name][producer|consumer]` role map:
 
-- A queue name is passed to `QueueProviderInterface::get($queueName)` and resolved into a configured `QueueInterface` instance.
-- Default implementation (`AdapterFactoryQueueProvider`) enforces a strict registry defined in `yiisoft/queue.queues`. Unknown names throw `QueueNotFoundException`.
-- Alternative providers include:
-  - `PredefinedQueueProvider` — accepts a pre-built map of queue name → `QueueInterface` instance.
-  - `QueueFactoryProvider` — creates queue objects lazily from [`yiisoft/factory`](https://github.com/yiisoft/factory) definitions.
-  - `CompositeQueueProvider` — aggregates multiple providers and selects the first that knows the queue name.
-- Implement `QueueProviderInterface` to introduce custom registries or fallback strategies, then register the implementation in DI.
+- `QueueProducerProviderInterface::getProducer($queueName)` resolves a configured `QueueProducerInterface`; `QueueConsumerProviderInterface::getConsumer($queueName)` resolves a `QueueConsumerInterface`.
+- `QueueFactoryProvider` lazily creates each role from [`yiisoft/factory`](https://github.com/yiisoft/factory) definitions; `PredefinedQueueProvider` accepts ready role instances in the same map shape.
+- `CompositeQueueProvider` aggregates typed providers and selects the first provider that has the requested role for the name.
+- Implement the producer provider, consumer provider, or both to introduce custom registries or fallback strategies, then register the typed dependency in DI.

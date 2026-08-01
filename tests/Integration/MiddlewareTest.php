@@ -11,7 +11,6 @@ use Psr\Log\LoggerInterface;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
-use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
@@ -25,8 +24,8 @@ use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\Queue;
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\QueueProducer;
+use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Tests\Integration\Support\TestMiddleware;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -59,13 +58,12 @@ final class MiddlewareTest extends TestCase
         );
         $worker = $this->createMock(WorkerInterface::class);
         $worker->method('process')->willReturnArgument(0);
-        $queue = new Queue(
-            $worker,
-            $this->createMock(LoopInterface::class),
+        $queue = new QueueProducer(
             $this->createMock(LoggerInterface::class),
             $pushMiddlewareConfig,
             null,
             'test',
+            $worker,
             new TestMiddleware('channel 1'),
             new TestMiddleware('channel 2'),
             new TestMiddleware('channel 3'),
@@ -115,7 +113,7 @@ final class MiddlewareTest extends TestCase
         );
 
         $message = new GenericMessage('test', ['initial']);
-        $messageConsumed = $worker->process($message, $this->createMock(QueueInterface::class));
+        $messageConsumed = $worker->process($message, 'test-queue');
 
         self::assertEquals($stack, $messageConsumed->getPayload());
     }
@@ -127,7 +125,7 @@ final class MiddlewareTest extends TestCase
 
         $message = new GenericMessage('simple', null);
         $queueCallback = static fn(MessageInterface $message): MessageInterface => $message;
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = $this->createMock(QueueProducerInterface::class);
         $container = new SimpleContainer([SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queue)]);
         $callableFactory = new CallableFactory($container);
 
@@ -135,7 +133,7 @@ final class MiddlewareTest extends TestCase
         $queue->method('getName')->willReturn('simple');
 
         $middlewares = [
-            'simple' => [
+            'test-queue' => [
                 new SendAgainMiddleware('test', 1, $queue),
                 [
                     'class' => SendAgainMiddleware::class,
@@ -163,7 +161,7 @@ final class MiddlewareTest extends TestCase
         );
 
         $iteration = 0;
-        $request = new FailureHandlingRequest($message, $exception, $queue);
+        $request = new FailureHandlingRequest($message, $exception, 'test-queue', $queue);
         $finalHandler = new FailureFinalHandler();
         try {
             do {

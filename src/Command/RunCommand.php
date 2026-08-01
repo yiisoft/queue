@@ -10,12 +10,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Yiisoft\Queue\Provider\InvalidQueueConfigException;
-use Yiisoft\Queue\Provider\QueueProviderInterface;
-use Yiisoft\Queue\QueueConsumerInterface;
-
-use function get_debug_type;
-use function sprintf;
+use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
 
 #[AsCommand(
     'queue:run',
@@ -24,7 +19,7 @@ use function sprintf;
 final class RunCommand extends Command
 {
     public function __construct(
-        private readonly QueueProviderInterface $queueProvider,
+        private readonly QueueConsumerProviderInterface $queueProvider,
     ) {
         parent::__construct();
     }
@@ -51,17 +46,13 @@ final class RunCommand extends Command
     {
         /** @var string[] $queueNames */
         $queueNames = $input->getArgument('queue');
-        $queueIsRequired = $queueNames !== [];
-        if (!$queueIsRequired) {
-            $queueNames = $this->queueProvider->getNames();
+        if ($queueNames === []) {
+            $queueNames = $this->queueProvider->getConsumerNames();
         }
 
         /** @var string $queue */
         foreach ($queueNames as $queue) {
-            $queueConsumer = $this->getQueueConsumer($queue, $queueIsRequired);
-            if ($queueConsumer === null) {
-                continue;
-            }
+            $queueConsumer = $this->queueProvider->getConsumer($queue);
 
             $output->write("Processing queue $queue... ");
             $count = $queueConsumer->run((int) $input->getOption('limit'));
@@ -70,27 +61,5 @@ final class RunCommand extends Command
         }
 
         return 0;
-    }
-
-    private function getQueueConsumer(string $name, bool $required): ?QueueConsumerInterface
-    {
-        $queue = $this->queueProvider->get($name);
-
-        if (!$queue instanceof QueueConsumerInterface) {
-            if (!$required) {
-                return null;
-            }
-
-            throw new InvalidQueueConfigException(
-                sprintf(
-                    'Queue "%s" must implement "%s" to consume messages. Got "%s" instead.',
-                    $name,
-                    QueueConsumerInterface::class,
-                    get_debug_type($queue),
-                ),
-            );
-        }
-
-        return $queue;
     }
 }

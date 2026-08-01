@@ -6,7 +6,6 @@ namespace Yiisoft\Queue\Tests\Unit\Stubs;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Message\GenericMessage;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Stubs\StubWorker;
 
 final class StubWorkerTest extends TestCase
@@ -17,7 +16,7 @@ final class StubWorkerTest extends TestCase
 
         $sourceMessage = new GenericMessage('test', 42);
 
-        $message = $worker->process($sourceMessage, $this->createMock(QueueInterface::class));
+        $message = $worker->process($sourceMessage, 'test-queue');
 
         $this->assertSame($sourceMessage, $message);
         $this->assertSame('test', $message->getType());

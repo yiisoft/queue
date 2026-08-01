@@ -21,16 +21,18 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\QueueProducer;
+use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\QueueConsumerInterface;
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Tests\Benchmark\Support\VoidAdapter;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 
 final class QueueBench
 {
-    private readonly QueueInterface&QueueConsumerInterface $queue;
+    private readonly QueueProducerInterface $producer;
+    private readonly QueueConsumerInterface $consumer;
     private readonly MessageSerializer $serializer;
     private readonly VoidAdapter $adapter;
 
@@ -57,13 +59,12 @@ final class QueueBench
         $this->serializer = new MessageSerializer(new JsonMessageEncoder());
         $this->adapter = new VoidAdapter($this->serializer);
 
-        $this->queue = new Queue(
-            $worker,
-            new SimpleLoop(0),
+        $this->producer = new QueueProducer(
             $logger,
             new PushMiddlewareConfig(new PushMiddlewareFactory($container, $callableFactory)),
             $this->adapter,
         );
+        $this->consumer = new QueueConsumer($worker, new SimpleLoop(0), $logger, $this->adapter);
     }
 
     public function providePush(): Generator
@@ -83,7 +84,7 @@ final class QueueBench
     #[ParamProviders('providePush')]
     public function benchPush(array $params): void
     {
-        $this->queue->push($params['message']);
+        $this->producer->push($params['message']);
     }
 
     public function provideConsume(): Generator
@@ -106,6 +107,6 @@ final class QueueBench
     public function benchConsume(array $params): void
     {
         $this->adapter->message = $params['message'];
-        $this->queue->run();
+        $this->consumer->run();
     }
 }

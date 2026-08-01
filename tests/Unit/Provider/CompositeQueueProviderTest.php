@@ -4,82 +4,32 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit\Provider;
 
+use PHPUnit\Framework\TestCase;
+use Yiisoft\Queue\Provider\CompositeQueueProvider;
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;
 use Yiisoft\Queue\Provider\QueueNotFoundException;
-use Yiisoft\Queue\Provider\CompositeQueueProvider;
-use Yiisoft\Queue\Stubs\StubQueue;
-use Yiisoft\Queue\Tests\TestCase;
+use Yiisoft\Queue\Stubs\StubQueueConsumer;
+use Yiisoft\Queue\Stubs\StubQueueProducer;
 
 final class CompositeQueueProviderTest extends TestCase
 {
-    public function testBase(): void
+    public function testCombinesRolesAndPreservesPrecedence(): void
     {
-        $queue1 = new StubQueue();
-        $queue2 = new StubQueue();
+        $firstProducer = new StubQueueProducer('first');
         $provider = new CompositeQueueProvider(
-            new PredefinedQueueProvider(['queue1' => $queue1]),
-            new PredefinedQueueProvider(['queue2' => $queue2]),
+            new PredefinedQueueProvider(['queue' => ['producer' => $firstProducer]]),
+            new PredefinedQueueProvider(['queue' => ['producer' => new StubQueueProducer('second'), 'consumer' => new StubQueueConsumer()]]),
         );
-
-        $this->assertTrue($provider->has('queue1'));
-        $this->assertTrue($provider->has('queue2'));
-        $this->assertFalse($provider->has('queue3'));
-
-        $this->assertSame($queue1, $provider->get('queue1'));
-        $this->assertSame($queue2, $provider->get('queue2'));
+        self::assertSame($firstProducer, $provider->getProducer('queue'));
+        self::assertInstanceOf(StubQueueConsumer::class, $provider->getConsumer('queue'));
+        self::assertSame(['queue'], $provider->getProducerNames());
+        self::assertSame(['queue'], $provider->getConsumerNames());
     }
 
-    public function testNotFound(): void
+    public function testMissingCapabilityThrows(): void
     {
-        $provider = new CompositeQueueProvider(
-            new PredefinedQueueProvider([
-                'queue1' => new StubQueue(),
-            ]),
-        );
-
+        $provider = new CompositeQueueProvider(new PredefinedQueueProvider(['queue' => ['producer' => new StubQueueProducer()]]));
         $this->expectException(QueueNotFoundException::class);
-        $this->expectExceptionMessage('Queue with name "not-exists" not found.');
-        $provider->get('not-exists');
-    }
-
-    public function testGetNames(): void
-    {
-        $provider = new CompositeQueueProvider(
-            new PredefinedQueueProvider([
-                'queue1' => new StubQueue(),
-                'queue2' => new StubQueue(),
-            ]),
-            new PredefinedQueueProvider([
-                'queue3' => new StubQueue(),
-            ]),
-        );
-
-        $names = $provider->getNames();
-
-        $this->assertSame(['queue1', 'queue2', 'queue3'], $names);
-    }
-
-    public function testGetNamesWithDuplicates(): void
-    {
-        $provider = new CompositeQueueProvider(
-            new PredefinedQueueProvider([
-                'queue1' => new StubQueue(),
-            ]),
-            new PredefinedQueueProvider([
-                'queue1' => new StubQueue(),
-                'queue2' => new StubQueue(),
-            ]),
-        );
-
-        $names = $provider->getNames();
-
-        $this->assertSame(['queue1', 'queue2'], $names);
-    }
-
-    public function testGetNamesEmpty(): void
-    {
-        $provider = new CompositeQueueProvider();
-
-        $this->assertSame([], $provider->getNames());
+        $provider->getConsumer('queue');
     }
 }

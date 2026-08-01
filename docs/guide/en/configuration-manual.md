@@ -8,7 +8,7 @@ To use the queue, you need to create instances of the following classes:
 
 1. **Adapter** - handles the actual queue backend like AMQP, Redis, etc.
 2. **Worker** - processes messages from the queue
-3. **Queue** - the main entry point for pushing messages
+3. **QueueProducer** - pushes messages; **QueueConsumer** consumes them when needed
 
 ### Example
 
@@ -24,7 +24,8 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\QueueConsumer;
+use Yiisoft\Queue\QueueProducer;
 use Yiisoft\Queue\Worker\Worker;
 
 // A PSR-11 container is required for resolving dependencies of middleware and handlers.
@@ -70,16 +71,16 @@ $loop = new SimpleLoop();
 
 // Create queue. Without an adapter the queue runs in synchronous mode (messages are processed
 // immediately on push). Pass an adapter (e.g., AMQP, Redis) for asynchronous processing.
-$queue = new Queue(
-    $worker,
-    $loop,
+$producer = new QueueProducer(
     $logger,
     $pushMiddlewareConfig,
+    worker: $worker,
 );
+$consumer = new QueueConsumer($worker, $loop, $logger);
 
-// Now you can push messages
+// Now you can push messages. With no adapter, the producer dispatches directly to the worker.
 $message = new DownloadFileMessage(url: 'https://example.com/file.pdf', destinationPath: '/tmp/file.pdf');
-$queue->push($message);
+$producer->push($message);
 ```
 
 ## Using Queue Provider
@@ -89,17 +90,17 @@ For multiple queue names, use `PredefinedQueueProvider` (maps queue names to pre
 ```php
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;
 
-// PredefinedQueueProvider: pass fully built queue instances.
+// PredefinedQueueProvider: pass fully built role instances in a strict role map.
 $provider = new PredefinedQueueProvider([
-    'queue1' => $queue1,
-    'queue2' => $queue2,
+    'queue1' => ['producer' => $producer1, 'consumer' => $consumer1],
+    'queue2' => ['producer' => $producer2],
 ]);
 ```
 
 ## Running the queue
 
 Message consumption methods are available on `Yiisoft\Queue\QueueConsumerInterface`.
-The built-in `Queue` implements both `QueueInterface` for producing messages and `QueueConsumerInterface` for consuming them.
+`QueueProducer` and `QueueConsumer` are separate capabilities. Obtain or construct the consumer role before calling these methods.
 
 ### Processing existing messages
 

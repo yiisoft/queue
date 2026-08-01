@@ -6,7 +6,7 @@ If you are using [yiisoft/config](https://github.com/yiisoft/config) and [yiisof
 
 If you are using [symfony/console](https://github.com/symfony/console) directly, you should register the commands manually.
 
-> **Note:** When no queue names are passed to `queue:run` or `queue:listen-all`, the commands use the queue names provided by `QueueProviderInterface::getNames()` and skip queues that don't implement `QueueConsumerInterface`. Explicitly passed queue names must be consumer-capable.
+> **Note:** `queue:run` and `queue:listen-all` use `QueueConsumerProviderInterface::getConsumerNames()` when no queue names are passed. Explicitly passed names are resolved with `getConsumer()` and must have a consumer role.
 
 In [yiisoft/app](https://github.com/yiisoft/app) the `yii` console binary is provided out of the box.
 If you are using [yiisoft/yii-console](https://github.com/yiisoft/yii-console) or `symfony/console` without that template, invoke these commands the same way you invoke other console commands in your application.

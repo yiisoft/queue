@@ -23,7 +23,6 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Tests\App\FakeHandler;
 use Yiisoft\Queue\Tests\App\StaticMessageHandler;
 use Yiisoft\Queue\Tests\TestCase;
@@ -40,8 +39,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer($containerServices);
         $handlers = ['simple' => $handler];
 
-        /** @var MockObject&QueueInterface $queue */
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = 'test-queue';
         $worker = $this->createWorkerByParams($handlers, $container, $logger);
 
         $worker->process($message, $queue);
@@ -95,8 +93,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => [FakeHandler::class, 'undefinedMethod']];
 
-        /** @var MockObject&QueueInterface $queue */
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = 'test-queue';
         $worker = $this->createWorkerByParams($handlers, $container);
 
         $worker->process($message, $queue);
@@ -112,8 +109,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => ['UndefinedClass', 'handle']];
 
-        /** @var MockObject&QueueInterface $queue */
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = 'test-queue';
         $worker = $this->createWorkerByParams($handlers, $container, $logger);
 
         $worker->process($message, $queue);
@@ -126,8 +122,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer();
         $handlers = ['simple' => [FakeHandler::class, 'handle']];
 
-        /** @var MockObject&QueueInterface $queue */
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = 'test-queue';
         $worker = $this->createWorkerByParams($handlers, $container);
 
         $worker->process($message, $queue);
@@ -141,8 +136,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer([FakeHandler::class => $handler]);
         $handlers = ['simple' => [FakeHandler::class, 'handleWithException']];
 
-        /** @var MockObject&QueueInterface $queue */
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = 'test-queue';
         $worker = $this->createWorkerByParams($handlers, $container, $logger);
 
         try {
@@ -167,8 +161,7 @@ final class WorkerTest extends TestCase
         $container = new SimpleContainer();
         $handlers = [];
 
-        /** @var MockObject&QueueInterface $queue */
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = 'test-queue';
         $worker = $this->createWorkerByParams($handlers, $container);
 
         $this->expectException(RuntimeException::class);
@@ -186,8 +179,7 @@ final class WorkerTest extends TestCase
         ]);
         $handlers = [];
 
-        /** @var MockObject&QueueInterface $queue */
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = 'test-queue';
         $worker = $this->createWorkerByParams($handlers, $container);
 
         $this->expectException(RuntimeException::class);
@@ -198,9 +190,7 @@ final class WorkerTest extends TestCase
     public function testMessageFailureIsHandledSuccessfully(): void
     {
         $message = new GenericMessage('simple', null);
-        /** @var MockObject&QueueInterface $queue */
-        $queue = $this->createMock(QueueInterface::class);
-        $queue->method('getName')->willReturn('test-queue');
+        $queue = 'test-queue';
 
         $originalException = new RuntimeException('Consume failed');
         /** @var ConsumeMiddlewareInterface&MockObject $consumeMiddleware */
@@ -246,8 +236,7 @@ final class WorkerTest extends TestCase
             'static-handler' => StaticMessageHandler::handle(...),
         ];
 
-        /** @var MockObject&QueueInterface $queue */
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = 'test-queue';
         $worker = $this->createWorkerByParams($handlers, $container);
 
         StaticMessageHandler::$wasHandled = false;

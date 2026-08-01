@@ -28,7 +28,7 @@ Common reasons to add middlewares:
 
 Each message may pass through three independent pipelines:
 
-- **Push pipeline** (executed when calling `QueueInterface::push()`).
+- **Push pipeline** (executed when calling `QueueProducerInterface::push()`).
 - **Consume pipeline** (executed when a worker processes a message).
 - **Failure handling pipeline** (executed when message processing throws a `Throwable`).
 
@@ -72,7 +72,7 @@ The required interface depends on the pipeline:
 
 ## Push pipeline
 
-The push pipeline is executed when calling `QueueInterface::push()`.
+The push pipeline is executed when calling `QueueProducerInterface::push()`.
 
 Push middlewares can:
 
@@ -149,6 +149,6 @@ See [Configuration with yiisoft/config](configuration-with-config.md) for exampl
 
 ### Manual configuration (without yiisoft/config)
 
-When configuring the component manually, you instantiate the middleware dispatchers and pass them to `Queue` / `Worker`.
+When configuring the component manually, you instantiate the middleware dispatchers and pass them to `QueueProducer`, `QueueConsumer`, and `Worker` as appropriate.
 
 See [Manual configuration](configuration-manual.md) for a full runnable example.

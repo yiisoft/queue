@@ -17,7 +17,6 @@ use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\CallableObjectMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\Consume\Support\InvalidController;
@@ -62,7 +61,7 @@ final class MiddlewareFactoryTest extends TestCase
         $middleware = $this->getMiddlewareFactory($container)->createConsumeMiddleware(
             fn(): ConsumeRequest => new ConsumeRequest(
                 new GenericMessage('test', 'test data'),
-                $this->createMock(QueueInterface::class),
+                'test-queue',
             ),
         );
         self::assertSame(
@@ -223,7 +222,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         return new ConsumeRequest(
             new GenericMessage('handler', 'data'),
-            $this->createMock(QueueInterface::class),
+            'test-queue',
         );
     }
 }

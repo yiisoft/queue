@@ -6,15 +6,17 @@ namespace Yiisoft\Queue\Middleware\FailureHandling;
 
 use Throwable;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\QueueProducerInterface;
 
 final class FailureHandlingRequest
 {
-    public function __construct(private MessageInterface $message, private Throwable $exception, private QueueInterface $queue) {}
+    public function __construct(
+        private MessageInterface $message,
+        private Throwable $exception,
+        private string $queueName,
+        private ?QueueProducerInterface $retryProducer = null,
+    ) {}
 
-    /**
-     * @return MessageInterface
-     */
     public function getMessage(): MessageInterface
     {
         return $this->message;
@@ -25,16 +27,22 @@ final class FailureHandlingRequest
         return $this->exception;
     }
 
-    public function getQueue(): QueueInterface
+    /** Logical name of the queue which executed the message. */
+    public function getQueueName(): string
     {
-        return $this->queue;
+        return $this->queueName;
+    }
+
+    /** Direct retry target used by synchronous producer execution, if any. */
+    public function getRetryProducer(): ?QueueProducerInterface
+    {
+        return $this->retryProducer;
     }
 
     public function withMessage(MessageInterface $message): self
     {
         $instance = clone $this;
         $instance->message = $message;
-
         return $instance;
     }
 
@@ -42,15 +50,13 @@ final class FailureHandlingRequest
     {
         $instance = clone $this;
         $instance->exception = $exception;
-
         return $instance;
     }
 
-    public function withQueue(QueueInterface $queue): self
+    public function withQueueName(string $queueName): self
     {
         $instance = clone $this;
-        $instance->queue = $queue;
-
+        $instance->queueName = $queueName;
         return $instance;
     }
 }

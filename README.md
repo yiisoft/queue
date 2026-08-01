@@ -37,7 +37,7 @@ For production use, you should install an adapter package that matches your mess
 See the [adapter list](docs/guide/en/adapter-list.md) and follow the adapter-specific documentation for installation and configuration details.
 
 > If you don't have an external broker — whether for development, testing, or because you want to
-> design around `QueueInterface` from day one and add a real broker later — you can run the queue
+> design around `QueueProducerInterface` from day one and add a real broker later — you can run the queue
 > in [synchronous mode](docs/guide/en/synchronous-mode.md) (the adapter argument is optional).
 > In this mode messages are processed immediately in the same process, so it won't provide true
 > async execution, but the code stays the same when you switch to a real adapter.
@@ -138,11 +138,11 @@ For setting up all classes manually, see the [Manual configuration](docs/guide/e
 To send a message to the queue, get the queue instance and call `push()`. Typically the queue is injected as a dependency:
 
 ```php
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\QueueProducerInterface;
 
 final readonly class Foo
 {
-    public function __construct(private QueueInterface $queue) {}
+    public function __construct(private QueueProducerInterface $queue) {}
 
     public function bar(): void
     {
@@ -166,7 +166,7 @@ By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/
 
 See [Console commands](docs/guide/en/console-commands.md) for more details.
 
-Consumers are represented by `Yiisoft\Queue\QueueConsumerInterface`; it contains `run()` and `listen()`.
+Producers use `Yiisoft\Queue\QueueProducerInterface` (`push()`, `status()`, `getName()`); consumers use `Yiisoft\Queue\QueueConsumerInterface` (`run()`, `listen()`). See [capability configuration](docs/guide/en/queue-capabilities.md) for the strict role map used when named queues are configured.
 
 > In case you're running the queue in synchronous mode (no adapter), `queue:listen` logs an info message and exits. The messages are processed immediately when pushed.
 

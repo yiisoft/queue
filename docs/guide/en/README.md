@@ -9,6 +9,7 @@ Yii Queue is a framework-agnostic PHP queue library for running tasks asynchrono
 - [Adapter list](adapter-list.md)
 - [Synchronous mode](synchronous-mode.md)
 - [Queue names](queue-names.md)
+- [Producer and consumer capabilities](queue-capabilities.md)
 
 ## Build and handle messages
 

@@ -6,11 +6,13 @@ use Yiisoft\Queue\Command\ListenAllCommand;
 use Yiisoft\Queue\Command\ListenCommand;
 use Yiisoft\Queue\Command\RunCommand;
 use Yiisoft\Queue\Debug\QueueCollector;
-use Yiisoft\Queue\Debug\QueueProviderInterfaceProxy;
+use Yiisoft\Queue\Debug\QueueConsumerProviderProxy;
+use Yiisoft\Queue\Debug\QueueProducerProviderProxy;
 use Yiisoft\Queue\Debug\QueueWorkerInterfaceProxy;
 use Yiisoft\Queue\Message\MessageHandlerInterface;
 use Yiisoft\Queue\Message\Serializer\MessageSerializer;
-use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
+use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
 return [
@@ -50,7 +52,8 @@ return [
             QueueCollector::class,
         ],
         'trackedServices' => [
-            QueueProviderInterface::class => [QueueProviderInterfaceProxy::class, QueueCollector::class],
+            QueueProducerProviderInterface::class => [QueueProducerProviderProxy::class, QueueCollector::class],
+            QueueConsumerProviderInterface::class => [QueueConsumerProviderProxy::class, QueueCollector::class],
             WorkerInterface::class => [QueueWorkerInterfaceProxy::class, QueueCollector::class],
         ],
     ],

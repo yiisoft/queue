@@ -16,7 +16,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMidd
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Tests\TestCase;
 
 final class SendAgainMiddlewareTest extends TestCase
@@ -160,6 +160,7 @@ final class SendAgainMiddlewareTest extends TestCase
                 null,
             ))->withMeta([FailureEnvelope::META_FAILURE => $metaInitial]),
             new Exception('testException'),
+            'test-queue',
             $queue,
         );
         $result = $strategy->processFailure($request, $handler);
@@ -167,7 +168,7 @@ final class SendAgainMiddlewareTest extends TestCase
         self::assertInstanceOf(FailureHandlingRequest::class, $result);
     }
 
-    private function getStrategy(string $strategyName, QueueInterface $queue): FailureMiddlewareInterface
+    private function getStrategy(string $strategyName, QueueProducerInterface $queue): FailureMiddlewareInterface
     {
         return match ($strategyName) {
             SendAgainMiddleware::class => new SendAgainMiddleware('', 2, $queue),
@@ -200,7 +201,7 @@ final class SendAgainMiddlewareTest extends TestCase
         return $handler;
     }
 
-    private function getPreparedQueue(array $metaResult, bool $suites): QueueInterface
+    private function getPreparedQueue(array $metaResult, bool $suites): QueueProducerInterface
     {
         $queueAssertion = static function (MessageInterface $message) use ($metaResult): MessageInterface {
             Assert::assertEquals($metaResult, $message->getMeta()[FailureEnvelope::META_FAILURE] ?? []);
@@ -208,7 +209,7 @@ final class SendAgainMiddlewareTest extends TestCase
             return $message;
         };
 
-        $queue = $this->createMock(QueueInterface::class);
+        $queue = $this->createMock(QueueProducerInterface::class);
         $queue->expects($suites ? self::once() : self::never())
             ->method('push')
             ->willReturnCallback($queueAssertion);

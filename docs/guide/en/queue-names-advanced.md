@@ -1,95 +1,72 @@
 # Advanced queue name internals
 
-Use this reference when you need to understand how queue names map to adapters, how providers resolve queues, and how to implement your own provider.
+Use typed providers to resolve a capability for a logical queue name:
 
-## How queue names are used in code
+- `QueueProducerProviderInterface::getProducer($name)` returns `QueueProducerInterface`.
+- `QueueConsumerProviderInterface::getConsumer($name)` returns `QueueConsumerInterface`.
+- `hasProducer()` / `hasConsumer()` and `getProducerNames()` / `getConsumerNames()` are role-specific.
 
-- A queue name (string or `BackedEnum`) is passed to `Yiisoft\Queue\Provider\QueueProviderInterface::get($queueName)`.
-- The provider returns a `Yiisoft\Queue\QueueInterface` instance configured for that name.
-- `QueueInterface::getName()` can be used for introspection; it returns the logical name the queue was created with.
-- Queues that can consume messages also implement `Yiisoft\Queue\QueueConsumerInterface`.
+Both lookups accept a string or `BackedEnum`. They throw `QueueNotFoundException` when the name or requested role is absent and may throw `InvalidQueueConfigException` for an invalid role definition.
 
 ## Provider implementations
 
-`QueueProviderInterface::get()` may throw the following exceptions when configuration is invalid:
+### `QueueFactoryProvider`
 
-- `Yiisoft\Queue\Provider\QueueNotFoundException`
-- `Yiisoft\Queue\Provider\InvalidQueueConfigException`
-- `Yiisoft\Queue\Provider\QueueProviderException`
+`QueueFactoryProvider` accepts strict nested role maps whose values are [yiisoft/factory](https://github.com/yiisoft/factory) definitions. It creates and caches a producer and consumer separately, so a failure to create one role does not instantiate the other.
 
-This package ships four provider strategies:
+```php
+use Yiisoft\Queue\Provider\QueueFactoryProvider;
+use Yiisoft\Queue\QueueConsumer;
+use Yiisoft\Queue\QueueProducer;
 
-### AdapterFactoryQueueProvider (default)
+$provider = new QueueFactoryProvider([
+    'emails' => [
+        'producer' => ['class' => QueueProducer::class],
+        'consumer' => ['class' => QueueConsumer::class],
+    ],
+    'reports' => [
+        'producer' => ['class' => QueueProducer::class],
+    ],
+], $container);
 
-- Backed by the `yiisoft/queue.queues` params array.
-- Each queue name maps to an adapter definition.
-- Uses `yiisoft/factory` to create adapters lazily, then wraps them in a `Queue` with the given name.
-- Enforces a strict name mapping: unknown queue names throw `QueueNotFoundException` immediately.
+$emailProducer = $provider->getProducer('emails');
+$emailConsumer = $provider->getConsumer('emails');
+```
 
-### PredefinedQueueProvider
+A raw definition such as `'emails' => ['class' => QueueProducer::class]`, an empty map, or keys other than `producer` and `consumer` is invalid.
 
-- Accepts a pre-built map of queue name → `QueueInterface` instance.
-- Useful when you already have fully constructed queue objects and want to register them by name.
-- Throws `QueueNotFoundException` for unknown names, `InvalidQueueConfigException` if a value is not a `QueueInterface`.
+### `PredefinedQueueProvider`
 
-Example:
+`PredefinedQueueProvider` uses the same map shape for objects that have already been built. It does not accept factory definitions.
 
 ```php
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;
 
 $provider = new PredefinedQueueProvider([
-    'emails' => $emailQueue,
-    'reports' => $reportsQueue,
-]);
-$queueForEmails = $provider->get('emails');
-```
-
-### QueueFactoryProvider
-
-- Creates queue objects from [yiisoft/factory](https://github.com/yiisoft/factory) definitions indexed by queue name.
-- Lazily instantiates and caches queues on first access.
-- Throws `QueueNotFoundException` for unknown names.
-
-Example:
-
-```php
-use Yiisoft\Queue\Provider\QueueFactoryProvider;
-
-$provider = new QueueFactoryProvider(
-    [
-        'emails' => [
-            'class' => Queue::class,
-            '__construct()' => [$worker, $loop, $logger, $pushDispatcher, $adapter],
-        ],
+    'emails' => [
+        'producer' => $emailProducer,
+        'consumer' => $emailConsumer,
     ],
-    $container,
-);
-$queueForEmails = $provider->get('emails');
+    'audit' => ['producer' => $auditProducer],
+]);
+
+$auditProducer = $provider->getProducer('audit');
 ```
 
-### CompositeQueueProvider
+Every `producer` value must implement `QueueProducerInterface`; every `consumer` value must implement `QueueConsumerInterface`.
 
-- Accepts multiple providers and queries them in order.
-- The first provider whose `has()` returns true for the queue name wins.
-- Useful for mixing multiple providers, for example combining adapter-based and pre-built queues.
+### `CompositeQueueProvider`
 
-Example:
+`CompositeQueueProvider` combines typed providers. Earlier providers take precedence independently for each capability, which makes it possible to mix producer-only, consumer-only, and dual-role providers.
 
 ```php
 use Yiisoft\Queue\Provider\CompositeQueueProvider;
-use Yiisoft\Queue\Provider\AdapterFactoryQueueProvider;
-use Yiisoft\Queue\Provider\PredefinedQueueProvider;
 
-$provider = new CompositeQueueProvider(
-    new AdapterFactoryQueueProvider($queue, $definitions, $container),
-    new PredefinedQueueProvider(['fallback' => $fallbackQueue]),
-);
-
-$queueForEmails = $provider->get('emails');
+$provider = new CompositeQueueProvider($applicationQueues, $fallbackQueues);
+$producer = $provider->getProducer('emails');
+$consumer = $provider->getConsumer('inbound-events');
 ```
 
-## Implementing a custom provider
+## Custom providers
 
-- Implement `QueueProviderInterface` if you need bespoke selection logic (e.g., tenant-specific routing, remote lookups, or metrics-aware routing).
-- Register your provider in the DI container and swap it in wherever `QueueProviderInterface` is used.
-- Consider exposing diagnostics (e.g., list of available queues) through `getNames()`, console commands, or health checks so operators can verify the available queues at runtime.
+Implement `QueueProducerProviderInterface`, `QueueConsumerProviderInterface`, or both, according to the capability your integration exposes. Do not expose a generic queue lookup: callers must request `getProducer()` or `getConsumer()` explicitly.

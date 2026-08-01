@@ -8,7 +8,6 @@ use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Yii\Debug\Collector\CollectorTrait;
 use Yiisoft\Yii\Debug\Collector\SummaryCollectorInterface;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\QueueInterface;
 
 use function count;
 
@@ -65,12 +64,12 @@ final class QueueCollector implements SummaryCollectorInterface
         ];
     }
 
-    public function collectWorkerProcessing(MessageInterface $message, QueueInterface $queue): void
+    public function collectWorkerProcessing(MessageInterface $message, string $queueName): void
     {
         if (!$this->isActive()) {
             return;
         }
-        $this->processingMessages[$queue->getName()][] = $message;
+        $this->processingMessages[$queueName][] = $message;
     }
 
     public function getSummary(): array
