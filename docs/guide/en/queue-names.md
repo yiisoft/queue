@@ -8,6 +8,10 @@ A *queue name* is a logical identifier for independently configured producer and
 
 The default name is `QueueProducerProviderInterface::DEFAULT_QUEUE` (also available from `QueueConsumerProviderInterface`) and is `yii-queue`.
 
+## When to use named queues
+
+Use the default queue when all messages can share the same transport and worker behavior. Add names when messages need separate operational treatment: for example, to send high-priority and background work to different backends, run workers independently, or exchange only one message stream with another application. A name is an application-level routing decision; the `producer` and `consumer` roles under that name define how messages enter and leave that stream.
+
 ## Configuration
 
 Named queues use a strict role map under `yiisoft/queue.queues`. Each name must contain one or both of `producer` and `consumer`; flat adapter or factory definitions are not supported.

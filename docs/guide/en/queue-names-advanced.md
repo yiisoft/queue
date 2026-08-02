@@ -1,18 +1,31 @@
-# Advanced queue name internals
+# Advanced queue names and providers
 
-Use typed providers to resolve a capability for a logical queue name:
+A queue name is a logical message stream. It lets an application choose a producer and a consumer independently for that stream: a name may be producer-only, consumer-only, or have both capabilities. It is not itself a queue object and does not require both roles to use the same backend.
 
-- `QueueProducerProviderInterface::getProducer($name)` returns `QueueProducerInterface`.
-- `QueueConsumerProviderInterface::getConsumer($name)` returns `QueueConsumerInterface`.
-- `hasProducer()` / `hasConsumer()` and `getProducerNames()` / `getConsumerNames()` are role-specific.
+Most applications configure names through [`yiisoft/queue.queues`](queue-names.md) and inject the default producer directly. Use a provider when code must choose a named stream at runtime, a worker must resolve a named consumer, or your application constructs or combines queue registries itself.
 
-Both lookups accept a string or `BackedEnum`. They throw `QueueNotFoundException` when the name or requested role is absent and may throw `InvalidQueueConfigException` for an invalid role definition.
+## Providers and capabilities
 
-## Provider implementations
+Providers translate a queue name into the capability the caller needs:
 
-### `QueueFactoryProvider`
+- `QueueProducerProviderInterface::getProducer($name)` returns a `QueueProducerInterface` for pushing messages and obtaining their status.
+- `QueueConsumerProviderInterface::getConsumer($name)` returns a `QueueConsumerInterface` for running or listening for messages.
+- `hasProducer()` / `hasConsumer()` check whether a name exposes a role. `getProducerNames()` / `getConsumerNames()` list names for only that role.
 
-`QueueFactoryProvider` accepts strict nested role maps whose values are [yiisoft/factory](https://github.com/yiisoft/factory) definitions. It creates and caches a producer and consumer separately, so a failure to create one role does not instantiate the other.
+Both lookup methods accept a string or `BackedEnum`. They throw `QueueNotFoundException` when the name is unknown or does not have the requested role. This separation prevents a producer-only queue from accidentally being used by a worker, and vice versa.
+
+The default name is `QueueProducerProviderInterface::DEFAULT_QUEUE` (also available from `QueueConsumerProviderInterface`), whose value is `yii-queue`.
+
+## Role-map configuration
+
+The built-in providers use a strict role map: `queues[name][producer|consumer]`. Every name must contain at least one role, and no keys other than `producer` and `consumer` are valid. The values are either factory definitions or ready instances, depending on the provider.
+
+Choose the provider by how the roles are created:
+
+- Use `QueueFactoryProvider` when the values are [`yiisoft/factory`](https://github.com/yiisoft/factory) definitions. It creates and caches each role lazily, so resolving a producer does not construct the consumer for the same name.
+- Use `PredefinedQueueProvider` when the values are already-built `QueueProducerInterface` or `QueueConsumerInterface` instances. It does not accept factory definitions.
+
+`QueueFactoryProvider` is appropriate for container configuration:
 
 ```php
 use Yiisoft\Queue\Provider\QueueFactoryProvider;
@@ -24,7 +37,7 @@ $provider = new QueueFactoryProvider([
         'producer' => ['class' => QueueProducer::class],
         'consumer' => ['class' => QueueConsumer::class],
     ],
-    'reports' => [
+    'audit' => [
         'producer' => ['class' => QueueProducer::class],
     ],
 ], $container);
@@ -33,11 +46,7 @@ $emailProducer = $provider->getProducer('emails');
 $emailConsumer = $provider->getConsumer('emails');
 ```
 
-A raw definition such as `'emails' => ['class' => QueueProducer::class]`, an empty map, or keys other than `producer` and `consumer` is invalid.
-
-### `PredefinedQueueProvider`
-
-`PredefinedQueueProvider` uses the same map shape for objects that have already been built. It does not accept factory definitions.
+`PredefinedQueueProvider` is useful for manual wiring or tests, where the roles have already been constructed:
 
 ```php
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;
@@ -49,15 +58,13 @@ $provider = new PredefinedQueueProvider([
     ],
     'audit' => ['producer' => $auditProducer],
 ]);
-
-$auditProducer = $provider->getProducer('audit');
 ```
 
-Every `producer` value must implement `QueueProducerInterface`; every `consumer` value must implement `QueueConsumerInterface`.
+For configuration through `yiisoft/config`, see [Queue names](queue-names.md). For manual construction of producers and consumers, see [Manual configuration](configuration-manual.md).
 
-### `CompositeQueueProvider`
+## Combining and extending providers
 
-`CompositeQueueProvider` combines typed providers. Earlier providers take precedence independently for each capability, which makes it possible to mix producer-only, consumer-only, and dual-role providers.
+`CompositeQueueProvider` combines providers. It checks providers in constructor order and uses the first one that has the requested capability. Precedence is per role, so one provider can supply a producer while another supplies the consumer for the same name.
 
 ```php
 use Yiisoft\Queue\Provider\CompositeQueueProvider;
@@ -67,6 +74,4 @@ $producer = $provider->getProducer('emails');
 $consumer = $provider->getConsumer('inbound-events');
 ```
 
-## Custom providers
-
-Implement `QueueProducerProviderInterface`, `QueueConsumerProviderInterface`, or both, according to the capability your integration exposes. Do not expose a generic queue lookup: callers must request `getProducer()` or `getConsumer()` explicitly.
+Use a composite provider for layered configuration, such as application-specific queues with a fallback registry. Implement `QueueProducerProviderInterface`, `QueueConsumerProviderInterface`, or both when names come from another source—for example, a tenant-aware registry or an external configuration service. Register the typed interface that your caller needs in DI; do not expose a generic queue lookup.
