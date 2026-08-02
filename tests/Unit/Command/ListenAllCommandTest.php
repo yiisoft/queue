@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Command\ListenAllCommand;
@@ -15,6 +17,15 @@ use Yiisoft\Queue\Stubs\StubQueueProducer;
 
 final class ListenAllCommandTest extends TestCase
 {
+    public function testReportsWhenNoConsumersAreConfigured(): void
+    {
+        $command = new ListenAllCommand(new PredefinedQueueProvider([]), $this->createMock(LoopInterface::class));
+        $output = new BufferedOutput();
+
+        self::assertSame(Command::SUCCESS, $command->run(new ArrayInput([], $command->getNativeDefinition()), $output));
+        self::assertSame("No consumers are configured.\n", $output->fetch());
+    }
+
     public function testRunsOnlyConsumerRolesByDefault(): void
     {
         $consumer = $this->createMock(QueueConsumerInterface::class);

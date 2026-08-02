@@ -74,6 +74,8 @@ final class ListenAllCommand extends Command
         }
 
         if ($queues === []) {
+            $output->writeln('No consumers are configured.');
+
             return Command::SUCCESS;
         }
 
