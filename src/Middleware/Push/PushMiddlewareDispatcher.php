@@ -8,7 +8,7 @@ use Closure;
 use Yiisoft\Queue\Message\MessageInterface;
 
 /**
- * @internal Used internally by {@see QueueProducer}.
+ * @internal Used internally by {@see SyncQueueProducer} and {@see AsyncQueueProducer}.
  */
 final class PushMiddlewareDispatcher
 {

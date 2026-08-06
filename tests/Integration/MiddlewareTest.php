@@ -24,7 +24,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\QueueProducer;
+use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Tests\Integration\Support\TestMiddleware;
 use Yiisoft\Queue\Worker\Worker;
@@ -58,16 +58,17 @@ final class MiddlewareTest extends TestCase
         );
         $worker = $this->createMock(WorkerInterface::class);
         $worker->method('process')->willReturnArgument(0);
-        $queue = new QueueProducer(
+        $queue = new SyncQueueProducer(
             $this->createMock(LoggerInterface::class),
             $pushMiddlewareConfig,
-            null,
-            'test',
             $worker,
-            new TestMiddleware('channel 1'),
-            new TestMiddleware('channel 2'),
-            new TestMiddleware('channel 3'),
-            new TestMiddleware('channel 4'),
+            'test',
+            [
+                new TestMiddleware('channel 1'),
+                new TestMiddleware('channel 2'),
+                new TestMiddleware('channel 3'),
+                new TestMiddleware('channel 4'),
+            ],
         );
 
         $message = new GenericMessage('test', ['initial']);
