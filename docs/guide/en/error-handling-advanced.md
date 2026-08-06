@@ -18,7 +18,8 @@ This document covers advanced internals of the failure handling pipeline, built-
 
     - the message
     - the caught exception
-    - the queue instance
+    - the logical queue name
+    - an optional direct retry producer (provided for synchronous producer execution)
 
 4. A failure pipeline is selected by queue name
 
@@ -83,7 +84,7 @@ This interface has the only method `processFailure` with these parameters:
 - [`FailureHandlingRequest $request`](../../../src/Middleware/FailureHandling/FailureHandlingRequest.php) - a request for a message handling. It consists of
     - a [message](../../../src/Message/MessageInterface.php)
     - a `Throwable $exception` object thrown on the `request` handling
-    - a queue the message came from
+    - the logical queue name the message came from and, when available, a direct retry producer
 - `FailureHandlerInterface $handler` - failure strategy pipeline continuation. Your Middleware should call `$handler->handleFailure($request)` when the middleware itself should not interrupt failure pipeline execution.
 
 > Note: your strategy have to check by its own if it should be applied. Look into [`SendAgainMiddleware::suits()`](../../../src/Middleware/FailureHandling/Implementation/SendAgainMiddleware.php#L54) for an example.

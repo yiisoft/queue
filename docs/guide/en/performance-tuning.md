@@ -126,9 +126,18 @@ Use different queue names for different priority levels. See [Queue names](queue
 return [
     'yiisoft/queue' => [
         'queues' => [
-            'critical' => AmqpAdapter::class,
-            'normal' => AmqpAdapter::class,
-            'low' => AmqpAdapter::class,
+            'critical' => [
+                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+            ],
+            'normal' => [
+                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+            ],
+            'low' => [
+                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+            ],
         ],
     ],
 ];
@@ -155,10 +164,22 @@ Create separate queues for different workload characteristics:
 return [
     'yiisoft/queue' => [
         'queues' => [
-            'fast' => AmqpAdapter::class,      // Quick tasks (< 1s)
-            'slow' => AmqpAdapter::class,      // Long tasks (> 10s)
-            'cpu-bound' => AmqpAdapter::class, // CPU-intensive
-            'io-bound' => AmqpAdapter::class,  // I/O-intensive
+            'fast' => [ // Quick tasks (< 1s)
+                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+            ],
+            'slow' => [ // Long tasks (> 10s)
+                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+            ],
+            'cpu-bound' => [ // CPU-intensive
+                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+            ],
+            'io-bound' => [ // I/O-intensive
+                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+            ],
         ],
     ],
 ];
@@ -383,7 +404,7 @@ Test with realistic message volumes and data:
 
 ```php
 // Load test script
-$queue = $container->get(QueueInterface::class);
+$queue = $container->get(QueueProducerInterface::class);
 
 $start = microtime(true);
 $count = 10000;

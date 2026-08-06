@@ -29,14 +29,18 @@ Here below is configuration via [yiisoft/config](https://github.com/yiisoft/conf
         FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [
             [
                 'class' => SendAgainMiddleware::class,
-                '__construct()' => ['id' => 'default-first-resend', 'queue' => null], 
+                '__construct()' => [
+                    'id' => 'default-first-resend',
+                    'maxAttempts' => 1,
+                    'producerProvider' => QueueProducerProviderInterface::class,
+                ],
             ],
-            static fn (QueueFactoryInterface $factory) => new SendAgainMiddleware(
-                id: 'default-second-resend', 
-                queue: $factory->get('failed-messages'),
+            static fn (QueueProducerProviderInterface $queues) => new SendAgainMiddleware(
+                id: 'default-second-resend',
+                maxAttempts: 1,
+                targetQueue: $queues->getProducer('failed-messages'),
             ),
         ],
-        
         'failed-messages' => [
             [
                 'class' => ExponentialDelayMiddleware::class,
@@ -46,8 +50,8 @@ Here below is configuration via [yiisoft/config](https://github.com/yiisoft/conf
                     'delayInitial' => 5,
                     'delayMaximum' => 60,
                     'exponent' => 1.5,
-                    'queue' => null,
-                ], 
+                    'producerProvider' => QueueProducerProviderInterface::class,
+                ],
             ],
         ],
     ],
@@ -83,7 +87,8 @@ Failures of messages that arrived in the `failed-messages` queue directly (bypas
 
  - `id` - A unique string. Allows to use this strategy more than once for the same message, just like in example above.
  - `maxAttempts` - Maximum attempts count for this strategy with the given $id before it will give up.
- - `queue` - The strategy will send the message to the given queue when it's not `null`. That means you can use this strategy to push a message not to the same queue it came from. When the `queue` parameter is set to `null`, a message will be sent to the same queue it came from.
+ - `targetQueue` - An optional `QueueProducerInterface` for an explicit retry destination. When it is `null`, synchronous execution supplies its originating producer; asynchronous execution resolves the originating queue name through `producerProvider`.
+ - `producerProvider` - The `QueueProducerProviderInterface` used to resolve the source producer for asynchronous retries when no `targetQueue` is supplied. Configure it, or provide `targetQueue`; otherwise retry fails with a configuration error.
 
  State tracking:
 
@@ -101,7 +106,8 @@ It's configured via constructor parameters, too. Here they are:
  - `delayInitial` - The initial delay that will be applied to a message for the first time. It must be a positive float. 
  - `delayMaximum` - The maximum delay which can be applied to a single message. Must be above the `delayInitial`.
  - `exponent` - Message handling delay will be multiplied by exponent each time it fails.
- - `queue` - The strategy will send the message to the given queue when it's not `null`. That means you can use this strategy to push a message not to the same queue it came from. When the `queue` parameter is set to `null`, a message will be sent to the same queue it came from.
+ - `queue` - An optional `QueueProducerInterface` retry destination. When it is `null`, synchronous execution supplies its originating producer; asynchronous execution resolves the originating queue name through `producerProvider`.
+ - `producerProvider` - The `QueueProducerProviderInterface` used for that asynchronous source-producer lookup.
 
  Requirements:
 

@@ -9,7 +9,6 @@ use Yiisoft\Yii\Debug\Collector\CollectorInterface;
 use Yiisoft\Yii\Debug\Tests\Shared\AbstractCollectorTestCase;
 use Yiisoft\Queue\Debug\QueueCollector;
 use Yiisoft\Queue\Message\GenericMessage;
-use Yiisoft\Queue\Stubs\StubQueue;
 
 final class QueueCollectorTest extends AbstractCollectorTestCase
 {
@@ -32,15 +31,15 @@ final class QueueCollectorTest extends AbstractCollectorTestCase
         $collector->collectPush('chan2', $this->pushMessage, 'push.php:31');
         $collector->collectWorkerProcessing(
             $this->pushMessage,
-            new StubQueue('chan1'),
+            'chan1',
         );
         $collector->collectWorkerProcessing(
             $this->pushMessage,
-            new StubQueue('chan1'),
+            'chan1',
         );
         $collector->collectWorkerProcessing(
             $this->pushMessage,
-            new StubQueue('chan2'),
+            'chan2',
         );
     }
 

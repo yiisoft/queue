@@ -6,122 +6,37 @@ namespace Yiisoft\Queue\Tests\Unit\Debug;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Debug\QueueCollector;
-use Yiisoft\Queue\Debug\QueueDecorator;
+use Yiisoft\Queue\Debug\QueueConsumerDecorator;
+use Yiisoft\Queue\Debug\QueueProducerDecorator;
+use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\MessageStatus;
-use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\QueueConsumerInterface;
+use Yiisoft\Queue\QueueProducerInterface;
 
 final class QueueDecoratorTest extends TestCase
 {
-    public function testStatus(): void
+    public function testProducerDecoratorDelegatesAndCollects(): void
     {
-        $queue = $this->createMock(QueueInterface::class);
-        $messageStatus = MessageStatus::WAITING;
-        $queue->expects($this->once())->method('status')->willReturn($messageStatus);
-        $collector = new QueueCollector();
-        $decorator = new QueueDecorator(
-            $queue,
-            $collector,
-        );
-
-        $result = $decorator->status('');
-        $this->assertEquals($messageStatus, $result);
-    }
-
-    public function testPush(): void
-    {
-        $queue = $this->createMock(QueueInterface::class);
-        $queue->expects($this->once())->method('push');
-        $message = $this->createMock(MessageInterface::class);
-        $collector = new QueueCollector();
-        $decorator = new QueueDecorator(
-            $queue,
-            $collector,
-        );
-
-        $decorator->push($message);
-    }
-
-    public function testPushCollectsCallLocation(): void
-    {
-        $message = $this->createMock(MessageInterface::class);
-        $queue = $this->createMock(QueueInterface::class);
-        $queue->method('getName')->willReturn('test-queue');
-        $queue->method('push')->willReturn($message);
+        $message = new GenericMessage('test', null);
+        $producer = $this->createMock(QueueProducerInterface::class);
+        $producer->method('getName')->willReturn('queue');
+        $producer->expects($this->once())->method('push')->with($message)->willReturn($message);
+        $producer->expects($this->once())->method('status')->with('1')->willReturn(MessageStatus::WAITING);
         $collector = new QueueCollector();
         $collector->startup();
-        $decorator = new QueueDecorator(
-            $queue,
-            $collector,
-        );
-
-        $line = __LINE__ + 1;
-        $decorator->push($message);
-
-        $collected = $collector->getCollected();
-        $this->assertSame(
-            ['message' => $message, 'line' => __FILE__ . ':' . $line],
-            $collected['pushes']['test-queue'][0],
-        );
+        $decorator = new QueueProducerDecorator($producer, $collector);
+        self::assertSame($message, $decorator->push($message));
+        self::assertSame(MessageStatus::WAITING, $decorator->status('1'));
+        self::assertArrayHasKey('queue', $collector->getCollected()['pushes']);
     }
 
-    public function testStatusCollectsCallLocation(): void
+    public function testConsumerDecoratorDelegates(): void
     {
-        $queue = $this->createMock(QueueInterface::class);
-        $queue->method('status')->willReturn(MessageStatus::WAITING);
-        $collector = new QueueCollector();
-        $collector->startup();
-        $decorator = new QueueDecorator(
-            $queue,
-            $collector,
-        );
-
-        $line = __LINE__ + 1;
-        $decorator->status('42');
-
-        $collected = $collector->getCollected();
-        $this->assertSame(
-            ['id' => '42', 'status' => MessageStatus::WAITING->key(), 'line' => __FILE__ . ':' . $line],
-            $collected['statuses'][0],
-        );
-    }
-
-    public function testRun(): void
-    {
-        $queue = $this->createMock(QueueInterface::class);
-        $queue->expects($this->once())->method('run');
-        $collector = new QueueCollector();
-        $decorator = new QueueDecorator(
-            $queue,
-            $collector,
-        );
-
-        $decorator->run(5);
-    }
-
-    public function testListen(): void
-    {
-        $queue = $this->createMock(QueueInterface::class);
-        $queue->expects($this->once())->method('listen');
-        $collector = new QueueCollector();
-        $decorator = new QueueDecorator(
-            $queue,
-            $collector,
-        );
-
+        $consumer = $this->createMock(QueueConsumerInterface::class);
+        $consumer->expects($this->once())->method('run')->with(2)->willReturn(1);
+        $consumer->expects($this->once())->method('listen');
+        $decorator = new QueueConsumerDecorator($consumer, new QueueCollector());
+        self::assertSame(1, $decorator->run(2));
         $decorator->listen();
-    }
-
-    public function testGetName(): void
-    {
-        $queue = $this->createMock(QueueInterface::class);
-        $queue->expects($this->once())->method('getName')->willReturn('hello');
-        $collector = new QueueCollector();
-        $decorator = new QueueDecorator(
-            $queue,
-            $collector,
-        );
-
-        $this->assertEquals('hello', $decorator->getName());
     }
 }

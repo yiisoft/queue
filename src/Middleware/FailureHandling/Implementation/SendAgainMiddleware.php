@@ -10,45 +10,51 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\Provider\InvalidQueueConfigException;
+use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
+use Yiisoft\Queue\QueueProducerInterface;
+use Throwable;
 
-/**
- * Failure strategy which resends the given message to a queue.
- */
+use function sprintf;
+
+/** Failure strategy which resends a message through a producer capability. */
 final class SendAgainMiddleware implements FailureMiddlewareInterface
 {
     public const META_KEY_RESEND = 'failure-strategy-resend-attempts';
 
-    /**
-     * @param string $id A unique id to differentiate two and more instances of this class
-     * @param int $maxAttempts Maximum attempts count for this strategy with the given $id before it will give up
-     * @param QueueInterface|null $targetQueue Messages will be sent to this queue if set.
-     *        They will be resent to an original queue otherwise.
-     */
     public function __construct(
         private readonly string $id,
         private readonly int $maxAttempts,
-        private readonly ?QueueInterface $targetQueue = null,
+        private readonly ?QueueProducerInterface $targetQueue = null,
+        private readonly ?QueueProducerProviderInterface $producerProvider = null,
     ) {
         if ($maxAttempts < 1) {
             throw new InvalidArgumentException("maxAttempts parameter must be a positive integer, $this->maxAttempts given.");
         }
     }
 
-    public function processFailure(
-        FailureHandlingRequest $request,
-        FailureHandlerInterface $handler,
-    ): FailureHandlingRequest {
+    public function processFailure(FailureHandlingRequest $request, FailureHandlerInterface $handler): FailureHandlingRequest
+    {
         $message = $request->getMessage();
-        if ($this->suits($message)) {
-            $envelope = new FailureEnvelope($message, $this->createMeta($message));
-            $envelope = ($this->targetQueue ?? $request->getQueue())->push($envelope);
-
-            return $request->withMessage($envelope)
-                ->withQueue($this->targetQueue ?? $request->getQueue());
+        if (!$this->suits($message)) {
+            return $handler->handleFailure($request);
         }
+        $envelope = new FailureEnvelope($message, [$this->getMetaKey() => $this->getAttempts($message) + 1]);
+        $producer = $this->targetQueue ?? $request->getRetryProducer() ?? $this->sourceProducer($request);
+        $envelope = $producer->push($envelope);
+        return $request->withMessage($envelope);
+    }
 
-        return $handler->handleFailure($request);
+    private function sourceProducer(FailureHandlingRequest $request): QueueProducerInterface
+    {
+        if ($this->producerProvider === null) {
+            throw new InvalidQueueConfigException(sprintf('Cannot retry queue "%s": configure a producer target or QueueProducerProviderInterface.', $request->getQueueName()));
+        }
+        try {
+            return $this->producerProvider->getProducer($request->getQueueName());
+        } catch (Throwable $exception) {
+            throw new InvalidQueueConfigException(sprintf('Cannot retry queue "%s": no producer capability is available.', $request->getQueueName()), previous: $exception);
+        }
     }
 
     private function suits(MessageInterface $message): bool
@@ -56,19 +62,9 @@ final class SendAgainMiddleware implements FailureMiddlewareInterface
         return $this->getAttempts($message) < $this->maxAttempts;
     }
 
-    private function createMeta(MessageInterface $message): array
-    {
-        return [$this->getMetaKey() => $this->getAttempts($message) + 1];
-    }
-
     private function getAttempts(MessageInterface $message): int
     {
-        $result = FailureEnvelope::fromMessage($message)->getFailureMetaValue($this->getMetaKey(), 0);
-        if ($result < 0) {
-            $result = 0;
-        }
-
-        return (int) $result;
+        return max(0, (int) FailureEnvelope::fromMessage($message)->getFailureMetaValue($this->getMetaKey(), 0));
     }
 
     private function getMetaKey(): string

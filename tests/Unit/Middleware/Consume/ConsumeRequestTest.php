@@ -6,7 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\Consume;
 
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Tests\TestCase;
 
 final class ConsumeRequestTest extends TestCase
@@ -14,10 +14,10 @@ final class ConsumeRequestTest extends TestCase
     public function testImmutable(): void
     {
         $message = new GenericMessage('test', 'test');
-        $queue = $this->createMock(QueueInterface::class);
-        $consumeRequest = new ConsumeRequest($message, $queue);
+        $queue = $this->createMock(QueueProducerInterface::class);
+        $consumeRequest = new ConsumeRequest($message, 'test-queue');
 
         $this->assertNotSame($consumeRequest, $consumeRequest->withMessage($message));
-        $this->assertNotSame($consumeRequest, $consumeRequest->withQueue($queue));
+        $this->assertNotSame($consumeRequest, $consumeRequest->withQueueName('other-queue'));
     }
 }

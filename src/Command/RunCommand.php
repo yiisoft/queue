@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
 
 #[AsCommand(
     'queue:run',
@@ -19,7 +19,7 @@ use Yiisoft\Queue\Provider\QueueProviderInterface;
 final class RunCommand extends Command
 {
     public function __construct(
-        private readonly QueueProviderInterface $queueProvider,
+        private readonly QueueConsumerProviderInterface $queueProvider,
     ) {
         parent::__construct();
     }
@@ -30,7 +30,7 @@ final class RunCommand extends Command
             'queue',
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
             'Queue name list to connect to.',
-            $this->queueProvider->getNames(),
+            [],
         )
             ->addOption(
                 'limit',
@@ -44,12 +44,18 @@ final class RunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var string[] $queueNames */
+        $queueNames = $input->getArgument('queue');
+        if ($queueNames === []) {
+            $queueNames = $this->queueProvider->getConsumerNames();
+        }
+
         /** @var string $queue */
-        foreach ($input->getArgument('queue') as $queue) {
+        foreach ($queueNames as $queue) {
+            $queueConsumer = $this->queueProvider->getConsumer($queue);
+
             $output->write("Processing queue $queue... ");
-            $count = $this->queueProvider
-                ->get($queue)
-                ->run((int) $input->getOption('limit'));
+            $count = $queueConsumer->run((int) $input->getOption('limit'));
 
             $output->writeln("Messages processed: $count.");
         }

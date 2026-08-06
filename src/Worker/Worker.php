@@ -23,7 +23,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
-use Yiisoft\Queue\QueueInterface;
+use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
 use function array_key_exists;
@@ -49,8 +49,11 @@ final class Worker implements WorkerInterface
     /**
      * @throws Throwable
      */
-    public function process(MessageInterface $message, QueueInterface $queue): MessageInterface
-    {
+    public function process(
+        MessageInterface $message,
+        string $queueName,
+        ?QueueProducerInterface $retryProducer = null,
+    ): MessageInterface {
         $messageId = IdEnvelope::fromMessage($message)->getId();
         if ($messageId === null) {
             $this->logger->info('Processing message without ID.');
@@ -69,12 +72,12 @@ final class Worker implements WorkerInterface
             throw new RuntimeException(sprintf('Queue handler for message type "%s" does not exist.', $messageType));
         }
 
-        $request = new ConsumeRequest($message, $queue);
+        $request = new ConsumeRequest($message, $queueName);
         $closure = fn(MessageInterface $message): mixed => $this->injector->invoke($handler, [$message]);
         try {
             return $this->consumeMiddlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure))->getMessage();
         } catch (Throwable $exception) {
-            $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueue());
+            $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueueName(), $retryProducer);
 
             try {
                 $result = $this->failureMiddlewareDispatcher->dispatch($request, $this->createFailureHandler());

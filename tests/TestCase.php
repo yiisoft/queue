@@ -10,7 +10,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
@@ -22,7 +22,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\Queue;
+use Yiisoft\Queue\QueueProducer;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
@@ -32,7 +32,7 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 abstract class TestCase extends BaseTestCase
 {
     protected ?ContainerInterface $container = null;
-    protected ?Queue $queue = null;
+    protected ?QueueProducer $queue = null;
     protected ?LoopInterface $loop = null;
     protected ?WorkerInterface $worker = null;
     protected array $eventHandlers = [];
@@ -51,9 +51,9 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * @return Queue The same object every time
+     * @return QueueProducer The same object every time
      */
-    protected function getQueue(): Queue
+    protected function getQueue(): QueueProducer
     {
         if ($this->queue === null) {
             $this->queue = $this->createQueue();
@@ -91,15 +91,14 @@ abstract class TestCase extends BaseTestCase
 
     protected function createQueue(
         ?AdapterInterface $adapter = null,
-        string|BackedEnum $name = QueueProviderInterface::DEFAULT_QUEUE,
-    ): Queue {
-        return new Queue(
-            $this->getWorker(),
-            $this->getLoop(),
+        string|BackedEnum $name = QueueProducerProviderInterface::DEFAULT_QUEUE,
+    ): QueueProducer {
+        return new QueueProducer(
             new NullLogger(),
             $this->getPushMiddlewareConfig(),
             $adapter,
             $name,
+            $adapter === null ? $this->getWorker() : null,
         );
     }
 

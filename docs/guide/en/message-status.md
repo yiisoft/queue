@@ -4,14 +4,14 @@ Yii Queue can report the status of a message by its ID.
 
 The API surface is:
 
-- `QueueInterface::status(string|int $id): MessageStatus`
+- `QueueProducerInterface::status(string|int $id): MessageStatus`
 - `AdapterInterface::status(string|int $id): MessageStatus`
 
 Status tracking support depends on the adapter. If an adapter doesn't support status tracking or can't find the message by ID, it returns `MessageStatus::NOT_FOUND`.
 
 ## Getting a message ID
 
-`QueueInterface::push()` returns a `MessageInterface`. When the adapter supports IDs, the returned message is typically wrapped into an `IdEnvelope`, which stores the ID in message metadata.
+`QueueProducerInterface::push()` returns a `MessageInterface`. When the adapter supports IDs, the returned message is typically wrapped into an `IdEnvelope`, which stores the ID in message metadata.
 
 To read the ID:
 

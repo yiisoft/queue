@@ -15,7 +15,6 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
-use Yiisoft\Queue\QueueInterface;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support\TestCallableMiddleware;
 use Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Support\TestMiddleware;
@@ -175,7 +174,7 @@ final class MiddlewareDispatcherTest extends TestCase
         return new FailureHandlingRequest(
             new GenericMessage('handler', 'data'),
             new Exception('Test exception.'),
-            $this->createMock(QueueInterface::class),
+            'test-queue',
         );
     }
 }

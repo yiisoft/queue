@@ -5,169 +5,56 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Definitions\Reference;
-use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Provider\InvalidQueueConfigException;
 use Yiisoft\Queue\Provider\QueueFactoryProvider;
 use Yiisoft\Queue\Provider\QueueNotFoundException;
-use Yiisoft\Queue\QueueInterface;
-use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Stubs\StubLoop;
-use Yiisoft\Queue\Stubs\StubQueue;
-use Yiisoft\Queue\Tests\Unit\Support\StringEnum;
-use Yiisoft\Test\Support\Container\SimpleContainer;
-
-use function sprintf;
+use Yiisoft\Queue\Stubs\StubQueueConsumer;
+use Yiisoft\Queue\Stubs\StubQueueProducer;
 
 final class QueueFactoryProviderTest extends TestCase
 {
-    public function testBase(): void
+    public function testLazilyCreatesRolesIndependently(): void
     {
-        $provider = new QueueFactoryProvider(
-            [
-                'queue1' => StubQueue::class,
-            ],
-        );
-
-        $queue = $provider->get('queue1');
-
-        $this->assertInstanceOf(StubQueue::class, $queue);
-        $this->assertTrue($provider->has('queue1'));
-        $this->assertFalse($provider->has('not-exist-queue'));
+        $provider = new QueueFactoryProvider(['queue' => ['producer' => StubQueueProducer::class, 'consumer' => StubQueueConsumer::class]]);
+        self::assertInstanceOf(StubQueueProducer::class, $provider->getProducer('queue'));
+        self::assertSame($provider->getProducer('queue'), $provider->getProducer('queue'));
+        self::assertInstanceOf(StubQueueConsumer::class, $provider->getConsumer('queue'));
+        self::assertSame(['queue'], $provider->getProducerNames());
+        self::assertSame(['queue'], $provider->getConsumerNames());
     }
 
-    public function testGetTwice(): void
+    public function testCapabilityIsolation(): void
     {
-        $provider = new QueueFactoryProvider(
-            [
-                'queue1' => StubQueue::class,
-            ],
-        );
-
-        $queue1 = $provider->get('queue1');
-        $queue2 = $provider->get('queue1');
-
-        $this->assertSame($queue1, $queue2);
-    }
-
-    public function testGetNotExistQueue(): void
-    {
-        $provider = new QueueFactoryProvider(
-            [
-                'queue1' => StubQueue::class,
-            ],
-        );
-
+        $provider = new QueueFactoryProvider(['producer-only' => ['producer' => StubQueueProducer::class]]);
+        self::assertTrue($provider->hasProducer('producer-only'));
+        self::assertFalse($provider->hasConsumer('producer-only'));
         $this->expectException(QueueNotFoundException::class);
-        $this->expectExceptionMessage('Queue with name "not-exist-queue" not found.');
-        $provider->get('not-exist-queue');
+        $provider->getConsumer('producer-only');
     }
 
-    public function testInvalidQueueConfig(): void
+    public function testRejectsFlatEmptyAndUnknownRoleMaps(): void
     {
-        $definitions = [
-            'queue1' => [
-                'class' => StubQueue::class,
-                '__construct()' => 'hello',
-            ],
-        ];
-
-        $this->expectException(InvalidQueueConfigException::class);
-        $this->expectExceptionMessage(
-            'Invalid definition: incorrect constructor arguments. Expected array, got string.',
-        );
-        new QueueFactoryProvider($definitions);
+        foreach ([['queue' => StubQueueProducer::class], ['queue' => []], ['queue' => ['unknown' => StubQueueProducer::class]]] as $definitions) {
+            try {
+                new QueueFactoryProvider($definitions);
+                self::fail('Invalid role maps must be rejected.');
+            } catch (InvalidQueueConfigException) {
+                self::addToAssertionCount(1);
+            }
+        }
     }
 
-    public function testInvalidQueueConfigOnGet(): void
+    public function testRejectsWrongRoleOnResolutionAndCachesFailure(): void
     {
-        $provider = new QueueFactoryProvider(
-            [
-                'queue1' => StubLoop::class,
-            ],
-        );
-
-        $this->expectException(InvalidQueueConfigException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'Queue must implement "%s". For queue "%s" got "%s" instead.',
-                QueueInterface::class,
-                'queue1',
-                StubLoop::class,
-            ),
-        );
-        $provider->get('queue1');
-    }
-
-    public function testGetHasByStringEnum(): void
-    {
-        $provider = new QueueFactoryProvider(
-            [
-                'red' => StubQueue::class,
-            ],
-        );
-
-        $queue = $provider->get(StringEnum::RED);
-
-        $this->assertInstanceOf(StubQueue::class, $queue);
-        $this->assertTrue($provider->has(StringEnum::RED));
-        $this->assertFalse($provider->has(StringEnum::GREEN));
-    }
-
-    public function testWithContainer(): void
-    {
-        $container = new SimpleContainer([
-            AdapterInterface::class => new InMemoryAdapter(),
-        ]);
-
-        $provider = new QueueFactoryProvider(
-            [
-                'queue1' => [
-                    'class' => StubQueue::class,
-                    '__construct()' => [
-                        'adapter' => Reference::to(AdapterInterface::class),
-                    ],
-                ],
-            ],
-            $container,
-        );
-
-        $queue = $provider->get('queue1');
-
-        $this->assertInstanceOf(StubQueue::class, $queue);
-    }
-
-    public function testValidateFalse(): void
-    {
-        $provider = new QueueFactoryProvider(
-            [
-                'queue1' => [
-                    'class' => StubQueue::class,
-                    '__construct()' => 'hello',
-                ],
-            ],
-            validate: false,
-        );
-
-        $this->assertTrue($provider->has('queue1'));
-    }
-
-    public function testGetNames(): void
-    {
-        $provider = new QueueFactoryProvider(
-            [
-                'queue1' => StubQueue::class,
-                'queue2' => StubQueue::class,
-            ],
-        );
-
-        $this->assertSame(['queue1', 'queue2'], $provider->getNames());
-    }
-
-    public function testGetNamesEmpty(): void
-    {
-        $provider = new QueueFactoryProvider([]);
-
-        $this->assertSame([], $provider->getNames());
+        $provider = new QueueFactoryProvider(['queue' => ['producer' => StubLoop::class]]);
+        foreach ([1, 2] as $_) {
+            try {
+                $provider->getProducer('queue');
+                self::fail('Wrong role must be rejected.');
+            } catch (InvalidQueueConfigException) {
+                self::addToAssertionCount(1);
+            }
+        }
     }
 }

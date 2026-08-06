@@ -11,19 +11,19 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
-use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
 
 #[AsCommand(
     'queue:listen-all',
     'Listens the all the given queues and executes messages as they come. '
         . 'Meant to be used in development environment only. '
-        . 'Listens all configured queues by default in case you\'re using yiisoft/config. '
+        . 'Listens all consumer-capable configured queues by default. '
         . 'Needs to be stopped manually.',
 )]
 final class ListenAllCommand extends Command
 {
     public function __construct(
-        private readonly QueueProviderInterface $queueProvider,
+        private readonly QueueConsumerProviderInterface $queueProvider,
         private readonly LoopInterface $loop,
     ) {
         parent::__construct();
@@ -38,7 +38,7 @@ final class ListenAllCommand extends Command
             'queue',
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
             'Queue name list to connect to',
-            $this->queueProvider->getNames(),
+            [],
         )
             ->addOption(
                 'pause',
@@ -61,10 +61,22 @@ final class ListenAllCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var string[] $queueNames */
+        $queueNames = $input->getArgument('queue');
+        if ($queueNames === []) {
+            $queueNames = $this->queueProvider->getConsumerNames();
+        }
+
         $queues = [];
         /** @var string $queue */
-        foreach ($input->getArgument('queue') as $queue) {
-            $queues[] = $this->queueProvider->get($queue);
+        foreach ($queueNames as $queue) {
+            $queues[] = $this->queueProvider->getConsumer($queue);
+        }
+
+        if ($queues === []) {
+            $output->writeln('No consumers are configured.');
+
+            return Command::SUCCESS;
         }
 
         $pauseSeconds = (int) $input->getOption('pause');

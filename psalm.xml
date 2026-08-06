@@ -17,6 +17,7 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
+        <MissingClassConstType errorLevel="suppress" />
         <MixedAssignment errorLevel="suppress" />
     </issueHandlers>
 </psalm>

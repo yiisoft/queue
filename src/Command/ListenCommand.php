@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Yiisoft\Queue\Provider\QueueProviderInterface;
+use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
 
 #[AsCommand(
     'queue:listen',
@@ -18,7 +18,7 @@ use Yiisoft\Queue\Provider\QueueProviderInterface;
 final class ListenCommand extends Command
 {
     public function __construct(
-        private readonly QueueProviderInterface $queueProvider,
+        private readonly QueueConsumerProviderInterface $queueProvider,
     ) {
         parent::__construct();
     }
@@ -29,7 +29,7 @@ final class ListenCommand extends Command
             'queue',
             InputArgument::OPTIONAL,
             'Queue name to connect to',
-            QueueProviderInterface::DEFAULT_QUEUE,
+            QueueConsumerProviderInterface::DEFAULT_QUEUE,
         );
     }
 
@@ -37,7 +37,7 @@ final class ListenCommand extends Command
     {
         $queueName = (string) $input->getArgument('queue');
 
-        $this->queueProvider->get($queueName)->listen();
+        $this->queueProvider->getConsumer($queueName)->listen();
 
         return Command::SUCCESS;
     }
