@@ -149,6 +149,6 @@ See [Configuration with yiisoft/config](configuration-with-config.md) for exampl
 
 ### Manual configuration (without yiisoft/config)
 
-When configuring the component manually, you instantiate the middleware dispatchers and pass them to `QueueProducer`, `QueueConsumer`, and `Worker` as appropriate.
+When configuring the component manually, you instantiate the middleware dispatchers and pass them to `SyncQueueProducer` / `AsyncQueueProducer`, `QueueConsumer`, and `Worker` as appropriate.
 
 See [Manual configuration](configuration-manual.md) for a full runnable example.

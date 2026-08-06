@@ -38,7 +38,7 @@ See the [adapter list](docs/guide/en/adapter-list.md) and follow the adapter-spe
 
 > If you don't have an external broker — whether for development, testing, or because you want to
 > design around `QueueProducerInterface` from day one and add a real broker later — you can run the queue
-> in [synchronous mode](docs/guide/en/synchronous-mode.md) (the adapter argument is optional).
+> in [synchronous mode](docs/guide/en/synchronous-mode.md) using `SyncQueueProducer` instead of `AsyncQueueProducer`.
 > In this mode messages are processed immediately in the same process, so it won't provide true
 > async execution, but the code stays the same when you switch to a real adapter.
 

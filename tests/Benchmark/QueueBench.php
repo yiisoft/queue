@@ -21,7 +21,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\QueueProducer;
+use Yiisoft\Queue\AsyncQueueProducer;
 use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueProducerInterface;
@@ -59,7 +59,7 @@ final class QueueBench
         $this->serializer = new MessageSerializer(new JsonMessageEncoder());
         $this->adapter = new VoidAdapter($this->serializer);
 
-        $this->producer = new QueueProducer(
+        $this->producer = new AsyncQueueProducer(
             $logger,
             new PushMiddlewareConfig(new PushMiddlewareFactory($container, $callableFactory)),
             $this->adapter,
