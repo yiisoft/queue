@@ -10,7 +10,6 @@ use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Push\SynchronousPushHandler;
-use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
 /**
@@ -28,7 +27,7 @@ final class SyncQueueProducer implements QueueProducerInterface
         private readonly LoggerInterface $logger,
         PushMiddlewareConfig $middlewareConfig,
         WorkerInterface $worker,
-        string|BackedEnum $name = QueueProducerProviderInterface::DEFAULT_QUEUE,
+        string|BackedEnum $name = DefaultQueue::NAME,
         array $middlewareDefinitions = [],
     ) {
         $this->name = StringNormalizer::normalize($name);

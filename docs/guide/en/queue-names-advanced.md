@@ -14,7 +14,7 @@ Providers translate a queue name into the capability the caller needs:
 
 Both lookup methods accept a string or `BackedEnum`. They throw `QueueNotFoundException` when the name is unknown or does not have the requested role. This separation prevents a producer-only queue from accidentally being used by a worker, and vice versa.
 
-The default name is `QueueProducerProviderInterface::DEFAULT_QUEUE` (also available from `QueueConsumerProviderInterface`), whose value is `yii-queue`.
+The default name is `DefaultQueue::NAME`, whose value is `yii-queue`.
 
 ## Role-map configuration
 

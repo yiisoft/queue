@@ -8,7 +8,7 @@ use BackedEnum;
 use Yiisoft\Queue\QueueProducerInterface;
 
 /** Finds producer capabilities by logical queue name. */
-interface QueueProducerProviderInterface extends QueueProviderDefaults
+interface QueueProducerProviderInterface
 {
     /** @throws InvalidQueueConfigException|QueueNotFoundException|QueueProviderException */
     public function getProducer(string|BackedEnum $name): QueueProducerInterface;

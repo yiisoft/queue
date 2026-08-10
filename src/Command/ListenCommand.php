@@ -9,6 +9,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Yiisoft\Queue\DefaultQueue;
 use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
 
 #[AsCommand(
@@ -29,7 +30,7 @@ final class ListenCommand extends Command
             'queue',
             InputArgument::OPTIONAL,
             'Queue name to connect to',
-            QueueConsumerProviderInterface::DEFAULT_QUEUE,
+            DefaultQueue::NAME,
         );
     }
 
