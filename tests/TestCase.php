@@ -22,7 +22,9 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\QueueProducer;
+use Yiisoft\Queue\AsyncQueueProducer;
+use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
@@ -32,7 +34,7 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 abstract class TestCase extends BaseTestCase
 {
     protected ?ContainerInterface $container = null;
-    protected ?QueueProducer $queue = null;
+    protected ?QueueProducerInterface $queue = null;
     protected ?LoopInterface $loop = null;
     protected ?WorkerInterface $worker = null;
     protected array $eventHandlers = [];
@@ -51,9 +53,9 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * @return QueueProducer The same object every time
+     * @return QueueProducerInterface The same object every time
      */
-    protected function getQueue(): QueueProducer
+    protected function getQueue(): QueueProducerInterface
     {
         if ($this->queue === null) {
             $this->queue = $this->createQueue();
@@ -92,14 +94,20 @@ abstract class TestCase extends BaseTestCase
     protected function createQueue(
         ?AdapterInterface $adapter = null,
         string|BackedEnum $name = QueueProducerProviderInterface::DEFAULT_QUEUE,
-    ): QueueProducer {
-        return new QueueProducer(
-            new NullLogger(),
-            $this->getPushMiddlewareConfig(),
-            $adapter,
-            $name,
-            $adapter === null ? $this->getWorker() : null,
-        );
+    ): QueueProducerInterface {
+        return $adapter === null
+            ? new SyncQueueProducer(
+                new NullLogger(),
+                $this->getPushMiddlewareConfig(),
+                $this->getWorker(),
+                $name,
+            )
+            : new AsyncQueueProducer(
+                new NullLogger(),
+                $this->getPushMiddlewareConfig(),
+                $adapter,
+                $name,
+            );
     }
 
     protected function createLoop(): LoopInterface

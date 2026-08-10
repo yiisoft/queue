@@ -6,18 +6,18 @@ Named providers use a strict nested role map. `getProducerNames()` and `getConsu
 
 ```php
 use Yiisoft\Queue\QueueConsumer;
-use Yiisoft\Queue\QueueProducer;
+use Yiisoft\Queue\AsyncQueueProducer;
 
 $definitions = [
     'orders' => [
-        'producer' => ['class' => QueueProducer::class],
+        'producer' => ['class' => AsyncQueueProducer::class],
         'consumer' => ['class' => QueueConsumer::class],
     ],
-    'outbound-events' => ['producer' => ['class' => QueueProducer::class]],
+    'outbound-events' => ['producer' => ['class' => AsyncQueueProducer::class]],
     'inbound-events' => ['consumer' => ['class' => QueueConsumer::class]],
 ];
 ```
 
-`QueueFactoryProvider` accepts factory definitions in each role. `PredefinedQueueProvider` uses the same outer shape but each role value must already be its respective interface instance. A raw definition such as `'orders' => ['class' => QueueProducer::class]`, an empty role map, and unknown role keys are invalid.
+`QueueFactoryProvider` accepts factory definitions in each role. `PredefinedQueueProvider` uses the same outer shape but each role value must already be its respective interface instance. A raw definition such as `'orders' => ['class' => AsyncQueueProducer::class]`, an empty role map, and unknown role keys are invalid.
 
-`QueueInterface`, `Queue`, and `QueueProviderInterface` were removed before release. Replace them with `QueueProducerInterface`, `QueueProducer` / `QueueConsumer`, and the relevant typed provider. Synchronous consumers retain no-op `run()` and `listen()` behavior when no adapter is configured. Default retry of an asynchronously consumed message resolves a producer for the execution queue name through a configured producer provider; if none is available it fails with an actionable configuration error rather than dropping the message.
+`QueueInterface`, `Queue`, and `QueueProviderInterface` were removed before release. Replace them with `QueueProducerInterface`, `SyncQueueProducer` / `AsyncQueueProducer` / `QueueConsumer`, and the relevant typed provider. Synchronous consumers retain no-op `run()` and `listen()` behavior when no adapter is configured. Default retry of an asynchronously consumed message resolves a producer for the execution queue name through a configured producer provider; if none is available it fails with an actionable configuration error rather than dropping the message.

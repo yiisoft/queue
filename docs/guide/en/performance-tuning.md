@@ -127,15 +127,15 @@ return [
     'yiisoft/queue' => [
         'queues' => [
             'critical' => [
-                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'producer' => ['class' => \Yiisoft\Queue\AsyncQueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
                 'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
             ],
             'normal' => [
-                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'producer' => ['class' => \Yiisoft\Queue\AsyncQueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
                 'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
             ],
             'low' => [
-                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'producer' => ['class' => \Yiisoft\Queue\AsyncQueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
                 'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
             ],
         ],
@@ -165,19 +165,19 @@ return [
     'yiisoft/queue' => [
         'queues' => [
             'fast' => [ // Quick tasks (< 1s)
-                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'producer' => ['class' => \Yiisoft\Queue\AsyncQueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
                 'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
             ],
             'slow' => [ // Long tasks (> 10s)
-                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'producer' => ['class' => \Yiisoft\Queue\AsyncQueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
                 'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
             ],
             'cpu-bound' => [ // CPU-intensive
-                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'producer' => ['class' => \Yiisoft\Queue\AsyncQueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
                 'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
             ],
             'io-bound' => [ // I/O-intensive
-                'producer' => ['class' => \Yiisoft\Queue\QueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
+                'producer' => ['class' => \Yiisoft\Queue\AsyncQueueProducer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
                 'consumer' => ['class' => \Yiisoft\Queue\QueueConsumer::class, '__construct()' => ['adapter' => AmqpAdapter::class]],
             ],
         ],

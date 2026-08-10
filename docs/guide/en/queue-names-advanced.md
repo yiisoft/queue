@@ -30,15 +30,15 @@ Choose the provider by how the roles are created:
 ```php
 use Yiisoft\Queue\Provider\QueueFactoryProvider;
 use Yiisoft\Queue\QueueConsumer;
-use Yiisoft\Queue\QueueProducer;
+use Yiisoft\Queue\AsyncQueueProducer;
 
 $provider = new QueueFactoryProvider([
     'emails' => [
-        'producer' => ['class' => QueueProducer::class],
+        'producer' => ['class' => AsyncQueueProducer::class],
         'consumer' => ['class' => QueueConsumer::class],
     ],
     'audit' => [
-        'producer' => ['class' => QueueProducer::class],
+        'producer' => ['class' => AsyncQueueProducer::class],
     ],
 ], $container);
 

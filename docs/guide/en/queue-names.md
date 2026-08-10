@@ -20,19 +20,19 @@ Named queues use a strict role map under `yiisoft/queue.queues`. Each name must 
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
 use Yiisoft\Queue\QueueConsumer;
-use Yiisoft\Queue\QueueProducer;
+use Yiisoft\Queue\AsyncQueueProducer;
 
 return [
     'yiisoft/queue' => [
         'queues' => [
             // A queue with both capabilities.
             QueueProducerProviderInterface::DEFAULT_QUEUE => [
-                'producer' => ['class' => QueueProducer::class, '__construct()' => ['adapter' => AdapterInterface::class]],
+                'producer' => ['class' => AsyncQueueProducer::class, '__construct()' => ['adapter' => AdapterInterface::class]],
                 'consumer' => ['class' => QueueConsumer::class, '__construct()' => ['adapter' => AdapterInterface::class]],
             ],
             // Produce-only and consume-only names are valid.
             'outbound-events' => [
-                'producer' => ['class' => QueueProducer::class, '__construct()' => ['adapter' => AdapterInterface::class]],
+                'producer' => ['class' => AsyncQueueProducer::class, '__construct()' => ['adapter' => AdapterInterface::class]],
             ],
             'inbound-events' => [
                 'consumer' => ['class' => QueueConsumer::class, '__construct()' => ['adapter' => AdapterInterface::class]],

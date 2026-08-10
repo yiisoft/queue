@@ -8,7 +8,7 @@ To use the queue, you need to create instances of the following classes:
 
 1. **Adapter** - handles the actual queue backend like AMQP, Redis, etc.
 2. **Worker** - processes messages from the queue
-3. **QueueProducer** - pushes messages; **QueueConsumer** consumes them when needed
+3. **SyncQueueProducer** / **AsyncQueueProducer** - pushes messages; **QueueConsumer** consumes them when needed
 
 ### Example
 
@@ -25,7 +25,7 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\QueueConsumer;
-use Yiisoft\Queue\QueueProducer;
+use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\Worker\Worker;
 
 // A PSR-11 container is required for resolving dependencies of middleware and handlers.
@@ -69,16 +69,17 @@ $worker = new Worker(
 // Create loop (SignalLoop requires ext-pcntl; SimpleLoop works without it)
 $loop = new SimpleLoop();
 
-// Create queue. Without an adapter the queue runs in synchronous mode (messages are processed
-// immediately on push). Pass an adapter (e.g., AMQP, Redis) for asynchronous processing.
-$producer = new QueueProducer(
+// Create queue. SyncQueueProducer runs in synchronous mode (messages are processed
+// immediately on push). Use AsyncQueueProducer with an adapter (e.g., AMQP, Redis) instead
+// for asynchronous processing.
+$producer = new SyncQueueProducer(
     $logger,
     $pushMiddlewareConfig,
-    worker: $worker,
+    $worker,
 );
 $consumer = new QueueConsumer($worker, $loop, $logger);
 
-// Now you can push messages. With no adapter, the producer dispatches directly to the worker.
+// Now you can push messages. SyncQueueProducer dispatches directly to the worker.
 $message = new DownloadFileMessage(url: 'https://example.com/file.pdf', destinationPath: '/tmp/file.pdf');
 $producer->push($message);
 ```
@@ -100,7 +101,7 @@ $provider = new PredefinedQueueProvider([
 ## Running the queue
 
 Message consumption methods are available on `Yiisoft\Queue\QueueConsumerInterface`.
-`QueueProducer` and `QueueConsumer` are separate capabilities. Obtain or construct the consumer role before calling these methods.
+The producer and `QueueConsumer` are separate capabilities. Obtain or construct the consumer role before calling these methods.
 
 ### Processing existing messages
 
