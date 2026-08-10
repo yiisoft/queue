@@ -6,7 +6,7 @@ A *queue name* is a logical identifier for independently configured producer and
 - Use `QueueProducerProviderInterface` to obtain a named producer with `getProducer()`.
 - Use `QueueConsumerProviderInterface` to obtain a named consumer with `getConsumer()`; console commands use this provider.
 
-The default name is `QueueProducerProviderInterface::DEFAULT_QUEUE` (also available from `QueueConsumerProviderInterface`) and is `yii-queue`.
+The default name is `DefaultQueue::NAME`, whose value is `yii-queue`.
 
 ## When to use named queues
 
@@ -18,7 +18,7 @@ Named queues use a strict role map under `yiisoft/queue.queues`. Each name must 
 
 ```php
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
+use Yiisoft\Queue\DefaultQueue;
 use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\AsyncQueueProducer;
 
@@ -26,7 +26,7 @@ return [
     'yiisoft/queue' => [
         'queues' => [
             // A queue with both capabilities.
-            QueueProducerProviderInterface::DEFAULT_QUEUE => [
+            DefaultQueue::NAME => [
                 'producer' => ['class' => AsyncQueueProducer::class, '__construct()' => ['adapter' => AdapterInterface::class]],
                 'consumer' => ['class' => QueueConsumer::class, '__construct()' => ['adapter' => AdapterInterface::class]],
             ],

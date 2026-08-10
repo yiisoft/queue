@@ -8,7 +8,7 @@ use BackedEnum;
 use Yiisoft\Queue\QueueConsumerInterface;
 
 /** Finds consumer capabilities by logical queue name. */
-interface QueueConsumerProviderInterface extends QueueProviderDefaults
+interface QueueConsumerProviderInterface
 {
     /** @throws InvalidQueueConfigException|QueueNotFoundException|QueueProviderException */
     public function getConsumer(string|BackedEnum $name): QueueConsumerInterface;

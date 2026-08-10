@@ -9,7 +9,6 @@ use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
 /** Consumes messages for one logical queue. */
@@ -22,7 +21,7 @@ final class QueueConsumer implements QueueConsumerInterface
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
         private readonly ?AdapterInterface $adapter = null,
-        string|BackedEnum $name = QueueConsumerProviderInterface::DEFAULT_QUEUE,
+        string|BackedEnum $name = DefaultQueue::NAME,
     ) {
         $this->name = StringNormalizer::normalize($name);
     }
