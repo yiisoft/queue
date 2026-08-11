@@ -17,10 +17,10 @@ final class QueueWorkerInterfaceProxy implements WorkerInterface
 
     public function process(
         MessageInterface $message,
-        string $queueName,
+        string $queue,
         ?QueueProducerInterface $retryProducer = null,
     ): MessageInterface {
-        $this->collector->collectWorkerProcessing($message, $queueName);
-        return $this->worker->process($message, $queueName, $retryProducer);
+        $this->collector->collectWorkerProcessing($message, $queue);
+        return $this->worker->process($message, $queue, $retryProducer);
     }
 }

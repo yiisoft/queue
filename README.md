@@ -160,13 +160,13 @@ By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/
 
 ```bash
 ./yii queue:run # Handle all existing messages in the queue
-./yii queue:listen [queueName] # Start a daemon listening for new messages permanently from the specified queue
-./yii queue:listen-all [queueName [queueName2 [...]]] # Start a daemon listening for new messages permanently from all consumer-capable queues or specified list of queues (use with caution in production, recommended for dev only)
+./yii queue:listen [queue] # Start a daemon listening for new messages permanently from the specified queue
+./yii queue:listen-all [queue [queue2 [...]]] # Start a daemon listening for new messages permanently from all consumer-capable queues or specified list of queues (use with caution in production, recommended for dev only)
 ```
 
 See [Console commands](docs/guide/en/console-commands.md) for more details.
 
-Producers use `Yiisoft\Queue\QueueProducerInterface` (`push()`, `status()`, `getName()`); consumers use `Yiisoft\Queue\QueueConsumerInterface` (`run()`, `listen()`). See [capability configuration](docs/guide/en/queue-capabilities.md) for the strict role map used when named queues are configured.
+Producers use `Yiisoft\Queue\QueueProducerInterface` (`push()`, `status()`, `getQueue()`); consumers use `Yiisoft\Queue\QueueConsumerInterface` (`run()`, `listen()`). See [capability configuration](docs/guide/en/queue-capabilities.md) for the strict role map used when named queues are configured.
 
 > In case you're running the queue in synchronous mode (no adapter), `queue:listen` logs an info message and exits. The messages are processed immediately when pushed.
 

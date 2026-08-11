@@ -18,6 +18,6 @@ final class ConsumeRequestTest extends TestCase
         $consumeRequest = new ConsumeRequest($message, 'test-queue');
 
         $this->assertNotSame($consumeRequest, $consumeRequest->withMessage($message));
-        $this->assertNotSame($consumeRequest, $consumeRequest->withQueueName('other-queue'));
+        $this->assertNotSame($consumeRequest, $consumeRequest->withQueue('other-queue'));
     }
 }

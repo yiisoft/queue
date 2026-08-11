@@ -51,7 +51,7 @@ final class Worker implements WorkerInterface
      */
     public function process(
         MessageInterface $message,
-        string $queueName,
+        string $queue,
         ?QueueProducerInterface $retryProducer = null,
     ): MessageInterface {
         $messageId = IdEnvelope::fromMessage($message)->getId();
@@ -72,12 +72,12 @@ final class Worker implements WorkerInterface
             throw new RuntimeException(sprintf('Queue handler for message type "%s" does not exist.', $messageType));
         }
 
-        $request = new ConsumeRequest($message, $queueName);
+        $request = new ConsumeRequest($message, $queue);
         $closure = fn(MessageInterface $message): mixed => $this->injector->invoke($handler, [$message]);
         try {
             return $this->consumeMiddlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure))->getMessage();
         } catch (Throwable $exception) {
-            $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueueName(), $retryProducer);
+            $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueue(), $retryProducer);
 
             try {
                 $result = $this->failureMiddlewareDispatcher->dispatch($request, $this->createFailureHandler());

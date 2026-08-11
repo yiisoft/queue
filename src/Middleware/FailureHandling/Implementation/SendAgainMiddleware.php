@@ -48,12 +48,12 @@ final class SendAgainMiddleware implements FailureMiddlewareInterface
     private function sourceProducer(FailureHandlingRequest $request): QueueProducerInterface
     {
         if ($this->producerProvider === null) {
-            throw new InvalidQueueConfigException(sprintf('Cannot retry queue "%s": configure a producer target or QueueProducerProviderInterface.', $request->getQueueName()));
+            throw new InvalidQueueConfigException(sprintf('Cannot retry queue "%s": configure a producer target or QueueProducerProviderInterface.', $request->getQueue()));
         }
         try {
-            return $this->producerProvider->getProducer($request->getQueueName());
+            return $this->producerProvider->getProducer($request->getQueue());
         } catch (Throwable $exception) {
-            throw new InvalidQueueConfigException(sprintf('Cannot retry queue "%s": no producer capability is available.', $request->getQueueName()), previous: $exception);
+            throw new InvalidQueueConfigException(sprintf('Cannot retry queue "%s": no producer capability is available.', $request->getQueue()), previous: $exception);
         }
     }
 

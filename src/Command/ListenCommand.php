@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Yiisoft\Queue\DefaultQueue;
+use Yiisoft\Queue\Defaults;
 use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
 
 #[AsCommand(
@@ -29,16 +29,16 @@ final class ListenCommand extends Command
         $this->addArgument(
             'queue',
             InputArgument::OPTIONAL,
-            'Queue name to connect to',
-            DefaultQueue::NAME,
+            'Queue to connect to',
+            Defaults::QUEUE,
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $queueName = (string) $input->getArgument('queue');
+        $queue = (string) $input->getArgument('queue');
 
-        $this->queueProvider->getConsumer($queueName)->listen();
+        $this->queueProvider->getConsumer($queue)->listen();
 
         return Command::SUCCESS;
     }

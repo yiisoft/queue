@@ -7,15 +7,15 @@ namespace Yiisoft\Queue\Provider;
 use BackedEnum;
 use Yiisoft\Queue\QueueConsumerInterface;
 
-/** Finds consumer capabilities by logical queue name. */
+/** Finds consumer capabilities by logical queue. */
 interface QueueConsumerProviderInterface
 {
     /** @throws InvalidQueueConfigException|QueueNotFoundException|QueueProviderException */
-    public function getConsumer(string|BackedEnum $name): QueueConsumerInterface;
+    public function getConsumer(string|BackedEnum $queue): QueueConsumerInterface;
 
-    /** Whether this name has a configured consumer role. */
-    public function hasConsumer(string|BackedEnum $name): bool;
+    /** Whether this queue has a configured consumer role. */
+    public function hasConsumer(string|BackedEnum $queue): bool;
 
-    /** @return list<string> Names which have a configured consumer role. */
-    public function getConsumerNames(): array;
+    /** @return list<string> Queues which have a configured consumer role. */
+    public function getConsumerQueues(): array;
 }

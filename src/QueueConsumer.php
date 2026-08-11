@@ -14,16 +14,16 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 /** Consumes messages for one logical queue. */
 final class QueueConsumer implements QueueConsumerInterface
 {
-    private string $name;
+    private string $queue;
 
     public function __construct(
         private readonly WorkerInterface $worker,
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
         private readonly ?AdapterInterface $adapter = null,
-        string|BackedEnum $name = DefaultQueue::NAME,
+        string|BackedEnum $queue = Defaults::QUEUE,
     ) {
-        $this->name = StringNormalizer::normalize($name);
+        $this->queue = StringNormalizer::normalize($queue);
     }
 
     public function run(int $max = 0): int
@@ -58,7 +58,7 @@ final class QueueConsumer implements QueueConsumerInterface
 
     private function handle(MessageInterface $message): bool
     {
-        $this->worker->process($message, $this->name);
+        $this->worker->process($message, $this->queue);
         return $this->loop->canContinue();
     }
 }

@@ -37,7 +37,7 @@ final class ListenAllCommand extends Command
         $this->addArgument(
             'queue',
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
-            'Queue name list to connect to',
+            'Queue list to connect to',
             [],
         )
             ->addOption(
@@ -61,19 +61,19 @@ final class ListenAllCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var string[] $queueNames */
-        $queueNames = $input->getArgument('queue');
-        if ($queueNames === []) {
-            $queueNames = $this->queueProvider->getConsumerNames();
-        }
-
-        $queues = [];
-        /** @var string $queue */
-        foreach ($queueNames as $queue) {
-            $queues[] = $this->queueProvider->getConsumer($queue);
-        }
-
+        /** @var string[] $queues */
+        $queues = $input->getArgument('queue');
         if ($queues === []) {
+            $queues = $this->queueProvider->getConsumerQueues();
+        }
+
+        $consumers = [];
+        /** @var string $queue */
+        foreach ($queues as $queue) {
+            $consumers[] = $this->queueProvider->getConsumer($queue);
+        }
+
+        if ($consumers === []) {
             $output->writeln('No consumers are configured.');
 
             return Command::SUCCESS;
@@ -86,8 +86,8 @@ final class ListenAllCommand extends Command
 
         while ($this->loop->canContinue()) {
             $hasMessages = false;
-            foreach ($queues as $queue) {
-                $hasMessages = $queue->run((int) $input->getOption('limit')) > 0 || $hasMessages;
+            foreach ($consumers as $consumer) {
+                $hasMessages = $consumer->run((int) $input->getOption('limit')) > 0 || $hasMessages;
             }
 
             if (!$hasMessages) {

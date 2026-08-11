@@ -22,8 +22,8 @@ final class PredefinedQueueProviderTest extends TestCase
 
         self::assertSame($producer, $provider->getProducer('queue1'));
         self::assertSame($consumer, $provider->getConsumer('queue1'));
-        self::assertSame(['queue1'], $provider->getProducerNames());
-        self::assertSame(['queue1'], $provider->getConsumerNames());
+        self::assertSame(['queue1'], $provider->getProducerQueues());
+        self::assertSame(['queue1'], $provider->getConsumerQueues());
     }
 
     public function testCapabilityIsolationAndEnumNames(): void

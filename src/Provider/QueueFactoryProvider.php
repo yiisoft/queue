@@ -29,9 +29,9 @@ final class QueueFactoryProvider implements QueueProducerProviderInterface, Queu
     /** @var array<string, array<string, QueueProducerInterface|QueueConsumerInterface|Throwable>> */
     private array $resolved = [];
     /** @var list<string> */
-    private array $producerNames = [];
+    private array $producerQueues = [];
     /** @var list<string> */
-    private array $consumerNames = [];
+    private array $consumerQueues = [];
 
     /** @param array<string, mixed> $definitions */
     public function __construct(
@@ -42,98 +42,98 @@ final class QueueFactoryProvider implements QueueProducerProviderInterface, Queu
         /** @var array<string, array<string, mixed>> $validatedDefinitions */
         $validatedDefinitions = $this->validateRoleMaps($definitions);
         $this->definitions = $validatedDefinitions;
-        foreach ($this->definitions as $name => $roles) {
+        foreach ($this->definitions as $queue => $roles) {
             if (array_key_exists('producer', $roles)) {
-                $this->producerNames[] = $name;
+                $this->producerQueues[] = $queue;
             }
             if (array_key_exists('consumer', $roles)) {
-                $this->consumerNames[] = $name;
+                $this->consumerQueues[] = $queue;
             }
         }
     }
 
-    public function getProducer(string|BackedEnum $name): QueueProducerInterface
+    public function getProducer(string|BackedEnum $queue): QueueProducerInterface
     {
-        $producer = $this->get($name, 'producer', QueueProducerInterface::class);
+        $producer = $this->get($queue, 'producer', QueueProducerInterface::class);
         assert($producer instanceof QueueProducerInterface);
         return $producer;
     }
 
-    public function hasProducer(string|BackedEnum $name): bool
+    public function hasProducer(string|BackedEnum $queue): bool
     {
-        return array_key_exists('producer', $this->definitions[StringNormalizer::normalize($name)] ?? []);
+        return array_key_exists('producer', $this->definitions[StringNormalizer::normalize($queue)] ?? []);
     }
 
-    public function getProducerNames(): array
+    public function getProducerQueues(): array
     {
-        return $this->producerNames;
+        return $this->producerQueues;
     }
 
-    public function getConsumer(string|BackedEnum $name): QueueConsumerInterface
+    public function getConsumer(string|BackedEnum $queue): QueueConsumerInterface
     {
-        $consumer = $this->get($name, 'consumer', QueueConsumerInterface::class);
+        $consumer = $this->get($queue, 'consumer', QueueConsumerInterface::class);
         assert($consumer instanceof QueueConsumerInterface);
         return $consumer;
     }
 
-    public function hasConsumer(string|BackedEnum $name): bool
+    public function hasConsumer(string|BackedEnum $queue): bool
     {
-        return array_key_exists('consumer', $this->definitions[StringNormalizer::normalize($name)] ?? []);
+        return array_key_exists('consumer', $this->definitions[StringNormalizer::normalize($queue)] ?? []);
     }
 
-    public function getConsumerNames(): array
+    public function getConsumerQueues(): array
     {
-        return $this->consumerNames;
+        return $this->consumerQueues;
     }
 
     /** @template T of QueueProducerInterface|QueueConsumerInterface @param class-string<T> $expected @return T */
-    private function get(string|BackedEnum $name, string $role, string $expected): QueueProducerInterface|QueueConsumerInterface
+    private function get(string|BackedEnum $queue, string $role, string $expected): QueueProducerInterface|QueueConsumerInterface
     {
-        $name = StringNormalizer::normalize($name);
-        if (!array_key_exists($name, $this->definitions)) {
-            throw new QueueNotFoundException($name);
+        $queue = StringNormalizer::normalize($queue);
+        if (!array_key_exists($queue, $this->definitions)) {
+            throw new QueueNotFoundException($queue);
         }
-        if (!array_key_exists($role, $this->definitions[$name])) {
-            throw new QueueNotFoundException(sprintf('Queue "%s" does not have the "%s" capability.', $name, $role));
+        if (!array_key_exists($role, $this->definitions[$queue])) {
+            throw new QueueNotFoundException(sprintf('Queue "%s" does not have the "%s" capability.', $queue, $role));
         }
-        if (isset($this->resolved[$name][$role])) {
-            $result = $this->resolved[$name][$role];
+        if (isset($this->resolved[$queue][$role])) {
+            $result = $this->resolved[$queue][$role];
             if ($result instanceof Throwable) {
                 throw $result;
             }
             return $result;
         }
         try {
-            $key = $name . ':' . $role;
-            $factory = new StrictFactory([$key => $this->definitions[$name][$role]], $this->container, $this->validate);
+            $key = $queue . ':' . $role;
+            $factory = new StrictFactory([$key => $this->definitions[$queue][$role]], $this->container, $this->validate);
             $result = $factory->create($key);
             if (!$result instanceof $expected) {
                 throw new InvalidQueueConfigException(sprintf(
                     'Queue "%s" role "%s" must implement "%s"; got "%s" (configuration path queues.%s.%s).',
-                    $name,
+                    $queue,
                     $role,
                     $expected,
                     get_debug_type($result),
-                    $name,
+                    $queue,
                     $role,
                 ));
             }
             assert($result instanceof QueueProducerInterface || $result instanceof QueueConsumerInterface);
-            $this->resolved[$name][$role] = $result;
+            $this->resolved[$queue][$role] = $result;
             return $result;
         } catch (InvalidQueueConfigException $exception) {
-            $this->resolved[$name][$role] = $exception;
+            $this->resolved[$queue][$role] = $exception;
             throw $exception;
         } catch (InvalidConfigException $exception) {
             $wrapped = new InvalidQueueConfigException(sprintf(
                 'Invalid queue "%s" role "%s" definition (configuration path queues.%s.%s): %s',
-                $name,
+                $queue,
                 $role,
-                $name,
+                $queue,
                 $role,
                 $exception->getMessage(),
             ), previous: $exception);
-            $this->resolved[$name][$role] = $wrapped;
+            $this->resolved[$queue][$role] = $wrapped;
             throw $wrapped;
         }
     }
@@ -143,20 +143,20 @@ final class QueueFactoryProvider implements QueueProducerProviderInterface, Queu
     {
         /** @var array<string, array<string, mixed>> $result */
         $result = [];
-        foreach ($definitions as $name => $roles) {
+        foreach ($definitions as $queue => $roles) {
             if (!is_array($roles)) {
-                throw new InvalidQueueConfigException(sprintf('Queue "%s" must be a role map containing "producer" and/or "consumer"; got "%s".', $name, get_debug_type($roles)));
+                throw new InvalidQueueConfigException(sprintf('Queue "%s" must be a role map containing "producer" and/or "consumer"; got "%s".', $queue, get_debug_type($roles)));
             }
             $keys = array_keys($roles);
             $unknown = array_diff($keys, ['producer', 'consumer']);
             if ($unknown !== []) {
-                throw new InvalidQueueConfigException(sprintf('Queue "%s" has unknown role key(s) "%s". Only "producer" and "consumer" are allowed.', $name, implode('", "', $unknown)));
+                throw new InvalidQueueConfigException(sprintf('Queue "%s" has unknown role key(s) "%s". Only "producer" and "consumer" are allowed.', $queue, implode('", "', $unknown)));
             }
             if ($roles === []) {
-                throw new InvalidQueueConfigException(sprintf('Queue "%s" role map must contain "producer" and/or "consumer".', $name));
+                throw new InvalidQueueConfigException(sprintf('Queue "%s" role map must contain "producer" and/or "consumer".', $queue));
             }
             /** @var array<string, mixed> $roles */
-            $result[$name] = $roles;
+            $result[$queue] = $roles;
         }
         return $result;
     }

@@ -2,7 +2,7 @@
 
 A logical queue name can independently expose a producer, a consumer, or both. Inject `QueueProducerInterface` to push/status messages and `QueueConsumerInterface` to run/listen. Console commands use only `QueueConsumerProviderInterface`; retry middleware uses a direct `QueueProducerInterface` or `QueueProducerProviderInterface`.
 
-Named providers use a strict nested role map. `getProducerNames()` and `getConsumerNames()` return only names with that role. Role definitions are created lazily and cached per name and role; failed lazy creation is cached and repeated lookups rethrow the same configuration error.
+Named providers use a strict nested role map. `getProducerQueues()` and `getConsumerQueues()` return only names with that role. Role definitions are created lazily and cached per name and role; failed lazy creation is cached and repeated lookups rethrow the same configuration error.
 
 ```php
 use Yiisoft\Queue\QueueConsumer;

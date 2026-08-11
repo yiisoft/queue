@@ -8,17 +8,17 @@ use Yiisoft\Queue\Message\MessageInterface;
 
 final class ConsumeRequest
 {
-    public function __construct(private MessageInterface $message, private string $queueName) {}
+    public function __construct(private MessageInterface $message, private string $queue) {}
 
     public function getMessage(): MessageInterface
     {
         return $this->message;
     }
 
-    /** Logical name of the queue currently executing this message. */
-    public function getQueueName(): string
+    /** Logical queue currently executing this message. */
+    public function getQueue(): string
     {
-        return $this->queueName;
+        return $this->queue;
     }
 
     public function withMessage(MessageInterface $message): self
@@ -28,10 +28,10 @@ final class ConsumeRequest
         return $instance;
     }
 
-    public function withQueueName(string $queueName): self
+    public function withQueue(string $queue): self
     {
         $instance = clone $this;
-        $instance->queueName = $queueName;
+        $instance->queue = $queue;
         return $instance;
     }
 }

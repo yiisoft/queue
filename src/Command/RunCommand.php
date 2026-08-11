@@ -29,7 +29,7 @@ final class RunCommand extends Command
         $this->addArgument(
             'queue',
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
-            'Queue name list to connect to.',
+            'Queue list to connect to.',
             [],
         )
             ->addOption(
@@ -44,14 +44,14 @@ final class RunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var string[] $queueNames */
-        $queueNames = $input->getArgument('queue');
-        if ($queueNames === []) {
-            $queueNames = $this->queueProvider->getConsumerNames();
+        /** @var string[] $queues */
+        $queues = $input->getArgument('queue');
+        if ($queues === []) {
+            $queues = $this->queueProvider->getConsumerQueues();
         }
 
         /** @var string $queue */
-        foreach ($queueNames as $queue) {
+        foreach ($queues as $queue) {
             $queueConsumer = $this->queueProvider->getConsumer($queue);
 
             $output->write("Processing queue $queue... ");

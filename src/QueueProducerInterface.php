@@ -15,6 +15,6 @@ interface QueueProducerInterface
     /** Returns the status of a message ID. */
     public function status(string|int $id): MessageStatus;
 
-    /** Returns the logical queue name. */
-    public function getName(): string;
+    /** Returns the logical queue. */
+    public function getQueue(): string;
 }

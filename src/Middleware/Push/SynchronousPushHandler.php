@@ -20,7 +20,7 @@ final class SynchronousPushHandler implements PushHandlerInterface
 
     public function handlePush(MessageInterface $message): MessageInterface
     {
-        $this->worker->process($message, $this->queue->getName(), $this->queue);
+        $this->worker->process($message, $this->queue->getQueue(), $this->queue);
 
         return $message;
     }

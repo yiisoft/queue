@@ -33,7 +33,7 @@ final class QueueProviderTest extends TestCase
             'both' => [
                 'producer' => [
                     'class' => StubQueueProducer::class,
-                    '__construct()' => ['name' => Reference::to('producer-name')],
+                    '__construct()' => ['queue' => Reference::to('producer-name')],
                 ],
                 'consumer' => StubQueueConsumer::class,
             ],
@@ -41,9 +41,9 @@ final class QueueProviderTest extends TestCase
             'consumer-only' => ['consumer' => StubQueueConsumer::class],
         ], $container);
 
-        self::assertSame(['both', 'producer-only'], $provider->getProducerNames());
-        self::assertSame(['both', 'consumer-only'], $provider->getConsumerNames());
-        self::assertSame('factory-both', $provider->getProducer('both')->getName());
+        self::assertSame(['both', 'producer-only'], $provider->getProducerQueues());
+        self::assertSame(['both', 'consumer-only'], $provider->getConsumerQueues());
+        self::assertSame('factory-both', $provider->getProducer('both')->getQueue());
         self::assertInstanceOf(StubQueueConsumer::class, $provider->getConsumer('both'));
         self::assertInstanceOf(StubQueueProducer::class, $provider->getProducer('producer-only'));
         self::assertInstanceOf(StubQueueConsumer::class, $provider->getConsumer('consumer-only'));
@@ -64,8 +64,8 @@ final class QueueProviderTest extends TestCase
             'consumer-only' => ['consumer' => $consumer],
         ]);
 
-        self::assertSame(['both', 'producer-only'], $provider->getProducerNames());
-        self::assertSame(['both', 'consumer-only'], $provider->getConsumerNames());
+        self::assertSame(['both', 'producer-only'], $provider->getProducerQueues());
+        self::assertSame(['both', 'consumer-only'], $provider->getConsumerQueues());
         self::assertInstanceOf(QueueProducerInterface::class, $provider->getProducer('both'));
         self::assertInstanceOf(QueueConsumerInterface::class, $provider->getConsumer('both'));
         self::assertFalse($provider->hasConsumer('producer-only'));
@@ -98,8 +98,8 @@ final class QueueProviderTest extends TestCase
 
         self::assertInstanceOf(QueueProducerDecorator::class, $producer);
         self::assertInstanceOf(QueueConsumerDecorator::class, $consumer);
-        self::assertSame(['mixed-name'], $producerProvider->getProducerNames());
-        self::assertSame(['consumer-only'], $consumerProvider->getConsumerNames());
+        self::assertSame(['mixed-name'], $producerProvider->getProducerQueues());
+        self::assertSame(['consumer-only'], $consumerProvider->getConsumerQueues());
         self::assertSame(1, $collector->getSummary()['countPushes']);
     }
 }

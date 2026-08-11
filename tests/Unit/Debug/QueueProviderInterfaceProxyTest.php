@@ -32,10 +32,10 @@ final class QueueProviderInterfaceProxyTest extends TestCase
         $provider = $this->createMock(QueueConsumerProviderInterface::class);
         $provider->method('getConsumer')->willReturn($consumer);
         $provider->method('hasConsumer')->with('queue')->willReturn(true);
-        $provider->method('getConsumerNames')->willReturn(['queue']);
+        $provider->method('getConsumerQueues')->willReturn(['queue']);
         $proxy = new QueueConsumerProviderProxy($provider, new QueueCollector());
         self::assertInstanceOf(QueueConsumerDecorator::class, $proxy->getConsumer('queue'));
         self::assertTrue($proxy->hasConsumer('queue'));
-        self::assertSame(['queue'], $proxy->getConsumerNames());
+        self::assertSame(['queue'], $proxy->getConsumerQueues());
     }
 }
