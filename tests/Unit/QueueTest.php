@@ -69,7 +69,7 @@ final class QueueTest extends TestCase
 
     public function testProducerNameSupportsEnum(): void
     {
-        self::assertSame('high-priority', $this->createQueue(name: TestQueue::HIGH_PRIORITY)->getName());
+        self::assertSame('high-priority', $this->createQueue(queueName: TestQueue::HIGH_PRIORITY)->getQueueName());
     }
 
     public function testConsumerStopsAtLimit(): void

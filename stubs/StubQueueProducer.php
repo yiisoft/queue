@@ -10,7 +10,7 @@ use Yiisoft\Queue\QueueProducerInterface;
 
 final class StubQueueProducer implements QueueProducerInterface
 {
-    public function __construct(private string $name = 'default') {}
+    public function __construct(private string $queueName = 'default') {}
 
     public function push(MessageInterface $message): MessageInterface
     {
@@ -22,8 +22,8 @@ final class StubQueueProducer implements QueueProducerInterface
         return MessageStatus::DONE;
     }
 
-    public function getName(): string
+    public function getQueueName(): string
     {
-        return $this->name;
+        return $this->queueName;
     }
 }

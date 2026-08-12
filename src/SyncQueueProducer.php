@@ -17,7 +17,7 @@ use Yiisoft\Queue\Worker\WorkerInterface;
  */
 final class SyncQueueProducer implements QueueProducerInterface
 {
-    private string $name;
+    private string $queueName;
     private PushMiddlewareDispatcher $dispatcher;
 
     /**
@@ -27,10 +27,10 @@ final class SyncQueueProducer implements QueueProducerInterface
         private readonly LoggerInterface $logger,
         PushMiddlewareConfig $middlewareConfig,
         WorkerInterface $worker,
-        string|BackedEnum $name = DefaultQueue::NAME,
+        string|BackedEnum $queueName = DefaultQueue::NAME,
         array $middlewareDefinitions = [],
     ) {
-        $this->name = StringNormalizer::normalize($name);
+        $this->queueName = StringNormalizer::normalize($queueName);
         $this->dispatcher = new PushMiddlewareDispatcher(
             middlewareFactory: $middlewareConfig->middlewareFactory,
             middlewareDefinitions: [...$middlewareConfig->commonMiddlewareDefinitions, ...$middlewareDefinitions],
@@ -38,9 +38,9 @@ final class SyncQueueProducer implements QueueProducerInterface
         );
     }
 
-    public function getName(): string
+    public function getQueueName(): string
     {
-        return $this->name;
+        return $this->queueName;
     }
 
     public function push(MessageInterface $message): MessageInterface

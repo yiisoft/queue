@@ -11,11 +11,11 @@ use Yiisoft\Queue\QueueProducerInterface;
 interface QueueProducerProviderInterface
 {
     /** @throws InvalidQueueConfigException|QueueNotFoundException|QueueProviderException */
-    public function getProducer(string|BackedEnum $name): QueueProducerInterface;
+    public function getProducer(string|BackedEnum $queueName): QueueProducerInterface;
 
-    /** Whether this name has a configured producer role. */
-    public function hasProducer(string|BackedEnum $name): bool;
+    /** Whether this queue name has a configured producer role. */
+    public function hasProducer(string|BackedEnum $queueName): bool;
 
-    /** @return list<string> Names which have a configured producer role. */
-    public function getProducerNames(): array;
+    /** @return list<string> Queue names which have a configured producer role. */
+    public function getProducerQueueNames(): array;
 }

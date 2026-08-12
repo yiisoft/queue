@@ -8,9 +8,9 @@ Most applications configure names through [`yiisoft/queue.queues`](queue-names.m
 
 Providers translate a queue name into the capability the caller needs:
 
-- `QueueProducerProviderInterface::getProducer($name)` returns a `QueueProducerInterface` for pushing messages and obtaining their status.
-- `QueueConsumerProviderInterface::getConsumer($name)` returns a `QueueConsumerInterface` for running or listening for messages.
-- `hasProducer()` / `hasConsumer()` check whether a name exposes a role. `getProducerNames()` / `getConsumerNames()` list names for only that role.
+- `QueueProducerProviderInterface::getProducer($queueName)` returns a `QueueProducerInterface` for pushing messages and obtaining their status.
+- `QueueConsumerProviderInterface::getConsumer($queueName)` returns a `QueueConsumerInterface` for running or listening for messages.
+- `hasProducer()` / `hasConsumer()` check whether a name exposes a role. `getProducerQueueNames()` / `getConsumerQueueNames()` list names for only that role.
 
 Both lookup methods accept a string or `BackedEnum`. They throw `QueueNotFoundException` when the name is unknown or does not have the requested role. This separation prevents a producer-only queue from accidentally being used by a worker, and vice versa.
 

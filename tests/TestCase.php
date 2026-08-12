@@ -93,20 +93,20 @@ abstract class TestCase extends BaseTestCase
 
     protected function createQueue(
         ?AdapterInterface $adapter = null,
-        string|BackedEnum $name = DefaultQueue::NAME,
+        string|BackedEnum $queueName = DefaultQueue::NAME,
     ): QueueProducerInterface {
         return $adapter === null
             ? new SyncQueueProducer(
                 new NullLogger(),
                 $this->getPushMiddlewareConfig(),
                 $this->getWorker(),
-                $name,
+                $queueName,
             )
             : new AsyncQueueProducer(
                 new NullLogger(),
                 $this->getPushMiddlewareConfig(),
                 $adapter,
-                $name,
+                $queueName,
             );
     }
 

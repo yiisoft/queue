@@ -78,7 +78,7 @@ final readonly class SendTransactionalEmail
 }
 ```
 
-Both typed providers accept strings and `BackedEnum` values. Use `getProducerNames()` or `getConsumerNames()` when enumerating only that role.
+Both typed providers accept strings and `BackedEnum` values. Use `getProducerQueueNames()` or `getConsumerQueueNames()` when enumerating only that role.
 
 ## Running workers
 

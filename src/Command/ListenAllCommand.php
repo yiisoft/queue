@@ -64,16 +64,16 @@ final class ListenAllCommand extends Command
         /** @var string[] $queueNames */
         $queueNames = $input->getArgument('queue');
         if ($queueNames === []) {
-            $queueNames = $this->queueProvider->getConsumerNames();
+            $queueNames = $this->queueProvider->getConsumerQueueNames();
         }
 
-        $queues = [];
-        /** @var string $queue */
-        foreach ($queueNames as $queue) {
-            $queues[] = $this->queueProvider->getConsumer($queue);
+        $consumers = [];
+        /** @var string $queueName */
+        foreach ($queueNames as $queueName) {
+            $consumers[] = $this->queueProvider->getConsumer($queueName);
         }
 
-        if ($queues === []) {
+        if ($consumers === []) {
             $output->writeln('No consumers are configured.');
 
             return Command::SUCCESS;
@@ -86,8 +86,8 @@ final class ListenAllCommand extends Command
 
         while ($this->loop->canContinue()) {
             $hasMessages = false;
-            foreach ($queues as $queue) {
-                $hasMessages = $queue->run((int) $input->getOption('limit')) > 0 || $hasMessages;
+            foreach ($consumers as $consumer) {
+                $hasMessages = $consumer->run((int) $input->getOption('limit')) > 0 || $hasMessages;
             }
 
             if (!$hasMessages) {

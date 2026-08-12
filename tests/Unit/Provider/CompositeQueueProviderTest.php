@@ -22,8 +22,8 @@ final class CompositeQueueProviderTest extends TestCase
         );
         self::assertSame($firstProducer, $provider->getProducer('queue'));
         self::assertInstanceOf(StubQueueConsumer::class, $provider->getConsumer('queue'));
-        self::assertSame(['queue'], $provider->getProducerNames());
-        self::assertSame(['queue'], $provider->getConsumerNames());
+        self::assertSame(['queue'], $provider->getProducerQueueNames());
+        self::assertSame(['queue'], $provider->getConsumerQueueNames());
     }
 
     public function testMissingCapabilityThrows(): void

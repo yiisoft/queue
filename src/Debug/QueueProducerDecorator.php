@@ -22,12 +22,12 @@ final class QueueProducerDecorator implements QueueProducerInterface
     public function push(MessageInterface $message): MessageInterface
     { /** @psalm-var array{file: string, line: int} $stack */ $stack = debug_backtrace()[0];
         $message = $this->queue->push($message);
-        $this->collector->collectPush($this->queue->getName(), $message, $stack['file'] . ':' . $stack['line']);
+        $this->collector->collectPush($this->queue->getQueueName(), $message, $stack['file'] . ':' . $stack['line']);
         return $message;
     }
 
-    public function getName(): string
+    public function getQueueName(): string
     {
-        return $this->queue->getName();
+        return $this->queue->getQueueName();
     }
 }

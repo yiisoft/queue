@@ -166,7 +166,7 @@ By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/
 
 See [Console commands](docs/guide/en/console-commands.md) for more details.
 
-Producers use `Yiisoft\Queue\QueueProducerInterface` (`push()`, `status()`, `getName()`); consumers use `Yiisoft\Queue\QueueConsumerInterface` (`run()`, `listen()`). See [capability configuration](docs/guide/en/queue-capabilities.md) for the strict role map used when named queues are configured.
+Producers use `Yiisoft\Queue\QueueProducerInterface` (`push()`, `status()`, `getQueueName()`); consumers use `Yiisoft\Queue\QueueConsumerInterface` (`run()`, `listen()`). See [capability configuration](docs/guide/en/queue-capabilities.md) for the strict role map used when named queues are configured.
 
 > In case you're running the queue in synchronous mode (no adapter), `queue:listen` logs an info message and exits. The messages are processed immediately when pushed.
 

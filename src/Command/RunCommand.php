@@ -47,14 +47,14 @@ final class RunCommand extends Command
         /** @var string[] $queueNames */
         $queueNames = $input->getArgument('queue');
         if ($queueNames === []) {
-            $queueNames = $this->queueProvider->getConsumerNames();
+            $queueNames = $this->queueProvider->getConsumerQueueNames();
         }
 
-        /** @var string $queue */
-        foreach ($queueNames as $queue) {
-            $queueConsumer = $this->queueProvider->getConsumer($queue);
+        /** @var string $queueName */
+        foreach ($queueNames as $queueName) {
+            $queueConsumer = $this->queueProvider->getConsumer($queueName);
 
-            $output->write("Processing queue $queue... ");
+            $output->write("Processing queue $queueName... ");
             $count = $queueConsumer->run((int) $input->getOption('limit'));
 
             $output->writeln("Messages processed: $count.");

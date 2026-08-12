@@ -12,18 +12,18 @@ final class QueueProducerProviderProxy implements QueueProducerProviderInterface
 {
     public function __construct(private readonly QueueProducerProviderInterface $provider, private readonly QueueCollector $collector) {}
 
-    public function getProducer(string|BackedEnum $name): QueueProducerInterface
+    public function getProducer(string|BackedEnum $queueName): QueueProducerInterface
     {
-        return new QueueProducerDecorator($this->provider->getProducer($name), $this->collector);
+        return new QueueProducerDecorator($this->provider->getProducer($queueName), $this->collector);
     }
 
-    public function hasProducer(string|BackedEnum $name): bool
+    public function hasProducer(string|BackedEnum $queueName): bool
     {
-        return $this->provider->hasProducer($name);
+        return $this->provider->hasProducer($queueName);
     }
 
-    public function getProducerNames(): array
+    public function getProducerQueueNames(): array
     {
-        return $this->provider->getProducerNames();
+        return $this->provider->getProducerQueueNames();
     }
 }
