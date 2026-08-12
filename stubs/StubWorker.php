@@ -15,7 +15,7 @@ final class StubWorker implements WorkerInterface
 {
     public function process(
         MessageInterface $message,
-        string $queue,
+        string $queueName,
         ?QueueProducerInterface $retryProducer = null,
     ): MessageInterface {
         return $message;

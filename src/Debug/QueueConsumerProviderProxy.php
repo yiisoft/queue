@@ -12,18 +12,18 @@ final class QueueConsumerProviderProxy implements QueueConsumerProviderInterface
 {
     public function __construct(private readonly QueueConsumerProviderInterface $provider, private readonly QueueCollector $collector) {}
 
-    public function getConsumer(string|BackedEnum $queue): QueueConsumerInterface
+    public function getConsumer(string|BackedEnum $queueName): QueueConsumerInterface
     {
-        return new QueueConsumerDecorator($this->provider->getConsumer($queue), $this->collector);
+        return new QueueConsumerDecorator($this->provider->getConsumer($queueName), $this->collector);
     }
 
-    public function hasConsumer(string|BackedEnum $queue): bool
+    public function hasConsumer(string|BackedEnum $queueName): bool
     {
-        return $this->provider->hasConsumer($queue);
+        return $this->provider->hasConsumer($queueName);
     }
 
-    public function getConsumerQueues(): array
+    public function getConsumerQueueNames(): array
     {
-        return $this->provider->getConsumerQueues();
+        return $this->provider->getConsumerQueueNames();
     }
 }

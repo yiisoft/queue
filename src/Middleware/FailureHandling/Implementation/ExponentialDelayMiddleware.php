@@ -67,12 +67,12 @@ final class ExponentialDelayMiddleware implements FailureMiddlewareInterface
             return $request->getRetryProducer();
         }
         if ($this->producerProvider === null) {
-            throw new InvalidQueueConfigException(sprintf('Cannot retry queue "%s": configure a producer target or QueueProducerProviderInterface.', $request->getQueue()));
+            throw new InvalidQueueConfigException(sprintf('Cannot retry queue "%s": configure a producer target or QueueProducerProviderInterface.', $request->getQueueName()));
         }
         try {
-            return $this->producerProvider->getProducer($request->getQueue());
+            return $this->producerProvider->getProducer($request->getQueueName());
         } catch (Throwable $exception) {
-            throw new InvalidQueueConfigException(sprintf('Cannot retry queue "%s": no producer capability is available.', $request->getQueue()), previous: $exception);
+            throw new InvalidQueueConfigException(sprintf('Cannot retry queue "%s": no producer capability is available.', $request->getQueueName()), previous: $exception);
         }
     }
 

@@ -6,7 +6,7 @@ A *queue name* is a logical identifier for independently configured producer and
 - Use `QueueProducerProviderInterface` to obtain a named producer with `getProducer()`.
 - Use `QueueConsumerProviderInterface` to obtain a named consumer with `getConsumer()`; console commands use this provider.
 
-The default name is `Defaults::QUEUE`, whose value is `yii-queue`.
+The default name is `DefaultQueue::NAME`, whose value is `yii-queue`.
 
 ## When to use named queues
 
@@ -18,7 +18,7 @@ Named queues use a strict role map under `yiisoft/queue.queues`. Each name must 
 
 ```php
 use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Defaults;
+use Yiisoft\Queue\DefaultQueue;
 use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\AsyncQueueProducer;
 
@@ -26,7 +26,7 @@ return [
     'yiisoft/queue' => [
         'queues' => [
             // A queue with both capabilities.
-            Defaults::QUEUE => [
+            DefaultQueue::NAME => [
                 'producer' => ['class' => AsyncQueueProducer::class, '__construct()' => ['adapter' => AdapterInterface::class]],
                 'consumer' => ['class' => QueueConsumer::class, '__construct()' => ['adapter' => AdapterInterface::class]],
             ],
@@ -78,7 +78,7 @@ final readonly class SendTransactionalEmail
 }
 ```
 
-Both typed providers accept strings and `BackedEnum` values. Use `getProducerQueues()` or `getConsumerQueues()` when enumerating only that role.
+Both typed providers accept strings and `BackedEnum` values. Use `getProducerQueueNames()` or `getConsumerQueueNames()` when enumerating only that role.
 
 ## Running workers
 

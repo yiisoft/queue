@@ -29,65 +29,65 @@ final class CompositeQueueProvider implements QueueProducerProviderInterface, Qu
         }
     }
 
-    public function getProducer(string|BackedEnum $queue): QueueProducerInterface
+    public function getProducer(string|BackedEnum $queueName): QueueProducerInterface
     {
         foreach ($this->producerProviders as $provider) {
-            if ($provider->hasProducer($queue)) {
-                return $provider->getProducer($queue);
+            if ($provider->hasProducer($queueName)) {
+                return $provider->getProducer($queueName);
             }
         }
-        throw new QueueNotFoundException(StringNormalizer::normalize($queue));
+        throw new QueueNotFoundException(StringNormalizer::normalize($queueName));
     }
 
-    public function hasProducer(string|BackedEnum $queue): bool
+    public function hasProducer(string|BackedEnum $queueName): bool
     {
         foreach ($this->producerProviders as $p) {
-            if ($p->hasProducer($queue)) {
+            if ($p->hasProducer($queueName)) {
                 return true;
             }
         } return false;
     }
 
     /** @return list<string> */
-    public function getProducerQueues(): array
+    public function getProducerQueueNames(): array
     {
         $result = [];
         foreach ($this->producerProviders as $provider) {
-            foreach ($provider->getProducerQueues() as $queue) {
-                if (!in_array($queue, $result, true)) {
-                    $result[] = $queue;
+            foreach ($provider->getProducerQueueNames() as $queueName) {
+                if (!in_array($queueName, $result, true)) {
+                    $result[] = $queueName;
                 }
             }
         } return $result;
     }
 
-    public function getConsumer(string|BackedEnum $queue): QueueConsumerInterface
+    public function getConsumer(string|BackedEnum $queueName): QueueConsumerInterface
     {
         foreach ($this->consumerProviders as $provider) {
-            if ($provider->hasConsumer($queue)) {
-                return $provider->getConsumer($queue);
+            if ($provider->hasConsumer($queueName)) {
+                return $provider->getConsumer($queueName);
             }
         }
-        throw new QueueNotFoundException(StringNormalizer::normalize($queue));
+        throw new QueueNotFoundException(StringNormalizer::normalize($queueName));
     }
 
-    public function hasConsumer(string|BackedEnum $queue): bool
+    public function hasConsumer(string|BackedEnum $queueName): bool
     {
         foreach ($this->consumerProviders as $p) {
-            if ($p->hasConsumer($queue)) {
+            if ($p->hasConsumer($queueName)) {
                 return true;
             }
         } return false;
     }
 
     /** @return list<string> */
-    public function getConsumerQueues(): array
+    public function getConsumerQueueNames(): array
     {
         $result = [];
         foreach ($this->consumerProviders as $provider) {
-            foreach ($provider->getConsumerQueues() as $queue) {
-                if (!in_array($queue, $result, true)) {
-                    $result[] = $queue;
+            foreach ($provider->getConsumerQueueNames() as $queueName) {
+                if (!in_array($queueName, $result, true)) {
+                    $result[] = $queueName;
                 }
             }
         } return $result;

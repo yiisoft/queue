@@ -14,7 +14,7 @@ use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SimpleLoop;
-use Yiisoft\Queue\Defaults;
+use Yiisoft\Queue\DefaultQueue;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
@@ -93,20 +93,20 @@ abstract class TestCase extends BaseTestCase
 
     protected function createQueue(
         ?AdapterInterface $adapter = null,
-        string|BackedEnum $queue = Defaults::QUEUE,
+        string|BackedEnum $queueName = DefaultQueue::NAME,
     ): QueueProducerInterface {
         return $adapter === null
             ? new SyncQueueProducer(
                 new NullLogger(),
                 $this->getPushMiddlewareConfig(),
                 $this->getWorker(),
-                $queue,
+                $queueName,
             )
             : new AsyncQueueProducer(
                 new NullLogger(),
                 $this->getPushMiddlewareConfig(),
                 $adapter,
-                $queue,
+                $queueName,
             );
     }
 

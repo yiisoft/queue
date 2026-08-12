@@ -16,10 +16,10 @@ use function sprintf;
  */
 final class QueueNotFoundException extends LogicException implements QueueProviderException
 {
-    public function __construct(string|BackedEnum $queue, int $code = 0, ?Throwable $previous = null)
+    public function __construct(string|BackedEnum $queueName, int $code = 0, ?Throwable $previous = null)
     {
         parent::__construct(
-            sprintf('Queue "%s" not found.', StringNormalizer::normalize($queue)),
+            sprintf('Queue "%s" not found.', StringNormalizer::normalize($queueName)),
             $code,
             $previous,
         );

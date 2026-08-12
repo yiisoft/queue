@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Command\RunCommand;
-use Yiisoft\Queue\Defaults;
+use Yiisoft\Queue\DefaultQueue;
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;
 use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\Stubs\StubQueueProducer;
@@ -32,7 +32,7 @@ final class RunCommandTest extends TestCase
         $consumer->expects($this->once())->method('run')->willReturn(0);
         $command = new RunCommand(new PredefinedQueueProvider([
             'producer' => ['producer' => new StubQueueProducer()],
-            Defaults::QUEUE => ['consumer' => $consumer],
+            DefaultQueue::NAME => ['consumer' => $consumer],
         ]));
         self::assertSame(0, $command->run(new StringInput(''), $this->createMock(OutputInterface::class)));
     }

@@ -28,7 +28,7 @@ final class MiddlewareDispatcherTest extends TestCase
         $dispatcher = $this->createDispatcher()->withMiddlewares(
             [
                 static function (ConsumeRequest $request): ConsumeRequest {
-                    return $request->withMessage(new GenericMessage('test', 'New closure test data'))->withQueue('other-queue');
+                    return $request->withMessage(new GenericMessage('test', 'New closure test data'))->withQueueName('other-queue');
                 },
             ],
         );

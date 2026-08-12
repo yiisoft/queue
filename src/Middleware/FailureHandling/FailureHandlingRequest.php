@@ -13,7 +13,7 @@ final class FailureHandlingRequest
     public function __construct(
         private MessageInterface $message,
         private Throwable $exception,
-        private string $queue,
+        private string $queueName,
         private ?QueueProducerInterface $retryProducer = null,
     ) {}
 
@@ -27,10 +27,10 @@ final class FailureHandlingRequest
         return $this->exception;
     }
 
-    /** Logical queue which executed the message. */
-    public function getQueue(): string
+    /** Logical name of the queue which executed the message. */
+    public function getQueueName(): string
     {
-        return $this->queue;
+        return $this->queueName;
     }
 
     /** Direct retry target used by synchronous producer execution, if any. */
@@ -53,10 +53,10 @@ final class FailureHandlingRequest
         return $instance;
     }
 
-    public function withQueue(string $queue): self
+    public function withQueueName(string $queueName): self
     {
         $instance = clone $this;
-        $instance->queue = $queue;
+        $instance->queueName = $queueName;
         return $instance;
     }
 }

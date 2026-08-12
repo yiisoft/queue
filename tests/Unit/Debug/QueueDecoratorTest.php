@@ -19,7 +19,7 @@ final class QueueDecoratorTest extends TestCase
     {
         $message = new GenericMessage('test', null);
         $producer = $this->createMock(QueueProducerInterface::class);
-        $producer->method('getQueue')->willReturn('queue');
+        $producer->method('getQueueName')->willReturn('queue');
         $producer->expects($this->once())->method('push')->with($message)->willReturn($message);
         $producer->expects($this->once())->method('status')->with('1')->willReturn(MessageStatus::WAITING);
         $collector = new QueueCollector();

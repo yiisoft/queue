@@ -52,24 +52,24 @@ final class QueueCollector implements SummaryCollectorInterface
         ];
     }
 
-    public function collectPush(string $queue, MessageInterface $message, string $line): void
+    public function collectPush(string $queueName, MessageInterface $message, string $line): void
     {
         if (!$this->isActive()) {
             return;
         }
 
-        $this->pushes[$queue][] = [
+        $this->pushes[$queueName][] = [
             'message' => $message,
             'line' => $line,
         ];
     }
 
-    public function collectWorkerProcessing(MessageInterface $message, string $queue): void
+    public function collectWorkerProcessing(MessageInterface $message, string $queueName): void
     {
         if (!$this->isActive()) {
             return;
         }
-        $this->processingMessages[$queue][] = $message;
+        $this->processingMessages[$queueName][] = $message;
     }
 
     public function getSummary(): array

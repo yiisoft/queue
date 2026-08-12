@@ -37,17 +37,17 @@ final class FailureMiddlewareDispatcher
         FailureHandlingRequest $request,
         FailureHandlerInterface $finishHandler,
     ): FailureHandlingRequest {
-        $queue = $request->getQueue();
-        if (!isset($this->middlewareDefinitions[$queue]) || $this->middlewareDefinitions[$queue] === []) {
-            $queue = self::DEFAULT_PIPELINE;
+        $queueName = $request->getQueueName();
+        if (!isset($this->middlewareDefinitions[$queueName]) || $this->middlewareDefinitions[$queueName] === []) {
+            $queueName = self::DEFAULT_PIPELINE;
         }
-        $definitions = array_reverse($this->middlewareDefinitions[$queue]);
+        $definitions = array_reverse($this->middlewareDefinitions[$queueName]);
 
-        if (!isset($this->stack[$queue])) {
-            $this->stack[$queue] = new FailureMiddlewareStack($this->buildMiddlewares(...$definitions), $finishHandler);
+        if (!isset($this->stack[$queueName])) {
+            $this->stack[$queueName] = new FailureMiddlewareStack($this->buildMiddlewares(...$definitions), $finishHandler);
         }
 
-        return $this->stack[$queue]->handleFailure($request);
+        return $this->stack[$queueName]->handleFailure($request);
     }
 
     /**

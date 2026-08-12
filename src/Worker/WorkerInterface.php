@@ -9,10 +9,10 @@ use Yiisoft\Queue\QueueProducerInterface;
 
 interface WorkerInterface
 {
-    /** @param string $queue Logical execution queue. */
+    /** @param string $queueName Logical execution queue name. */
     public function process(
         MessageInterface $message,
-        string $queue,
+        string $queueName,
         ?QueueProducerInterface $retryProducer = null,
     ): MessageInterface;
 }

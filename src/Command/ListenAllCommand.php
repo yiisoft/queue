@@ -37,7 +37,7 @@ final class ListenAllCommand extends Command
         $this->addArgument(
             'queue',
             InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
-            'Queue list to connect to',
+            'Queue name list to connect to',
             [],
         )
             ->addOption(
@@ -61,16 +61,16 @@ final class ListenAllCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var string[] $queues */
-        $queues = $input->getArgument('queue');
-        if ($queues === []) {
-            $queues = $this->queueProvider->getConsumerQueues();
+        /** @var string[] $queueNames */
+        $queueNames = $input->getArgument('queue');
+        if ($queueNames === []) {
+            $queueNames = $this->queueProvider->getConsumerQueueNames();
         }
 
         $consumers = [];
-        /** @var string $queue */
-        foreach ($queues as $queue) {
-            $consumers[] = $this->queueProvider->getConsumer($queue);
+        /** @var string $queueName */
+        foreach ($queueNames as $queueName) {
+            $consumers[] = $this->queueProvider->getConsumer($queueName);
         }
 
         if ($consumers === []) {

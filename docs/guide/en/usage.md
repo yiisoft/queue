@@ -73,9 +73,9 @@ Most adapters can be consumed using [console commands](./console-commands.md) re
 If you configured multiple [queue names](./queue-names.md), you can choose which queue to consume with console commands:
 
 ```sh
-yii queue:listen [queue]
-yii queue:run [queue1 [queue2 [...]]]
-yii queue:listen-all [queue1 [queue2 [...]]]
+yii queue:listen [queueName]
+yii queue:run [queueName1 [queueName2 [...]]]
+yii queue:listen-all [queueName1 [queueName2 [...]]]
 ```
 
 

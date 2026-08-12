@@ -20,8 +20,8 @@ final class QueueFactoryProviderTest extends TestCase
         self::assertInstanceOf(StubQueueProducer::class, $provider->getProducer('queue'));
         self::assertSame($provider->getProducer('queue'), $provider->getProducer('queue'));
         self::assertInstanceOf(StubQueueConsumer::class, $provider->getConsumer('queue'));
-        self::assertSame(['queue'], $provider->getProducerQueues());
-        self::assertSame(['queue'], $provider->getConsumerQueues());
+        self::assertSame(['queue'], $provider->getProducerQueueNames());
+        self::assertSame(['queue'], $provider->getConsumerQueueNames());
     }
 
     public function testCapabilityIsolation(): void

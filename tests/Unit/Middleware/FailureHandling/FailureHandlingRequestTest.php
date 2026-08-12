@@ -21,7 +21,7 @@ final class FailureHandlingRequestTest extends TestCase
             'test-queue',
             $queue,
         );
-        $request2 = $request1->withQueue('other-queue');
+        $request2 = $request1->withQueueName('other-queue');
         $request3 = $request1->withException(new Exception('exception 2'));
         $request4 = $request1->withMessage(new GenericMessage('test2', null));
 
