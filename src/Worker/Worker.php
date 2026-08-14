@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Worker;
 
-use Closure;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Yiisoft\Queue\Exception\MessageFailureException;
@@ -13,11 +12,9 @@ use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Queue\Middleware\Consume\ConsumeHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
 use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
