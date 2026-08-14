@@ -9,7 +9,7 @@ use Yiisoft\Queue\Debug\QueueCollector;
 use Yiisoft\Queue\Debug\QueueConsumerProviderProxy;
 use Yiisoft\Queue\Debug\QueueProducerProviderProxy;
 use Yiisoft\Queue\Debug\QueueWorkerInterfaceProxy;
-use Yiisoft\Queue\Message\MessageHandlerInterface;
+use Yiisoft\Queue\Message\Handler\HandlerInterface;
 use Yiisoft\Queue\Message\Serializer\MessageSerializer;
 use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
 use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
@@ -35,7 +35,7 @@ return [
         'messages' => [],
         /**
          * Map of message type to handler. The worker uses this to find the handler for a received message.
-         * A handler may be a class name implementing {@see MessageHandlerInterface}, a callable, or any definition
+         * A handler may be a class name implementing {@see HandlerInterface}, a callable, or any definition
          * supported by yiisoft/injector. Example:
          * [
          *     'send-email' => SendEmailHandler::class,

@@ -21,16 +21,19 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactoryInterface;
+use Yiisoft\Queue\Message\Handler\Resolver\HandlerResolver;
+use Yiisoft\Queue\Message\Handler\Resolver\HandlerResolverInterface;
 use Yiisoft\Queue\Worker\Worker as QueueWorker;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
 /* @var array $params */
 
 return [
-    QueueWorker::class => [
-        'class' => QueueWorker::class,
+    HandlerResolver::class => [
+        'class' => HandlerResolver::class,
         '__construct()' => [$params['yiisoft/queue']['handlers']],
     ],
+    HandlerResolverInterface::class => HandlerResolver::class,
     WorkerInterface::class => QueueWorker::class,
     LoopInterface::class => static function (ContainerInterface $container): LoopInterface {
         return \extension_loaded('pcntl')

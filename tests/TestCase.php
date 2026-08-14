@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
-use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
@@ -24,6 +23,7 @@ use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\AsyncQueueProducer;
 use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\Message\Handler\Resolver\HandlerResolver;
 use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -118,13 +118,14 @@ abstract class TestCase extends BaseTestCase
     protected function createWorker(): WorkerInterface
     {
         return new Worker(
-            $this->getMessageHandlers(),
             new NullLogger(),
-            new Injector($this->getContainer()),
-            $this->getContainer(),
             $this->getConsumeMiddlewareDispatcher(),
             $this->getFailureMiddlewareDispatcher(),
-            new CallableFactory($this->getContainer()),
+            new HandlerResolver(
+                $this->getMessageHandlers(),
+                $this->getContainer(),
+                new CallableFactory($this->getContainer()),
+            ),
         );
     }
 

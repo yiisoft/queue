@@ -8,7 +8,6 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Message\GenericMessage;
@@ -26,6 +25,7 @@ use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\Message\Handler\Resolver\HandlerResolver;
 use Yiisoft\Queue\Tests\Integration\Support\TestMiddleware;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -104,13 +104,10 @@ final class MiddlewareTest extends TestCase
         );
 
         $worker = new Worker(
-            ['test' => static fn() => true],
             new SimpleLogger(),
-            new Injector($container),
-            $container,
             $consumeMiddlewareDispatcher,
             $failureMiddlewareDispatcher,
-            $callableFactory,
+            new HandlerResolver(['test' => static fn() => true], $container, $callableFactory),
         );
 
         $message = new GenericMessage('test', ['initial']);
