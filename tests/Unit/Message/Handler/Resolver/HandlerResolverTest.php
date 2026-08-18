@@ -13,7 +13,6 @@ use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Message\Handler\InvalidHandlerConfigurationException;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Tests\App\FakeHandler;
 use Yiisoft\Queue\Tests\App\StaticMessageHandler;
 
