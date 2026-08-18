@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Middleware;
 
-use Closure;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use ReflectionMethod;
 
@@ -39,7 +37,7 @@ final class CallableFactory
             throw new InvalidCallableConfigurationException();
         }
 
-        if ($definition instanceof Closure) {
+        if (is_callable($definition)) {
             return $definition;
         }
 
@@ -83,7 +81,6 @@ final class CallableFactory
 
     /**
      * @throws ContainerExceptionInterface Error while retrieving the entry from container.
-     * @throws NotFoundExceptionInterface
      */
     private function fromDefinition(string $className, string $methodName): ?callable
     {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Queue\Message\Handler\Resolver;
+namespace Yiisoft\Queue\Message\Handler;
 
 use LogicException;
 use Throwable;

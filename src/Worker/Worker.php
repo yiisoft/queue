@@ -7,7 +7,7 @@ namespace Yiisoft\Queue\Worker;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Yiisoft\Queue\Exception\MessageFailureException;
-use Yiisoft\Queue\Message\Handler\Resolver\HandlerResolverInterface;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
@@ -24,7 +24,7 @@ final class Worker implements WorkerInterface
         private readonly LoggerInterface $logger,
         private readonly ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher,
         private readonly FailureMiddlewareDispatcher $failureMiddlewareDispatcher,
-        private readonly HandlerResolverInterface $handlerResolver,
+        private readonly HandlerResolver $handlerResolver,
     ) {}
 
     /**

@@ -7,12 +7,13 @@ namespace Yiisoft\Queue\Tests\Unit;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
+use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Exception\MessageFailureException;
-use Yiisoft\Queue\Message\Handler\CallableHandler;
-use Yiisoft\Queue\Message\Handler\Resolver\HandlerResolverInterface;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareInterface;
@@ -108,17 +109,18 @@ final class WorkerTest extends TestCase
         self::assertSame($finalMessage, $result);
     }
 
-    private function createHandlerResolver(MessageInterface $message, callable $handler): HandlerResolverInterface
+    private function createHandlerResolver(MessageInterface $message, callable $handler): HandlerResolver
     {
-        /** @var HandlerResolverInterface&MockObject $handlerResolver */
-        $handlerResolver = $this->createMock(HandlerResolverInterface::class);
-        $handlerResolver->method('resolve')->with($message->getType())->willReturn(new CallableHandler($handler));
+        $container = new SimpleContainer();
 
-        return $handlerResolver;
+        return new HandlerResolver(
+            [$message->getType() => $handler],
+            $container,
+        );
     }
 
     private function createWorkerByParams(
-        HandlerResolverInterface $handlerResolver,
+        HandlerResolver $handlerResolver,
         ?LoggerInterface $logger = null,
         ?ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher = null,
         ?FailureMiddlewareDispatcher $failureMiddlewareDispatcher = null,

@@ -24,7 +24,7 @@ use Yiisoft\Queue\AsyncQueueProducer;
 use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueProducerInterface;
-use Yiisoft\Queue\Message\Handler\Resolver\HandlerResolver;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Tests\Benchmark\Support\VoidAdapter;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Test\Support\Container\SimpleContainer;

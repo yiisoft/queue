@@ -23,7 +23,7 @@ use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\AsyncQueueProducer;
 use Yiisoft\Queue\QueueProducerInterface;
-use Yiisoft\Queue\Message\Handler\Resolver\HandlerResolver;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -124,7 +124,6 @@ abstract class TestCase extends BaseTestCase
             new HandlerResolver(
                 $this->getMessageHandlers(),
                 $this->getContainer(),
-                new CallableFactory($this->getContainer()),
             ),
         );
     }

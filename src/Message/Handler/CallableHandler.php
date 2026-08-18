@@ -9,15 +9,14 @@ use Yiisoft\Queue\Message\MessageInterface;
 /**
  * Handles a message by invoking the given callable.
  *
- * @psalm-type MessageHandlerCallable = callable(MessageInterface $message): void
+ * @internal
  */
 final class CallableHandler implements HandlerInterface
 {
     /**
      * @param callable $handler Callable invoked to handle a message.
-     * Format: `function (MessageInterface $message): void`.
      *
-     * @psalm-param MessageHandlerCallable $handler
+     * @psalm-param callable(MessageInterface): void $handler
      */
     public function __construct(
         private readonly mixed $handler,

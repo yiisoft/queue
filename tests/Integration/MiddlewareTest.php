@@ -25,7 +25,7 @@ use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\QueueProducerInterface;
-use Yiisoft\Queue\Message\Handler\Resolver\HandlerResolver;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Tests\Integration\Support\TestMiddleware;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -107,7 +107,7 @@ final class MiddlewareTest extends TestCase
             new SimpleLogger(),
             $consumeMiddlewareDispatcher,
             $failureMiddlewareDispatcher,
-            new HandlerResolver(['test' => static fn() => true], $container, $callableFactory),
+            new HandlerResolver(['test' => static fn() => true], $container),
         );
 
         $message = new GenericMessage('test', ['initial']);

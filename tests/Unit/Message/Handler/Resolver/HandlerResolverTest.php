@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit\Message\Handler\Resolver;
 
+use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Queue\Message\Handler\Resolver\HandlerNotFoundException;
-use Yiisoft\Queue\Message\Handler\Resolver\HandlerResolver;
+use Yiisoft\Queue\Message\Handler\HandlerNotFoundException;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
+use Yiisoft\Queue\Message\Handler\InvalidHandlerConfigurationException;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
@@ -22,7 +24,7 @@ final class HandlerResolverTest extends TestCase
     {
         $message = new GenericMessage('simple', ['test-data']);
         $container = new SimpleContainer($containerServices);
-        $resolver = new HandlerResolver(['simple' => $handler], $container, new CallableFactory($container));
+        $resolver = new HandlerResolver(['simple' => $handler], $container);
 
         $resolvedHandler = $resolver->resolve($message->getType());
         $resolvedHandler->handle($message);
@@ -62,7 +64,7 @@ final class HandlerResolverTest extends TestCase
     public function testResolveCachesResolvedHandler(): void
     {
         $container = new SimpleContainer([FakeHandler::class => new FakeHandler()]);
-        $resolver = new HandlerResolver(['simple' => FakeHandler::class], $container, new CallableFactory($container));
+        $resolver = new HandlerResolver(['simple' => FakeHandler::class], $container);
 
         $this->assertSame($resolver->resolve('simple'), $resolver->resolve('simple'));
     }
@@ -73,7 +75,6 @@ final class HandlerResolverTest extends TestCase
         $resolver = new HandlerResolver(
             ['static-handler' => StaticMessageHandler::handle(...)],
             $container,
-            new CallableFactory($container),
         );
 
         StaticMessageHandler::$wasHandled = false;
@@ -85,14 +86,13 @@ final class HandlerResolverTest extends TestCase
 
     public function testResolveThrowsWhenDefinitionMethodUndefined(): void
     {
-        $this->expectException(HandlerNotFoundException::class);
-        $this->expectExceptionMessage('Queue handler for message type "simple" does not exist');
+        $this->expectException(InvalidHandlerConfigurationException::class);
+        $this->expectExceptionMessage('Queue handler for message type "simple" is configured incorrectly');
 
         $container = new SimpleContainer([FakeHandler::class => new FakeHandler()]);
         $resolver = new HandlerResolver(
             ['simple' => [FakeHandler::class, 'undefinedMethod']],
             $container,
-            new CallableFactory($container),
         );
 
         $resolver->resolve('simple');
@@ -100,14 +100,13 @@ final class HandlerResolverTest extends TestCase
 
     public function testResolveThrowsWhenDefinitionClassUndefined(): void
     {
-        $this->expectException(HandlerNotFoundException::class);
-        $this->expectExceptionMessage('Queue handler for message type "simple" does not exist');
+        $this->expectException(InvalidHandlerConfigurationException::class);
+        $this->expectExceptionMessage('Queue handler for message type "simple" is configured incorrectly');
 
         $container = new SimpleContainer([FakeHandler::class => new FakeHandler()]);
         $resolver = new HandlerResolver(
             ['simple' => ['UndefinedClass', 'handle']],
             $container,
-            new CallableFactory($container),
         );
 
         $resolver->resolve('simple');
@@ -115,14 +114,13 @@ final class HandlerResolverTest extends TestCase
 
     public function testResolveThrowsWhenDefinitionClassNotFoundInContainer(): void
     {
-        $this->expectException(HandlerNotFoundException::class);
-        $this->expectExceptionMessage('Queue handler for message type "simple" does not exist');
+        $this->expectException(InvalidHandlerConfigurationException::class);
+        $this->expectExceptionMessage('Queue handler for message type "simple" is configured incorrectly');
 
         $container = new SimpleContainer();
         $resolver = new HandlerResolver(
             ['simple' => [FakeHandler::class, 'handle']],
             $container,
-            new CallableFactory($container),
         );
 
         $resolver->resolve('simple');
@@ -134,33 +132,33 @@ final class HandlerResolverTest extends TestCase
         $this->expectExceptionMessage('Queue handler for message type "nonexistent" does not exist');
 
         $container = new SimpleContainer();
-        $resolver = new HandlerResolver([], $container, new CallableFactory($container));
+        $resolver = new HandlerResolver([], $container);
 
         $resolver->resolve('nonexistent');
     }
 
     public function testResolveThrowsWhenHandlerInContainerNotImplementingInterface(): void
     {
-        $this->expectException(HandlerNotFoundException::class);
-        $this->expectExceptionMessage('Queue handler for message type "invalid" does not exist');
+        $this->expectException(InvalidHandlerConfigurationException::class);
+        $this->expectExceptionMessage('Queue handler for message type "invalid" is configured incorrectly');
 
         $container = new SimpleContainer([
             'invalid' => new class {
                 public function handle(): void {}
             },
         ]);
-        $resolver = new HandlerResolver([], $container, new CallableFactory($container));
+        $resolver = new HandlerResolver([], $container);
 
         $resolver->resolve('invalid');
     }
 
     public function testResolveThrowsWhenMessageTypeIsEmpty(): void
     {
-        $this->expectException(HandlerNotFoundException::class);
-        $this->expectExceptionMessage('Queue handler for message type "" does not exist');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Message type cannot be empty.');
 
         $container = new SimpleContainer();
-        $resolver = new HandlerResolver([], $container, new CallableFactory($container));
+        $resolver = new HandlerResolver([], $container);
 
         $resolver->resolve('');
     }
