@@ -54,7 +54,6 @@ final class QueueBench
                     'foo' => static function (): void {},
                 ],
                 $container,
-                $callableFactory,
             ),
         );
         $this->serializer = new MessageSerializer(new JsonMessageEncoder());
