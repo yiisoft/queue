@@ -83,6 +83,38 @@ final class HandlerResolverTest extends TestCase
         $this->assertTrue(StaticMessageHandler::$wasHandled);
     }
 
+    public function testResolveStaticMethodStringHandler(): void
+    {
+        $container = new SimpleContainer();
+        $resolver = new HandlerResolver(
+            ['static-handler' => StaticMessageHandler::class . '::handle'],
+            $container,
+        );
+
+        StaticMessageHandler::$wasHandled = false;
+        $resolvedHandler = $resolver->resolve('static-handler');
+        $resolvedHandler->handle(new GenericMessage('static-handler', null));
+
+        $this->assertTrue(StaticMessageHandler::$wasHandled);
+    }
+
+    public function testResolveNamedFunctionHandler(): void
+    {
+        $message = new GenericMessage('named-function-handler', null);
+        $resolver = new HandlerResolver(
+            ['named-function-handler' => __NAMESPACE__ . '\\namedFunctionHandler'],
+            new SimpleContainer(),
+        );
+
+        try {
+            $resolver->resolve('named-function-handler')->handle($message);
+
+            $this->assertSame([$message], FakeHandler::$processedMessages);
+        } finally {
+            FakeHandler::$processedMessages = [];
+        }
+    }
+
     public function testResolveThrowsWhenDefinitionMethodUndefined(): void
     {
         $this->expectException(InvalidHandlerConfigurationException::class);
@@ -161,4 +193,9 @@ final class HandlerResolverTest extends TestCase
 
         $resolver->resolve('');
     }
+}
+
+function namedFunctionHandler(MessageInterface $message): void
+{
+    FakeHandler::$processedMessages[] = $message;
 }
