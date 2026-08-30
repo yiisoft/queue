@@ -57,36 +57,28 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getQueue(): QueueProducerInterface
     {
-        if ($this->queue === null) {
-            $this->queue = $this->createQueue();
-        }
+        $this->queue ??= $this->createQueue();
 
         return $this->queue;
     }
 
     protected function getLoop(): LoopInterface
     {
-        if ($this->loop === null) {
-            $this->loop = $this->createLoop();
-        }
+        $this->loop ??= $this->createLoop();
 
         return $this->loop;
     }
 
     protected function getWorker(): WorkerInterface
     {
-        if ($this->worker === null) {
-            $this->worker = $this->createWorker();
-        }
+        $this->worker ??= $this->createWorker();
 
         return $this->worker;
     }
 
     protected function getContainer(): ContainerInterface
     {
-        if ($this->container === null) {
-            $this->container = $this->createContainer();
-        }
+        $this->container ??= $this->createContainer();
 
         return $this->container;
     }

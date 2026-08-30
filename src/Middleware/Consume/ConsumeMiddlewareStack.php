@@ -65,9 +65,7 @@ final class ConsumeMiddlewareStack implements ConsumeHandlerInterface
 
             public function handleConsume(ConsumeRequest $request): ConsumeRequest
             {
-                if ($this->middleware === null) {
-                    $this->middleware = ($this->middlewareFactory)();
-                }
+                $this->middleware ??= ($this->middlewareFactory)();
 
                 return $this->middleware->processConsume($request, $this->handler);
             }

@@ -68,9 +68,7 @@ final class PushMiddlewareStack implements PushHandlerInterface
 
             public function handlePush(MessageInterface $message): MessageInterface
             {
-                if ($this->middleware === null) {
-                    $this->middleware = ($this->middlewareFactory)();
-                }
+                $this->middleware ??= ($this->middlewareFactory)();
 
                 return $this->middleware->processPush($message, $this->handler);
             }

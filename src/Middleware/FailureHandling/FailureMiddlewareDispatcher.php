@@ -43,9 +43,7 @@ final class FailureMiddlewareDispatcher
         }
         $definitions = array_reverse($this->middlewareDefinitions[$queueName]);
 
-        if (!isset($this->stack[$queueName])) {
-            $this->stack[$queueName] = new FailureMiddlewareStack($this->buildMiddlewares(...$definitions), $finishHandler);
-        }
+        $this->stack[$queueName] ??= new FailureMiddlewareStack($this->buildMiddlewares(...$definitions), $finishHandler);
 
         return $this->stack[$queueName]->handleFailure($request);
     }
@@ -83,9 +81,7 @@ final class FailureMiddlewareDispatcher
 
     private function init(): void
     {
-        if (!isset($this->middlewareDefinitions[self::DEFAULT_PIPELINE])) {
-            $this->middlewareDefinitions[self::DEFAULT_PIPELINE] = [];
-        }
+        $this->middlewareDefinitions[self::DEFAULT_PIPELINE] ??= [];
     }
 
     /**
