@@ -15,8 +15,8 @@ To use the queue, you need to create instances of the following classes:
 ```php
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
-use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Cli\SimpleLoop;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
@@ -57,13 +57,10 @@ $pushMiddlewareConfig = new PushMiddlewareConfig(
 
 // Create worker
 $worker = new Worker(
-    $handlers,
     $logger,
-    new Injector($container),
-    $container,
     $consumeMiddlewareDispatcher,
     $failureMiddlewareDispatcher,
-    $callableFactory,
+    new HandlerResolver($handlers, $container),
 );
 
 // Create loop (SignalLoop requires ext-pcntl; SimpleLoop works without it)

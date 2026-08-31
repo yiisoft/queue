@@ -99,7 +99,7 @@ The message has no business logic, no dependencies. It is a value object — a t
 The handler receives the message and acts on it:
 
 ```php
-final class SendEmailHandler implements \Yiisoft\Queue\Message\MessageHandlerInterface
+final class SendEmailHandler implements \Yiisoft\Queue\Message\Handler\HandlerInterface
 {
     public function __construct(private Mailer $mailer) {}
 

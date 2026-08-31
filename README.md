@@ -87,10 +87,10 @@ final class DownloadFileMessage extends Message
 Then create a handler that processes it:
 
 ```php
+use Yiisoft\Queue\Message\Handler\HandlerInterface;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Message\MessageHandlerInterface;
 
-final readonly class RemoteFileHandler implements MessageHandlerInterface
+final readonly class RemoteFileHandler implements HandlerInterface
 {
     public function __construct(
         private FileDownloader $downloader,

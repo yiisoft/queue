@@ -9,7 +9,7 @@ This guide covers recommended practices for building reliable and maintainable q
 #### Bad
 
 ```php
-final class ProcessPaymentHandler implements MessageHandlerInterface
+final class ProcessPaymentHandler implements HandlerInterface
 {
     public function handle(MessageInterface $message): void
     {
@@ -24,7 +24,7 @@ final class ProcessPaymentHandler implements MessageHandlerInterface
 #### Good
 
 ```php
-final class ProcessPaymentHandler implements MessageHandlerInterface
+final class ProcessPaymentHandler implements HandlerInterface
 {
     public function handle(MessageInterface $message): void
     {
@@ -58,7 +58,7 @@ Avoid storing per-message state in handler properties. The container may return 
 #### Bad
 
 ```php
-final class ProcessPaymentHandler implements MessageHandlerInterface
+final class ProcessPaymentHandler implements HandlerInterface
 {
     private array $processedIds = [];
 
@@ -80,7 +80,7 @@ final class ProcessPaymentHandler implements MessageHandlerInterface
 #### Good
 
 ```php
-final class ProcessPaymentHandler implements MessageHandlerInterface
+final class ProcessPaymentHandler implements HandlerInterface
 {
     public function handle(MessageInterface $message): void
     {
@@ -273,7 +273,7 @@ See [Message handler](message-handler.md) for details.
 
 ```php
 // Metrics collection in every handler
-final class EmailHandler implements MessageHandlerInterface
+final class EmailHandler implements HandlerInterface
 {
     public function handle(MessageInterface $message): void
     {

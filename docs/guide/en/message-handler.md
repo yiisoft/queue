@@ -2,11 +2,11 @@
 
 > If you are new to the concept of messages and handlers, read [Messages and handlers: concepts](messages-and-handlers.md) first.
 
-The simplest setup requires no configuration at all: create a dedicated class implementing `Yiisoft\Queue\Message\MessageHandlerInterface` and use its FQCN as the message type when pushing a message.
+The simplest setup requires no configuration at all: create a dedicated class implementing `Yiisoft\Queue\Message\Handler\HandlerInterface` and use its FQCN as the message type when pushing a message.
 
 ## HandlerInterface implementation (without type mapping)
 
-If your handler implements `Yiisoft\Queue\Message\MessageHandlerInterface`, you can use the class FQCN as the message type. The DI container resolves the handler automatically.
+If your handler implements `Yiisoft\Queue\Message\Handler\HandlerInterface`, you can use the class FQCN as the message type. The DI container resolves the handler automatically.
 
 > By default the [yiisoft/di](https://github.com/yiisoft/di) container resolves all FQCNs into corresponding class objects.
 
@@ -46,7 +46,7 @@ new RemoteFileMessage('https://...');
 **Handler**:
 
 ```php
-final class RemoteFileHandler implements \Yiisoft\Queue\Message\MessageHandlerInterface
+final class RemoteFileHandler implements \Yiisoft\Queue\Message\Handler\HandlerInterface
 {
     public function handle(\Yiisoft\Queue\Message\MessageInterface $message): void
     {
