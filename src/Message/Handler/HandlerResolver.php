@@ -85,6 +85,10 @@ final class HandlerResolver
             return $definition;
         }
 
+        if (is_callable($definition)) {
+            return $this->createCallableHandler($messageType, $definition);
+        }
+
         if (is_string($definition)) {
             return $this->getHandlerFromContainer($messageType, $definition);
         }
