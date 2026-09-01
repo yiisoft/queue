@@ -72,10 +72,6 @@ final class CallableFactory
             }
         }
 
-        if (is_callable($definition)) {
-            return $definition;
-        }
-
         throw new InvalidCallableConfigurationException();
     }
 
