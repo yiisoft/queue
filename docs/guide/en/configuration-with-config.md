@@ -7,7 +7,7 @@ If you are using [yiisoft/config](https://github.com/yiisoft/config) (i.e. insta
 In [yiisoft/app](https://github.com/yiisoft/app) / [yiisoft/app-api](https://github.com/yiisoft/app-api) templates you typically add or adjust configuration in `config/params.php`.
 If your project structure differs, put configuration into any params config file that is loaded by [yiisoft/config](https://github.com/yiisoft/config).
 
-When your message type equals the FQCN of a handler class that implements `Yiisoft\Queue\Message\MessageHandlerInterface`, nothing else has to be configured: the DI container resolves the class automatically. See [Message handler](message-handler.md) for details and trade-offs.
+When your message type equals the FQCN of a handler class that implements `Yiisoft\Queue\Message\Handler\HandlerInterface`, nothing else has to be configured: the DI container resolves the class automatically. See [Message handler](message-handler.md) for details and trade-offs.
 
 Advanced applications eventually need the following tweaks:
 

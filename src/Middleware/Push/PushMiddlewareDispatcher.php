@@ -37,9 +37,7 @@ final class PushMiddlewareDispatcher
      */
     public function dispatch(MessageInterface $message): MessageInterface
     {
-        if ($this->stack === null) {
-            $this->stack = new PushMiddlewareStack($this->buildMiddlewares(), $this->finishHandler);
-        }
+        $this->stack ??= new PushMiddlewareStack($this->buildMiddlewares(), $this->finishHandler);
 
         return $this->stack->handlePush($message);
     }

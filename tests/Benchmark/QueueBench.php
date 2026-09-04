@@ -7,7 +7,6 @@ namespace Yiisoft\Queue\Tests\Benchmark;
 use Generator;
 use PhpBench\Attributes\ParamProviders;
 use Psr\Log\NullLogger;
-use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\GenericMessage;
@@ -25,6 +24,7 @@ use Yiisoft\Queue\AsyncQueueProducer;
 use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Tests\Benchmark\Support\VoidAdapter;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Test\Support\Container\SimpleContainer;
@@ -43,18 +43,18 @@ final class QueueBench
         $logger = new NullLogger();
 
         $worker = new Worker(
-            [
-                'foo' => static function (): void {},
-            ],
             $logger,
-            new Injector($container),
-            $container,
             new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container, $callableFactory)),
             new FailureMiddlewareDispatcher(
                 new FailureMiddlewareFactory($container, $callableFactory),
                 [],
             ),
-            $callableFactory,
+            new HandlerResolver(
+                [
+                    'foo' => static function (): void {},
+                ],
+                $container,
+            ),
         );
         $this->serializer = new MessageSerializer(new JsonMessageEncoder());
         $this->adapter = new VoidAdapter($this->serializer);

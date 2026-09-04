@@ -93,7 +93,7 @@ public function handle(MessageInterface $message): void
 
 ```php
 // Bad - accumulates in memory
-class Handler implements MessageHandlerInterface
+class Handler implements HandlerInterface
 {
     private static array $cache = [];
     
@@ -105,7 +105,7 @@ class Handler implements MessageHandlerInterface
 }
 
 // Good - use external cache
-class Handler implements MessageHandlerInterface
+class Handler implements HandlerInterface
 {
     public function __construct(private CacheInterface $cache) {}
     
@@ -328,7 +328,7 @@ public function handle(MessageInterface $message): void
 If your message handler only reads data, use read replicas:
 
 ```php
-final class GenerateReportHandler implements MessageHandlerInterface
+final class GenerateReportHandler implements HandlerInterface
 {
     public function __construct(
         private ConnectionInterface $readDb, // Read replica

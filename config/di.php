@@ -21,14 +21,14 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactoryInterface;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Worker\Worker as QueueWorker;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
 /* @var array $params */
 
 return [
-    QueueWorker::class => [
-        'class' => QueueWorker::class,
+    HandlerResolver::class => [
         '__construct()' => [$params['yiisoft/queue']['handlers']],
     ],
     WorkerInterface::class => QueueWorker::class,

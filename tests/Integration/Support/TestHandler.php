@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Integration\Support;
 
-use Yiisoft\Queue\Message\MessageHandlerInterface;
+use Yiisoft\Queue\Message\Handler\HandlerInterface;
 use Yiisoft\Queue\Message\MessageInterface;
 
-final class TestHandler implements MessageHandlerInterface
+final class TestHandler implements HandlerInterface
 {
     public function __construct(public array $messagesProcessed = []) {}
 

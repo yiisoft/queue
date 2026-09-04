@@ -64,9 +64,7 @@ final class FailureMiddlewareStack implements FailureHandlerInterface
 
             public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
             {
-                if ($this->middleware === null) {
-                    $this->middleware = ($this->middlewareFactory)();
-                }
+                $this->middleware ??= ($this->middlewareFactory)();
 
                 return $this->middleware->processFailure($request, $this->handler);
             }

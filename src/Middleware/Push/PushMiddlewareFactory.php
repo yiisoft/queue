@@ -27,7 +27,7 @@ final class PushMiddlewareFactory extends MiddlewareFactory implements PushMiddl
      *
      * - A middleware object.
      * - A name of a middleware class. The middleware instance will be obtained from container and executed.
-     * - A callable with `function(MessageInterface $message, MessageHandlerPushInterface $handler):
+     * - A callable with `function(MessageInterface $message, PushHandlerInterface $handler):
      *     MessageInterface` signature.
      * - A controller handler action in format `[TestController::class, 'index']`. `TestController` instance will
      *   be created and `index()` method will be executed.

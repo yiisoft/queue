@@ -4,46 +4,27 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Worker;
 
-use Closure;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Throwable;
-use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Exception\MessageFailureException;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Message\MessageHandlerInterface;
-use Yiisoft\Queue\Middleware\CallableFactory;
-use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
 use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Queue\Middleware\Consume\ConsumeHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
 use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
-use function array_key_exists;
-use function is_string;
-use function sprintf;
-
 final class Worker implements WorkerInterface
 {
-    /** @var array<non-empty-string, callable|null> Cache of resolved handlers */
-    private array $handlersCached = [];
-
     public function __construct(
-        /** @var array<non-empty-string, array|callable|object|string|null> */
-        private readonly array $handlers,
         private readonly LoggerInterface $logger,
-        private readonly Injector $injector,
-        private readonly ContainerInterface $container,
         private readonly ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher,
         private readonly FailureMiddlewareDispatcher $failureMiddlewareDispatcher,
-        private readonly CallableFactory $callableFactory,
+        private readonly HandlerResolver $handlerResolver,
     ) {}
 
     /**
@@ -61,26 +42,17 @@ final class Worker implements WorkerInterface
             $this->logger->info('Processing message #{message}.', ['message' => $messageId]);
         }
 
-        $messageType = $message->getType();
-        try {
-            $handler = $this->getHandler($messageType);
-        } catch (InvalidCallableConfigurationException $exception) {
-            throw new RuntimeException(sprintf('Queue handler for message type "%s" does not exist.', $messageType), 0, $exception);
-        }
-
-        if ($handler === null) {
-            throw new RuntimeException(sprintf('Queue handler for message type "%s" does not exist.', $messageType));
-        }
+        $handler = $this->handlerResolver->resolve($message->getType());
 
         $request = new ConsumeRequest($message, $queueName);
-        $closure = fn(MessageInterface $message): mixed => $this->injector->invoke($handler, [$message]);
+        $finishHandler = new ConsumeFinalHandler($handler->handle(...));
         try {
-            return $this->consumeMiddlewareDispatcher->dispatch($request, $this->createConsumeHandler($closure))->getMessage();
+            return $this->consumeMiddlewareDispatcher->dispatch($request, $finishHandler)->getMessage();
         } catch (Throwable $exception) {
             $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueueName(), $retryProducer);
 
             try {
-                $result = $this->failureMiddlewareDispatcher->dispatch($request, $this->createFailureHandler());
+                $result = $this->failureMiddlewareDispatcher->dispatch($request, new FailureFinalHandler());
                 $this->logger->info($exception->getMessage());
 
                 return $result->getMessage();
@@ -90,40 +62,5 @@ final class Worker implements WorkerInterface
                 throw $exception;
             }
         }
-    }
-
-    private function getHandler(string $messageType): ?callable
-    {
-        if ($messageType === '') {
-            return null;
-        }
-
-        if (!array_key_exists($messageType, $this->handlersCached)) {
-            $definition = $this->handlers[$messageType] ?? $messageType;
-
-            if (is_string($definition) && $this->container->has($definition)) {
-                $resolved = $this->container->get($definition);
-
-                if ($resolved instanceof MessageHandlerInterface) {
-                    $this->handlersCached[$messageType] = $resolved->handle(...);
-
-                    return $this->handlersCached[$messageType];
-                }
-            }
-
-            $this->handlersCached[$messageType] = $this->callableFactory->create($definition);
-        }
-
-        return $this->handlersCached[$messageType];
-    }
-
-    private function createConsumeHandler(Closure $handler): ConsumeHandlerInterface
-    {
-        return new ConsumeFinalHandler($handler);
-    }
-
-    private function createFailureHandler(): FailureHandlerInterface
-    {
-        return new FailureFinalHandler();
     }
 }

@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
-use Yiisoft\Injector\Injector;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
@@ -24,6 +23,7 @@ use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\AsyncQueueProducer;
 use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -57,36 +57,28 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getQueue(): QueueProducerInterface
     {
-        if ($this->queue === null) {
-            $this->queue = $this->createQueue();
-        }
+        $this->queue ??= $this->createQueue();
 
         return $this->queue;
     }
 
     protected function getLoop(): LoopInterface
     {
-        if ($this->loop === null) {
-            $this->loop = $this->createLoop();
-        }
+        $this->loop ??= $this->createLoop();
 
         return $this->loop;
     }
 
     protected function getWorker(): WorkerInterface
     {
-        if ($this->worker === null) {
-            $this->worker = $this->createWorker();
-        }
+        $this->worker ??= $this->createWorker();
 
         return $this->worker;
     }
 
     protected function getContainer(): ContainerInterface
     {
-        if ($this->container === null) {
-            $this->container = $this->createContainer();
-        }
+        $this->container ??= $this->createContainer();
 
         return $this->container;
     }
@@ -118,13 +110,13 @@ abstract class TestCase extends BaseTestCase
     protected function createWorker(): WorkerInterface
     {
         return new Worker(
-            $this->getMessageHandlers(),
             new NullLogger(),
-            new Injector($this->getContainer()),
-            $this->getContainer(),
             $this->getConsumeMiddlewareDispatcher(),
             $this->getFailureMiddlewareDispatcher(),
-            new CallableFactory($this->getContainer()),
+            new HandlerResolver(
+                $this->getMessageHandlers(),
+                $this->getContainer(),
+            ),
         );
     }
 
