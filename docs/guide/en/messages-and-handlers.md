@@ -89,7 +89,7 @@ new SendEmailMessage('user@example.com', 'Welcome', 'Thank you for registering.'
 
 The message has:
 
-- A **message type** — a string used by the worker to look up the correct handler.
+- A **message type** — a non-empty string used by the worker to look up the correct handler.
 - A **data payload** — typed properties serialized via `getPayload()`. Must contain only `null`, scalars (`bool`, `int`, `float`, `string`), or arrays composed of the same types recursively.
 
 The message has no business logic, no dependencies. It is a value object — a typed data wrapper.

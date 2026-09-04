@@ -61,8 +61,11 @@ final class MessageSerializer implements MessageSerializerInterface
         }
 
         $type = $data['type'] ?? null;
-        if (!isset($type) || !is_string($type)) {
+        if (!is_string($type)) {
             throw new MessageSerializerException('Message type must be a string. Got ' . get_debug_type($type) . '.');
+        }
+        if ($type === '') {
+            throw new MessageSerializerException('Message type must be a non-empty string.');
         }
 
         $meta = $data['meta'] ?? [];

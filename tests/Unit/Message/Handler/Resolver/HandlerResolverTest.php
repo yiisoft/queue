@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit\Message\Handler\Resolver;
 
-use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Test\Support\Container\SimpleContainer;
@@ -181,17 +180,6 @@ final class HandlerResolverTest extends TestCase
         $resolver = new HandlerResolver([], $container);
 
         $resolver->resolve('invalid');
-    }
-
-    public function testResolveThrowsWhenMessageTypeIsEmpty(): void
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Message type cannot be empty.');
-
-        $container = new SimpleContainer();
-        $resolver = new HandlerResolver([], $container);
-
-        $resolver->resolve('');
     }
 }
 

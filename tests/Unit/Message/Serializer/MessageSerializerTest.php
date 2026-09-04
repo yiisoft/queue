@@ -46,6 +46,18 @@ final class MessageSerializerTest extends TestCase
         $this->createSerializer()->unserialize($value);
     }
 
+    public function testEmptyType(): void
+    {
+        $value = json_encode(
+            ['type' => '', 'payload' => 'test', 'meta' => []],
+            JSON_THROW_ON_ERROR,
+        );
+
+        $this->expectException(MessageSerializerException::class);
+        $this->expectExceptionMessage('Message type must be a non-empty string.');
+        $this->createSerializer()->unserialize($value);
+    }
+
     #[TestWith([''])]
     #[TestWith([1])]
     #[TestWith([true])]

@@ -15,10 +15,11 @@ interface MessageInterface
     /**
      * Creates a new message instance from the given type and payload data.
      *
-     * @param string $type Message type.
+     * @param string $type Message type. Must be a non-empty string.
      * @param bool|int|float|string|array|null $payload Message payload data. Must contain only `null`, scalars (`bool`,
      * `int`, `float`, `string`), or arrays composed of the same types recursively.
      *
+     * @psalm-param non-empty-string $type
      * @psalm-param MessagePayload $payload
      *
      * @return static Instance of the called class with the given type and payload.
@@ -28,7 +29,9 @@ interface MessageInterface
     /**
      * Returns message type.
      *
-     * @return string Message type.
+     * @return string Message type. Always a non-empty string.
+     *
+     * @psalm-return non-empty-string
      */
     public function getType(): string;
 
