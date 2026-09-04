@@ -18,7 +18,7 @@ There was a concept in [yiisoft/yii2-queue] called `Job`: you had to push it to 
 being consumed. In the new package, it is divided into two different concepts: a message and a handler.
 
 - A `Message` is a class implementing `MessageInterface`. It contains two types of data:
-    - Type. The worker uses it to find the right handler for a message.
+    - Type. A non-empty string. The worker uses it to find the right handler for a message.
     - Payload. Any serializable data that should be used by the message handler.
     
     All the message payload is fully serializable (that means message `payload` must be serializable too). It allows you to

@@ -57,12 +57,15 @@ final class MessageSerializer implements MessageSerializerInterface
         $data = $this->encoder->decode($value);
 
         if (!is_array($data)) {
-            throw new MessageSerializerException('Decoded data must be array. Got ' . get_debug_type($data) . '.');
+            throw new MessageSerializerException('Decoded data must be an array. Got ' . get_debug_type($data) . '.');
         }
 
         $type = $data['type'] ?? null;
-        if (!isset($type) || !is_string($type)) {
-            throw new MessageSerializerException('Message type must be a string. Got ' . get_debug_type($type) . '.');
+        if (!is_string($type)) {
+            throw new MessageSerializerException('Message type must be a non-empty string. Got ' . get_debug_type($type) . '.');
+        }
+        if ($type === '') {
+            throw new MessageSerializerException('Message type must be a non-empty string. Got empty string.');
         }
 
         $meta = $data['meta'] ?? [];

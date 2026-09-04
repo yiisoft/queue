@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Message\Handler;
 
-use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Injector\Injector;
@@ -51,7 +50,9 @@ final class HandlerResolver
     /**
      * Get a handler for the given message type.
      *
-     * @param string $messageType Message type.
+     * @param string $messageType Message type. Must be a non-empty string.
+     *
+     * @psalm-param non-empty-string $messageType
      *
      * @throws HandlerNotFoundException If no handler exists for the message type.
      * @throws InvalidHandlerConfigurationException If the handler definition is configured incorrectly.
@@ -59,10 +60,6 @@ final class HandlerResolver
      */
     public function resolve(string $messageType): HandlerInterface
     {
-        if ($messageType === '') {
-            throw new LogicException('Message type cannot be empty.');
-        }
-
         if (array_key_exists($messageType, $this->cache)) {
             return $this->cache[$messageType];
         }
