@@ -26,7 +26,7 @@ final class MessageSerializerTest extends TestCase
     public function testNonArrayPayload(string $json, string $type): void
     {
         $this->expectException(MessageSerializerException::class);
-        $this->expectExceptionMessage(sprintf('Decoded data must be array. Got %s.', $type));
+        $this->expectExceptionMessage(sprintf('Decoded data must be an array. Got %s.', $type));
         $this->createSerializer()->unserialize($json);
     }
 
@@ -42,7 +42,9 @@ final class MessageSerializerTest extends TestCase
         );
 
         $this->expectException(MessageSerializerException::class);
-        $this->expectExceptionMessage(sprintf('Message type must be a string. Got %s.', get_debug_type($type)));
+        $this->expectExceptionMessage(
+            sprintf('Message type must be a non-empty string. Got %s.', get_debug_type($type)),
+        );
         $this->createSerializer()->unserialize($value);
     }
 
@@ -54,7 +56,7 @@ final class MessageSerializerTest extends TestCase
         );
 
         $this->expectException(MessageSerializerException::class);
-        $this->expectExceptionMessage('Message type must be a non-empty string.');
+        $this->expectExceptionMessage('Message type must be a non-empty string. Got empty string.');
         $this->createSerializer()->unserialize($value);
     }
 
