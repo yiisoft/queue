@@ -8,6 +8,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use ReflectionException;
 use ReflectionMethod;
+use Yiisoft\Injector\Injector;
 
 use function is_array;
 use function is_callable;
@@ -15,23 +16,42 @@ use function is_object;
 use function is_string;
 
 /**
- * @internal Create real callable listener from configuration.
+ * @internal Create real callable listener from configuration, ready to be invoked with dependency injection.
  */
 final class CallableFactory
 {
+    private readonly Injector $injector;
+
     public function __construct(
         private readonly ContainerInterface $container,
-    ) {}
+        ?ContainerInterface $dependencyContainer = null,
+    ) {
+        $this->injector = new Injector($dependencyContainer ?? $container);
+    }
 
     /**
-     * Create a real callable listener from definition.
+     * Create a real callable listener from definition. Calling the returned callable invokes the resolved listener,
+     * injecting its dependencies by type hinting.
      *
      * @param mixed $definition Definition to create listener from.
      *
      * @throws InvalidCallableConfigurationException Failed to create listener.
      * @throws ContainerExceptionInterface Error while retrieving the entry from container.
+     *
+     * @psalm-return callable(mixed...): mixed
      */
     public function create(mixed $definition): callable
+    {
+        $callable = $this->resolve($definition);
+
+        return fn(mixed ...$params): mixed => $this->injector->invoke($callable, $params);
+    }
+
+    /**
+     * @throws InvalidCallableConfigurationException Failed to resolve listener.
+     * @throws ContainerExceptionInterface Error while retrieving the entry from container.
+     */
+    private function resolve(mixed $definition): callable
     {
         if ($definition === null) {
             throw new InvalidCallableConfigurationException();

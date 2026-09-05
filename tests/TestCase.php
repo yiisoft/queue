@@ -14,7 +14,6 @@ use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\DefaultQueue;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
@@ -160,30 +159,21 @@ abstract class TestCase extends BaseTestCase
     protected function getPushMiddlewareConfig(): PushMiddlewareConfig
     {
         return new PushMiddlewareConfig(
-            new PushMiddlewareFactory(
-                $this->getContainer(),
-                new CallableFactory($this->getContainer()),
-            ),
+            new PushMiddlewareFactory($this->getContainer()),
         );
     }
 
     protected function getConsumeMiddlewareDispatcher(): ConsumeMiddlewareDispatcher
     {
         return new ConsumeMiddlewareDispatcher(
-            new ConsumeMiddlewareFactory(
-                $this->getContainer(),
-                new CallableFactory($this->getContainer()),
-            ),
+            new ConsumeMiddlewareFactory($this->getContainer()),
         );
     }
 
     protected function getFailureMiddlewareDispatcher(): FailureMiddlewareDispatcher
     {
         return new FailureMiddlewareDispatcher(
-            new FailureMiddlewareFactory(
-                $this->getContainer(),
-                new CallableFactory($this->getContainer()),
-            ),
+            new FailureMiddlewareFactory($this->getContainer()),
             [],
         );
     }

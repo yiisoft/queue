@@ -11,7 +11,6 @@ use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
@@ -175,7 +174,7 @@ final class MiddlewareFactoryTest extends TestCase
     {
         $container ??= $this->getContainer([AdapterInterface::class => new InMemoryAdapter()]);
 
-        return new PushMiddlewareFactory($container, new CallableFactory($container));
+        return new PushMiddlewareFactory($container);
     }
 
     private function getContainer(array $instances = []): ContainerInterface

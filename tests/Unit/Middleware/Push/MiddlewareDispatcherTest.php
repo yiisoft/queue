@@ -11,7 +11,6 @@ use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
@@ -141,10 +140,9 @@ final class MiddlewareDispatcherTest extends TestCase
         ?ContainerInterface $container = null,
     ): PushMiddlewareDispatcher {
         $container ??= $this->createContainer([AdapterInterface::class => new InMemoryAdapter()]);
-        $callableFactory = new CallableFactory($container);
 
         return new PushMiddlewareDispatcher(
-            new PushMiddlewareFactory($container, $callableFactory),
+            new PushMiddlewareFactory($container),
             [],
             new class implements PushHandlerInterface {
                 public function handlePush(MessageInterface $message): MessageInterface

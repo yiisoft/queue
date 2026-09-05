@@ -17,7 +17,6 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
@@ -39,20 +38,18 @@ $handlers = [
     DownloadFileMessage::TYPE => [FileDownloader::class, 'handle'],
 ];
 
-$callableFactory = new CallableFactory($container);
-
 // Create middleware dispatchers
 $consumeMiddlewareDispatcher = new ConsumeMiddlewareDispatcher(
-    new ConsumeMiddlewareFactory($container, $callableFactory),
+    new ConsumeMiddlewareFactory($container),
 );
 
 $failureMiddlewareDispatcher = new FailureMiddlewareDispatcher(
-    new FailureMiddlewareFactory($container, $callableFactory),
+    new FailureMiddlewareFactory($container),
     [],
 );
 
 $pushMiddlewareConfig = new PushMiddlewareConfig(
-    new PushMiddlewareFactory($container, $callableFactory),
+    new PushMiddlewareFactory($container),
 );
 
 // Create worker
