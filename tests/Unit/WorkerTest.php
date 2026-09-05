@@ -10,6 +10,7 @@ use RuntimeException;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Exception\MessageFailureException;
+use Yiisoft\Queue\Message\Handler\HandlerNotFoundException;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -102,6 +103,35 @@ final class WorkerTest extends TestCase
 
         $handlerResolver = $this->createHandlerResolver($message, static fn() => null);
         $worker = $this->createWorkerByParams($handlerResolver, new NullLogger(), $consumeDispatcher, $failureDispatcher);
+
+        $result = $worker->process($message, $queueName);
+
+        self::assertSame($finalMessage, $result);
+    }
+
+    public function testUnresolvableHandlerIsHandledByFailurePipeline(): void
+    {
+        $message = new GenericMessage('unsupported', null);
+        $queueName = 'test-queue';
+        $handlerResolver = new HandlerResolver([], new SimpleContainer());
+
+        $finalMessage = new GenericMessage('final', null);
+        /** @var FailureMiddlewareInterface&MockObject $failureMiddleware */
+        $failureMiddleware = $this->createMock(FailureMiddlewareInterface::class);
+        $failureMiddleware
+            ->expects(self::once())
+            ->method('processFailure')
+            ->with(self::callback(
+                static fn(FailureHandlingRequest $request): bool => $request->getException() instanceof HandlerNotFoundException,
+            ))
+            ->willReturn(new FailureHandlingRequest($finalMessage, new RuntimeException('unused'), $queueName));
+
+        /** @var FailureMiddlewareFactoryInterface&MockObject $failureMiddlewareFactory */
+        $failureMiddlewareFactory = $this->createMock(FailureMiddlewareFactoryInterface::class);
+        $failureMiddlewareFactory->method('createFailureMiddleware')->willReturn($failureMiddleware);
+        $failureDispatcher = new FailureMiddlewareDispatcher($failureMiddlewareFactory, [$queueName => ['simple']]);
+
+        $worker = $this->createWorkerByParams($handlerResolver, failureMiddlewareDispatcher: $failureDispatcher);
 
         $result = $worker->process($message, $queueName);
 
