@@ -56,7 +56,6 @@ final class HandlerResolver
      *
      * @throws HandlerNotFoundException If no handler exists for the message type.
      * @throws InvalidHandlerConfigurationException If the handler definition is configured incorrectly.
-     * @throws ContainerExceptionInterface Error while retrieving the entry from container.
      */
     public function resolve(string $messageType): HandlerInterface
     {
@@ -72,7 +71,6 @@ final class HandlerResolver
     /**
      * @throws HandlerNotFoundException
      * @throws InvalidHandlerConfigurationException
-     * @throws ContainerExceptionInterface
      */
     private function internalResolve(string $messageType): HandlerInterface
     {
@@ -96,7 +94,6 @@ final class HandlerResolver
     /**
      * @throws HandlerNotFoundException
      * @throws InvalidHandlerConfigurationException
-     * @throws ContainerExceptionInterface
      */
     private function getHandlerFromContainer(string $messageType, string $id): HandlerInterface
     {
@@ -104,7 +101,11 @@ final class HandlerResolver
             throw new HandlerNotFoundException($messageType);
         }
 
-        $handler = $this->container->get($id);
+        try {
+            $handler = $this->container->get($id);
+        } catch (ContainerExceptionInterface $exception) {
+            throw new InvalidHandlerConfigurationException($messageType, $exception->getMessage(), $exception);
+        }
 
         if ($handler instanceof HandlerInterface) {
             return $handler;
@@ -126,13 +127,12 @@ final class HandlerResolver
 
     /**
      * @throws InvalidHandlerConfigurationException
-     * @throws ContainerExceptionInterface
      */
     private function createCallableHandler(string $messageType, mixed $definition): CallableHandler
     {
         try {
             $callable = $this->callableFactory->create($definition);
-        } catch (InvalidCallableConfigurationException $exception) {
+        } catch (InvalidCallableConfigurationException|ContainerExceptionInterface $exception) {
             throw new InvalidHandlerConfigurationException($messageType, $exception->getMessage(), $exception);
         }
 

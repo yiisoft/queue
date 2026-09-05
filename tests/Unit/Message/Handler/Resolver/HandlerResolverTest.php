@@ -6,6 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit\Message\Handler\Resolver;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Yiisoft\Test\Support\Container\Exception\NotFoundException;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Message\Handler\HandlerNotFoundException;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
@@ -180,6 +181,40 @@ final class HandlerResolverTest extends TestCase
         $resolver = new HandlerResolver([], $container);
 
         $resolver->resolve('invalid');
+    }
+
+    public function testResolveThrowsWrappedContainerExceptionWhenGettingHandlerFromContainer(): void
+    {
+        $container = new SimpleContainer(
+            factory: static fn(string $id): mixed => throw new NotFoundException($id),
+            hasCallback: static fn(string $id): bool => true,
+        );
+        $resolver = new HandlerResolver([], $container);
+
+        $this->expectException(InvalidHandlerConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Queue handler for message type "simple" is configured incorrectly. No definition or class found for "simple".',
+        );
+        $resolver->resolve('simple');
+    }
+
+    public function testResolveThrowsWrappedContainerExceptionWhenCreatingCallableHandler(): void
+    {
+        $container = new SimpleContainer(
+            factory: static fn(string $id): mixed => throw new NotFoundException($id),
+            hasCallback: static fn(string $id): bool => true,
+        );
+        $resolver = new HandlerResolver(
+            ['simple' => ['NonExistentClassName', 'handle']],
+            $container,
+        );
+
+        $this->expectException(InvalidHandlerConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Queue handler for message type "simple" is configured incorrectly. No definition or class found for "NonExistentClassName".',
+        );
+
+        $resolver->resolve('simple');
     }
 }
 
