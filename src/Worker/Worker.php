@@ -42,11 +42,10 @@ final class Worker implements WorkerInterface
             $this->logger->info('Processing message #{message}.', ['message' => $messageId]);
         }
 
-        $handler = $this->handlerResolver->resolve($message->getType());
-
         $request = new ConsumeRequest($message, $queueName);
-        $finishHandler = new ConsumeFinalHandler($handler->handle(...));
         try {
+            $handler = $this->handlerResolver->resolve($message->getType());
+            $finishHandler = new ConsumeFinalHandler($handler->handle(...));
             return $this->consumeMiddlewareDispatcher->dispatch($request, $finishHandler)->getMessage();
         } catch (Throwable $exception) {
             $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueueName(), $retryProducer);
