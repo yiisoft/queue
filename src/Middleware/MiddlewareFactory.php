@@ -21,10 +21,19 @@ use function is_string;
  */
 abstract class MiddlewareFactory
 {
+    private readonly CallableFactory $callableFactory;
+
+    /**
+     * @param ContainerInterface $container Container used to resolve middleware.
+     * @param ContainerInterface|null $callableDependencyContainer Container used to resolve callable middleware
+     * dependencies. If not set, the main container is used.
+     */
     public function __construct(
         protected readonly ContainerInterface $container,
-        private readonly CallableFactory $callableFactory,
-    ) {}
+        ?ContainerInterface $callableDependencyContainer = null,
+    ) {
+        $this->callableFactory = new CallableFactory($container, $callableDependencyContainer);
+    }
 
     /**
      * @param callable|array|string $definition Middleware definition in one of the following formats:

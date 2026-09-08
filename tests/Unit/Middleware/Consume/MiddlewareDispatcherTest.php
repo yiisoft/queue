@@ -10,7 +10,6 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\GenericMessage;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Queue\Middleware\Consume\ConsumeHandlerInterface;
@@ -160,10 +159,9 @@ final class MiddlewareDispatcherTest extends TestCase
         ?ContainerInterface $container = null,
     ): ConsumeMiddlewareDispatcher {
         $container ??= $this->createContainer([AdapterInterface::class => new InMemoryAdapter()]);
-        $callableFactory = new CallableFactory($container);
 
         return new ConsumeMiddlewareDispatcher(
-            new ConsumeMiddlewareFactory($container, $callableFactory),
+            new ConsumeMiddlewareFactory($container),
         );
     }
 

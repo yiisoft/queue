@@ -6,8 +6,6 @@ namespace Yiisoft\Queue\Message\Handler;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Yiisoft\Injector\Injector;
-use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\InvalidCallableConfigurationException;
 
@@ -27,7 +25,6 @@ final class HandlerResolver
      */
     private array $cache = [];
 
-    private readonly Injector $injector;
     private readonly CallableFactory $callableFactory;
 
     /**
@@ -43,8 +40,7 @@ final class HandlerResolver
         private readonly ContainerInterface $container,
         ?ContainerInterface $callableDependencyContainer = null,
     ) {
-        $this->injector = new Injector($callableDependencyContainer ?? $this->container);
-        $this->callableFactory = new CallableFactory($this->container);
+        $this->callableFactory = new CallableFactory($this->container, $callableDependencyContainer);
     }
 
     /**
@@ -135,10 +131,6 @@ final class HandlerResolver
         } catch (InvalidCallableConfigurationException|ContainerExceptionInterface $exception) {
             throw new InvalidHandlerConfigurationException($messageType, $exception->getMessage(), $exception);
         }
-
-        $callable = function (MessageInterface $message) use ($callable): void {
-            $this->injector->invoke($callable, [$message]);
-        };
 
         return new CallableHandler($callable);
     }

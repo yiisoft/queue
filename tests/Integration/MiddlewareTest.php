@@ -12,7 +12,6 @@ use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
@@ -47,9 +46,6 @@ final class MiddlewareTest extends TestCase
         $pushMiddlewareConfig = new PushMiddlewareConfig(
             new PushMiddlewareFactory(
                 $this->createMock(ContainerInterface::class),
-                new CallableFactory(
-                    $this->createMock(ContainerInterface::class),
-                ),
             ),
             [
                 new TestMiddleware('common 1'),
@@ -85,21 +81,17 @@ final class MiddlewareTest extends TestCase
             'common 2',
         ];
         $container = new SimpleContainer();
-        $callableFactory = new CallableFactory($container);
 
         $consumeMiddlewareDispatcher = new ConsumeMiddlewareDispatcher(
             new ConsumeMiddlewareFactory(
                 $this->createMock(ContainerInterface::class),
-                new CallableFactory(
-                    $this->createMock(ContainerInterface::class),
-                ),
             ),
             new TestMiddleware('common 1'),
             new TestMiddleware('common 2'),
         );
 
         $failureMiddlewareDispatcher = new FailureMiddlewareDispatcher(
-            new FailureMiddlewareFactory($container, $callableFactory),
+            new FailureMiddlewareFactory($container),
             [],
         );
 
@@ -125,7 +117,6 @@ final class MiddlewareTest extends TestCase
         $queueCallback = static fn(MessageInterface $message): MessageInterface => $message;
         $queue = $this->createMock(QueueProducerInterface::class);
         $container = new SimpleContainer([SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queue)]);
-        $callableFactory = new CallableFactory($container);
 
         $queue->expects(self::exactly(7))->method('push')->willReturnCallback($queueCallback);
         $queue->method('getQueueName')->willReturn('simple');
@@ -154,7 +145,7 @@ final class MiddlewareTest extends TestCase
             ],
         ];
         $dispatcher = new FailureMiddlewareDispatcher(
-            new FailureMiddlewareFactory($container, $callableFactory),
+            new FailureMiddlewareFactory($container),
             $middlewares,
         );
 

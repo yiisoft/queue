@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Middleware\Push;
 
-use Psr\Container\ContainerInterface;
-use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
@@ -68,19 +66,17 @@ final class PushMiddlewareFactory extends MiddlewareFactory implements PushMiddl
 
     protected function wrapMiddleware(callable $callback): PushMiddlewareInterface
     {
-        return new class ($callback, $this->container) implements PushMiddlewareInterface {
+        return new class ($callback) implements PushMiddlewareInterface {
             private $callback;
 
-            public function __construct(
-                callable $callback,
-                private readonly ContainerInterface $container,
-            ) {
+            public function __construct(callable $callback)
+            {
                 $this->callback = $callback;
             }
 
             public function processPush(MessageInterface $message, PushHandlerInterface $handler): MessageInterface
             {
-                $response = (new Injector($this->container))->invoke($this->callback, [$message, $handler]);
+                $response = ($this->callback)($message, $handler);
                 if ($response instanceof MessageInterface) {
                     return $response;
                 }

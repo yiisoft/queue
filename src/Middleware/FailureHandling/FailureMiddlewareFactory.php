@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Middleware\FailureHandling;
 
 use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
 
@@ -64,20 +62,17 @@ final class FailureMiddlewareFactory extends MiddlewareFactory implements Failur
 
     protected function wrapMiddleware(callable $callback): FailureMiddlewareInterface
     {
-        $container = $this->container;
-        return new class ($callback, $container) implements FailureMiddlewareInterface {
+        return new class ($callback) implements FailureMiddlewareInterface {
             private $callback;
 
-            public function __construct(
-                callable $callback,
-                private readonly ContainerInterface $container,
-            ) {
+            public function __construct(callable $callback)
+            {
                 $this->callback = $callback;
             }
 
             public function processFailure(FailureHandlingRequest $request, FailureHandlerInterface $handler): FailureHandlingRequest
             {
-                $response = (new Injector($this->container))->invoke($this->callback, [$request, $handler]);
+                $response = ($this->callback)($request, $handler);
                 if ($response instanceof FailureHandlingRequest) {
                     return $response;
                 }

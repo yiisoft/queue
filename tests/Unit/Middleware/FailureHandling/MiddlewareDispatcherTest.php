@@ -10,7 +10,6 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Message\GenericMessage;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
@@ -159,9 +158,8 @@ final class MiddlewareDispatcherTest extends TestCase
         ?ContainerInterface $container = null,
     ): FailureMiddlewareDispatcher {
         $container ??= $this->createContainer([AdapterInterface::class => new InMemoryAdapter()]);
-        $callableFactory = new CallableFactory($container);
 
-        return new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container, $callableFactory), []);
+        return new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container), []);
     }
 
     private function createContainer(array $instances = []): ContainerInterface
