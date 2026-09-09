@@ -22,13 +22,13 @@ final class PushMiddlewareStack implements PushHandlerInterface
 
     /**
      * @param Closure[] $middlewares Middlewares.
-     * @param PushHandlerInterface $finishHandler Final handler invoked after all middlewares are processed.
+     * @param PushHandlerInterface $finalHandler Handler invoked after all middlewares are processed.
      *
      * @psalm-param list<Closure():PushMiddlewareInterface> $middlewares
      */
     public function __construct(
         private readonly array $middlewares,
-        private readonly PushHandlerInterface $finishHandler,
+        private readonly PushHandlerInterface $finalHandler,
     ) {}
 
     public function handlePush(MessageInterface $message): MessageInterface
@@ -39,7 +39,7 @@ final class PushMiddlewareStack implements PushHandlerInterface
 
     private function build(): PushHandlerInterface
     {
-        $handler = $this->finishHandler;
+        $handler = $this->finalHandler;
 
         foreach (array_reverse($this->middlewares) as $middleware) {
             $handler = $this->wrap($middleware, $handler);

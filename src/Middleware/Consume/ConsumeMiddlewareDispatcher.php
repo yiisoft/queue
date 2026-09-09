@@ -33,15 +33,15 @@ final class ConsumeMiddlewareDispatcher
      * Dispatch request through middleware to get response.
      *
      * @param ConsumeRequest $request Request to pass to middleware.
-     * @param ConsumeHandlerInterface $finishHandler Handler to use in case no middleware produced a response.
+     * @param ConsumeHandlerInterface $finalHandler Handler to use in case no middleware produced a response.
      */
     public function dispatch(
         ConsumeRequest $request,
-        ConsumeHandlerInterface $finishHandler,
+        ConsumeHandlerInterface $finalHandler,
     ): ConsumeRequest {
         $type = $request->getMessage()->getType();
         if (!array_key_exists($type, $this->stack)) {
-            $this->stack[$type] = new ConsumeMiddlewareStack($this->buildMiddlewares(), $finishHandler);
+            $this->stack[$type] = new ConsumeMiddlewareStack($this->buildMiddlewares(), $finalHandler);
         }
 
         return $this->stack[$type]->handleConsume($request);

@@ -18,14 +18,13 @@ final class ConsumeMiddlewareStack implements ConsumeHandlerInterface
 
     /**
      * @param Closure[] $middlewares Middlewares.
-     * @param ConsumeHandlerInterface $finishHandler Fallback handler
-     * events.
+     * @param ConsumeHandlerInterface $finalHandler Handler invoked after all middlewares are processed.
      *
      * @psalm-param list<Closure():ConsumeMiddlewareInterface> $middlewares
      */
     public function __construct(
         private readonly array $middlewares,
-        private readonly ConsumeHandlerInterface $finishHandler,
+        private readonly ConsumeHandlerInterface $finalHandler,
     ) {}
 
     public function handleConsume(ConsumeRequest $request): ConsumeRequest
@@ -36,7 +35,7 @@ final class ConsumeMiddlewareStack implements ConsumeHandlerInterface
 
     private function build(): ConsumeHandlerInterface
     {
-        $handler = $this->finishHandler;
+        $handler = $this->finalHandler;
 
         foreach ($this->middlewares as $middleware) {
             $handler = $this->wrap($middleware, $handler);

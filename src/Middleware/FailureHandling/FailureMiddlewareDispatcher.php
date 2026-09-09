@@ -31,11 +31,11 @@ final class FailureMiddlewareDispatcher
      * Dispatch request through middleware to get response.
      *
      * @param FailureHandlingRequest $request Request to pass to middleware.
-     * @param FailureHandlerInterface $finishHandler Handler to use in case no middleware produced a response.
+     * @param FailureHandlerInterface $finalHandler Handler to use in case no middleware produced a response.
      */
     public function dispatch(
         FailureHandlingRequest $request,
-        FailureHandlerInterface $finishHandler,
+        FailureHandlerInterface $finalHandler,
     ): FailureHandlingRequest {
         $queueName = $request->getQueueName();
         if (!isset($this->middlewareDefinitions[$queueName]) || $this->middlewareDefinitions[$queueName] === []) {
@@ -43,7 +43,7 @@ final class FailureMiddlewareDispatcher
         }
         $definitions = array_reverse($this->middlewareDefinitions[$queueName]);
 
-        $this->stack[$queueName] ??= new FailureMiddlewareStack($this->buildMiddlewares(...$definitions), $finishHandler);
+        $this->stack[$queueName] ??= new FailureMiddlewareStack($this->buildMiddlewares(...$definitions), $finalHandler);
 
         return $this->stack[$queueName]->handleFailure($request);
     }
