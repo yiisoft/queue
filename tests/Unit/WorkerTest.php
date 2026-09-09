@@ -7,6 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
+use Throwable;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Exception\MessageFailureException;
@@ -20,6 +21,11 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\Worker\WorkerHandlerInterface;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Worker\WorkerRequest;
 use Yiisoft\Queue\Tests\App\FakeHandler;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Worker\Worker;
@@ -108,6 +114,33 @@ final class WorkerTest extends TestCase
         self::assertSame($finalMessage, $result);
     }
 
+    public function testWorkerMiddlewareRunsBeforeHandlerResolution(): void
+    {
+        $message = new GenericMessage('missing', null);
+        $seen = false;
+        $workerMiddleware = new WorkerMiddlewareDispatcher(
+            new WorkerMiddlewareFactory(new SimpleContainer(), new CallableFactory(new SimpleContainer())),
+            [static function (WorkerRequest $request, WorkerHandlerInterface $handler) use (&$seen): WorkerRequest {
+                $seen = true;
+                return $handler->handleWorker($request);
+            }],
+        );
+        $worker = $this->createWorkerByParams(
+            new HandlerResolver([], new SimpleContainer()),
+            new NullLogger(),
+            null,
+            null,
+            $workerMiddleware,
+        );
+
+        $this->expectException(Throwable::class);
+        try {
+            $worker->process($message, 'queue');
+        } finally {
+            self::assertTrue($seen);
+        }
+    }
+
     private function createHandlerResolver(MessageInterface $message, callable $handler): HandlerResolver
     {
         $container = new SimpleContainer();
@@ -123,17 +156,23 @@ final class WorkerTest extends TestCase
         ?LoggerInterface $logger = null,
         ?ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher = null,
         ?FailureMiddlewareDispatcher $failureMiddlewareDispatcher = null,
+        ?WorkerMiddlewareDispatcher $workerMiddlewareDispatcher = null,
     ): Worker {
         /** @var ConsumeMiddlewareFactoryInterface&MockObject $consumeMiddlewareFactory */
         $consumeMiddlewareFactory = $this->createMock(ConsumeMiddlewareFactoryInterface::class);
         /** @var FailureMiddlewareFactoryInterface&MockObject $failureMiddlewareFactory */
         $failureMiddlewareFactory = $this->createMock(FailureMiddlewareFactoryInterface::class);
 
+        $workerMiddlewareDispatcher ??= new WorkerMiddlewareDispatcher(
+            new WorkerMiddlewareFactory(new SimpleContainer(), new CallableFactory(new SimpleContainer())),
+        );
+
         return new Worker(
             $logger ?? new NullLogger(),
             $consumeMiddlewareDispatcher ?? new ConsumeMiddlewareDispatcher($consumeMiddlewareFactory),
             $failureMiddlewareDispatcher ?? new FailureMiddlewareDispatcher($failureMiddlewareFactory, []),
             $handlerResolver,
+            $workerMiddlewareDispatcher,
         );
     }
 }

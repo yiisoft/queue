@@ -2,7 +2,7 @@
 
 A *queue name* is a logical identifier for independently configured producer and consumer capabilities. A name can have a producer, a consumer, or both; it does not imply that the two roles use the same object.
 
-- Inject `QueueProducerInterface` to push messages to the default queue.
+- Inject the configured producer (usually `AsyncQueueProducer`) to push messages to the default queue.
 - Use `QueueProducerProviderInterface` to obtain a named producer with `getProducer()`.
 - Use `QueueConsumerProviderInterface` to obtain a named consumer with `getConsumer()`; console commands use this provider.
 
@@ -42,18 +42,18 @@ return [
 ];
 ```
 
-`QueueFactoryProvider` resolves these role definitions lazily and caches each role independently. `PredefinedQueueProvider` has the same shape, but each value must be an already-created instance of its role interface.
+`QueueFactoryProvider` resolves these role definitions lazily and caches each role independently. `PredefinedQueueProvider` has the same shape, but each value must be an already-created producer or `QueueConsumer` instance.
 
 ## Producing messages
 
 For the default queue, inject the producer directly:
 
 ```php
-use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\AsyncQueueProducer;
 
 final readonly class SendWelcomeEmail
 {
-    public function __construct(private QueueProducerInterface $queue) {}
+    public function __construct(private AsyncQueueProducer $queue) {}
 
     public function run(string $email): void
     {

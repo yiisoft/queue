@@ -10,15 +10,17 @@ use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Push\SynchronousPushHandler;
-use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Worker\Worker;
+use Yiisoft\Queue\Middleware\Push\PushRequest;
 
 /**
  * Producer that runs each message synchronously, in the same process as the caller.
  */
-final class SyncQueueProducer implements QueueProducerInterface
+final class SyncQueueProducer
 {
     private string $queueName;
     private PushMiddlewareDispatcher $dispatcher;
+    private QueueProducerStatusInterface $status;
 
     /**
      * @param mixed[] $middlewareDefinitions Queue-specific push middleware definitions.
@@ -26,10 +28,12 @@ final class SyncQueueProducer implements QueueProducerInterface
     public function __construct(
         private readonly LoggerInterface $logger,
         PushMiddlewareConfig $middlewareConfig,
-        WorkerInterface $worker,
+        Worker $worker,
         string|BackedEnum $queueName = DefaultQueue::NAME,
         array $middlewareDefinitions = [],
+        ?QueueProducerStatusInterface $status = null,
     ) {
+        $this->status = $status ?? new NotFoundQueueProducerStatus();
         $this->queueName = StringNormalizer::normalize($queueName);
         $this->dispatcher = new PushMiddlewareDispatcher(
             middlewareFactory: $middlewareConfig->middlewareFactory,
@@ -46,13 +50,13 @@ final class SyncQueueProducer implements QueueProducerInterface
     public function push(MessageInterface $message): MessageInterface
     {
         $this->logger->debug('Preparing to push message with message type "{messageType}".', ['messageType' => $message->getType()]);
-        $message = $this->dispatcher->dispatch($message);
+        $message = $this->dispatcher->dispatch(new PushRequest($message, $this->queueName))->getMessage();
         $this->logger->info('Processed message with message type "{messageType}" synchronously.', ['messageType' => $message->getType()]);
         return $message;
     }
 
-    public function status(string|int $id): MessageStatus
+    public function getStatus(): QueueProducerStatusInterface
     {
-        return MessageStatus::NOT_FOUND;
+        return $this->status;
     }
 }

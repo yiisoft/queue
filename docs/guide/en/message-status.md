@@ -2,16 +2,13 @@
 
 Yii Queue can report the status of a message by its ID.
 
-The API surface is:
+Status is a producer capability exposed by `getStatus(): QueueProducerStatusInterface`. Call `status(string|int $id)` on the returned capability, not on the producer itself. For named queues, `QueueProducerStatusProviderInterface` is keyed by the logical queue name; its `getStatus($queueName)` method returns the capability for that queue.
 
-- `QueueProducerInterface::status(string|int $id): MessageStatus`
-- `AdapterInterface::status(string|int $id): MessageStatus`
-
-Status tracking support depends on the adapter. If an adapter doesn't support status tracking or can't find the message by ID, it returns `MessageStatus::NOT_FOUND`.
+`AsyncQueueProducer` uses adapter-backed status tracking by default. `SyncQueueProducer` uses a status capability that returns `MessageStatus::NOT_FOUND` by default; pass a custom capability when synchronous status tracking is available. For an asynchronous adapter that doesn't support status tracking or can't find the message by ID, it also returns `MessageStatus::NOT_FOUND`.
 
 ## Getting a message ID
 
-`QueueProducerInterface::push()` returns a `MessageInterface`. When the adapter supports IDs, the returned message is typically wrapped into an `IdEnvelope`, which stores the ID in message metadata.
+The examples below assume `$queue` is the configured producer for the default queue and `$message` is the message to push. A producer's `push()` method returns a `MessageInterface`. When the adapter supports IDs, the adapter-returned message is typically wrapped into an `IdEnvelope`, which stores the ID in message metadata.
 
 To read the ID:
 
@@ -61,7 +58,7 @@ if ($id === null) {
     throw new \RuntimeException('The adapter did not provide a message ID, status tracking is unavailable.');
 }
 
-$status = $queue->status($id);
+$status = $queue->getStatus()->status($id);
 
 if ($status === MessageStatus::WAITING) {
     // The message is waiting to be handled.
@@ -75,6 +72,19 @@ if ($status === MessageStatus::DONE) {
     // The message has been handled.
 }
 ```
+
+## Named queues
+
+Use the status provider with the same logical queue name used by the producer. The provider returns the configured producer's status capability:
+
+```php
+use Yiisoft\Queue\Provider\QueueProducerStatusProviderInterface;
+
+// `$statusProvider` is the configured QueueProducerStatusProviderInterface.
+$status = $statusProvider->getStatus('emails')->status($id);
+```
+
+`hasStatus($queueName)` can be used to check whether a producer status capability is configured, and `getStatusQueueNames()` lists the available queue keys. For an unknown queue, or a queue without a producer, `getStatus($queueName)` throws `QueueNotFoundException`; it does not return `MessageStatus::NOT_FOUND`. `NOT_FOUND` is the result for a known queue when the message ID is unknown or status tracking is unsupported.
 
 ## Edge cases
 

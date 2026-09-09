@@ -24,11 +24,13 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\SyncQueueProducer;
-use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\AsyncQueueProducer;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Tests\Integration\Support\TestMiddleware;
 use Yiisoft\Queue\Worker\Worker;
-use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
+use Yiisoft\Queue\Stubs\InMemoryAdapter;
 
 final class MiddlewareTest extends TestCase
 {
@@ -56,8 +58,12 @@ final class MiddlewareTest extends TestCase
                 new TestMiddleware('common 2'),
             ],
         );
-        $worker = $this->createMock(WorkerInterface::class);
-        $worker->method('process')->willReturnArgument(0);
+        $worker = new Worker(
+            $this->createMock(LoggerInterface::class),
+            new ConsumeMiddlewareDispatcher($this->createMock(ConsumeMiddlewareFactoryInterface::class)),
+            new FailureMiddlewareDispatcher($this->createMock(FailureMiddlewareFactoryInterface::class), []),
+            new HandlerResolver(['test' => static function (): void {}], new SimpleContainer()),
+        );
         $queue = new SyncQueueProducer(
             $this->createMock(LoggerInterface::class),
             $pushMiddlewareConfig,
@@ -123,25 +129,26 @@ final class MiddlewareTest extends TestCase
 
         $message = new GenericMessage('simple', null);
         $queueCallback = static fn(MessageInterface $message): MessageInterface => $message;
-        $queue = $this->createMock(QueueProducerInterface::class);
-        $container = new SimpleContainer([SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queue)]);
+        $queue = new AsyncQueueProducer(
+            $this->createMock(LoggerInterface::class),
+            new PushMiddlewareConfig(new PushMiddlewareFactory(new SimpleContainer(), new CallableFactory(new SimpleContainer()))),
+            new InMemoryAdapter(),
+        );
+        $container = new SimpleContainer([SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queueCallback)]);
         $callableFactory = new CallableFactory($container);
-
-        $queue->expects(self::exactly(7))->method('push')->willReturnCallback($queueCallback);
-        $queue->method('getQueueName')->willReturn('simple');
 
         $middlewares = [
             'test-queue' => [
-                new SendAgainMiddleware('test', 1, $queue),
+                new SendAgainMiddleware('test', 1, $queueCallback),
                 [
                     'class' => SendAgainMiddleware::class,
-                    '__construct()' => ['test-factory', 1, $queue],
+                    '__construct()' => ['test-factory', 1, $queueCallback],
                 ],
                 [
-                    new SendAgainMiddleware('test-callable', 1, $queue),
+                    new SendAgainMiddleware('test-callable', 1, $queueCallback),
                     'processFailure',
                 ],
-                fn(): SendAgainMiddleware => new SendAgainMiddleware('test-callable-2', 1, $queue),
+                fn(): SendAgainMiddleware => new SendAgainMiddleware('test-callable-2', 1, $queueCallback),
                 SendAgainMiddleware::class,
                 new ExponentialDelayMiddleware(
                     'test',
@@ -149,7 +156,7 @@ final class MiddlewareTest extends TestCase
                     1,
                     5,
                     2,
-                    $queue,
+                    $queueCallback,
                 ),
             ],
         ];
@@ -159,7 +166,7 @@ final class MiddlewareTest extends TestCase
         );
 
         $iteration = 0;
-        $request = new FailureHandlingRequest($message, $exception, 'test-queue', $queue);
+        $request = new FailureHandlingRequest($message, $exception, 'test-queue', $queueCallback);
         $finalHandler = new FailureFinalHandler();
         try {
             do {

@@ -5,48 +5,51 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\NullOutput;
+use Psr\Log\NullLogger;
 use Yiisoft\Definitions\Reference;
-use Yiisoft\Queue\Command\ListenCommand;
-use Yiisoft\Queue\Debug\QueueCollector;
-use Yiisoft\Queue\Debug\QueueConsumerDecorator;
-use Yiisoft\Queue\Debug\QueueConsumerProviderProxy;
-use Yiisoft\Queue\Debug\QueueProducerDecorator;
-use Yiisoft\Queue\Debug\QueueProducerProviderProxy;
-use Yiisoft\Queue\Message\GenericMessage;
+use Yiisoft\Queue\AsyncQueueProducer;
+use Yiisoft\Queue\Middleware\CallableFactory;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;
 use Yiisoft\Queue\Provider\QueueFactoryProvider;
 use Yiisoft\Queue\Provider\QueueNotFoundException;
-use Yiisoft\Queue\QueueConsumerInterface;
-use Yiisoft\Queue\QueueProducerInterface;
-use Yiisoft\Queue\Stubs\StubQueueConsumer;
-use Yiisoft\Queue\Stubs\StubQueueProducer;
+use Yiisoft\Queue\QueueConsumer;
+use Yiisoft\Queue\Stubs\InMemoryAdapter;
+use Yiisoft\Queue\Worker\Worker;
+use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 
 final class QueueProviderTest extends TestCase
 {
-    public function testFactoryRoleMapsResolveThroughContainerAndKeepCapabilitiesSeparate(): void
+    public function testFactoryProviderResolvesConcreteRolesThroughContainer(): void
     {
-        $container = new SimpleContainer(['producer-name' => 'factory-both']);
+        $producer = $this->producer('factory-name');
+        $consumer = $this->consumer();
+        $container = new SimpleContainer([
+            'factory-producer' => $producer,
+            'factory-consumer' => $consumer,
+        ]);
         $provider = new QueueFactoryProvider([
-            'both' => [
-                'producer' => [
-                    'class' => StubQueueProducer::class,
-                    '__construct()' => ['queueName' => Reference::to('producer-name')],
-                ],
-                'consumer' => StubQueueConsumer::class,
+            'factory-name' => [
+                'producer' => Reference::to('factory-producer'),
+                'consumer' => Reference::to('factory-consumer'),
             ],
-            'producer-only' => ['producer' => StubQueueProducer::class],
-            'consumer-only' => ['consumer' => StubQueueConsumer::class],
+            'producer-only' => ['producer' => Reference::to('factory-producer')],
+            'consumer-only' => ['consumer' => Reference::to('factory-consumer')],
         ], $container);
 
-        self::assertSame(['both', 'producer-only'], $provider->getProducerQueueNames());
-        self::assertSame(['both', 'consumer-only'], $provider->getConsumerQueueNames());
-        self::assertSame('factory-both', $provider->getProducer('both')->getQueueName());
-        self::assertInstanceOf(StubQueueConsumer::class, $provider->getConsumer('both'));
-        self::assertInstanceOf(StubQueueProducer::class, $provider->getProducer('producer-only'));
-        self::assertInstanceOf(StubQueueConsumer::class, $provider->getConsumer('consumer-only'));
+        self::assertSame(['factory-name', 'producer-only'], $provider->getProducerQueueNames());
+        self::assertSame(['factory-name', 'consumer-only'], $provider->getConsumerQueueNames());
+        self::assertSame('factory-name', $provider->getProducer('factory-name')->getQueueName());
+        self::assertInstanceOf(AsyncQueueProducer::class, $provider->getProducer('producer-only'));
+        self::assertSame('factory-name', $provider->getProducer('producer-only')->getQueueName());
+        self::assertInstanceOf(QueueConsumer::class, $provider->getConsumer('consumer-only'));
         self::assertFalse($provider->hasConsumer('producer-only'));
         self::assertFalse($provider->hasProducer('consumer-only'));
 
@@ -54,52 +57,43 @@ final class QueueProviderTest extends TestCase
         $provider->getConsumer('producer-only');
     }
 
-    public function testPredefinedRoleMapsAndListenCommandUseConsumerOnlyService(): void
+    public function testPredefinedProviderExposesConcreteRolesAndNormalizedNames(): void
     {
-        $consumer = $this->createMock(QueueConsumerInterface::class);
-        $consumer->expects(self::once())->method('listen');
         $provider = new PredefinedQueueProvider([
-            'both' => ['producer' => new StubQueueProducer('predefined-both'), 'consumer' => new StubQueueConsumer()],
-            'producer-only' => ['producer' => new StubQueueProducer()],
-            'consumer-only' => ['consumer' => $consumer],
+            'mixed-name' => ['producer' => $this->producer('mixed-name'), 'consumer' => $this->consumer()],
+            'producer-only' => ['producer' => $this->producer('producer-only')],
         ]);
 
-        self::assertSame(['both', 'producer-only'], $provider->getProducerQueueNames());
-        self::assertSame(['both', 'consumer-only'], $provider->getConsumerQueueNames());
-        self::assertInstanceOf(QueueProducerInterface::class, $provider->getProducer('both'));
-        self::assertInstanceOf(QueueConsumerInterface::class, $provider->getConsumer('both'));
+        self::assertSame(['mixed-name', 'producer-only'], $provider->getProducerQueueNames());
+        self::assertSame(['mixed-name'], $provider->getConsumerQueueNames());
+        self::assertInstanceOf(AsyncQueueProducer::class, $provider->getProducer('mixed-name'));
+        self::assertInstanceOf(QueueConsumer::class, $provider->getConsumer('mixed-name'));
         self::assertFalse($provider->hasConsumer('producer-only'));
-        self::assertFalse($provider->hasProducer('consumer-only'));
 
-        self::assertSame(0, (new ListenCommand($provider))->run(new StringInput('consumer-only'), new NullOutput()));
-
-        try {
-            $provider->getProducer('consumer-only');
-            self::fail('A consumer-only queue must not expose a producer service.');
-        } catch (QueueNotFoundException) {
-            self::addToAssertionCount(1);
-        }
+        $this->expectException(QueueNotFoundException::class);
+        $provider->getConsumer('producer-only');
     }
 
-    public function testDebugProxiesPreserveSeparatedProviderRoles(): void
+    private function producer(string $name): AsyncQueueProducer
     {
-        $provider = new PredefinedQueueProvider([
-            'mixed-name' => ['producer' => new StubQueueProducer('mixed-name')],
-            'consumer-only' => ['consumer' => new StubQueueConsumer()],
-        ]);
-        $collector = new QueueCollector();
-        $collector->startup();
+        $container = new SimpleContainer();
+        return new AsyncQueueProducer(
+            new NullLogger(),
+            new PushMiddlewareConfig(new PushMiddlewareFactory($container, new CallableFactory($container))),
+            new InMemoryAdapter(),
+            $name,
+        );
+    }
 
-        $producerProvider = new QueueProducerProviderProxy($provider, $collector);
-        $consumerProvider = new QueueConsumerProviderProxy($provider, $collector);
-        $producer = $producerProvider->getProducer('mixed-name');
-        $consumer = $consumerProvider->getConsumer('consumer-only');
-        $producer->push(new GenericMessage('test', 'payload'));
-
-        self::assertInstanceOf(QueueProducerDecorator::class, $producer);
-        self::assertInstanceOf(QueueConsumerDecorator::class, $consumer);
-        self::assertSame(['mixed-name'], $producerProvider->getProducerQueueNames());
-        self::assertSame(['consumer-only'], $consumerProvider->getConsumerQueueNames());
-        self::assertSame(1, $collector->getSummary()['countPushes']);
+    private function consumer(): QueueConsumer
+    {
+        $container = new SimpleContainer();
+        $worker = new Worker(
+            new NullLogger(),
+            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container, new CallableFactory($container))),
+            new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container, new CallableFactory($container)), []),
+            new HandlerResolver([], $container),
+        );
+        return new QueueConsumer($worker, new SimpleLoop(), new NullLogger());
     }
 }

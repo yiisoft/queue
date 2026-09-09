@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Provider;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use Yiisoft\Queue\Provider\QueueNotFoundException;
-use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Tests\Unit\Support\StringEnum;
 
 final class QueueNotFoundExceptionTest extends TestCase
 {
+    /** @return iterable<string, array{string, string|StringEnum}> */
     public static function dataBase(): iterable
     {
         yield 'string' => ['queue1', 'queue1'];
@@ -18,7 +19,7 @@ final class QueueNotFoundExceptionTest extends TestCase
     }
 
     #[DataProvider('dataBase')]
-    public function testBase(string $expectedName, mixed $name): void
+    public function testBase(string $expectedName, string|StringEnum $name): void
     {
         $exception = new QueueNotFoundException($name);
 

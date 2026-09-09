@@ -4,63 +4,50 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Worker;
 
+use Closure;
 use Psr\Log\LoggerInterface;
-use Throwable;
-use Yiisoft\Queue\Exception\MessageFailureException;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\QueueProducerInterface;
-use Yiisoft\Queue\Message\IdEnvelope;
+use Yiisoft\Queue\Middleware\Worker\WorkerFinalHandler;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareFactoryInterface;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareInterface;
+use Yiisoft\Queue\Middleware\Worker\WorkerRequest;
+use LogicException;
 
-final class Worker implements WorkerInterface
+final class Worker
 {
+    private readonly WorkerMiddlewareDispatcher $workerMiddlewareDispatcher;
+
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher,
         private readonly FailureMiddlewareDispatcher $failureMiddlewareDispatcher,
         private readonly HandlerResolver $handlerResolver,
-    ) {}
+        ?WorkerMiddlewareDispatcher $workerMiddlewareDispatcher = null,
+    ) {
+        $this->workerMiddlewareDispatcher = $workerMiddlewareDispatcher ?? new WorkerMiddlewareDispatcher(
+            new class implements WorkerMiddlewareFactoryInterface {
+                public function createWorkerMiddleware(mixed $definition): WorkerMiddlewareInterface
+                {
+                    throw new LogicException('The empty worker middleware dispatcher cannot create middleware.');
+                }
+            },
+        );
+    }
 
-    /**
-     * @throws Throwable
-     */
-    public function process(
-        MessageInterface $message,
-        string $queueName,
-        ?QueueProducerInterface $retryProducer = null,
-    ): MessageInterface {
-        $messageId = IdEnvelope::fromMessage($message)->getId();
-        if ($messageId === null) {
-            $this->logger->info('Processing message without ID.');
-        } else {
-            $this->logger->info('Processing message #{message}.', ['message' => $messageId]);
-        }
-
-        $handler = $this->handlerResolver->resolve($message->getType());
-
-        $request = new ConsumeRequest($message, $queueName);
-        $finishHandler = new ConsumeFinalHandler($handler->handle(...));
-        try {
-            return $this->consumeMiddlewareDispatcher->dispatch($request, $finishHandler)->getMessage();
-        } catch (Throwable $exception) {
-            $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueueName(), $retryProducer);
-
-            try {
-                $result = $this->failureMiddlewareDispatcher->dispatch($request, new FailureFinalHandler());
-                $this->logger->info($exception->getMessage());
-
-                return $result->getMessage();
-            } catch (Throwable $exception) {
-                $exception = new MessageFailureException($message, $exception);
-                $this->logger->error($exception->getMessage());
-                throw $exception;
-            }
-        }
+    /** @param Closure(MessageInterface): MessageInterface $retry */
+    public function process(MessageInterface $message, string $queueName, ?Closure $retry = null): MessageInterface
+    {
+        $request = new WorkerRequest($message, $queueName, $retry);
+        $final = new WorkerFinalHandler(
+            $this->logger,
+            $this->consumeMiddlewareDispatcher,
+            $this->failureMiddlewareDispatcher,
+            $this->handlerResolver,
+        );
+        return $this->workerMiddlewareDispatcher->dispatch($request, $final)->getMessage();
     }
 }

@@ -7,9 +7,12 @@ namespace Yiisoft\Queue\Tests\Benchmark;
 use Generator;
 use PhpBench\Attributes\ParamProviders;
 use Psr\Log\NullLogger;
+use Yiisoft\Queue\AsyncQueueProducer;
 use Yiisoft\Queue\Cli\SimpleLoop;
-use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\GenericMessage;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
+use Yiisoft\Queue\Message\IdEnvelope;
+use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Message\Serializer\JsonMessageEncoder;
 use Yiisoft\Queue\Message\Serializer\MessageSerializer;
 use Yiisoft\Queue\Middleware\CallableFactory;
@@ -20,19 +23,15 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\AsyncQueueProducer;
 use Yiisoft\Queue\QueueConsumer;
-use Yiisoft\Queue\QueueConsumerInterface;
-use Yiisoft\Queue\QueueProducerInterface;
-use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Tests\Benchmark\Support\VoidAdapter;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 
 final class QueueBench
 {
-    private readonly QueueProducerInterface $producer;
-    private readonly QueueConsumerInterface $consumer;
+    private readonly AsyncQueueProducer $producer;
+    private readonly QueueConsumer $consumer;
     private readonly MessageSerializer $serializer;
     private readonly VoidAdapter $adapter;
 
@@ -84,7 +83,9 @@ final class QueueBench
     #[ParamProviders('providePush')]
     public function benchPush(array $params): void
     {
-        $this->producer->push($params['message']);
+        /** @var MessageInterface $message */
+        $message = $params['message'];
+        $this->producer->push($message);
     }
 
     public function provideConsume(): Generator

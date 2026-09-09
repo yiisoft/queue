@@ -1,49 +1,50 @@
 # Advanced Yii Debug integration
 
-Use this guide when you need to understand which events are tracked by the queue collector, how proxy services operate, and how to wire the collector manually.
+Use this guide to understand the optional native middleware and status-provider instrumentation used by the queue collector.
 
 ## What is collected
 
-The integration is based on `Yiisoft\Queue\Debug\QueueCollector` and captures:
+`Yiisoft\Queue\Debug\QueueCollector` can capture:
 
-- Pushed messages grouped by queue name.
-- Message status checks performed via `QueueProducerInterface::status()`.
-- Messages processed by a worker grouped by queue name.
+- pushed messages, grouped by their normalized queue key;
+- status checks made through the producer status capability;
+- worker processing events, grouped by queue key.
+
+There is no consumer processing metric or debug proxy. Push instrumentation does not report status checks, and status instrumentation does not wrap push calls.
 
 ## How it works
 
-The collector is enabled by registering it in Yii Debug and wrapping tracked services with proxy implementations.
+The integration uses native middleware:
 
-Out of the box (see this package's `config/params.php`), the following services are wrapped:
+- `Yiisoft\Queue\Debug\Middleware\PushDebugMiddleware` wraps the push pipeline. After the downstream/final push handler returns, it records the message from the returned `PushRequest` and the immutable normalized identity from the incoming `PushRequest`. The returned message is not necessarily adapter output: synchronous pushing may process and replace it. If downstream processing throws, no push event is recorded; a middleware that short-circuits before this middleware is reached also bypasses it.
+- `Yiisoft\Queue\Debug\Middleware\WorkerDebugMiddleware` runs in the separate worker pipeline and records processing before handler resolution. The processing event is recorded before downstream handling, so a later exception does not remove it; middleware that short-circuits before this middleware is reached prevents it.
+- `Yiisoft\Queue\Debug\QueueProducerStatusProviderProxy` wraps only `QueueProducerStatusProviderInterface`. It decorates the status capability returned by `getStatus($queueName)`; status-provider operations are not push or consumer-processing instrumentation.
 
-- `Yiisoft\Queue\Provider\QueueProducerProviderInterface` is wrapped with `Yiisoft\Queue\Debug\QueueProducerProviderProxy`, which returns `QueueProducerDecorator` instances so `push()` and `status()` calls are reported.
-- `Yiisoft\Queue\Provider\QueueConsumerProviderInterface` is wrapped with `Yiisoft\Queue\Debug\QueueConsumerProviderProxy`, which returns typed consumer decorators.
-- `Yiisoft\Queue\Worker\WorkerInterface` is wrapped with `Yiisoft\Queue\Debug\QueueWorkerInterfaceProxy` to record message processing events.
-
-To see data in the debug panel, obtain the typed provider dependencies and `WorkerInterface` from the DI container — the proxies are registered there and will not be active if the services are instantiated directly.
+All of these are optional. Services instantiated directly are instrumented only when the corresponding middleware or provider wrapper is explicitly supplied.
 
 ## Manual configuration
 
-If you do not rely on the defaults supplied via [yiisoft/config](https://github.com/yiisoft/config), configure the collector and proxies explicitly:
+When using [yiisoft/config](https://github.com/yiisoft/config), configure `middlewares-push` and `middlewares-worker` as needed. Register the status provider wrapper only if status instrumentation is wanted:
 
 ```php
+use Yiisoft\Queue\Debug\Middleware\PushDebugMiddleware;
+use Yiisoft\Queue\Debug\Middleware\WorkerDebugMiddleware;
 use Yiisoft\Queue\Debug\QueueCollector;
-use Yiisoft\Queue\Debug\QueueConsumerProviderProxy;
-use Yiisoft\Queue\Debug\QueueProducerProviderProxy;
-use Yiisoft\Queue\Debug\QueueWorkerInterfaceProxy;
-use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
-use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
-use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Debug\QueueProducerStatusProviderProxy;
+use Yiisoft\Queue\Provider\QueueProducerStatusProviderInterface;
 
 return [
+    'yiisoft/queue' => [
+        'middlewares-push' => [PushDebugMiddleware::class],
+        'middlewares-worker' => [WorkerDebugMiddleware::class],
+    ],
     'yiisoft/yii-debug' => [
-        'collectors' => [
-            QueueCollector::class,
-        ],
+        'collectors' => [QueueCollector::class],
         'trackedServices' => [
-            QueueProducerProviderInterface::class => [QueueProducerProviderProxy::class, QueueCollector::class],
-            QueueConsumerProviderInterface::class => [QueueConsumerProviderProxy::class, QueueCollector::class],
-            WorkerInterface::class => [QueueWorkerInterfaceProxy::class, QueueCollector::class],
+            QueueProducerStatusProviderInterface::class => [
+                QueueProducerStatusProviderProxy::class,
+                QueueCollector::class,
+            ],
         ],
     ],
 ];

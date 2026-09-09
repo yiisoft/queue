@@ -1,11 +1,9 @@
 # Yii Debug integration
 
-This package provides an integration with [yiisoft/yii-debug](https://github.com/yiisoft/yii-debug).
+This package provides optional integration with [yiisoft/yii-debug](https://github.com/yiisoft/yii-debug).
 
-When Yii Debug is enabled, the queue collector adds a panel that shows pushed messages, message status checks, and worker activity.
+When enabled, optional native push and worker middleware add queue events to the queue collector. Push events contain the normalized queue key and the message from the final push handler's returned `PushRequest`; this is not necessarily a message returned by an adapter (for example, synchronous pushing can process and replace the message). Worker events are recorded before handler resolution. A push event is recorded only when the downstream push handler returns; an exception prevents that event, and middleware that short-circuits before the debug middleware is reached bypasses it. Status instrumentation is separate and wraps only the `QueueProducerStatusProviderInterface` capability.
 
-If you use [yiisoft/config](https://github.com/yiisoft/config) together with this package, the debug collector is registered automatically. For manual configuration snippets and proxy wiring details, see [Advanced Yii Debug integration](debug-integration-advanced.md).
+The instrumentation is optional: applications can enable or omit each middleware and the status provider wrapper independently. There are no producer, consumer, or worker debug proxy/decorator services.
 
-## See also
-
-- [Advanced Yii Debug integration](debug-integration-advanced.md) — collector internals, proxies, and manual wiring
+For manual wiring and tracked events, see [Advanced Yii Debug integration](debug-integration-advanced.md).

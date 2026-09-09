@@ -9,8 +9,9 @@ use Psr\Container\ContainerInterface;
 use Throwable;
 use Yiisoft\Definitions\Exception\InvalidConfigException;
 use Yiisoft\Factory\StrictFactory;
-use Yiisoft\Queue\QueueConsumerInterface;
-use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\AsyncQueueProducer;
+use Yiisoft\Queue\QueueConsumer;
+use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\StringNormalizer;
 
 use function array_key_exists;
@@ -26,7 +27,7 @@ final class QueueFactoryProvider implements QueueProducerProviderInterface, Queu
 {
     /** @var array<string, array<string, mixed>> */
     private array $definitions;
-    /** @var array<string, array<string, QueueProducerInterface|QueueConsumerInterface|Throwable>> */
+    /** @var array<string, array<string, AsyncQueueProducer|SyncQueueProducer|QueueConsumer|Throwable>> */
     private array $resolved = [];
     /** @var list<string> */
     private array $producerQueueNames = [];
@@ -52,10 +53,10 @@ final class QueueFactoryProvider implements QueueProducerProviderInterface, Queu
         }
     }
 
-    public function getProducer(string|BackedEnum $queueName): QueueProducerInterface
+    public function getProducer(string|BackedEnum $queueName): AsyncQueueProducer|SyncQueueProducer
     {
-        $producer = $this->get($queueName, 'producer', QueueProducerInterface::class);
-        assert($producer instanceof QueueProducerInterface);
+        $producer = $this->get($queueName, 'producer');
+        assert($producer instanceof AsyncQueueProducer || $producer instanceof SyncQueueProducer);
         return $producer;
     }
 
@@ -69,10 +70,10 @@ final class QueueFactoryProvider implements QueueProducerProviderInterface, Queu
         return $this->producerQueueNames;
     }
 
-    public function getConsumer(string|BackedEnum $queueName): QueueConsumerInterface
+    public function getConsumer(string|BackedEnum $queueName): QueueConsumer
     {
-        $consumer = $this->get($queueName, 'consumer', QueueConsumerInterface::class);
-        assert($consumer instanceof QueueConsumerInterface);
+        $consumer = $this->get($queueName, 'consumer');
+        assert($consumer instanceof QueueConsumer);
         return $consumer;
     }
 
@@ -86,8 +87,7 @@ final class QueueFactoryProvider implements QueueProducerProviderInterface, Queu
         return $this->consumerQueueNames;
     }
 
-    /** @template T of QueueProducerInterface|QueueConsumerInterface @param class-string<T> $expected @return T */
-    private function get(string|BackedEnum $queueName, string $role, string $expected): QueueProducerInterface|QueueConsumerInterface
+    private function get(string|BackedEnum $queueName, string $role): AsyncQueueProducer|SyncQueueProducer|QueueConsumer
     {
         $queueName = StringNormalizer::normalize($queueName);
         if (!array_key_exists($queueName, $this->definitions)) {
@@ -107,18 +107,18 @@ final class QueueFactoryProvider implements QueueProducerProviderInterface, Queu
             $key = $queueName . ':' . $role;
             $factory = new StrictFactory([$key => $this->definitions[$queueName][$role]], $this->container, $this->validate);
             $result = $factory->create($key);
-            if (!$result instanceof $expected) {
+            if ($role === 'producer' ? (!$result instanceof AsyncQueueProducer && !$result instanceof SyncQueueProducer) : !$result instanceof QueueConsumer) {
                 throw new InvalidQueueConfigException(sprintf(
                     'Queue "%s" role "%s" must implement "%s"; got "%s" (configuration path queues.%s.%s).',
                     $queueName,
                     $role,
-                    $expected,
+                    $role === 'producer' ? AsyncQueueProducer::class . ' or ' . SyncQueueProducer::class : QueueConsumer::class,
                     get_debug_type($result),
                     $queueName,
                     $role,
                 ));
             }
-            assert($result instanceof QueueProducerInterface || $result instanceof QueueConsumerInterface);
+            assert($result instanceof AsyncQueueProducer || $result instanceof SyncQueueProducer || $result instanceof QueueConsumer);
             $this->resolved[$queueName][$role] = $result;
             return $result;
         } catch (InvalidQueueConfigException $exception) {

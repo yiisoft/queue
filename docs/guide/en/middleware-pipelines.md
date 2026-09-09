@@ -4,7 +4,7 @@ Yii Queue uses middlewares to run custom logic around message pushing and messag
 
 A middleware is a piece of code that receives a request object and can either:
 
-- change the request (for example, change the message, adapter, or error handling behavior) and continue the pipeline, or
+- return a modified request (for example, one with a changed message or error-handling data) and continue the pipeline, or
 - stop the pipeline by returning without calling the next handler.
 
 The pipeline mechanism is similar to HTTP middleware, but applied to queue messages.
@@ -21,15 +21,16 @@ Common reasons to add middlewares:
   You can log message ids, queue names, attempts, and failures in a consistent way.
 - **Modify the message payload**
   You can obfuscate sensitive data, normalize payload, add extra fields required by consumers, or wrap a message into envelopes.
-- **Route and schedule**
-  You can switch queue, choose a different adapter, or add delay when the adapter supports it.
+- **Schedule**
+  You can add delay when the adapter supports it.
 
 ## Pipelines overview
 
-Each message may pass through three independent pipelines:
+A message may pass through four independent pipelines:
 
-- **Push pipeline** (executed when calling `QueueProducerInterface::push()`).
-- **Consume pipeline** (executed when a worker processes a message).
+- **Push pipeline** (executed when a producer pushes a message).
+- **Worker pipeline** (executed by `Worker` before handler resolution).
+- **Consume pipeline** (executed while the worker invokes the resolved handler).
 - **Failure handling pipeline** (executed when message processing throws a `Throwable`).
 
 The execution order inside a pipeline is forward in the same order you configured middlewares.
@@ -41,9 +42,9 @@ graph LR
     PushMiddleware1[$middleware1] -.-> EndPush((End))
 
 
-    StartConsume((Start)) --> ConsumeMiddleware1[$middleware1] --> ConsumeMiddleware2[$middleware2] --> Consume(Consume / handle)
-    -.-> ConsumeMiddleware2[$middleware2] -.-> ConsumeMiddleware1[$middleware1]
-    ConsumeMiddleware1[$middleware1] -.-> EndConsume((End))
+    StartWorker((Start)) --> WorkerMiddleware1[$workerMiddleware1] --> WorkerMiddleware2[$workerMiddleware2] --> Consume(Resolve handler / consume)
+    -.-> WorkerMiddleware2[$workerMiddleware2] -.-> WorkerMiddleware1[$workerMiddleware1]
+    WorkerMiddleware1[$workerMiddleware1] -.-> EndWorker((End))
 
 
     Consume -- Throwable --> StartFailure((Start failure))
@@ -67,50 +68,39 @@ You can use any of these formats:
 The required interface depends on the pipeline:
 
 - Push: `Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface`
+- Worker: `Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareInterface`
 - Consume: `Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareInterface`
 - Failure handling: `Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface`
 
 ## Push pipeline
 
-The push pipeline is executed when calling `QueueProducerInterface::push()`.
+The push pipeline is a request-in/request-out pipeline. It receives a `PushRequest` and returns a `PushRequest`; requests are immutable. The request normalizes the logical queue identity once, so `getQueueName()` always returns the same normalized queue key throughout the pipeline.
 
-Push middlewares can:
-
-- Modify the message (wrap it into envelopes, add metadata, obfuscate data, etc.).
-- Modify the adapter (add delay, route to a different backend, etc.).
-
-In particular, push middlewares may define or replace the adapter that will be used to push the message. This can be useful when:
-
-- You choose a backend dynamically (for example, based on message type or payload).
-- You route messages to different queues/backends (for example, `critical` vs `low`).
-- You apply scheduling/delay logic in a middleware.
-
-The adapter is set by returning a modified request:
-
-```php
-return $pushRequest->withAdapter($adapter);
-```
-
-### Adapter must be configured by the end of the pipeline
-
-The push pipeline ends with a final handler that actually pushes the message using the adapter.
-
-If the adapter is not configured by the time the pipeline reaches the final handler,
-`Yiisoft\Queue\Exception\AdapterNotConfiguredException` is thrown.
+Push middlewares can modify the message, for example by wrapping it in envelopes or adding metadata. The normalized queue identity in `PushRequest` is immutable: push middleware cannot switch queues or adapters. The adapter final handler performs the push and returns the adapter-returned message in the resulting request.
 
 ### Custom push middleware
 
 Implement `PushMiddlewareInterface` and return a modified `PushRequest` from `processPush()`:
 
 ```php
-return $pushRequest
-    ->withMessage($newMessage)
-    ->withAdapter($newAdapter);
+public function processPush(PushRequest $request, PushHandlerInterface $handler): PushRequest
+{
+    $result = $handler->handlePush($request);
+    return $result->withMessage($this->normalize($result->getMessage()));
+}
 ```
+
+`PushRequest` has no mutable adapter or queue field. Adapter and queue selection belong to producer configuration; the final handler preserves the message returned by that adapter.
+
+## Worker pipeline
+
+The worker pipeline is a separate request-in/request-out pipeline. `Worker` runs it before resolving the message handler. The resolved handler is then processed by the consume pipeline; if processing throws, the failure handling pipeline runs. Worker-level instrumentation and processing event semantics belong here. Configure it with `middlewares-worker`.
+
+Implement `WorkerMiddlewareInterface` and return a `WorkerRequest` from `processWorker()`.
 
 ## Consume pipeline
 
-The consume pipeline is executed by the worker while processing a message.
+The consume pipeline is a request-in/request-out pipeline executed by `Worker` while processing a message, after the worker pipeline and handler resolution.
 
 Consume middlewares are often used to modify the message and/or collect runtime information:
 
@@ -128,7 +118,10 @@ The pipeline receives a `FailureHandlingRequest` that contains:
 
 - the message
 - the caught exception
-- the queue instance
+- the normalized queue name
+- an optional typed retry `Closure(MessageInterface): MessageInterface`
+
+It does not contain a queue instance.
 
 The pipeline is selected by queue name; if there is no queue-specific pipeline configured,
 `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` is used.
@@ -142,6 +135,7 @@ See [Error handling on message processing](error-handling.md) for the step-by-st
 When using [yiisoft/config](https://github.com/yiisoft/config), pipelines are configured in params under `yiisoft/queue`:
 
 - `middlewares-push`
+- `middlewares-worker`
 - `middlewares-consume`
 - `middlewares-fail`
 

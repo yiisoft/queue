@@ -6,7 +6,6 @@ namespace Yiisoft\Queue\Middleware\Push;
 
 use Psr\Container\ContainerInterface;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
 
@@ -27,15 +26,14 @@ final class PushMiddlewareFactory extends MiddlewareFactory implements PushMiddl
      *
      * - A middleware object.
      * - A name of a middleware class. The middleware instance will be obtained from container and executed.
-     * - A callable with `function(MessageInterface $message, PushHandlerInterface $handler):
-     *     MessageInterface` signature.
+     * - A callable with `function(PushRequest $request, PushHandlerInterface $handler): PushRequest` signature.
      * - A controller handler action in format `[TestController::class, 'index']`. `TestController` instance will
      *   be created and `index()` method will be executed.
      * - A function returning a middleware. The middleware returned will be executed.
      *
      * For handler action and callable
      * typed parameters are automatically injected using dependency injection container.
-     * Current message and handler could be obtained by type-hinting for {@see MessageInterface}
+     * Current request and handler could be obtained by type-hinting for {@see PushRequest}
      * and {@see PushHandlerInterface}.
      *
      * @throws InvalidMiddlewareDefinitionException
@@ -78,15 +76,15 @@ final class PushMiddlewareFactory extends MiddlewareFactory implements PushMiddl
                 $this->callback = $callback;
             }
 
-            public function processPush(MessageInterface $message, PushHandlerInterface $handler): MessageInterface
+            public function processPush(PushRequest $request, PushHandlerInterface $handler): PushRequest
             {
-                $response = (new Injector($this->container))->invoke($this->callback, [$message, $handler]);
-                if ($response instanceof MessageInterface) {
+                $response = (new Injector($this->container))->invoke($this->callback, [$request, $handler]);
+                if ($response instanceof PushRequest) {
                     return $response;
                 }
 
                 if ($response instanceof PushMiddlewareInterface) {
-                    return $response->processPush($message, $handler);
+                    return $response->processPush($request, $handler);
                 }
 
                 throw new InvalidMiddlewareDefinitionException($this->callback);

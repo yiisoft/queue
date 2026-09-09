@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Middleware\Push;
 
 use Closure;
-use Yiisoft\Queue\Message\MessageInterface;
 
 /**
  * @internal Used internally by {@see SyncQueueProducer} and {@see AsyncQueueProducer}.
@@ -33,13 +32,13 @@ final class PushMiddlewareDispatcher
     /**
      * Dispatch message through middleware to get response.
      *
-     * @param MessageInterface $message Message to pass to middleware.
+     * @param PushRequest $request Request to pass to middleware.
      */
-    public function dispatch(MessageInterface $message): MessageInterface
+    public function dispatch(PushRequest $request): PushRequest
     {
         $this->stack ??= new PushMiddlewareStack($this->buildMiddlewares(), $this->finishHandler);
 
-        return $this->stack->handlePush($message);
+        return $this->stack->handlePush($request);
     }
 
     public function withFinishHandler(PushHandlerInterface $finishHandler): self

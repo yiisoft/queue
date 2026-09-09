@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
 
 use Exception;
+use Closure;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
@@ -16,7 +17,6 @@ use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMidd
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
-use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Tests\TestCase;
 
 final class SendAgainMiddlewareTest extends TestCase
@@ -151,9 +151,9 @@ final class SendAgainMiddlewareTest extends TestCase
         }
 
         $handler = $this->getHandler($metaResult, $suites);
-        $queue = $this->getPreparedQueue($metaResult, $suites);
+        $retry = $this->getRetry($metaResult, $suites);
 
-        $strategy = $this->getStrategy($strategyName, $queue);
+        $strategy = $this->getStrategy($strategyName, $retry);
         $request = new FailureHandlingRequest(
             (new GenericMessage(
                 'test',
@@ -161,24 +161,27 @@ final class SendAgainMiddlewareTest extends TestCase
             ))->withMeta([FailureEnvelope::META_FAILURE => $metaInitial]),
             new Exception('testException'),
             'test-queue',
-            $queue,
+            $retry,
         );
         $result = $strategy->processFailure($request, $handler);
 
         self::assertInstanceOf(FailureHandlingRequest::class, $result);
     }
 
-    private function getStrategy(string $strategyName, QueueProducerInterface $queue): FailureMiddlewareInterface
+    /**
+     * @param Closure(MessageInterface): MessageInterface $retry
+     */
+    private function getStrategy(string $strategyName, Closure $retry): FailureMiddlewareInterface
     {
         return match ($strategyName) {
-            SendAgainMiddleware::class => new SendAgainMiddleware('', 2, $queue),
+            SendAgainMiddleware::class => new SendAgainMiddleware('', 2, $retry),
             ExponentialDelayMiddleware::class => new ExponentialDelayMiddleware(
                 'test',
                 2,
                 self::EXPONENTIAL_STRATEGY_DELAY_INITIAL,
                 self::EXPONENTIAL_STRATEGY_DELAY_MAXIMUM,
                 self::EXPONENTIAL_STRATEGY_EXPONENT,
-                $queue,
+                $retry,
             ),
             default => throw new RuntimeException('Unknown strategy'),
         };
@@ -201,19 +204,16 @@ final class SendAgainMiddlewareTest extends TestCase
         return $handler;
     }
 
-    private function getPreparedQueue(array $metaResult, bool $suites): QueueProducerInterface
+    /**
+     * @return Closure(MessageInterface): MessageInterface
+     */
+    private function getRetry(array $metaResult, bool $suites): Closure
     {
-        $queueAssertion = static function (MessageInterface $message) use ($metaResult): MessageInterface {
-            Assert::assertEquals($metaResult, $message->getMeta()[FailureEnvelope::META_FAILURE] ?? []);
-
+        return function (MessageInterface $message) use ($metaResult, $suites): MessageInterface {
+            if ($suites) {
+                Assert::assertEquals($metaResult, $message->getMeta()[FailureEnvelope::META_FAILURE] ?? []);
+            }
             return $message;
         };
-
-        $queue = $this->createMock(QueueProducerInterface::class);
-        $queue->expects($suites ? self::once() : self::never())
-            ->method('push')
-            ->willReturnCallback($queueAssertion);
-
-        return $queue;
     }
 }

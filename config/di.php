@@ -21,17 +21,35 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactoryInterface;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareFactoryInterface;
+use Yiisoft\Queue\Provider\QueueProducerStatusProvider;
+use Yiisoft\Queue\Provider\QueueProducerStatusProviderInterface;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
-use Yiisoft\Queue\Worker\Worker as QueueWorker;
-use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Debug\Middleware\PushDebugMiddleware;
+use Yiisoft\Queue\Debug\Middleware\WorkerDebugMiddleware;
+use Yiisoft\Queue\Worker\Worker;
+use Yiisoft\Yii\Debug\Collector\SummaryCollectorInterface;
 
 /* @var array $params */
 
-return [
+$debugEnabled = (bool) ($params['yiisoft/yii-debug']['enabled'] ?? false)
+    && interface_exists(SummaryCollectorInterface::class);
+
+$pushMiddlewareDefinitions = $params['yiisoft/queue']['middlewares-push'];
+$workerMiddlewareDefinitions = $params['yiisoft/queue']['middlewares-worker'] ?? [];
+if ($debugEnabled) {
+    array_unshift($pushMiddlewareDefinitions, PushDebugMiddleware::class);
+    array_unshift($workerMiddlewareDefinitions, WorkerDebugMiddleware::class);
+}
+
+$definitions = [
     HandlerResolver::class => [
         '__construct()' => [$params['yiisoft/queue']['handlers']],
     ],
-    WorkerInterface::class => QueueWorker::class,
+    Worker::class => Worker::class,
+    QueueProducerStatusProviderInterface::class => QueueProducerStatusProvider::class,
     LoopInterface::class => static function (ContainerInterface $container): LoopInterface {
         return \extension_loaded('pcntl')
             ? $container->get(SignalLoop::class)
@@ -41,7 +59,11 @@ return [
     ConsumeMiddlewareFactoryInterface::class => ConsumeMiddlewareFactory::class,
     FailureMiddlewareFactoryInterface::class => FailureMiddlewareFactory::class,
     PushMiddlewareConfig::class => [
-        '__construct()' => ['commonMiddlewareDefinitions' => $params['yiisoft/queue']['middlewares-push']],
+        '__construct()' => ['commonMiddlewareDefinitions' => $pushMiddlewareDefinitions],
+    ],
+    WorkerMiddlewareFactoryInterface::class => WorkerMiddlewareFactory::class,
+    WorkerMiddlewareDispatcher::class => [
+        '__construct()' => ['middlewareDefinitions' => $workerMiddlewareDefinitions],
     ],
     ConsumeMiddlewareDispatcher::class => [
         '__construct()' => ['middlewareDefinitions' => $params['yiisoft/queue']['middlewares-consume']],
@@ -58,3 +80,5 @@ return [
         ],
     ],
 ];
+
+return $definitions;

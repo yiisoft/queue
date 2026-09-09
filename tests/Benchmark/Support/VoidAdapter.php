@@ -17,7 +17,7 @@ final class VoidAdapter implements AdapterInterface
     /**
      * @var string A serialized message
      */
-    public string $message;
+    public string $message = '';
 
     public function __construct(private readonly MessageSerializer $serializer) {}
 

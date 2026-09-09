@@ -97,15 +97,15 @@ $provider = new PredefinedQueueProvider([
 
 ## Running the queue
 
-Message consumption methods are available on `Yiisoft\Queue\QueueConsumerInterface`.
+Message consumption methods are available on `Yiisoft\Queue\QueueConsumer`.
 The producer and `QueueConsumer` are separate capabilities. Obtain or construct the consumer role before calling these methods.
 
 ### Processing existing messages
 
 ```php
-use Yiisoft\Queue\QueueConsumerInterface;
+use Yiisoft\Queue\QueueConsumer;
 
-/** @var QueueConsumerInterface $queue */
+/** @var QueueConsumer $queue */
 $queue->run();      // Process all messages
 $queue->run(10);    // Process up to 10 messages
 ```
@@ -113,9 +113,9 @@ $queue->run(10);    // Process up to 10 messages
 ### Listening for new messages
 
 ```php
-use Yiisoft\Queue\QueueConsumerInterface;
+use Yiisoft\Queue\QueueConsumer;
 
-/** @var QueueConsumerInterface $queue */
+/** @var QueueConsumer $queue */
 $queue->listen();   // Run indefinitely
 ```
 

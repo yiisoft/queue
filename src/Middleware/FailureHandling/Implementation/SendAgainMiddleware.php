@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Middleware\FailureHandling\Implementation;
 
+use Closure;
 use InvalidArgumentException;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
@@ -12,7 +13,6 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
 use Yiisoft\Queue\Provider\InvalidQueueConfigException;
 use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
-use Yiisoft\Queue\QueueProducerInterface;
 use Throwable;
 
 use function sprintf;
@@ -22,10 +22,13 @@ final class SendAgainMiddleware implements FailureMiddlewareInterface
 {
     public const META_KEY_RESEND = 'failure-strategy-resend-attempts';
 
+    /**
+     * @param Closure(MessageInterface): MessageInterface $targetQueue
+     */
     public function __construct(
         private readonly string $id,
         private readonly int $maxAttempts,
-        private readonly ?QueueProducerInterface $targetQueue = null,
+        private readonly ?Closure $targetQueue = null,
         private readonly ?QueueProducerProviderInterface $producerProvider = null,
     ) {
         if ($maxAttempts < 1) {
@@ -40,18 +43,19 @@ final class SendAgainMiddleware implements FailureMiddlewareInterface
             return $handler->handleFailure($request);
         }
         $envelope = new FailureEnvelope($message, [$this->getMetaKey() => $this->getAttempts($message) + 1]);
-        $producer = $this->targetQueue ?? $request->getRetryProducer() ?? $this->sourceProducer($request);
-        $envelope = $producer->push($envelope);
-        return $request->withMessage($envelope);
+        $retry = $this->targetQueue ?? $request->getRetry() ?? $this->sourceProducer($request);
+        return $request->withMessage($retry($envelope));
     }
 
-    private function sourceProducer(FailureHandlingRequest $request): QueueProducerInterface
+    /** @return Closure(MessageInterface): MessageInterface */
+    private function sourceProducer(FailureHandlingRequest $request): Closure
     {
         if ($this->producerProvider === null) {
             throw new InvalidQueueConfigException(sprintf('Cannot retry queue "%s": configure a producer target or QueueProducerProviderInterface.', $request->getQueueName()));
         }
         try {
-            return $this->producerProvider->getProducer($request->getQueueName());
+            $producer = $this->producerProvider->getProducer($request->getQueueName());
+            return static fn(MessageInterface $message): MessageInterface => $producer->push($message);
         } catch (Throwable $exception) {
             throw new InvalidQueueConfigException(sprintf('Cannot retry queue "%s": no producer capability is available.', $request->getQueueName()), previous: $exception);
         }
