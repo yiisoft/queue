@@ -14,6 +14,7 @@ use Yiisoft\Queue\Exception\MessageFailureException;
 use Yiisoft\Queue\Message\Handler\HandlerNotFoundException;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Message\GenericMessage;
+use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
@@ -52,6 +53,18 @@ final class WorkerTest extends TestCase
         $messages = $logger->getMessages();
         $this->assertNotEmpty($messages);
         $this->assertStringContainsString('Processing message without ID.', $messages[0]['message']);
+    }
+
+    public function testMessageWithIdLogsId(): void
+    {
+        $message = new IdEnvelope(new GenericMessage('simple', null), 42);
+        $logger = new SimpleLogger();
+        $handlerResolver = $this->createHandlerResolver($message, static function (): void {});
+
+        $worker = $this->createWorkerByParams($handlerResolver, $logger);
+        $worker->process($message, 'test-queue');
+
+        self::assertStringContainsString('Processing message #42.', $logger->getMessages()[0]['message']);
     }
 
     public function testMessageFailWithDefinitionHandlerException(): void

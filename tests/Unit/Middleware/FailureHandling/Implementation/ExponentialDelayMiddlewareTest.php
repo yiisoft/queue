@@ -7,6 +7,15 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
 use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Psr\Log\NullLogger;
+use RuntimeException;
+use Yiisoft\Queue\AsyncQueueProducer;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
+use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
+use Yiisoft\Queue\Provider\InvalidQueueConfigException;
+use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
+use Yiisoft\Queue\Stubs\InMemoryAdapter;
+use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
@@ -179,5 +188,83 @@ final class ExponentialDelayMiddlewareTest extends TestCase
         $nextHandler->expects(self::once())->method('handleFailure')->willThrowException($exception);
         $request = new FailureHandlingRequest($message, $exception, 'test-queue', $retry);
         $middleware->processFailure($request, $nextHandler);
+    }
+
+    public function testMissingProducerCapability(): void
+    {
+        $middleware = new ExponentialDelayMiddleware('test', 1, 1, 1, 1);
+        $request = new FailureHandlingRequest(
+            new GenericMessage('test', null),
+            new Exception('test'),
+            'test-queue',
+        );
+
+        $this->expectException(InvalidQueueConfigException::class);
+        $this->expectExceptionMessage('configure a producer target or QueueProducerProviderInterface');
+        $middleware->processFailure($request, $this->createMock(FailureHandlerInterface::class));
+    }
+
+    public function testProducerProviderIsUsedForRetry(): void
+    {
+        $producer = $this->getProducer();
+        $provider = $this->createMock(QueueProducerProviderInterface::class);
+        $provider->expects(self::once())->method('getProducer')->with('test-queue')->willReturn($producer);
+        $middleware = new ExponentialDelayMiddleware(
+            'test',
+            1,
+            1,
+            1,
+            1,
+            producerProvider: $provider,
+        );
+        $request = new FailureHandlingRequest(
+            new GenericMessage('test', null),
+            new Exception('test'),
+            'test-queue',
+        );
+
+        $result = $middleware->processFailure($request, $this->createMock(FailureHandlerInterface::class));
+
+        self::assertNotSame($request->getMessage(), $result->getMessage());
+    }
+
+    public function testUnavailableProducerProviderIsReported(): void
+    {
+        $provider = $this->createMock(QueueProducerProviderInterface::class);
+        $provider->expects(self::once())
+            ->method('getProducer')
+            ->with('test-queue')
+            ->willThrowException(new RuntimeException('missing producer'));
+        $middleware = new ExponentialDelayMiddleware(
+            'test',
+            1,
+            1,
+            1,
+            1,
+            producerProvider: $provider,
+        );
+        $request = new FailureHandlingRequest(
+            new GenericMessage('test', null),
+            new Exception('test'),
+            'test-queue',
+        );
+
+        try {
+            $middleware->processFailure($request, $this->createMock(FailureHandlerInterface::class));
+            self::fail('Expected an invalid queue configuration exception.');
+        } catch (InvalidQueueConfigException $exception) {
+            self::assertStringContainsString('no producer capability is available', $exception->getMessage());
+            self::assertInstanceOf(RuntimeException::class, $exception->getPrevious());
+        }
+    }
+
+    private function getProducer(): AsyncQueueProducer
+    {
+        return new AsyncQueueProducer(
+            new NullLogger(),
+            new PushMiddlewareConfig(new PushMiddlewareFactory(new SimpleContainer())),
+            new InMemoryAdapter(),
+            'test-queue',
+        );
     }
 }

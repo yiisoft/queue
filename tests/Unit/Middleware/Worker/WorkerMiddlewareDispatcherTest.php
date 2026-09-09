@@ -43,6 +43,35 @@ final class WorkerMiddlewareDispatcherTest extends TestCase
         self::assertSame('done', $result->getMessage()->getType());
     }
 
+    public function testWithMiddlewaresClonesAndRebuildsStack(): void
+    {
+        $factory = new WorkerMiddlewareFactory(new SimpleContainer());
+        $dispatcher = new WorkerMiddlewareDispatcher($factory, [
+            static fn(WorkerRequest $request, WorkerHandlerInterface $handler): WorkerRequest => $request->withMessage(
+                new GenericMessage('original', null),
+            ),
+        ]);
+        $finish = new class implements WorkerHandlerInterface {
+            public function handleWorker(WorkerRequest $request): WorkerRequest
+            {
+                return $request;
+            }
+        };
+        $request = new WorkerRequest(new GenericMessage('start', null), 'queue');
+
+        self::assertSame('original', $dispatcher->dispatch($request, $finish)->getMessage()->getType());
+
+        $replacement = $dispatcher->withMiddlewares([
+            static fn(WorkerRequest $request, WorkerHandlerInterface $handler): WorkerRequest => $request->withMessage(
+                new GenericMessage('replacement', null),
+            ),
+        ]);
+
+        self::assertNotSame($dispatcher, $replacement);
+        self::assertSame('original', $dispatcher->dispatch($request, $finish)->getMessage()->getType());
+        self::assertSame('replacement', $replacement->dispatch($request, $finish)->getMessage()->getType());
+    }
+
     public function testRequestNormalizesQueueAndHasNoQueueMutator(): void
     {
         $request = new WorkerRequest(new GenericMessage('test', null), '7');
