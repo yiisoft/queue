@@ -8,6 +8,8 @@ use Yiisoft\Queue\Debug\QueueCollector;
 use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareInterface;
 use Yiisoft\Queue\Middleware\Push\PushRequest;
+use Yiisoft\Queue\AsyncQueueProducer;
+use Yiisoft\Queue\SyncQueueProducer;
 
 use function in_array;
 use function is_string;
@@ -63,8 +65,8 @@ final class PushDebugMiddleware implements PushMiddlewareInterface
         $class = $frame['class'] ?? '';
         if (
             str_starts_with($class, 'Yiisoft\\Queue\\Middleware\\')
-            || $class === 'Yiisoft\\Queue\\AsyncQueueProducer'
-            || $class === 'Yiisoft\\Queue\\SyncQueueProducer'
+            || $class === AsyncQueueProducer::class
+            || $class === SyncQueueProducer::class
         ) {
             return true;
         }
