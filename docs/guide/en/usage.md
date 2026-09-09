@@ -81,6 +81,8 @@ yii queue:listen-all [queueName1 [queueName2 [...]]]
 
 ## Message status
 
+The example assumes `$queue` is the configured producer used above (typically an `AsyncQueueProducer`; a `SyncQueueProducer` keeps its default `NOT_FOUND` status behavior).
+
 ```php
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Message\IdEnvelope;
@@ -92,7 +94,7 @@ if ($id === null) {
     throw new \RuntimeException('The adapter did not provide a message ID, status tracking is unavailable.');
 }
 
-$status = $queue->status($id);
+$status = $queue->getStatus()->status($id);
 
 // Check whether the message is waiting to be handled.
 $status === MessageStatus::WAITING;
@@ -104,7 +106,7 @@ $status === MessageStatus::RESERVED;
 $status === MessageStatus::DONE;
 ```
 
-For details and edge cases, see [Message status](message-status.md).
+For named queues, obtain the status capability by queue key from the configured `QueueProducerStatusProviderInterface`; `getStatus($queueName)` throws `QueueNotFoundException` when that queue has no producer. For details and other edge cases, see [Message status](message-status.md).
 
 ## Limitations
 

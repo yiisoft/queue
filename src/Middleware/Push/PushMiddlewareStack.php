@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Middleware\Push;
 
 use Closure;
-use Yiisoft\Queue\Message\MessageInterface;
 
 /**
  * @internal
@@ -31,10 +30,10 @@ final class PushMiddlewareStack implements PushHandlerInterface
         private readonly PushHandlerInterface $finishHandler,
     ) {}
 
-    public function handlePush(MessageInterface $message): MessageInterface
+    public function handlePush(PushRequest $request): PushRequest
     {
         $this->stack ??= $this->build();
-        return $this->stack->handlePush($message);
+        return $this->stack->handlePush($request);
     }
 
     private function build(): PushHandlerInterface
@@ -66,11 +65,11 @@ final class PushMiddlewareStack implements PushHandlerInterface
                 private readonly PushHandlerInterface $handler,
             ) {}
 
-            public function handlePush(MessageInterface $message): MessageInterface
+            public function handlePush(PushRequest $request): PushRequest
             {
                 $this->middleware ??= ($this->middlewareFactory)();
 
-                return $this->middleware->processPush($message, $this->handler);
+                return $this->middleware->processPush($request, $this->handler);
             }
         };
     }

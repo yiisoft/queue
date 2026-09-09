@@ -404,7 +404,7 @@ Test with realistic message volumes and data:
 
 ```php
 // Load test script
-$queue = $container->get(QueueProducerInterface::class);
+$queue = $container->get(AsyncQueueProducer::class);
 
 $start = microtime(true);
 $count = 10000;

@@ -12,14 +12,16 @@ use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Push\PushRequest;
 
 /**
  * Produces messages for one logical queue, pushing them to an adapter-backed broker.
  */
-final class AsyncQueueProducer implements QueueProducerInterface
+final class AsyncQueueProducer
 {
     private string $queueName;
     private PushMiddlewareDispatcher $dispatcher;
+    private QueueProducerStatusInterface $status;
 
     /**
      * @param mixed[] $middlewareDefinitions Queue-specific push middleware definitions.
@@ -30,7 +32,9 @@ final class AsyncQueueProducer implements QueueProducerInterface
         private readonly AdapterInterface $adapter,
         string|BackedEnum $queueName = DefaultQueue::NAME,
         array $middlewareDefinitions = [],
+        ?QueueProducerStatusInterface $status = null,
     ) {
+        $this->status = $status ?? new AdapterQueueProducerStatus($adapter);
         $this->queueName = StringNormalizer::normalize($queueName);
         $this->dispatcher = new PushMiddlewareDispatcher(
             middlewareFactory: $middlewareConfig->middlewareFactory,
@@ -50,7 +54,9 @@ final class AsyncQueueProducer implements QueueProducerInterface
             'Preparing to push message with message type "{messageType}".',
             ['messageType' => $message->getType()],
         );
-        $message = $this->dispatcher->dispatch($message);
+        $message = $this->dispatcher->hasMiddlewares()
+            ? $this->dispatcher->dispatch(new PushRequest($message, $this->queueName))->getMessage()
+            : $this->adapter->push($message);
         $id = IdEnvelope::fromMessage($message)->getId();
         $this->logger->info(
             $id === null
@@ -61,8 +67,8 @@ final class AsyncQueueProducer implements QueueProducerInterface
         return $message;
     }
 
-    public function status(string|int $id): MessageStatus
+    public function getStatus(): QueueProducerStatusInterface
     {
-        return $this->adapter->status($id);
+        return $this->status;
     }
 }

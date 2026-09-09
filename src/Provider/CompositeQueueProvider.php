@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Provider;
 
 use BackedEnum;
-use Yiisoft\Queue\QueueConsumerInterface;
-use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\AsyncQueueProducer;
+use Yiisoft\Queue\QueueConsumer;
+use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\StringNormalizer;
 
 use function in_array;
@@ -29,7 +30,7 @@ final class CompositeQueueProvider implements QueueProducerProviderInterface, Qu
         }
     }
 
-    public function getProducer(string|BackedEnum $queueName): QueueProducerInterface
+    public function getProducer(string|BackedEnum $queueName): AsyncQueueProducer|SyncQueueProducer
     {
         foreach ($this->producerProviders as $provider) {
             if ($provider->hasProducer($queueName)) {
@@ -61,7 +62,7 @@ final class CompositeQueueProvider implements QueueProducerProviderInterface, Qu
         } return $result;
     }
 
-    public function getConsumer(string|BackedEnum $queueName): QueueConsumerInterface
+    public function getConsumer(string|BackedEnum $queueName): QueueConsumer
     {
         foreach ($this->consumerProviders as $provider) {
             if ($provider->hasConsumer($queueName)) {

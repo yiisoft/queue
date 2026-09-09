@@ -37,7 +37,7 @@ For production use, you should install an adapter package that matches your mess
 See the [adapter list](docs/guide/en/adapter-list.md) and follow the adapter-specific documentation for installation and configuration details.
 
 > If you don't have an external broker — whether for development, testing, or because you want to
-> design around `QueueProducerInterface` from day one and add a real broker later — you can run the queue
+> start with a concrete producer and add a real broker later — you can run the queue
 > in [synchronous mode](docs/guide/en/synchronous-mode.md) using `SyncQueueProducer` instead of `AsyncQueueProducer`.
 > In this mode messages are processed immediately in the same process, so it won't provide true
 > async execution, but the code stays the same when you switch to a real adapter.
@@ -138,11 +138,11 @@ For setting up all classes manually, see the [Manual configuration](docs/guide/e
 To send a message to the queue, get the queue instance and call `push()`. Typically the queue is injected as a dependency:
 
 ```php
-use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\AsyncQueueProducer;
 
 final readonly class Foo
 {
-    public function __construct(private QueueProducerInterface $queue) {}
+    public function __construct(private AsyncQueueProducer $queue) {}
 
     public function bar(): void
     {
@@ -166,9 +166,13 @@ By default, Yii Framework uses [yiisoft/yii-console](https://github.com/yiisoft/
 
 See [Console commands](docs/guide/en/console-commands.md) for more details.
 
-Producers use `Yiisoft\Queue\QueueProducerInterface` (`push()`, `status()`, `getQueueName()`); consumers use `Yiisoft\Queue\QueueConsumerInterface` (`run()`, `listen()`). See [capability configuration](docs/guide/en/queue-capabilities.md) for the strict role map used when named queues are configured.
+`AsyncQueueProducer` and `SyncQueueProducer` provide `push()`, `getStatus()`, and `getQueueName()`; `QueueConsumer` provides `run()` and `listen()`, while `Yiisoft\Queue\Worker\Worker` processes messages. For named queues, use the queue-keyed `QueueProducerStatusProvider` to obtain a producer's status capability. See [capability configuration](docs/guide/en/queue-capabilities.md) for the strict role map used when named queues are configured.
 
 > In case you're running the queue in synchronous mode (no adapter), `queue:listen` logs an info message and exits. The messages are processed immediately when pushed.
+
+#### Migration note
+
+`QueueProducerInterface`, `QueueConsumerInterface`, and `WorkerInterface` were removed. Custom implementations using these symbols are unsupported; use the concrete producer, consumer, and worker APIs instead.
 
 ## Documentation
 

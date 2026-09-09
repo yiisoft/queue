@@ -8,8 +8,8 @@ Most applications configure names through [`yiisoft/queue.queues`](queue-names.m
 
 Providers translate a queue name into the capability the caller needs:
 
-- `QueueProducerProviderInterface::getProducer($queueName)` returns a `QueueProducerInterface` for pushing messages and obtaining their status.
-- `QueueConsumerProviderInterface::getConsumer($queueName)` returns a `QueueConsumerInterface` for running or listening for messages.
+- `QueueProducerProviderInterface::getProducer($queueName)` returns a producer. Call its `getStatus()` capability for status operations.
+- `QueueConsumerProviderInterface::getConsumer($queueName)` returns a `QueueConsumer` for running or listening for messages.
 - `hasProducer()` / `hasConsumer()` check whether a name exposes a role. `getProducerQueueNames()` / `getConsumerQueueNames()` list names for only that role.
 
 Both lookup methods accept a string or `BackedEnum`. They throw `QueueNotFoundException` when the name is unknown or does not have the requested role. This separation prevents a producer-only queue from accidentally being used by a worker, and vice versa.
@@ -23,7 +23,7 @@ The built-in providers use a strict role map: `queues[name][producer|consumer]`.
 Choose the provider by how the roles are created:
 
 - Use `QueueFactoryProvider` when the values are [`yiisoft/factory`](https://github.com/yiisoft/factory) definitions. It creates and caches each role lazily, so resolving a producer does not construct the consumer for the same name.
-- Use `PredefinedQueueProvider` when the values are already-built `QueueProducerInterface` or `QueueConsumerInterface` instances. It does not accept factory definitions.
+- Use `PredefinedQueueProvider` when the values are already-built producer or `QueueConsumer` instances. It does not accept factory definitions.
 
 `QueueFactoryProvider` is appropriate for container configuration:
 

@@ -29,4 +29,14 @@ being consumed. In the new package, it is divided into two different concepts: a
 - A `Handler` is called by a `Worker` when a message is received. Default `Worker` finds a corresponding message handler
   by the message type. [See more](message-handler-advanced.md).
 
+## Queue API migration note
+
+The following API symbols were removed:
+
+- `QueueProducerInterface`
+- `QueueConsumerInterface`
+- `WorkerInterface`
+
+Custom implementations using these symbols are unsupported. Use the concrete producer, consumer, and worker APIs documented in this guide.
+
 [yiisoft/yii2-queue]: https://github.com/yiisoft/yii2-queue

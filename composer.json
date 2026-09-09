@@ -55,6 +55,7 @@
         "shipmonk/composer-dependency-analyser": "^1.8",
         "vimeo/psalm": "^5.26.1 || ^6.16.1",
         "yiisoft/code-style": "^1.0",
+        "yiisoft/di": "^1.4",
         "yiisoft/test-support": "^3.2.0",
         "yiisoft/yii-debug": "dev-master"
     },

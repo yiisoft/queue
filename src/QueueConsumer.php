@@ -9,15 +9,15 @@ use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Worker\Worker;
 
 /** Consumes messages for one logical queue. */
-final class QueueConsumer implements QueueConsumerInterface
+final class QueueConsumer
 {
     private string $queueName;
 
     public function __construct(
-        private readonly WorkerInterface $worker,
+        private readonly Worker $worker,
         private readonly LoopInterface $loop,
         private readonly LoggerInterface $logger,
         private readonly ?AdapterInterface $adapter = null,

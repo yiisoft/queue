@@ -21,11 +21,9 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\AsyncQueueProducer;
-use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\Worker\Worker;
-use Yiisoft\Queue\Worker\WorkerInterface;
 
 /**
  * Base Test Case.
@@ -33,9 +31,9 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 abstract class TestCase extends BaseTestCase
 {
     protected ?ContainerInterface $container = null;
-    protected ?QueueProducerInterface $queue = null;
+    protected AsyncQueueProducer|SyncQueueProducer|null $queue = null;
     protected ?LoopInterface $loop = null;
-    protected ?WorkerInterface $worker = null;
+    protected ?Worker $worker = null;
     protected array $eventHandlers = [];
     protected int $executionTimes;
 
@@ -52,9 +50,9 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * @return QueueProducerInterface The same object every time
+     * @return AsyncQueueProducer|SyncQueueProducer The same object every time
      */
-    protected function getQueue(): QueueProducerInterface
+    protected function getQueue(): AsyncQueueProducer|SyncQueueProducer
     {
         $this->queue ??= $this->createQueue();
 
@@ -68,7 +66,7 @@ abstract class TestCase extends BaseTestCase
         return $this->loop;
     }
 
-    protected function getWorker(): WorkerInterface
+    protected function getWorker(): Worker
     {
         $this->worker ??= $this->createWorker();
 
@@ -85,7 +83,7 @@ abstract class TestCase extends BaseTestCase
     protected function createQueue(
         ?AdapterInterface $adapter = null,
         string|BackedEnum $queueName = DefaultQueue::NAME,
-    ): QueueProducerInterface {
+    ): AsyncQueueProducer|SyncQueueProducer {
         return $adapter === null
             ? new SyncQueueProducer(
                 new NullLogger(),
@@ -106,7 +104,7 @@ abstract class TestCase extends BaseTestCase
         return new SimpleLoop();
     }
 
-    protected function createWorker(): WorkerInterface
+    protected function createWorker(): Worker
     {
         return new Worker(
             new NullLogger(),
@@ -139,6 +137,7 @@ abstract class TestCase extends BaseTestCase
         return $this->eventHandlers;
     }
 
+    /** @return array<string, callable> */
     protected function getMessageHandlers(): array
     {
         return [

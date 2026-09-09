@@ -6,14 +6,10 @@ use Yiisoft\Queue\Command\ListenAllCommand;
 use Yiisoft\Queue\Command\ListenCommand;
 use Yiisoft\Queue\Command\RunCommand;
 use Yiisoft\Queue\Debug\QueueCollector;
-use Yiisoft\Queue\Debug\QueueConsumerProviderProxy;
-use Yiisoft\Queue\Debug\QueueProducerProviderProxy;
-use Yiisoft\Queue\Debug\QueueWorkerInterfaceProxy;
+use Yiisoft\Queue\Debug\QueueProducerStatusProviderProxy;
 use Yiisoft\Queue\Message\Handler\HandlerInterface;
 use Yiisoft\Queue\Message\Serializer\MessageSerializer;
-use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
-use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
-use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Queue\Provider\QueueProducerStatusProviderInterface;
 
 return [
     'yiisoft/yii-console' => [
@@ -44,6 +40,7 @@ return [
          */
         'handlers' => [],
         'middlewares-push' => [],
+        'middlewares-worker' => [],
         'middlewares-consume' => [],
         'middlewares-fail' => [],
     ],
@@ -52,9 +49,7 @@ return [
             QueueCollector::class,
         ],
         'trackedServices' => [
-            QueueProducerProviderInterface::class => [QueueProducerProviderProxy::class, QueueCollector::class],
-            QueueConsumerProviderInterface::class => [QueueConsumerProviderProxy::class, QueueCollector::class],
-            WorkerInterface::class => [QueueWorkerInterfaceProxy::class, QueueCollector::class],
+            QueueProducerStatusProviderInterface::class => [QueueProducerStatusProviderProxy::class, QueueCollector::class],
         ],
     ],
 ];

@@ -4,18 +4,25 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Middleware\FailureHandling;
 
+use Closure;
 use Throwable;
+use BackedEnum;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\StringNormalizer;
 
 final class FailureHandlingRequest
 {
+    private readonly string $queueName;
+
+    /** @param Closure(MessageInterface): MessageInterface $retry */
     public function __construct(
-        private MessageInterface $message,
-        private Throwable $exception,
-        private string $queueName,
-        private ?QueueProducerInterface $retryProducer = null,
-    ) {}
+        private readonly MessageInterface $message,
+        private readonly Throwable $exception,
+        string|BackedEnum $queueName,
+        private readonly ?Closure $retry = null,
+    ) {
+        $this->queueName = StringNormalizer::normalize($queueName);
+    }
 
     public function getMessage(): MessageInterface
     {
@@ -27,36 +34,24 @@ final class FailureHandlingRequest
         return $this->exception;
     }
 
-    /** Logical name of the queue which executed the message. */
     public function getQueueName(): string
     {
         return $this->queueName;
     }
 
-    /** Direct retry target used by synchronous producer execution, if any. */
-    public function getRetryProducer(): ?QueueProducerInterface
+    /** @return Closure(MessageInterface): MessageInterface */
+    public function getRetry(): ?Closure
     {
-        return $this->retryProducer;
+        return $this->retry;
     }
 
     public function withMessage(MessageInterface $message): self
     {
-        $instance = clone $this;
-        $instance->message = $message;
-        return $instance;
+        return new self($message, $this->exception, $this->queueName, $this->retry);
     }
 
     public function withException(Throwable $exception): self
     {
-        $instance = clone $this;
-        $instance->exception = $exception;
-        return $instance;
-    }
-
-    public function withQueueName(string $queueName): self
-    {
-        $instance = clone $this;
-        $instance->queueName = $queueName;
-        return $instance;
+        return new self($this->message, $exception, $this->queueName, $this->retry);
     }
 }

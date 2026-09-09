@@ -6,8 +6,7 @@ namespace Yiisoft\Queue\Tests\Unit;
 
 use Psr\Log\NullLogger;
 use Yiisoft\Queue\QueueConsumer;
-use Yiisoft\Queue\QueueConsumerInterface;
-use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\MessageStatus;
@@ -26,8 +25,7 @@ final class QueueTest extends TestCase
     public function testProducerContract(): void
     {
         $queue = $this->createQueue();
-        self::assertInstanceOf(QueueProducerInterface::class, $queue);
-        self::assertFalse(method_exists(QueueProducerInterface::class, 'run'));
+        self::assertInstanceOf(SyncQueueProducer::class, $queue);
     }
 
     public function testPushAndStatus(): void
@@ -38,7 +36,7 @@ final class QueueTest extends TestCase
         self::assertSame(1, count($adapter->getMessagesList()));
         /** @var int|string $id */
         $id = $envelope->getMeta()[IdEnvelope::META_ID];
-        self::assertSame(MessageStatus::WAITING, $queue->status($id));
+        self::assertSame(MessageStatus::WAITING, $queue->getStatus()->status($id));
     }
 
     public function testSynchronousProducerProcessesMessage(): void
@@ -46,7 +44,7 @@ final class QueueTest extends TestCase
         $queue = $this->createQueue();
         $queue->push(new GenericMessage('simple', null));
         self::assertSame(1, $this->executionTimes);
-        self::assertSame(MessageStatus::NOT_FOUND, $queue->status('1'));
+        self::assertSame(MessageStatus::NOT_FOUND, $queue->getStatus()->status('1'));
     }
 
     public function testConsumerContractAndRun(): void
@@ -55,7 +53,7 @@ final class QueueTest extends TestCase
         $producer = $this->createQueue($adapter);
         $producer->push(new GenericMessage('simple', null));
         $consumer = new QueueConsumer($this->getWorker(), $this->getLoop(), new NullLogger(), $adapter);
-        self::assertInstanceOf(QueueConsumerInterface::class, $consumer);
+        self::assertInstanceOf(QueueConsumer::class, $consumer);
         self::assertSame(1, $consumer->run());
         self::assertSame(1, $this->executionTimes);
     }
