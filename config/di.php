@@ -37,12 +37,14 @@ use Yiisoft\Yii\Debug\Collector\SummaryCollectorInterface;
 $debugEnabled = (bool) ($params['yiisoft/yii-debug']['enabled'] ?? false)
     && interface_exists(SummaryCollectorInterface::class);
 
-$pushMiddlewareDefinitions = $params['yiisoft/queue']['middlewares-push'];
-$workerMiddlewareDefinitions = $params['yiisoft/queue']['middlewares-worker'] ?? [];
-if ($debugEnabled) {
-    array_unshift($pushMiddlewareDefinitions, PushDebugMiddleware::class);
-    array_unshift($workerMiddlewareDefinitions, WorkerDebugMiddleware::class);
-}
+$pushMiddlewareDefinitions = array_merge(
+    $debugEnabled ? [PushDebugMiddleware::class] : [],
+    $params['yiisoft/queue']['middlewares-push'],
+);
+$workerMiddlewareDefinitions = array_merge(
+    $debugEnabled ? [WorkerDebugMiddleware::class] : [],
+    $params['yiisoft/queue']['middlewares-worker'] ?? [],
+);
 
 $definitions = [
     HandlerResolver::class => [
