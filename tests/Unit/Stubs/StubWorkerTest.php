@@ -12,15 +12,9 @@ final class StubWorkerTest extends TestCase
 {
     public function testBase(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $worker = new StubWorker();
-
-        $sourceMessage = new GenericMessage('test', 42);
-
-        $message = $worker->process($sourceMessage, 'test-queue');
-
-        $this->assertSame($sourceMessage, $message);
-        $this->assertSame('test', $message->getType());
-        $this->assertSame(42, $message->getPayload());
-        $this->assertSame([], $message->getMeta());
+        $worker->process(new GenericMessage('test', 42), 'test-queue');
     }
 }

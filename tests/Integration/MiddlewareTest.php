@@ -95,17 +95,24 @@ final class MiddlewareTest extends TestCase
             [],
         );
 
+        $handledMessage = null;
         $worker = new Worker(
             new SimpleLogger(),
             $consumeMiddlewareDispatcher,
             $failureMiddlewareDispatcher,
-            new HandlerResolver(['test' => static fn() => true], $container),
+            new HandlerResolver(
+                ['test' => static function (MessageInterface $message) use (&$handledMessage): void {
+                    $handledMessage = $message;
+                }],
+                $container,
+            ),
         );
 
         $message = new GenericMessage('test', ['initial']);
-        $messageConsumed = $worker->process($message, 'test-queue');
+        $worker->process($message, 'test-queue');
 
-        self::assertEquals($stack, $messageConsumed->getPayload());
+        self::assertInstanceOf(MessageInterface::class, $handledMessage);
+        self::assertEquals($stack, $handledMessage->getPayload());
     }
 
     public function testFullStackFailure(): void

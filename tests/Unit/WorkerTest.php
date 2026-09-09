@@ -94,7 +94,13 @@ final class WorkerTest extends TestCase
         $finalMessage = new GenericMessage('final', null);
         /** @var FailureMiddlewareInterface&MockObject $failureMiddleware */
         $failureMiddleware = $this->createMock(FailureMiddlewareInterface::class);
-        $failureMiddleware->method('processFailure')->willReturn(new FailureHandlingRequest($finalMessage, $originalException, $queueName));
+        $failureMiddleware
+            ->expects(self::once())
+            ->method('processFailure')
+            ->with(self::callback(
+                static fn(FailureHandlingRequest $request): bool => $request->getException() === $originalException,
+            ))
+            ->willReturn(new FailureHandlingRequest($finalMessage, $originalException, $queueName));
 
         /** @var FailureMiddlewareFactoryInterface&MockObject $failureMiddlewareFactory */
         $failureMiddlewareFactory = $this->createMock(FailureMiddlewareFactoryInterface::class);
@@ -104,9 +110,7 @@ final class WorkerTest extends TestCase
         $handlerResolver = $this->createHandlerResolver($message, static fn() => null);
         $worker = $this->createWorkerByParams($handlerResolver, new NullLogger(), $consumeDispatcher, $failureDispatcher);
 
-        $result = $worker->process($message, $queueName);
-
-        self::assertSame($finalMessage, $result);
+        $worker->process($message, $queueName);
     }
 
     public function testUnresolvableHandlerIsHandledByFailurePipeline(): void
@@ -133,9 +137,7 @@ final class WorkerTest extends TestCase
 
         $worker = $this->createWorkerByParams($handlerResolver, failureMiddlewareDispatcher: $failureDispatcher);
 
-        $result = $worker->process($message, $queueName);
-
-        self::assertSame($finalMessage, $result);
+        $worker->process($message, $queueName);
     }
 
     private function createHandlerResolver(MessageInterface $message, callable $handler): HandlerResolver

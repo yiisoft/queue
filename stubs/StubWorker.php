@@ -17,7 +17,5 @@ final class StubWorker implements WorkerInterface
         MessageInterface $message,
         string $queueName,
         ?QueueProducerInterface $retryProducer = null,
-    ): MessageInterface {
-        return $message;
-    }
+    ): void {}
 }
