@@ -20,6 +20,7 @@ use Yiisoft\Queue\Middleware\Worker\WorkerRequest;
 final class Worker
 {
     private readonly WorkerMiddlewareDispatcher $workerMiddlewareDispatcher;
+    private readonly WorkerFinalHandler $workerFinalHandler;
 
     public function __construct(
         private readonly LoggerInterface $logger,
@@ -36,19 +37,23 @@ final class Worker
                 }
             },
         );
-    }
-
-    /** @param Closure(MessageInterface): MessageInterface $retry */
-    public function process(MessageInterface $message, string $queueName, ?Closure $retry = null): MessageInterface
-    {
-        $request = new WorkerRequest($message, $queueName, $retry);
-        $final = new WorkerFinalHandler(
+        $this->workerFinalHandler = new WorkerFinalHandler(
             $this->logger,
             $this->consumeMiddlewareDispatcher,
             $this->failureMiddlewareDispatcher,
             $this->handlerResolver,
         );
+    }
 
-        return $this->workerMiddlewareDispatcher->dispatch($request, $final)->getMessage();
+    /** @param Closure(MessageInterface): MessageInterface $retry */
+    public function process(MessageInterface $message, string $queueName, ?Closure $retry = null): MessageInterface
+    {
+        if (!$this->workerMiddlewareDispatcher->hasMiddlewares()) {
+            return $this->workerFinalHandler->process($message, $queueName, $retry);
+        }
+
+        return $this->workerMiddlewareDispatcher
+            ->dispatch(new WorkerRequest($message, $queueName, $retry), $this->workerFinalHandler)
+            ->getMessage();
     }
 }

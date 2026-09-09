@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Middleware\Worker;
 
+use Closure;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Yiisoft\Queue\Exception\MessageFailureException;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Message\IdEnvelope;
+use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
@@ -27,7 +29,16 @@ final class WorkerFinalHandler implements WorkerHandlerInterface
 
     public function handleWorker(WorkerRequest $request): WorkerRequest
     {
-        $message = $request->getMessage();
+        return $request->withMessage($this->process(
+            $request->getMessage(),
+            $request->getQueueName(),
+            $request->getRetry(),
+        ));
+    }
+
+    /** @param null|Closure(MessageInterface): MessageInterface $retry */
+    public function process(MessageInterface $message, string $queueName, ?Closure $retry = null): MessageInterface
+    {
         $id = IdEnvelope::fromMessage($message)->getId();
         $id === null
             ? $this->logger->info('Processing message without ID.')
@@ -35,20 +46,15 @@ final class WorkerFinalHandler implements WorkerHandlerInterface
 
         try {
             $handler = $this->resolver->resolve($message->getType());
-            $consumeRequest = new ConsumeRequest($message, $request->getQueueName());
+            $consumeRequest = new ConsumeRequest($message, $queueName);
             $result = $this->consume->dispatch($consumeRequest, new ConsumeFinalHandler($handler->handle(...)));
-            return $request->withMessage($result->getMessage());
+            return $result->getMessage();
         } catch (Throwable $exception) {
-            $failureRequest = new FailureHandlingRequest(
-                $message,
-                $exception,
-                $request->getQueueName(),
-                $request->getRetry(),
-            );
+            $failureRequest = new FailureHandlingRequest($message, $exception, $queueName, $retry);
             try {
                 $result = $this->failure->dispatch($failureRequest, new FailureFinalHandler());
                 $this->logger->info($exception->getMessage());
-                return $request->withMessage($result->getMessage());
+                return $result->getMessage();
             } catch (Throwable $failureException) {
                 $failureException = new MessageFailureException($message, $failureException);
                 $this->logger->error($failureException->getMessage());

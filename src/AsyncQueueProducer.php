@@ -54,7 +54,9 @@ final class AsyncQueueProducer
             'Preparing to push message with message type "{messageType}".',
             ['messageType' => $message->getType()],
         );
-        $message = $this->dispatcher->dispatch(new PushRequest($message, $this->queueName))->getMessage();
+        $message = $this->dispatcher->hasMiddlewares()
+            ? $this->dispatcher->dispatch(new PushRequest($message, $this->queueName))->getMessage()
+            : $this->adapter->push($message);
         $id = IdEnvelope::fromMessage($message)->getId();
         $this->logger->info(
             $id === null
