@@ -16,7 +16,6 @@ use Yiisoft\Queue\Cli\SimpleLoop;
 use Yiisoft\Queue\Command\ListenAllCommand;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
@@ -51,7 +50,7 @@ final class ListenAllCommandTest extends TestCase
         $loop = $this->createMock(LoopInterface::class);
         $loop->method('canContinue')->willReturn(true, false);
         $command = new ListenAllCommand(new PredefinedQueueProvider([
-            'producer' => ['producer' => new AsyncQueueProducer(new NullLogger(), new PushMiddlewareConfig(new PushMiddlewareFactory(new SimpleContainer(), new CallableFactory(new SimpleContainer()))), new InMemoryAdapter())],
+            'producer' => ['producer' => new AsyncQueueProducer(new NullLogger(), new PushMiddlewareConfig(new PushMiddlewareFactory(new SimpleContainer())), new InMemoryAdapter())],
             'consumer' => ['consumer' => $consumer],
         ]), $loop);
         $input = new ArrayInput([], $command->getNativeDefinition());
@@ -64,11 +63,10 @@ final class ListenAllCommandTest extends TestCase
     private function consumer(InMemoryAdapter $adapter, callable $handler): QueueConsumer
     {
         $container = new SimpleContainer();
-        $factory = new CallableFactory($container);
         $worker = new Worker(
             new NullLogger(),
-            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container, $factory)),
-            new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container, $factory), []),
+            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container)),
+            new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container), []),
             new HandlerResolver(['test' => $handler], $container),
         );
 

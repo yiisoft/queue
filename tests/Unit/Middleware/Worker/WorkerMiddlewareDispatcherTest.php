@@ -7,7 +7,6 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\Worker;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Queue\Message\GenericMessage;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Worker\WorkerHandlerInterface;
 use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareFactory;
@@ -18,7 +17,7 @@ final class WorkerMiddlewareDispatcherTest extends TestCase
     public function testMiddlewareOrderAndShortCircuit(): void
     {
         $events = [];
-        $factory = new WorkerMiddlewareFactory(new SimpleContainer(), new CallableFactory(new SimpleContainer()));
+        $factory = new WorkerMiddlewareFactory(new SimpleContainer());
         $dispatcher = new WorkerMiddlewareDispatcher($factory, [
             static function (WorkerRequest $request, WorkerHandlerInterface $next) use (&$events): WorkerRequest {
                 $events[] = 'first-before';

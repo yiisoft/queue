@@ -12,7 +12,6 @@ use Yiisoft\Queue\Debug\Middleware\PushDebugMiddleware;
 use Yiisoft\Queue\Debug\QueueCollector;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Push\PushHandlerInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
@@ -77,7 +76,7 @@ final class PushDebugMiddlewareTest extends TestCase
         $producer = new AsyncQueueProducer(
             new NullLogger(),
             new PushMiddlewareConfig(
-                new PushMiddlewareFactory($container, new CallableFactory($container)),
+                new PushMiddlewareFactory($container),
                 [new PushDebugMiddleware($collector)],
             ),
             new InMemoryAdapter(),

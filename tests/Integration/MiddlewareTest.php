@@ -12,7 +12,6 @@ use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
@@ -24,13 +23,11 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
 use Yiisoft\Queue\SyncQueueProducer;
-use Yiisoft\Queue\AsyncQueueProducer;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Tests\Integration\Support\TestMiddleware;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
-use Yiisoft\Queue\Stubs\InMemoryAdapter;
 
 final class MiddlewareTest extends TestCase
 {
@@ -49,9 +46,6 @@ final class MiddlewareTest extends TestCase
         $pushMiddlewareConfig = new PushMiddlewareConfig(
             new PushMiddlewareFactory(
                 $this->createMock(ContainerInterface::class),
-                new CallableFactory(
-                    $this->createMock(ContainerInterface::class),
-                ),
             ),
             [
                 new TestMiddleware('common 1'),
@@ -91,21 +85,17 @@ final class MiddlewareTest extends TestCase
             'common 2',
         ];
         $container = new SimpleContainer();
-        $callableFactory = new CallableFactory($container);
 
         $consumeMiddlewareDispatcher = new ConsumeMiddlewareDispatcher(
             new ConsumeMiddlewareFactory(
                 $this->createMock(ContainerInterface::class),
-                new CallableFactory(
-                    $this->createMock(ContainerInterface::class),
-                ),
             ),
             new TestMiddleware('common 1'),
             new TestMiddleware('common 2'),
         );
 
         $failureMiddlewareDispatcher = new FailureMiddlewareDispatcher(
-            new FailureMiddlewareFactory($container, $callableFactory),
+            new FailureMiddlewareFactory($container),
             [],
         );
 
@@ -129,13 +119,9 @@ final class MiddlewareTest extends TestCase
 
         $message = new GenericMessage('simple', null);
         $queueCallback = static fn(MessageInterface $message): MessageInterface => $message;
-        $queue = new AsyncQueueProducer(
-            $this->createMock(LoggerInterface::class),
-            new PushMiddlewareConfig(new PushMiddlewareFactory(new SimpleContainer(), new CallableFactory(new SimpleContainer()))),
-            new InMemoryAdapter(),
-        );
-        $container = new SimpleContainer([SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queueCallback)]);
-        $callableFactory = new CallableFactory($container);
+        $container = new SimpleContainer([
+            SendAgainMiddleware::class => new SendAgainMiddleware('test-container', 1, $queueCallback),
+        ]);
 
         $middlewares = [
             'test-queue' => [
@@ -161,7 +147,7 @@ final class MiddlewareTest extends TestCase
             ],
         ];
         $dispatcher = new FailureMiddlewareDispatcher(
-            new FailureMiddlewareFactory($container, $callableFactory),
+            new FailureMiddlewareFactory($container),
             $middlewares,
         );
 

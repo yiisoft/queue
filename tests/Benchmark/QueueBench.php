@@ -15,7 +15,6 @@ use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Message\Serializer\JsonMessageEncoder;
 use Yiisoft\Queue\Message\Serializer\MessageSerializer;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
@@ -38,14 +37,13 @@ final class QueueBench
     public function __construct()
     {
         $container = new SimpleContainer();
-        $callableFactory = new CallableFactory($container);
         $logger = new NullLogger();
 
         $worker = new Worker(
             $logger,
-            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container, $callableFactory)),
+            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container)),
             new FailureMiddlewareDispatcher(
-                new FailureMiddlewareFactory($container, $callableFactory),
+                new FailureMiddlewareFactory($container),
                 [],
             ),
             new HandlerResolver(
@@ -60,7 +58,7 @@ final class QueueBench
 
         $this->producer = new AsyncQueueProducer(
             $logger,
-            new PushMiddlewareConfig(new PushMiddlewareFactory($container, $callableFactory)),
+            new PushMiddlewareConfig(new PushMiddlewareFactory($container)),
             $this->adapter,
         );
         $this->consumer = new QueueConsumer($worker, new SimpleLoop(0), $logger, $this->adapter);

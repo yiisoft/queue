@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Middleware\Consume;
 
-use Psr\Container\ContainerInterface;
-use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
 
@@ -60,20 +58,17 @@ final class ConsumeMiddlewareFactory extends MiddlewareFactory implements Consum
 
     protected function wrapMiddleware(callable $callback): ConsumeMiddlewareInterface
     {
-        $container = $this->container;
-        return new class ($callback, $container) implements ConsumeMiddlewareInterface {
+        return new class ($callback) implements ConsumeMiddlewareInterface {
             private $callback;
 
-            public function __construct(
-                callable $callback,
-                private readonly ContainerInterface $container,
-            ) {
+            public function __construct(callable $callback)
+            {
                 $this->callback = $callback;
             }
 
             public function processConsume(ConsumeRequest $request, ConsumeHandlerInterface $handler): ConsumeRequest
             {
-                $response = (new Injector($this->container))->invoke($this->callback, [$request, $handler]);
+                $response = ($this->callback)($request, $handler);
                 if ($response instanceof ConsumeRequest) {
                     return $response;
                 }

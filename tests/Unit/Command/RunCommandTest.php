@@ -13,7 +13,6 @@ use Yiisoft\Queue\Command\RunCommand;
 use Yiisoft\Queue\DefaultQueue;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
@@ -55,7 +54,7 @@ final class RunCommandTest extends TestCase
             $processed++;
         });
         $command = new RunCommand(new PredefinedQueueProvider([
-            'producer' => ['producer' => new AsyncQueueProducer(new NullLogger(), new PushMiddlewareConfig(new PushMiddlewareFactory(new SimpleContainer(), new CallableFactory(new SimpleContainer()))), new InMemoryAdapter())],
+            'producer' => ['producer' => new AsyncQueueProducer(new NullLogger(), new PushMiddlewareConfig(new PushMiddlewareFactory(new SimpleContainer())), new InMemoryAdapter())],
             DefaultQueue::NAME => ['consumer' => $consumer],
         ]));
 
@@ -66,11 +65,10 @@ final class RunCommandTest extends TestCase
     private function consumer(InMemoryAdapter $adapter, callable $handler): QueueConsumer
     {
         $container = new SimpleContainer();
-        $factory = new CallableFactory($container);
         $worker = new Worker(
             new NullLogger(),
-            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container, $factory)),
-            new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container, $factory), []),
+            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container)),
+            new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container), []),
             new HandlerResolver(['test' => $handler], $container),
         );
 

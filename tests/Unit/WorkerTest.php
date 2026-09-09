@@ -11,6 +11,7 @@ use Throwable;
 use Yiisoft\Test\Support\Container\SimpleContainer;
 use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Exception\MessageFailureException;
+use Yiisoft\Queue\Message\Handler\HandlerNotFoundException;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -21,7 +22,6 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Worker\WorkerHandlerInterface;
 use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareFactory;
@@ -119,7 +119,7 @@ final class WorkerTest extends TestCase
         $message = new GenericMessage('missing', null);
         $seen = false;
         $workerMiddleware = new WorkerMiddlewareDispatcher(
-            new WorkerMiddlewareFactory(new SimpleContainer(), new CallableFactory(new SimpleContainer())),
+            new WorkerMiddlewareFactory(new SimpleContainer()),
             [static function (WorkerRequest $request, WorkerHandlerInterface $handler) use (&$seen): WorkerRequest {
                 $seen = true;
                 return $handler->handleWorker($request);
@@ -139,6 +139,35 @@ final class WorkerTest extends TestCase
         } finally {
             self::assertTrue($seen);
         }
+    }
+
+    public function testUnresolvableHandlerIsHandledByFailurePipeline(): void
+    {
+        $message = new GenericMessage('unsupported', null);
+        $queueName = 'test-queue';
+        $handlerResolver = new HandlerResolver([], new SimpleContainer());
+
+        $finalMessage = new GenericMessage('final', null);
+        /** @var FailureMiddlewareInterface&MockObject $failureMiddleware */
+        $failureMiddleware = $this->createMock(FailureMiddlewareInterface::class);
+        $failureMiddleware
+            ->expects(self::once())
+            ->method('processFailure')
+            ->with(self::callback(
+                static fn(FailureHandlingRequest $request): bool => $request->getException() instanceof HandlerNotFoundException,
+            ))
+            ->willReturn(new FailureHandlingRequest($finalMessage, new RuntimeException('unused'), $queueName));
+
+        /** @var FailureMiddlewareFactoryInterface&MockObject $failureMiddlewareFactory */
+        $failureMiddlewareFactory = $this->createMock(FailureMiddlewareFactoryInterface::class);
+        $failureMiddlewareFactory->method('createFailureMiddleware')->willReturn($failureMiddleware);
+        $failureDispatcher = new FailureMiddlewareDispatcher($failureMiddlewareFactory, [$queueName => ['simple']]);
+
+        $worker = $this->createWorkerByParams($handlerResolver, failureMiddlewareDispatcher: $failureDispatcher);
+
+        $result = $worker->process($message, $queueName);
+
+        self::assertSame($finalMessage, $result);
     }
 
     private function createHandlerResolver(MessageInterface $message, callable $handler): HandlerResolver
@@ -164,7 +193,7 @@ final class WorkerTest extends TestCase
         $failureMiddlewareFactory = $this->createMock(FailureMiddlewareFactoryInterface::class);
 
         $workerMiddlewareDispatcher ??= new WorkerMiddlewareDispatcher(
-            new WorkerMiddlewareFactory(new SimpleContainer(), new CallableFactory(new SimpleContainer())),
+            new WorkerMiddlewareFactory(new SimpleContainer()),
         );
 
         return new Worker(

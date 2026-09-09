@@ -35,7 +35,7 @@ final class CallableFactoryTest extends TestCase
 
         yield 'callable string' => [
             'strlen',
-            ['foo'],
+            ['string' => 'foo'],
             3,
             new SimpleContainer(),
         ];

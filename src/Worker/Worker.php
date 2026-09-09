@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Worker;
 
 use Closure;
+use LogicException;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Message\MessageInterface;
@@ -15,7 +16,6 @@ use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareInterface;
 use Yiisoft\Queue\Middleware\Worker\WorkerRequest;
-use LogicException;
 
 final class Worker
 {
@@ -48,6 +48,7 @@ final class Worker
             $this->failureMiddlewareDispatcher,
             $this->handlerResolver,
         );
+
         return $this->workerMiddlewareDispatcher->dispatch($request, $final)->getMessage();
     }
 }

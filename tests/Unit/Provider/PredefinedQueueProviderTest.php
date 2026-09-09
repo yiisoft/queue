@@ -7,7 +7,6 @@ namespace Yiisoft\Queue\Tests\Unit\Provider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Yiisoft\Queue\Cli\SimpleLoop;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
@@ -70,7 +69,7 @@ final class PredefinedQueueProviderTest extends TestCase
 
         return new SyncQueueProducer(
             new NullLogger(),
-            new PushMiddlewareConfig(new PushMiddlewareFactory($container, new CallableFactory($container))),
+            new PushMiddlewareConfig(new PushMiddlewareFactory($container)),
             $this->createWorkerFixture(),
         );
     }
@@ -81,8 +80,8 @@ final class PredefinedQueueProviderTest extends TestCase
 
         return new Worker(
             new NullLogger(),
-            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container, new CallableFactory($container))),
-            new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container, new CallableFactory($container)), []),
+            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container)),
+            new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container), []),
             new HandlerResolver([], $container),
         );
     }

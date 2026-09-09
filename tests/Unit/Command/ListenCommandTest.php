@@ -13,7 +13,6 @@ use Yiisoft\Queue\Provider\PredefinedQueueProvider;
 use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\Worker\Worker;
-use Yiisoft\Queue\Middleware\CallableFactory;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
@@ -42,11 +41,10 @@ final class ListenCommandTest extends TestCase
     private function consumer(InMemoryAdapter $adapter, callable $handler): QueueConsumer
     {
         $container = new SimpleContainer();
-        $factory = new CallableFactory($container);
         $worker = new Worker(
             new NullLogger(),
-            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container, $factory)),
-            new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container, $factory), []),
+            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container)),
+            new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container), []),
             new HandlerResolver(['test' => $handler], $container),
         );
 

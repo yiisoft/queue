@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Middleware\Worker;
 
-use Psr\Container\ContainerInterface;
-use Yiisoft\Injector\Injector;
 use Yiisoft\Queue\Middleware\InvalidMiddlewareDefinitionException;
 use Yiisoft\Queue\Middleware\MiddlewareFactory;
 
@@ -51,20 +49,18 @@ final class WorkerMiddlewareFactory extends MiddlewareFactory implements WorkerM
 
     protected function wrapMiddleware(callable $callback): WorkerMiddlewareInterface
     {
-        return new class ($callback, $this->container) implements WorkerMiddlewareInterface {
+        return new class ($callback) implements WorkerMiddlewareInterface {
             /** @var callable */
             private readonly mixed $callback;
 
-            public function __construct(
-                callable $callback,
-                private readonly ContainerInterface $container,
-            ) {
+            public function __construct(callable $callback)
+            {
                 $this->callback = $callback;
             }
 
             public function processWorker(WorkerRequest $request, WorkerHandlerInterface $handler): WorkerRequest
             {
-                $response = (new Injector($this->container))->invoke($this->callback, [$request, $handler]);
+                $response = ($this->callback)($request, $handler);
                 if ($response instanceof WorkerRequest) {
                     return $response;
                 }

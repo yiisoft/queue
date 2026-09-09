@@ -33,9 +33,8 @@ final class WorkerFinalHandler implements WorkerHandlerInterface
             ? $this->logger->info('Processing message without ID.')
             : $this->logger->info('Processing message #{message}.', ['message' => $id]);
 
-        // Resolution errors are deliberately outside failure handling.
-        $handler = $this->resolver->resolve($message->getType());
         try {
+            $handler = $this->resolver->resolve($message->getType());
             $consumeRequest = new ConsumeRequest($message, $request->getQueueName());
             $result = $this->consume->dispatch($consumeRequest, new ConsumeFinalHandler($handler->handle(...)));
             return $request->withMessage($result->getMessage());
