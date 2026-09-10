@@ -7,12 +7,17 @@ namespace Yiisoft\Queue\Worker;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueProducerInterface;
 
+/**
+ * Executes a message: runs it through the consume pipeline and, on failure, through the failure pipeline.
+ */
 interface WorkerInterface
 {
-    /** @param string $queueName Logical execution queue name. */
+    /**
+     * @param string $queueName Logical execution queue name.
+     */
     public function process(
         MessageInterface $message,
         string $queueName,
         ?QueueProducerInterface $retryProducer = null,
-    ): MessageInterface;
+    ): void;
 }

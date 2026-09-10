@@ -34,7 +34,7 @@ final class Worker implements WorkerInterface
         MessageInterface $message,
         string $queueName,
         ?QueueProducerInterface $retryProducer = null,
-    ): MessageInterface {
+    ): void {
         $messageId = IdEnvelope::fromMessage($message)->getId();
         if ($messageId === null) {
             $this->logger->info('Processing message without ID.');
@@ -46,15 +46,13 @@ final class Worker implements WorkerInterface
         try {
             $handler = $this->handlerResolver->resolve($message->getType());
             $finalHandler = new ConsumeFinalHandler($handler->handle(...));
-            return $this->consumeMiddlewareDispatcher->dispatch($request, $finalHandler)->getMessage();
+            $this->consumeMiddlewareDispatcher->dispatch($request, $finalHandler);
         } catch (Throwable $exception) {
             $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueueName(), $retryProducer);
 
             try {
-                $result = $this->failureMiddlewareDispatcher->dispatch($request, new FailureFinalHandler());
+                $this->failureMiddlewareDispatcher->dispatch($request, new FailureFinalHandler());
                 $this->logger->info($exception->getMessage());
-
-                return $result->getMessage();
             } catch (Throwable $exception) {
                 $exception = new MessageFailureException($message, $exception);
                 $this->logger->error($exception->getMessage());

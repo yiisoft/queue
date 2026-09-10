@@ -8,6 +8,9 @@ use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
+/**
+ * Debug proxy for {@see WorkerInterface} that records processed messages into the {@see QueueCollector}.
+ */
 final class QueueWorkerInterfaceProxy implements WorkerInterface
 {
     public function __construct(
@@ -19,8 +22,8 @@ final class QueueWorkerInterfaceProxy implements WorkerInterface
         MessageInterface $message,
         string $queueName,
         ?QueueProducerInterface $retryProducer = null,
-    ): MessageInterface {
+    ): void {
         $this->collector->collectWorkerProcessing($message, $queueName);
-        return $this->worker->process($message, $queueName, $retryProducer);
+        $this->worker->process($message, $queueName, $retryProducer);
     }
 }
