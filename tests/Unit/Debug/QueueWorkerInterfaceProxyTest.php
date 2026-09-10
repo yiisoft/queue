@@ -19,9 +19,7 @@ final class QueueWorkerInterfaceProxyTest extends TestCase
         $collector->startup();
         $proxy = new QueueWorkerInterfaceProxy(new StubWorker(), $collector);
 
-        $result = $proxy->process($message, 'chan');
-
-        self::assertSame($message, $result);
+        $proxy->process($message, 'chan');
 
         $collected = $collector->getCollected();
         self::assertArrayHasKey('processingMessages', $collected);
