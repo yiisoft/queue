@@ -34,7 +34,7 @@ final class SyncQueueProducer implements QueueProducerInterface
         $this->dispatcher = new PushMiddlewareDispatcher(
             middlewareFactory: $middlewareConfig->middlewareFactory,
             middlewareDefinitions: [...$middlewareConfig->commonMiddlewareDefinitions, ...$middlewareDefinitions],
-            finishHandler: new SynchronousPushHandler($worker, $this),
+            finalHandler: new SynchronousPushHandler($worker, $this),
         );
     }
 

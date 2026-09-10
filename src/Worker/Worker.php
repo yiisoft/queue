@@ -45,8 +45,8 @@ final class Worker implements WorkerInterface
         $request = new ConsumeRequest($message, $queueName);
         try {
             $handler = $this->handlerResolver->resolve($message->getType());
-            $finishHandler = new ConsumeFinalHandler($handler->handle(...));
-            $this->consumeMiddlewareDispatcher->dispatch($request, $finishHandler);
+            $finalHandler = new ConsumeFinalHandler($handler->handle(...));
+            $this->consumeMiddlewareDispatcher->dispatch($request, $finalHandler);
         } catch (Throwable $exception) {
             $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueueName(), $retryProducer);
 

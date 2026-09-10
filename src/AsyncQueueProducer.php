@@ -35,7 +35,7 @@ final class AsyncQueueProducer implements QueueProducerInterface
         $this->dispatcher = new PushMiddlewareDispatcher(
             middlewareFactory: $middlewareConfig->middlewareFactory,
             middlewareDefinitions: [...$middlewareConfig->commonMiddlewareDefinitions, ...$middlewareDefinitions],
-            finishHandler: new AdapterPushHandler($adapter),
+            finalHandler: new AdapterPushHandler($adapter),
         );
     }
 

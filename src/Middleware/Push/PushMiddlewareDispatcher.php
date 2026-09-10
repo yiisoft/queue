@@ -22,12 +22,12 @@ final class PushMiddlewareDispatcher
     /**
      * @param PushMiddlewareFactoryInterface $middlewareFactory Factory used to instantiate middleware.
      * @param mixed[] $middlewareDefinitions Middleware definitions.
-     * @param PushHandlerInterface $finishHandler Finish message handler.
+     * @param PushHandlerInterface $finalHandler Handler invoked after all middlewares are processed.
      */
     public function __construct(
         private readonly PushMiddlewareFactoryInterface $middlewareFactory,
         private array $middlewareDefinitions,
-        private PushHandlerInterface $finishHandler,
+        private PushHandlerInterface $finalHandler,
     ) {}
 
     /**
@@ -37,15 +37,15 @@ final class PushMiddlewareDispatcher
      */
     public function dispatch(MessageInterface $message): MessageInterface
     {
-        $this->stack ??= new PushMiddlewareStack($this->buildMiddlewares(), $this->finishHandler);
+        $this->stack ??= new PushMiddlewareStack($this->buildMiddlewares(), $this->finalHandler);
 
         return $this->stack->handlePush($message);
     }
 
-    public function withFinishHandler(PushHandlerInterface $finishHandler): self
+    public function withFinalHandler(PushHandlerInterface $finalHandler): self
     {
         $instance = clone $this;
-        $instance->finishHandler = $finishHandler;
+        $instance->finalHandler = $finalHandler;
 
         // Fixes a memory leak.
         unset($instance->stack);

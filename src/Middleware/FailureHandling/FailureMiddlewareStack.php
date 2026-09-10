@@ -18,14 +18,13 @@ final class FailureMiddlewareStack implements FailureHandlerInterface
 
     /**
      * @param Closure[] $middlewares Middlewares.
-     * @param FailureHandlerInterface $finishHandler Fallback handler
-     * events.
+     * @param FailureHandlerInterface $finalHandler Handler invoked after all middlewares are processed.
      *
      * @psalm-param list<Closure():FailureMiddlewareInterface> $middlewares
      */
     public function __construct(
         private readonly array $middlewares,
-        private readonly FailureHandlerInterface $finishHandler,
+        private readonly FailureHandlerInterface $finalHandler,
     ) {}
 
     public function handleFailure(FailureHandlingRequest $request): FailureHandlingRequest
@@ -36,7 +35,7 @@ final class FailureMiddlewareStack implements FailureHandlerInterface
 
     private function build(): FailureHandlerInterface
     {
-        $handler = $this->finishHandler;
+        $handler = $this->finalHandler;
 
         foreach ($this->middlewares as $middleware) {
             $handler = $this->wrap($middleware, $handler);
