@@ -19,10 +19,18 @@ interface AdapterInterface
     /**
      * Returns status code of a message with the given ID.
      * Returns {@see MessageStatus::NOT_FOUND} when status tracking is not supported or there is no such id.
+     * Use {@see hasStatusSupport()} to tell unsupported tracking apart from a missing ID.
      *
      * @param int|string $id ID of a message.
      */
     public function status(string|int $id): MessageStatus;
+
+    /**
+     * Whether the adapter supports message status tracking.
+     *
+     * When `false`, {@see status()} always returns {@see MessageStatus::NOT_FOUND}.
+     */
+    public function hasStatusSupport(): bool;
 
     /**
      * Pushing a message to the queue. Adapter sets message ID if available.
