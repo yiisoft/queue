@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Debug;
 
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
 /**
@@ -18,12 +17,9 @@ final class QueueWorkerInterfaceProxy implements WorkerInterface
         private readonly QueueCollector $collector,
     ) {}
 
-    public function process(
-        MessageInterface $message,
-        string $queueName,
-        ?QueueProducerInterface $retryProducer = null,
-    ): void {
+    public function process(MessageInterface $message, string $queueName): void
+    {
         $this->collector->collectWorkerProcessing($message, $queueName);
-        $this->worker->process($message, $queueName, $retryProducer);
+        $this->worker->process($message, $queueName);
     }
 }

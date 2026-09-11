@@ -6,12 +6,15 @@ namespace Yiisoft\Queue\Tests\Unit\Middleware\FailureHandling\Implementation;
 
 use Exception;
 use InvalidArgumentException;
+use RuntimeException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
+use Yiisoft\Queue\Provider\InvalidQueueConfigException;
+use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
 use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Message\DelayEnvelope;
 use Yiisoft\Queue\Tests\TestCase;
@@ -144,7 +147,7 @@ final class ExponentialDelayMiddlewareTest extends TestCase
         );
         $nextHandler = $this->createMock(FailureHandlerInterface::class);
         $nextHandler->expects(self::never())->method('handleFailure');
-        $request = new FailureHandlingRequest($message, new Exception('test'), 'test-queue', $queue);
+        $request = new FailureHandlingRequest($message, new Exception('test'), 'test-queue');
         $result = $middleware->processFailure($request, $nextHandler);
 
         self::assertNotEquals($request, $result);
@@ -178,7 +181,65 @@ final class ExponentialDelayMiddlewareTest extends TestCase
         $nextHandler = $this->createMock(FailureHandlerInterface::class);
         $exception = new Exception('test');
         $nextHandler->expects(self::once())->method('handleFailure')->willThrowException($exception);
-        $request = new FailureHandlingRequest($message, $exception, 'test-queue', $queue);
+        $request = new FailureHandlingRequest($message, $exception, 'test-queue');
         $middleware->processFailure($request, $nextHandler);
+    }
+
+    public function testProducerIsResolvedFromProviderByQueueName(): void
+    {
+        $message = new GenericMessage('test', null);
+        $producer = $this->createMock(QueueProducerInterface::class);
+        $producer->expects(self::once())->method('push')->willReturnArgument(0);
+        $provider = $this->createMock(QueueProducerProviderInterface::class);
+        $provider->expects(self::once())
+            ->method('getProducer')
+            ->with('test-queue')
+            ->willReturn($producer);
+        $handler = $this->createMock(FailureHandlerInterface::class);
+        $handler->expects(self::never())->method('handleFailure');
+        $middleware = new ExponentialDelayMiddleware('test', 1, 1, 1, 1, null, $provider);
+        $request = new FailureHandlingRequest($message, new Exception('test'), 'test-queue');
+
+        $result = $middleware->processFailure($request, $handler);
+
+        self::assertArrayHasKey(DelayEnvelope::META_DELAY_SECONDS, $result->getMessage()->getMeta());
+    }
+
+    public function testFailsWithoutQueueAndProducerProvider(): void
+    {
+        $message = new GenericMessage('test', null);
+        $handler = $this->createMock(FailureHandlerInterface::class);
+        $handler->expects(self::never())->method('handleFailure');
+        $middleware = new ExponentialDelayMiddleware('test', 1, 1, 1, 1);
+        $request = new FailureHandlingRequest($message, new Exception('test'), 'test-queue');
+
+        $this->expectException(InvalidQueueConfigException::class);
+        $this->expectExceptionMessage(
+            'Cannot retry queue "test-queue": configure a producer target or QueueProducerProviderInterface.',
+        );
+        $middleware->processFailure($request, $handler);
+    }
+
+    public function testFailsWhenProviderCannotResolveProducer(): void
+    {
+        $message = new GenericMessage('test', null);
+        $providerException = new RuntimeException('no such queue');
+        $provider = $this->createMock(QueueProducerProviderInterface::class);
+        $provider->method('getProducer')->willThrowException($providerException);
+        $handler = $this->createMock(FailureHandlerInterface::class);
+        $handler->expects(self::never())->method('handleFailure');
+        $middleware = new ExponentialDelayMiddleware('test', 1, 1, 1, 1, null, $provider);
+        $request = new FailureHandlingRequest($message, new Exception('test'), 'test-queue');
+
+        try {
+            $middleware->processFailure($request, $handler);
+            self::fail('Exception was not thrown.');
+        } catch (InvalidQueueConfigException $exception) {
+            self::assertSame(
+                'Cannot retry queue "test-queue": no producer capability is available.',
+                $exception->getMessage(),
+            );
+            self::assertSame($providerException, $exception->getPrevious());
+        }
     }
 }

@@ -40,7 +40,7 @@ final class SendAgainMiddleware implements FailureMiddlewareInterface
             return $handler->handleFailure($request);
         }
         $envelope = new FailureEnvelope($message, [$this->getMetaKey() => $this->getAttempts($message) + 1]);
-        $producer = $this->targetQueue ?? $request->getRetryProducer() ?? $this->sourceProducer($request);
+        $producer = $this->targetQueue ?? $this->sourceProducer($request);
         $envelope = $producer->push($envelope);
         return $request->withMessage($envelope);
     }

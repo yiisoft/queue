@@ -16,6 +16,8 @@ use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMidd
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlerInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
+use Yiisoft\Queue\Provider\InvalidQueueConfigException;
+use Yiisoft\Queue\Provider\QueueProducerProviderInterface;
 use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Tests\TestCase;
 
@@ -161,11 +163,68 @@ final class SendAgainMiddlewareTest extends TestCase
             ))->withMeta([FailureEnvelope::META_FAILURE => $metaInitial]),
             new Exception('testException'),
             'test-queue',
-            $queue,
         );
         $result = $strategy->processFailure($request, $handler);
 
         self::assertInstanceOf(FailureHandlingRequest::class, $result);
+    }
+
+    public function testProducerIsResolvedFromProviderByQueueName(): void
+    {
+        $message = new GenericMessage('test', null);
+        $producer = $this->createMock(QueueProducerInterface::class);
+        $producer->expects(self::once())->method('push')->willReturnArgument(0);
+        $provider = $this->createMock(QueueProducerProviderInterface::class);
+        $provider->expects(self::once())
+            ->method('getProducer')
+            ->with('test-queue')
+            ->willReturn($producer);
+        $handler = $this->createMock(FailureHandlerInterface::class);
+        $handler->expects(self::never())->method('handleFailure');
+        $middleware = new SendAgainMiddleware('test', 1, null, $provider);
+        $request = new FailureHandlingRequest($message, new Exception('test'), 'test-queue');
+
+        $result = $middleware->processFailure($request, $handler);
+
+        self::assertArrayHasKey(FailureEnvelope::META_FAILURE, $result->getMessage()->getMeta());
+    }
+
+    public function testFailsWithoutTargetQueueAndProducerProvider(): void
+    {
+        $message = new GenericMessage('test', null);
+        $handler = $this->createMock(FailureHandlerInterface::class);
+        $handler->expects(self::never())->method('handleFailure');
+        $middleware = new SendAgainMiddleware('test', 1);
+        $request = new FailureHandlingRequest($message, new Exception('test'), 'test-queue');
+
+        $this->expectException(InvalidQueueConfigException::class);
+        $this->expectExceptionMessage(
+            'Cannot retry queue "test-queue": configure a producer target or QueueProducerProviderInterface.',
+        );
+        $middleware->processFailure($request, $handler);
+    }
+
+    public function testFailsWhenProviderCannotResolveProducer(): void
+    {
+        $message = new GenericMessage('test', null);
+        $providerException = new RuntimeException('no such queue');
+        $provider = $this->createMock(QueueProducerProviderInterface::class);
+        $provider->method('getProducer')->willThrowException($providerException);
+        $handler = $this->createMock(FailureHandlerInterface::class);
+        $handler->expects(self::never())->method('handleFailure');
+        $middleware = new SendAgainMiddleware('test', 1, null, $provider);
+        $request = new FailureHandlingRequest($message, new Exception('test'), 'test-queue');
+
+        try {
+            $middleware->processFailure($request, $handler);
+            self::fail('Exception was not thrown.');
+        } catch (InvalidQueueConfigException $exception) {
+            self::assertSame(
+                'Cannot retry queue "test-queue": no producer capability is available.',
+                $exception->getMessage(),
+            );
+            self::assertSame($providerException, $exception->getPrevious());
+        }
     }
 
     private function getStrategy(string $strategyName, QueueProducerInterface $queue): FailureMiddlewareInterface
