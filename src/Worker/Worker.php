@@ -15,7 +15,6 @@ use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
-use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Message\IdEnvelope;
 
 final class Worker implements WorkerInterface
@@ -30,11 +29,8 @@ final class Worker implements WorkerInterface
     /**
      * @throws Throwable
      */
-    public function process(
-        MessageInterface $message,
-        string $queueName,
-        ?QueueProducerInterface $retryProducer = null,
-    ): void {
+    public function process(MessageInterface $message, string $queueName): void
+    {
         $messageId = IdEnvelope::fromMessage($message)->getId();
         if ($messageId === null) {
             $this->logger->info('Processing message without ID.');
@@ -48,7 +44,7 @@ final class Worker implements WorkerInterface
             $finalHandler = new ConsumeFinalHandler($handler->handle(...));
             $this->consumeMiddlewareDispatcher->dispatch($request, $finalHandler);
         } catch (Throwable $exception) {
-            $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueueName(), $retryProducer);
+            $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueueName());
 
             try {
                 $this->failureMiddlewareDispatcher->dispatch($request, new FailureFinalHandler());

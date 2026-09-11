@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Middleware\Push;
 
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\QueueProducerInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
 /**
@@ -15,12 +14,12 @@ final class SynchronousPushHandler implements PushHandlerInterface
 {
     public function __construct(
         private readonly WorkerInterface $worker,
-        private readonly QueueProducerInterface $queue,
+        private readonly string $queueName,
     ) {}
 
     public function handlePush(MessageInterface $message): MessageInterface
     {
-        $this->worker->process($message, $this->queue->getQueueName(), $this->queue);
+        $this->worker->process($message, $this->queueName);
 
         return $message;
     }

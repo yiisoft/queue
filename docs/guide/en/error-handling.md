@@ -87,8 +87,8 @@ Failures of messages that arrived in the `failed-messages` queue directly (bypas
 
  - `id` - A unique string. Allows to use this strategy more than once for the same message, just like in example above.
  - `maxAttempts` - Maximum attempts count for this strategy with the given $id before it will give up.
- - `targetQueue` - An optional `QueueProducerInterface` for an explicit retry destination. When it is `null`, synchronous execution supplies its originating producer; asynchronous execution resolves the originating queue name through `producerProvider`.
- - `producerProvider` - The `QueueProducerProviderInterface` used to resolve the source producer for asynchronous retries when no `targetQueue` is supplied. Configure it, or provide `targetQueue`; otherwise retry fails with a configuration error.
+ - `targetQueue` - An optional `QueueProducerInterface` for an explicit retry destination. When it is `null`, the originating queue name is resolved through `producerProvider`.
+ - `producerProvider` - The `QueueProducerProviderInterface` used to resolve the source producer when no `targetQueue` is supplied. Configure it, or provide `targetQueue`; otherwise retry fails with a configuration error.
 
  State tracking:
 
@@ -106,8 +106,8 @@ It's configured via constructor parameters, too. Here they are:
  - `delayInitial` - The initial delay that will be applied to a message for the first time. It must be a positive float. 
  - `delayMaximum` - The maximum delay which can be applied to a single message. Must be above the `delayInitial`.
  - `exponent` - Message handling delay will be multiplied by exponent each time it fails.
- - `queue` - An optional `QueueProducerInterface` retry destination. When it is `null`, synchronous execution supplies its originating producer; asynchronous execution resolves the originating queue name through `producerProvider`.
- - `producerProvider` - The `QueueProducerProviderInterface` used for that asynchronous source-producer lookup.
+ - `queue` - An optional `QueueProducerInterface` retry destination. When it is `null`, the originating queue name is resolved through `producerProvider`.
+ - `producerProvider` - The `QueueProducerProviderInterface` used for that source-producer lookup.
 
  Requirements:
 

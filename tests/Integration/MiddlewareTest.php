@@ -157,7 +157,7 @@ final class MiddlewareTest extends TestCase
         );
 
         $iteration = 0;
-        $request = new FailureHandlingRequest($message, $exception, 'test-queue', $queue);
+        $request = new FailureHandlingRequest($message, $exception, 'test-queue');
         $finalHandler = new FailureFinalHandler();
         try {
             do {

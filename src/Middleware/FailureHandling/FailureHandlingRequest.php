@@ -6,7 +6,6 @@ namespace Yiisoft\Queue\Middleware\FailureHandling;
 
 use Throwable;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\QueueProducerInterface;
 
 final class FailureHandlingRequest
 {
@@ -14,7 +13,6 @@ final class FailureHandlingRequest
         private MessageInterface $message,
         private Throwable $exception,
         private string $queueName,
-        private ?QueueProducerInterface $retryProducer = null,
     ) {}
 
     public function getMessage(): MessageInterface
@@ -31,12 +29,6 @@ final class FailureHandlingRequest
     public function getQueueName(): string
     {
         return $this->queueName;
-    }
-
-    /** Direct retry target used by synchronous producer execution, if any. */
-    public function getRetryProducer(): ?QueueProducerInterface
-    {
-        return $this->retryProducer;
     }
 
     public function withMessage(MessageInterface $message): self
