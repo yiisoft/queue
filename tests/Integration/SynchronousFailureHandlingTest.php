@@ -34,7 +34,7 @@ final class SynchronousFailureHandlingTest extends TestCase
 {
     public function testFailurePipelineIsExecuted(): void
     {
-        $middleware = new class () implements FailureMiddlewareInterface {
+        $middleware = new class implements FailureMiddlewareInterface {
             /**
              * @var string[]
              */
