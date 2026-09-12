@@ -24,15 +24,13 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $request = $this->getFailureHandlingRequest();
 
-        $dispatcher = $this->createDispatcher()->withMiddlewares(
-            [
-                FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [
-                    static function (FailureHandlingRequest $request): FailureHandlingRequest {
-                        return $request->withMessage(new GenericMessage('test', 'New closure test data'));
-                    },
-                ],
+        $dispatcher = $this->createDispatcher(middlewareDefinitions: [
+            FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [
+                static function (FailureHandlingRequest $request): FailureHandlingRequest {
+                    return $request->withMessage(new GenericMessage('test', 'New closure test data'));
+                },
             ],
-        );
+        ]);
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('New closure test data', $request->getMessage()->getPayload());
@@ -46,13 +44,12 @@ final class MiddlewareDispatcherTest extends TestCase
                 TestCallableMiddleware::class => new TestCallableMiddleware(),
             ],
         );
-        $dispatcher = $this
-            ->createDispatcher($container)
-            ->withMiddlewares(
-                [
-                    FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [[TestCallableMiddleware::class, 'index']],
-                ],
-            );
+        $dispatcher = $this->createDispatcher(
+            $container,
+            [
+                FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [[TestCallableMiddleware::class, 'index']],
+            ],
+        );
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('New test data', $request->getMessage()->getPayload());
     }
@@ -65,7 +62,7 @@ final class MiddlewareDispatcherTest extends TestCase
             'class' => TestMiddleware::class,
             '__construct()' => ['message' => 'New test data from the definition'],
         ];
-        $dispatcher = $this->createDispatcher($container)->withMiddlewares([FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [$definition]]);
+        $dispatcher = $this->createDispatcher($container, [FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [$definition]]);
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('New test data from the definition', $request->getMessage()->getPayload());
     }
@@ -85,7 +82,7 @@ final class MiddlewareDispatcherTest extends TestCase
             return $handler->handleFailure($request);
         };
 
-        $dispatcher = $this->createDispatcher()->withMiddlewares([FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [$middleware1, $middleware2]]);
+        $dispatcher = $this->createDispatcher(middlewareDefinitions: [FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [$middleware1, $middleware2]]);
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('new test data', $request->getMessage()->getPayload());
@@ -103,45 +100,10 @@ final class MiddlewareDispatcherTest extends TestCase
             return $request->withMessage(new GenericMessage($request->getMessage()->getType(), 'second'));
         };
 
-        $dispatcher = $this->createDispatcher()->withMiddlewares([FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [$middleware1, $middleware2]]);
+        $dispatcher = $this->createDispatcher(middlewareDefinitions: [FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [$middleware1, $middleware2]]);
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('first', $request->getMessage()->getPayload());
-    }
-
-    public function dataHasMiddlewares(): array
-    {
-        return [
-            [[], false],
-            [[[TestCallableMiddleware::class, 'index']], true],
-        ];
-    }
-
-    public function testImmutability(): void
-    {
-        $dispatcher = $this->createDispatcher();
-        self::assertNotSame($dispatcher, $dispatcher->withMiddlewares([]));
-    }
-
-    public function testResetStackOnWithMiddlewares(): void
-    {
-        $request = $this->getFailureHandlingRequest();
-        $container = $this->createContainer(
-            [
-                TestCallableMiddleware::class => new TestCallableMiddleware(),
-                TestMiddleware::class => new TestMiddleware(),
-            ],
-        );
-
-        $dispatcher = $this
-            ->createDispatcher($container)
-            ->withMiddlewares([[TestCallableMiddleware::class, 'index']]);
-        $dispatcher->dispatch($request, $this->getRequestHandler());
-
-        $dispatcher = $dispatcher->withMiddlewares([FailureMiddlewareDispatcher::DEFAULT_PIPELINE => [TestMiddleware::class]]);
-        $request = $dispatcher->dispatch($request, $this->getRequestHandler());
-
-        self::assertSame('New middleware test data', $request->getMessage()->getPayload());
     }
 
     private function getRequestHandler(): FailureHandlerInterface
@@ -156,10 +118,11 @@ final class MiddlewareDispatcherTest extends TestCase
 
     private function createDispatcher(
         ?ContainerInterface $container = null,
+        array $middlewareDefinitions = [],
     ): FailureMiddlewareDispatcher {
         $container ??= $this->createContainer([AdapterInterface::class => new InMemoryAdapter()]);
 
-        return new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container), []);
+        return new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container), $middlewareDefinitions);
     }
 
     private function createContainer(array $instances = []): ContainerInterface
