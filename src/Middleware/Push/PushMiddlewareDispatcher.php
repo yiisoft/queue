@@ -26,8 +26,8 @@ final class PushMiddlewareDispatcher
      */
     public function __construct(
         private readonly PushMiddlewareFactoryInterface $middlewareFactory,
-        private array $middlewareDefinitions,
-        private PushHandlerInterface $finalHandler,
+        private readonly array $middlewareDefinitions,
+        private readonly PushHandlerInterface $finalHandler,
     ) {}
 
     /**
@@ -40,57 +40,6 @@ final class PushMiddlewareDispatcher
         $this->stack ??= new PushMiddlewareStack($this->buildMiddlewares(), $this->finalHandler);
 
         return $this->stack->handlePush($message);
-    }
-
-    public function withFinalHandler(PushHandlerInterface $finalHandler): self
-    {
-        $instance = clone $this;
-        $instance->finalHandler = $finalHandler;
-
-        // Fixes a memory leak.
-        unset($instance->stack);
-        $instance->stack = null;
-
-        return $instance;
-    }
-
-    /**
-     * Returns new instance with middleware handlers replaced with the ones provided.
-     *
-     * @param mixed[] $middlewareDefinitions Middleware definitions.
-     *
-     * @return self New instance of the {@see PushMiddlewareDispatcher}
-     */
-    public function withMiddlewares(array $middlewareDefinitions): self
-    {
-        $instance = clone $this;
-        $instance->middlewareDefinitions = $middlewareDefinitions;
-
-        // Fixes a memory leak.
-        unset($instance->stack);
-        $instance->stack = null;
-
-        return $instance;
-    }
-
-    /**
-     * Returns a new instance with additional middleware handlers added to the existing ones.
-     *
-     * @param mixed[] $middlewareDefinitions Middleware definitions.
-     *
-     * @return self New instance of the {@see PushMiddlewareDispatcher}
-     */
-    public function withMiddlewaresAdded(array $middlewareDefinitions): self
-    {
-        return $this->withMiddlewares([...$this->middlewareDefinitions, ...$middlewareDefinitions]);
-    }
-
-    /**
-     * @return bool Whether there are middleware defined in the dispatcher.
-     */
-    public function hasMiddlewares(): bool
-    {
-        return $this->middlewareDefinitions !== [];
     }
 
     /**
