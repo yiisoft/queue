@@ -18,13 +18,19 @@ final class FailureMiddlewareDispatcher
     private array $stack = [];
 
     /**
+     * @var array[][]|callable[][]|FailureMiddlewareInterface[][]|string[][]
+     */
+    private readonly array $middlewareDefinitions;
+
+    /**
      * @param array[][]|callable[][]|FailureMiddlewareInterface[][]|string[][] $middlewareDefinitions
      */
     public function __construct(
         private readonly FailureMiddlewareFactoryInterface $middlewareFactory,
-        private array $middlewareDefinitions,
+        array $middlewareDefinitions,
     ) {
-        $this->init();
+        $middlewareDefinitions[self::DEFAULT_PIPELINE] ??= [];
+        $this->middlewareDefinitions = $middlewareDefinitions;
     }
 
     /**
@@ -46,42 +52,6 @@ final class FailureMiddlewareDispatcher
         $this->stack[$queueName] ??= new FailureMiddlewareStack($this->buildMiddlewares(...$definitions), $finalHandler);
 
         return $this->stack[$queueName]->handleFailure($request);
-    }
-
-    /**
-     * Returns new instance with middleware handlers replaced with the ones provided.
-     * The last specified handler will be executed first.
-     *
-     * @param array[][]|callable[][]|FailureMiddlewareInterface[][]|string[][] $middlewareDefinitions Each array element is:
-     *
-     * - A name of a middleware class. The middleware instance will be obtained from container executed.
-     * - A callable with `function(ServerRequestInterface $request, RequestHandlerInterface $handler):
-     *     ResponseInterface` signature.
-     * - A "callable-like" array in format `[FooMiddleware::class, 'index']`. `FooMiddleware` instance will
-     *   be created and `index()` method will be executed.
-     * - A function returning a middleware. The middleware returned will be executed.
-     *
-     * For callables typed parameters are automatically injected using dependency injection container.
-     *
-     * @return self New instance of the {@see FailureMiddlewareDispatcher}
-     */
-    public function withMiddlewares(array $middlewareDefinitions): self
-    {
-        $instance = clone $this;
-        $instance->middlewareDefinitions = $middlewareDefinitions;
-
-        // Fixes a memory leak.
-        unset($instance->stack);
-        $instance->stack = [];
-
-        $instance->init();
-
-        return $instance;
-    }
-
-    private function init(): void
-    {
-        $this->middlewareDefinitions[self::DEFAULT_PIPELINE] ??= [];
     }
 
     /**

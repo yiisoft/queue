@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit\Middleware\Consume;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Yiisoft\Test\Support\Container\SimpleContainer;
@@ -24,13 +23,11 @@ final class MiddlewareDispatcherTest extends TestCase
     {
         $request = $this->getConsumeRequest();
 
-        $dispatcher = $this->createDispatcher()->withMiddlewares(
-            [
-                static function (ConsumeRequest $request): ConsumeRequest {
-                    return $request->withMessage(new GenericMessage('test', 'New closure test data'))->withQueueName('other-queue');
-                },
-            ],
-        );
+        $dispatcher = $this->createDispatcher(middlewareDefinitions: [
+            static function (ConsumeRequest $request): ConsumeRequest {
+                return $request->withMessage(new GenericMessage('test', 'New closure test data'))->withQueueName('other-queue');
+            },
+        ]);
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('New closure test data', $request->getMessage()->getPayload());
@@ -44,7 +41,7 @@ final class MiddlewareDispatcherTest extends TestCase
                 TestCallableMiddleware::class => new TestCallableMiddleware(),
             ],
         );
-        $dispatcher = $this->createDispatcher($container)->withMiddlewares([[TestCallableMiddleware::class, 'index']]);
+        $dispatcher = $this->createDispatcher($container, [[TestCallableMiddleware::class, 'index']]);
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('New test data', $request->getMessage()->getPayload());
     }
@@ -57,7 +54,7 @@ final class MiddlewareDispatcherTest extends TestCase
             'class' => TestMiddleware::class,
             '__construct()' => ['message' => 'New test data from the definition'],
         ];
-        $dispatcher = $this->createDispatcher($container)->withMiddlewares([$definition]);
+        $dispatcher = $this->createDispatcher($container, [$definition]);
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('New test data from the definition', $request->getMessage()->getPayload());
     }
@@ -77,7 +74,7 @@ final class MiddlewareDispatcherTest extends TestCase
             return $handler->handleConsume($request);
         };
 
-        $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
+        $dispatcher = $this->createDispatcher(middlewareDefinitions: [$middleware1, $middleware2]);
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('new test data', $request->getMessage()->getPayload());
@@ -95,54 +92,10 @@ final class MiddlewareDispatcherTest extends TestCase
             return $request->withMessage(new GenericMessage($request->getMessage()->getType(), 'second'));
         };
 
-        $dispatcher = $this->createDispatcher()->withMiddlewares([$middleware1, $middleware2]);
+        $dispatcher = $this->createDispatcher(middlewareDefinitions: [$middleware1, $middleware2]);
 
         $request = $dispatcher->dispatch($request, $this->getRequestHandler());
         $this->assertSame('first', $request->getMessage()->getPayload());
-    }
-
-    public static function dataHasMiddlewares(): array
-    {
-        return [
-            [[], false],
-            [[[TestCallableMiddleware::class, 'index']], true],
-        ];
-    }
-
-    #[DataProvider('dataHasMiddlewares')]
-    public function testHasMiddlewares(array $definitions, bool $expected): void
-    {
-        self::assertSame(
-            $expected,
-            $this->createDispatcher()->withMiddlewares($definitions)->hasMiddlewares(),
-        );
-    }
-
-    public function testImmutability(): void
-    {
-        $dispatcher = $this->createDispatcher();
-        self::assertNotSame($dispatcher, $dispatcher->withMiddlewares([]));
-    }
-
-    public function testResetStackOnWithMiddlewares(): void
-    {
-        $request = $this->getConsumeRequest();
-        $container = $this->createContainer(
-            [
-                TestCallableMiddleware::class => new TestCallableMiddleware(),
-                TestMiddleware::class => new TestMiddleware(),
-            ],
-        );
-
-        $dispatcher = $this
-            ->createDispatcher($container)
-            ->withMiddlewares([[TestCallableMiddleware::class, 'index']]);
-        $dispatcher->dispatch($request, $this->getRequestHandler());
-
-        $dispatcher = $dispatcher->withMiddlewares([TestMiddleware::class]);
-        $request = $dispatcher->dispatch($request, $this->getRequestHandler());
-
-        self::assertSame('New middleware test data', $request->getMessage()->getPayload());
     }
 
     private function getRequestHandler(): ConsumeHandlerInterface
@@ -157,12 +110,11 @@ final class MiddlewareDispatcherTest extends TestCase
 
     private function createDispatcher(
         ?ContainerInterface $container = null,
+        array $middlewareDefinitions = [],
     ): ConsumeMiddlewareDispatcher {
         $container ??= $this->createContainer([AdapterInterface::class => new InMemoryAdapter()]);
 
-        return new ConsumeMiddlewareDispatcher(
-            new ConsumeMiddlewareFactory($container),
-        );
+        return new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container), ...$middlewareDefinitions);
     }
 
     private function createContainer(array $instances = []): ContainerInterface
