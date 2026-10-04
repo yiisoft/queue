@@ -46,6 +46,7 @@ return [
         'middlewares-push' => [],
         'middlewares-consume' => [],
         'middlewares-fail' => [],
+        'middlewares-worker' => [],
     ],
     'yiisoft/yii-debug' => [
         'collectors' => [

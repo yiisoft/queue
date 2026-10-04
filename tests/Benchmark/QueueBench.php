@@ -19,6 +19,9 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Worker\WorkerFinalHandler;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareFactory;
 use Yiisoft\Queue\AsyncQueueProducer;
 use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\QueueConsumerInterface;
@@ -42,17 +45,18 @@ final class QueueBench
 
         $worker = new Worker(
             $logger,
-            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container)),
-            new FailureMiddlewareDispatcher(
-                new FailureMiddlewareFactory($container),
+            new WorkerMiddlewareDispatcher(
+                new WorkerMiddlewareFactory($container),
                 [],
+                new WorkerFinalHandler(
+                    new HandlerResolver(
+                        ['foo' => static function (): void {}],
+                        $container,
+                    ),
+                    new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container)),
+                ),
             ),
-            new HandlerResolver(
-                [
-                    'foo' => static function (): void {},
-                ],
-                $container,
-            ),
+            new FailureMiddlewareDispatcher(new FailureMiddlewareFactory($container), []),
         );
         $this->serializer = new MessageSerializer(new JsonMessageEncoder());
         $this->adapter = new VoidAdapter($this->serializer);

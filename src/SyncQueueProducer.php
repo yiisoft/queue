@@ -8,6 +8,7 @@ use BackedEnum;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
+use Yiisoft\Queue\Middleware\Push\PushRequest;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Push\SynchronousPushHandler;
 use Yiisoft\Queue\Worker\WorkerInterface;
@@ -46,7 +47,7 @@ final class SyncQueueProducer implements QueueProducerInterface
     public function push(MessageInterface $message): MessageInterface
     {
         $this->logger->debug('Preparing to push message with message type "{messageType}".', ['messageType' => $message->getType()]);
-        $message = $this->dispatcher->dispatch($message);
+        $message = $this->dispatcher->dispatch(new PushRequest($message, $this->queueName))->getMessage();
         $this->logger->info('Processed message with message type "{messageType}" synchronously.', ['messageType' => $message->getType()]);
         return $message;
     }

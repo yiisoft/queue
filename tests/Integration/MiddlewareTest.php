@@ -8,26 +8,29 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Yiisoft\Test\Support\Container\SimpleContainer;
-use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Message\GenericMessage;
+use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\ExponentialDelayMiddleware;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
-use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactory;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
-use Yiisoft\Queue\SyncQueueProducer;
+use Yiisoft\Queue\Middleware\Worker\WorkerFinalHandler;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareFactory;
 use Yiisoft\Queue\QueueProducerInterface;
-use Yiisoft\Queue\Message\Handler\HandlerResolver;
+use Yiisoft\Queue\SyncQueueProducer;
 use Yiisoft\Queue\Tests\Integration\Support\TestMiddleware;
 use Yiisoft\Queue\Worker\Worker;
 use Yiisoft\Queue\Worker\WorkerInterface;
+use Yiisoft\Test\Support\Container\SimpleContainer;
+use Yiisoft\Test\Support\Log\SimpleLogger;
 
 final class MiddlewareTest extends TestCase
 {
@@ -98,14 +101,20 @@ final class MiddlewareTest extends TestCase
         $handledMessage = null;
         $worker = new Worker(
             new SimpleLogger(),
-            $consumeMiddlewareDispatcher,
-            $failureMiddlewareDispatcher,
-            new HandlerResolver(
-                ['test' => static function (MessageInterface $message) use (&$handledMessage): void {
-                    $handledMessage = $message;
-                }],
-                $container,
+            new WorkerMiddlewareDispatcher(
+                new WorkerMiddlewareFactory($container),
+                [],
+                new WorkerFinalHandler(
+                    new HandlerResolver(
+                        ['test' => static function (MessageInterface $message) use (&$handledMessage): void {
+                            $handledMessage = $message;
+                        }],
+                        $container,
+                    ),
+                    $consumeMiddlewareDispatcher,
+                ),
             ),
+            $failureMiddlewareDispatcher,
         );
 
         $message = new GenericMessage('test', ['initial']);
