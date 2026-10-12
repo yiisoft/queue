@@ -6,12 +6,9 @@
         "yii",
         "queue",
         "async",
-        "gii",
-        "db",
         "redis",
         "rabbitmq",
         "beanstalk",
-        "gearman",
         "sqs"
     ],
     "license": "BSD-3-Clause",
