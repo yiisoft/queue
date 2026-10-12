@@ -2,9 +2,11 @@
 
 Yii Queue uses middlewares to run custom logic around message pushing and message processing.
 
-A middleware is a piece of code that receives a request object and can either:
+A middleware is a piece of code that receives the message being pushed, or a request object wrapping it, and can
+either:
 
-- change the request (for example, change the message, adapter, or error handling behavior) and continue the pipeline, or
+- change what it received (for example, wrap the message into an envelope, or change the error handling behavior)
+  and continue the pipeline, or
 - stop the pipeline by returning without calling the next handler.
 
 The pipeline mechanism is similar to HTTP middleware, but applied to queue messages.
@@ -21,8 +23,9 @@ Common reasons to add middlewares:
   You can log message ids, queue names, attempts, and failures in a consistent way.
 - **Modify the message payload**
   You can obfuscate sensitive data, normalize payload, add extra fields required by consumers, or wrap a message into envelopes.
-- **Route and schedule**
-  You can switch queue, choose a different adapter, or add delay when the adapter supports it.
+- **Schedule**
+  You can add delay when the adapter supports it. Routing to another queue is not done in a middleware: resolve the
+  producer for that queue through `QueueProducerProviderInterface` instead, see [Queue names](queue-names.md).
 
 ## Pipelines overview
 
@@ -113,7 +116,7 @@ The pipeline receives a `FailureHandlingRequest` that contains:
 
 - the message
 - the caught exception
-- the queue instance
+- the queue name
 
 The pipeline is selected by queue name; if there is no queue-specific pipeline configured,
 `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` is used.

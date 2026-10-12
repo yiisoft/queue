@@ -249,7 +249,7 @@ Instead of sending many small messages, batch them when possible:
 
 ```php
 foreach ($userIds as $userId) {
-    $queue->push(new Message(SendEmailHandler::class, [
+    $queue->push(new GenericMessage(SendEmailHandler::class, [
         'userId' => $userId,
     ]));
 }
@@ -258,7 +258,7 @@ foreach ($userIds as $userId) {
 **Good** (1 message):
 
 ```php
-$queue->push(new Message(SendBulkEmailHandler::class, [
+$queue->push(new GenericMessage(SendBulkEmailHandler::class, [
     'userIds' => $userIds, // Process in batches
 ]));
 ```
@@ -277,21 +277,15 @@ public function handle(MessageInterface $message): void
 }
 ```
 
-### Avoid deep envelope stacking
+### Envelope depth costs nothing at read time
 
-While [envelope](envelopes.md) stacking is optimized, deep nesting still has overhead:
+[Envelopes](envelopes.md) do not nest at runtime: each one merges its metadata into the wrapped message's metadata
+and keeps the innermost message, so `getMeta()`, `getType()` and `getPayload()` cost the same whatever the wrapping
+looked like.
 
-```php
-// Avoid excessive wrapping
-$message = new Message(...);
-$message = new Envelope1($message);
-$message = new Envelope2($message);
-$message = new Envelope3($message);
-$message = new Envelope4($message);
-$message = new Envelope5($message); // Too many layers
-```
-
-Keep envelope depth reasonable (typically 2-3 layers).
+What each wrap does cost is one metadata merge when it is constructed, which is negligible next to any handler doing
+real work. Wrap as many times as the code reads best — see
+[Envelope metadata and serialization](envelopes-metadata-internals.md) for the mechanics.
 
 ## Database optimization
 
@@ -410,7 +404,7 @@ $start = microtime(true);
 $count = 10000;
 
 for ($i = 0; $i < $count; $i++) {
-    $queue->push(new Message(TestHandler::class, [
+    $queue->push(new GenericMessage(TestHandler::class, [
         'id' => $i,
         'data' => $this->generateRealisticData(),
     ]));
