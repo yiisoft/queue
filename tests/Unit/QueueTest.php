@@ -12,6 +12,7 @@ use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
+use Yiisoft\Queue\Stubs\StubLoop;
 use Yiisoft\Queue\Tests\TestCase;
 
 use function count;
@@ -81,5 +82,18 @@ final class QueueTest extends TestCase
         $consumer = new QueueConsumer($this->getWorker(), $this->getLoop(), new NullLogger(), $adapter);
         self::assertSame(1, $consumer->run(1));
         self::assertSame(1, $this->executionTimes);
+        self::assertCount(1, $adapter->getMessagesList(), 'The message that hits the limit stays in the queue.');
+    }
+
+    public function testMessageIsNotConsumedWhenLoopCannotContinue(): void
+    {
+        $adapter = new InMemoryAdapter();
+        $producer = $this->createQueue($adapter);
+        $producer->push(new GenericMessage('simple', null));
+        $producer->push(new GenericMessage('simple', null));
+        $consumer = new QueueConsumer($this->getWorker(), new StubLoop(false), new NullLogger(), $adapter);
+
+        self::assertSame(0, $consumer->run());
+        self::assertCount(2, $adapter->getMessagesList());
     }
 }
