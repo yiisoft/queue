@@ -328,7 +328,7 @@ $this->logger->info('Queued task');
 
 ```php
 $pushedMessage = $queue->push($message);
-$id = $pushedMessage->getMetadata()[IdEnvelope::META_ID] ?? null;
+$id = $pushedMessage->getMeta()[IdEnvelope::META_ID] ?? null;
 
 $this->logger->info('Queued task', [
     'messageId' => $id,

@@ -1,35 +1,53 @@
-# Envelope metadata and stack reconstruction
+# Envelope metadata and serialization
 
-This document explains the internal mechanics of envelope metadata handling and stack reconstruction during serialization/deserialization.
+This document explains how envelope metadata is built and what survives serialization.
 
 For basic envelope usage and concepts, see [Envelopes](envelopes.md).
 
-## Metadata and envelope stacking
+## Metadata merging
 
-Every envelope contributes its own metadata to the resulting metadata array.
+Every envelope contributes its own metadata to the resulting metadata array. `Yiisoft\Queue\Message\Envelope` merges
+the wrapped message metadata with the envelope's own metadata, the envelope's own values taking precedence:
 
-`Yiisoft\Queue\Message\Envelope` (base class) also maintains an envelope stack in message metadata under `EnvelopeInterface::ENVELOPE_STACK_KEY` (`"envelopes"`).
+```php
+$message = new GenericMessage('my-type', null);
+$envelope = new DelayEnvelope(new IdEnvelope($message, 7), 3.5);
 
-When `getMetadata()` is called on an envelope, it returns:
+$envelope->getMeta(); // ['yii-id' => 7, 'yii-delay' => 3.5]
+```
 
-- the wrapped message metadata,
-- plus an updated `"envelopes"` stack (previous stack + current envelope's FQCN),
-- plus envelope-specific metadata.
+`getType()` and `getPayload()` are delegated to the wrapped message, so an envelope is transparent for both.
 
-Because envelopes wrap other messages, multiple envelopes form a stack.
+## Envelopes are flattened, not stacked
 
-## Restoring envelopes from metadata
+`Envelope::__construct()` unwraps nested envelopes, so `getMessage()` always returns the innermost message:
 
-If metadata contains the `"envelopes"` key with an array of envelope class names, the serializer will try to rebuild the stack by wrapping the message with each envelope in reverse order.
+```php
+$envelope->getMessage(); // GenericMessage, not IdEnvelope
+```
 
-During this process:
+The envelope classes themselves are not recorded anywhere. What an envelope contributes is its metadata, and that is
+all that is carried further.
 
-- The `"envelopes"` key is removed from the base message metadata (it is set to an empty array before creating the base message).
-- Each envelope from the list is applied to the message using `EnvelopeInterface::fromMessage(...)` in reverse order.
-- A value is applied only if it is a string, the class exists, and it implements `EnvelopeInterface`. Otherwise it is ignored.
+## Serialization
+
+`Yiisoft\Queue\Message\Serializer\MessageSerializer` writes three keys — `type`, `payload` and `meta` — and restores a
+message by resolving the class from `type` and applying `withMeta()`. Envelope wrappers are therefore not rebuilt on
+the way back; the values they carried are still in the metadata and can be read through the envelope that owns them:
+
+```php
+IdEnvelope::fromMessage($message)->getId();
+DelayEnvelope::fromMessage($message)->getDelaySeconds();
+```
+
+> **Note:** do not register an `Envelope` subclass as the class for a message type in the class resolver. Unserializing
+> such a type calls `Envelope::fromPayload()`, which always throws a `LogicException`. Register the wrapped message
+> class instead.
 
 ## FailureEnvelope metadata merging
 
-`Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope` stores failure-handling metadata under the `FailureEnvelope::META_FAILURE` key (`"yii-failure"`).
+`Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope` stores failure-handling metadata under the
+`FailureEnvelope::META_FAILURE` key (`"yii-failure"`).
 
-The envelope performs special deep-merge logic when building `getMetadata()` to combine failure metadata from nested envelopes.
+Its constructor deep-merges the failure metadata already present on the message with the metadata being added, so
+values accumulated by earlier failure-handling middlewares are preserved rather than overwritten.

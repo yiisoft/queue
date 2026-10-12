@@ -74,38 +74,23 @@ The required interface depends on the pipeline:
 
 The push pipeline is executed when calling `QueueProducerInterface::push()`.
 
-Push middlewares can:
+Push middlewares receive the message and return a message, so they can wrap it into envelopes, add metadata,
+obfuscate data, and so on.
 
-- Modify the message (wrap it into envelopes, add metadata, obfuscate data, etc.).
-- Modify the adapter (add delay, route to a different backend, etc.).
-
-In particular, push middlewares may define or replace the adapter that will be used to push the message. This can be useful when:
-
-- You choose a backend dynamically (for example, based on message type or payload).
-- You route messages to different queues/backends (for example, `critical` vs `low`).
-- You apply scheduling/delay logic in a middleware.
-
-The adapter is set by returning a modified request:
-
-```php
-return $pushRequest->withAdapter($adapter);
-```
-
-### Adapter must be configured by the end of the pipeline
-
-The push pipeline ends with a final handler that actually pushes the message using the adapter.
-
-If the adapter is not configured by the time the pipeline reaches the final handler,
-`Yiisoft\Queue\Exception\AdapterNotConfiguredException` is thrown.
+The adapter is not part of the pipeline: it is fixed when the producer is built, and the push pipeline ends with a
+final handler that pushes through it (`AdapterPushHandler` for `AsyncQueueProducer`, `SynchronousPushHandler` for
+`SyncQueueProducer`). To route messages to different backends, resolve a different producer by queue name through
+`QueueProducerProviderInterface` instead — see [Queue names](queue-names.md).
 
 ### Custom push middleware
 
-Implement `PushMiddlewareInterface` and return a modified `PushRequest` from `processPush()`:
+Implement `PushMiddlewareInterface` and return the message to pass down the pipeline:
 
 ```php
-return $pushRequest
-    ->withMessage($newMessage)
-    ->withAdapter($newAdapter);
+public function processPush(MessageInterface $message, PushHandlerInterface $handler): MessageInterface
+{
+    return $handler->handlePush(new MyEnvelope($message));
+}
 ```
 
 ## Consume pipeline

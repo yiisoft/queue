@@ -2,7 +2,8 @@
 
 An *envelope* is a message container that wraps another message and adds metadata.
 
-An envelope implements `Yiisoft\Queue\Message\EnvelopeInterface`, which itself extends `Yiisoft\Queue\Message\MessageInterface`.
+An envelope extends the abstract `Yiisoft\Queue\Message\Envelope` class, which implements
+`Yiisoft\Queue\Message\MessageInterface`.
 
 ## How an envelope behaves
 
@@ -11,17 +12,17 @@ An envelope is transparent to callers: it delegates the wrapped message type and
 - `getType()` is delegated to the wrapped message.
 - `getPayload()` is delegated to the wrapped message.
 
-Envelopes modify the metadata returned by `getMetadata()` and may provide convenience methods for accessing specific metadata entries (for example, `getId()` in an ID envelope).
+Envelopes modify the metadata returned by `getMeta()` and may provide convenience methods for accessing specific metadata entries (for example, `getId()` in an ID envelope).
 
 ## Creating envelopes
 
-To wrap a message into an envelope, envelope classes provide:
+To wrap a message into an envelope, use either the envelope constructor or:
 
-- `EnvelopeInterface::fromMessage(MessageInterface $message): static`
+- `Envelope::fromMessage(MessageInterface $message): static`, which restores the envelope's own parameters from the
+  message metadata.
 
-and, via `MessageInterface` inheritance, also support:
-
-- `Envelope::fromPayload(string $type, mixed $payload): static`
+`Envelope::fromPayload()` is inherited from `MessageInterface`, but it always throws a `LogicException`: an envelope
+cannot be created from a raw payload, it can only wrap an existing message.
 
 ## Built-in envelopes
 
@@ -35,4 +36,4 @@ This envelope is used to carry the adapter-provided message ID through the messa
 
 `Yiisoft\Queue\Middleware\FailureHandling\FailureEnvelope` stores failure-handling metadata.
 
-See [Errors and retryable messages](error-handling.md) for error handling concepts and [Envelope metadata and stack reconstruction](envelopes-metadata-internals.md) for details on how failure metadata is merged.
+See [Errors and retryable messages](error-handling.md) for error handling concepts and [Envelope metadata and serialization](envelopes-metadata-internals.md) for details on how failure metadata is merged.
