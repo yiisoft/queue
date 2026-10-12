@@ -64,7 +64,7 @@ final class WorkerTest extends TestCase
             self::fail('Exception was not thrown.');
         } catch (MessageFailureException $exception) {
             self::assertSame($exception::class, MessageFailureException::class);
-            self::assertSame($exception->getMessage(), "Processing of message without ID is stopped because of an exception:\nTest exception");
+            self::assertSame("Processing of message without ID is stopped because of an exception:\nTest exception", $exception->getMessage());
             self::assertEquals(['test-data'], $exception->getQueueMessage()->getPayload());
         } finally {
             $messages = $logger->getMessages();
