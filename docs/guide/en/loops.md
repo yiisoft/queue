@@ -26,6 +26,13 @@ It supports:
 - Pause/resume via `SIGTSTP` and `SIGCONT`.
 - Optional soft memory limit (see below).
 
+Signal handlers are installed only while messages are consumed: `QueueConsumer::run()`, `QueueConsumer::listen()`
+and `queue:listen-all` install them when they start and restore the previous handlers when they finish. Creating
+`SignalLoop`, for example when it is resolved from the container, doesn't affect handlers registered by other code,
+such as Symfony Console. While a consumer runs, its handlers replace the previous ones, so that the message being
+processed is finished before stopping. If `canContinue()` is called outside of a consumer, the handlers are installed
+at that moment and kept.
+
 ### `SimpleLoop`
 
 `\Yiisoft\Queue\Cli\SimpleLoop` is used by default when `ext-pcntl` is **not** available.
@@ -100,4 +107,8 @@ Implement `LoopInterface` and encapsulate your own stopping conditions:
 - Integration with your own signal / shutdown handling.
 
 The only requirement is that `canContinue()` returns `false` when the worker should stop.
+
+If the loop needs to change process-wide state only while messages are consumed, such as installing signal handlers,
+implement `ScopedLoopInterface` instead. Its `start()` is called before consuming begins and `finish()` after it ends.
+Calls may be nested when several consumers share one loop, so restore the state on the outermost `finish()`.
 

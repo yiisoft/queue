@@ -9,12 +9,15 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Yiisoft\Queue\Cli\SignalLoop;
 
+use function array_map;
+
 use const SIGALRM;
 use const SIGCONT;
 use const SIGHUP;
 use const SIGINT;
 use const SIGTERM;
 use const SIGTSTP;
+use const SIG_DFL;
 
 /**
  * @psalm-suppress UndefinedConstant
@@ -23,10 +26,115 @@ use const SIGTSTP;
 #[RequiresPhpExtension('pcntl')]
 final class SignalLoopTest extends TestCase
 {
+    private const SIGNALS = [SIGHUP, SIGINT, SIGTERM, SIGTSTP, SIGCONT];
+
+    /**
+     * @var SignalLoop[]
+     */
+    private array $startedLoops = [];
+
     public function setUp(): void
     {
         parent::setUp();
         pcntl_async_signals(true);
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->startedLoops as $loop) {
+            $loop->finish();
+        }
+        $this->startedLoops = [];
+        foreach (self::SIGNALS as $signal) {
+            pcntl_signal($signal, SIG_DFL);
+        }
+
+        parent::tearDown();
+    }
+
+    public function testConstructionKeepsExistingHandlers(): void
+    {
+        $handler = static function (): void {};
+        foreach (self::SIGNALS as $signal) {
+            pcntl_signal($signal, $handler);
+        }
+
+        new SignalLoop();
+
+        foreach (self::SIGNALS as $signal) {
+            self::assertSame($handler, pcntl_signal_get_handler($signal), "Handler of signal {$signal} was replaced.");
+        }
+    }
+
+    public function testFinishRestoresHandlersReplacedByStart(): void
+    {
+        $handler = static function (): void {};
+        foreach (self::SIGNALS as $signal) {
+            pcntl_signal($signal, $handler);
+        }
+        $loop = new SignalLoop();
+
+        $loop->start();
+        $replaced = array_map(pcntl_signal_get_handler(...), self::SIGNALS);
+        $loop->finish();
+
+        foreach ($replaced as $signalHandler) {
+            self::assertNotSame($handler, $signalHandler);
+        }
+        foreach (self::SIGNALS as $signal) {
+            self::assertSame($handler, pcntl_signal_get_handler($signal), "Handler of signal {$signal} was not restored.");
+        }
+    }
+
+    public function testNestedStartRestoresHandlersOnOutermostFinish(): void
+    {
+        $handler = static function (): void {};
+        pcntl_signal(SIGTERM, $handler);
+        $loop = new SignalLoop();
+
+        $loop->start();
+        $loop->start();
+        $loop->finish();
+        $afterInnerFinish = pcntl_signal_get_handler(SIGTERM);
+        $loop->finish();
+
+        self::assertNotSame($handler, $afterInnerFinish);
+        self::assertSame($handler, pcntl_signal_get_handler(SIGTERM));
+    }
+
+    public function testExtraFinishDoesNothing(): void
+    {
+        $handler = static function (): void {};
+        pcntl_signal(SIGTERM, $handler);
+        $loop = new SignalLoop();
+
+        $loop->finish();
+
+        self::assertSame($handler, pcntl_signal_get_handler(SIGTERM));
+    }
+
+    public function testExitSignalReceivedWhileStartedIsKeptAfterFinish(): void
+    {
+        $loop = new SignalLoop();
+        $loop->start();
+        posix_kill(getmypid(), SIGTERM);
+        $loop->finish();
+
+        $loop->start();
+        $result = $loop->canContinue();
+        $loop->finish();
+
+        self::assertFalse($result);
+    }
+
+    public function testCanContinueWithoutStartInstallsHandlers(): void
+    {
+        $loop = new SignalLoop();
+
+        self::assertTrue($loop->canContinue());
+        posix_kill(getmypid(), SIGTERM);
+
+        self::assertFalse($loop->canContinue());
     }
 
     public function testMemoryLimitReached(): void
@@ -37,7 +145,7 @@ final class SignalLoopTest extends TestCase
 
     public function testSuspendAndResume(): void
     {
-        $loop = new SignalLoop(0);
+        $loop = $this->createStartedLoop();
         pcntl_signal(SIGALRM, static function (): void {
             posix_kill(getmypid(), SIGCONT);
         });
@@ -56,7 +164,7 @@ final class SignalLoopTest extends TestCase
     #[DataProvider('exitSignalProvider')]
     public function testExitSignals(int $signal): void
     {
-        $loop = new SignalLoop(0);
+        $loop = $this->createStartedLoop();
 
         self::assertTrue($loop->canContinue(), 'Loop should continue');
         posix_kill(getmypid(), $signal);
@@ -73,7 +181,7 @@ final class SignalLoopTest extends TestCase
 
     public function testResumeSignal(): void
     {
-        $loop = new SignalLoop(0);
+        $loop = $this->createStartedLoop();
 
         // First suspend the loop
         posix_kill(getmypid(), SIGTSTP);
@@ -91,7 +199,7 @@ final class SignalLoopTest extends TestCase
 
     public function testMultipleExitSignals(): void
     {
-        $loop = new SignalLoop(0);
+        $loop = $this->createStartedLoop();
 
         // Send multiple exit signals
         posix_kill(getmypid(), SIGINT);
@@ -104,7 +212,7 @@ final class SignalLoopTest extends TestCase
 
     public function testSuspendOverridesResume(): void
     {
-        $loop = new SignalLoop(0);
+        $loop = $this->createStartedLoop();
 
         // Resume first
         posix_kill(getmypid(), SIGCONT);
@@ -123,5 +231,14 @@ final class SignalLoopTest extends TestCase
 
         self::assertTrue($result);
         self::assertGreaterThan(0.5, $elapsed, 'Loop should wait for resume after suspend');
+    }
+
+    private function createStartedLoop(): SignalLoop
+    {
+        $loop = new SignalLoop(0);
+        $loop->start();
+        $this->startedLoops[] = $loop;
+
+        return $loop;
     }
 }

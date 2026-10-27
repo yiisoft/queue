@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Queue\Tests\Unit;
 
 use Psr\Log\NullLogger;
+use RuntimeException;
+use Yiisoft\Queue\Adapter\AdapterInterface;
+use Yiisoft\Queue\Cli\ScopedLoopInterface;
 use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueProducerInterface;
@@ -118,5 +121,68 @@ final class QueueTest extends TestCase
         self::assertSame(1, $consumer->run());
         self::assertSame(2, $this->executionTimes, 'The message handled before the stop is not handled again.');
         self::assertCount(0, $adapter->getMessagesList());
+    }
+
+    public function testConsumerRunStartsAndFinishesScopedLoop(): void
+    {
+        $adapter = new InMemoryAdapter();
+        $this->createQueue($adapter)->push(new GenericMessage('simple', null));
+        $loop = new RecordingScopedLoop();
+        $consumer = new QueueConsumer($this->getWorker(), $loop, new NullLogger(), $adapter);
+
+        $consumer->run();
+
+        self::assertSame(['start', 'canContinue', 'finish'], $loop->calls);
+    }
+
+    public function testConsumerListenStartsAndFinishesScopedLoop(): void
+    {
+        $adapter = new InMemoryAdapter();
+        $this->createQueue($adapter)->push(new GenericMessage('simple', null));
+        $loop = new RecordingScopedLoop();
+        $consumer = new QueueConsumer($this->getWorker(), $loop, new NullLogger(), $adapter);
+
+        $consumer->listen();
+
+        self::assertSame(['start', 'canContinue', 'finish'], $loop->calls);
+    }
+
+    public function testConsumerFinishesScopedLoopWhenAdapterThrows(): void
+    {
+        $adapter = $this->createMock(AdapterInterface::class);
+        $adapter->method('runExisting')->willThrowException(new RuntimeException('Adapter failed.'));
+        $loop = new RecordingScopedLoop();
+        $consumer = new QueueConsumer($this->getWorker(), $loop, new NullLogger(), $adapter);
+
+        try {
+            $consumer->run();
+        } catch (RuntimeException) {
+        }
+
+        self::assertSame(['start', 'finish'], $loop->calls);
+    }
+}
+
+final class RecordingScopedLoop implements ScopedLoopInterface
+{
+    /**
+     * @var string[]
+     */
+    public array $calls = [];
+
+    public function start(): void
+    {
+        $this->calls[] = 'start';
+    }
+
+    public function finish(): void
+    {
+        $this->calls[] = 'finish';
+    }
+
+    public function canContinue(): bool
+    {
+        $this->calls[] = 'canContinue';
+        return true;
     }
 }
