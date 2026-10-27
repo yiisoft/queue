@@ -4,7 +4,9 @@ Yii Queue uses `\Yiisoft\Queue\Cli\LoopInterface` to control long-running execut
 
 The loop is evaluated to determine whether it can continue:
 
-- After each processed message (via `QueueConsumer::run()` / `QueueConsumer::listen()`).
+- Before each message in `QueueConsumer::run()`. A message taken from the queue after the loop stopped is not processed
+  and goes back to the queue.
+- By the adapter between messages in `QueueConsumer::listen()`.
 - On each iteration of `queue:listen-all`.
 
 When `canContinue()` returns `false`, consuming stops gracefully (as soon as the current message is finished).

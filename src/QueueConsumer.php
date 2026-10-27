@@ -35,9 +35,10 @@ final class QueueConsumer implements QueueConsumerInterface
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
         $this->adapter->runExisting(function (MessageInterface $message) use (&$count, $max): bool {
-            if (($max > 0 && $count >= $max) || !$this->handle($message)) {
+            if (($max > 0 && $count >= $max) || !$this->loop->canContinue()) {
                 return false;
             }
+            $this->worker->process($message, $this->queueName);
             $count++;
             return true;
         });
@@ -52,13 +53,10 @@ final class QueueConsumer implements QueueConsumerInterface
             return;
         }
         $this->logger->info('Start listening to the queue.');
-        $this->adapter->subscribe(fn(MessageInterface $message): bool => $this->handle($message));
+        $this->adapter->subscribe(function (MessageInterface $message): bool {
+            $this->worker->process($message, $this->queueName);
+            return true;
+        });
         $this->logger->info('Finish listening to the queue.');
-    }
-
-    private function handle(MessageInterface $message): bool
-    {
-        $this->worker->process($message, $this->queueName);
-        return $this->loop->canContinue();
     }
 }
