@@ -160,6 +160,21 @@ final class QueueTest extends TestCase
         self::assertSame(MessageStatus::DONE, $adapter->status($message->getId()));
     }
 
+    public function testConsumerListenStopsBeforeProcessingAnotherMessage(): void
+    {
+        $adapter = new InMemoryAdapter();
+        $producer = $this->createQueue($adapter);
+        $first = IdEnvelope::fromMessage($producer->push(new GenericMessage('simple', null)));
+        $second = IdEnvelope::fromMessage($producer->push(new GenericMessage('simple', null)));
+        $consumer = new QueueConsumer($this->getWorker(), $this->createStopAfterFirstExecutionLoop(), new NullLogger(), $adapter);
+
+        $consumer->listen();
+
+        self::assertSame(1, $this->executionTimes);
+        self::assertSame(MessageStatus::DONE, $adapter->status($first->getId()));
+        self::assertSame(MessageStatus::WAITING, $adapter->status($second->getId()));
+    }
+
     private function createStopAfterFirstExecutionLoop(): LoopInterface
     {
         return new class (fn(): int => $this->executionTimes) implements LoopInterface {

@@ -54,6 +54,9 @@ final class QueueConsumer implements QueueConsumerInterface
         }
         $this->logger->info('Start listening to the queue.');
         $this->adapter->subscribe(function (MessageInterface $message): bool {
+            if (!$this->loop->canContinue()) {
+                return false;
+            }
             $this->worker->process($message, $this->queueName);
             return true;
         });
