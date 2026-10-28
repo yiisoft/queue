@@ -19,7 +19,7 @@ final class MessageFailureException extends RuntimeException
     ) {
         $messageId = IdEnvelope::fromMessage($queueMessage)->getId();
         $exceptionMessage = sprintf(
-            "Processing of message %s is stopped because of an exception:\n%s.",
+            "Processing of message %s is stopped because of an exception:\n%s",
             $messageId === null ? 'without ID' : "#$messageId",
             $previous->getMessage(),
         );
