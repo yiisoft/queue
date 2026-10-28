@@ -36,7 +36,10 @@ interface AdapterInterface
     /**
      * Listen to the queue and pass messages to the given handler as they come.
      *
-     * @param callable(MessageInterface): bool $handlerCallback The handler which will handle messages. Returns false if it cannot continue handling messages.
+     * The handler returns `false` for a message it did not consume, as in {@see runExisting()}: that message must
+     * stay in the queue.
+     *
+     * @param callable(MessageInterface): bool $handlerCallback The handler which will handle messages. Returns false for a message it did not consume.
      */
     public function subscribe(callable $handlerCallback): void;
 }
