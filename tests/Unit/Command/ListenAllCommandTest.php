@@ -33,7 +33,7 @@ final class ListenAllCommandTest extends TestCase
         $command = new ListenAllCommand(new PredefinedQueueProvider([
             'producer' => ['producer' => new StubQueueProducer()],
             'consumer' => ['consumer' => $consumer],
-        ]), $this->createStoppingLoop());
+        ]), $this->createLoop(1));
         $input = new ArrayInput(['--pause' => 0], $command->getNativeDefinition());
         self::assertSame(Command::SUCCESS, $command->run($input, $this->createMock(OutputInterface::class)));
     }
@@ -44,7 +44,7 @@ final class ListenAllCommandTest extends TestCase
         $consumer->method('run')->willReturn(0);
         $command = new ListenAllCommand(new PredefinedQueueProvider([
             'consumer' => ['consumer' => $consumer],
-        ]), $this->createStoppingLoop());
+        ]), $this->createLoop(1));
         $input = new ArrayInput(['--pause' => 3], $command->getNativeDefinition());
 
         $start = hrtime(true);
@@ -53,20 +53,32 @@ final class ListenAllCommandTest extends TestCase
         self::assertLessThan(1.0, (hrtime(true) - $start) / 1_000_000_000, 'The pause is skipped once the loop asked to stop.');
     }
 
-    /**
-     * @return LoopInterface A loop which allows a single iteration and then asks to stop.
-     */
-    private function createStoppingLoop(): LoopInterface
+    public function testPausesWhenThereAreNoMessages(): void
     {
-        return new class implements LoopInterface {
-            private bool $canContinue = true;
+        $consumer = $this->createMock(QueueConsumerInterface::class);
+        $consumer->method('run')->willReturn(0);
+        $command = new ListenAllCommand(new PredefinedQueueProvider([
+            'consumer' => ['consumer' => $consumer],
+        ]), $this->createLoop(2));
+        $input = new ArrayInput(['--pause' => 1], $command->getNativeDefinition());
+
+        $start = hrtime(true);
+        $command->run($input, $this->createMock(OutputInterface::class));
+
+        self::assertGreaterThanOrEqual(1.0, (hrtime(true) - $start) / 1_000_000_000, 'An empty queue is polled once per pause.');
+    }
+
+    /**
+     * @return LoopInterface A loop which allows the given number of checks and then asks to stop.
+     */
+    private function createLoop(int $continueTimes): LoopInterface
+    {
+        return new class ($continueTimes) implements LoopInterface {
+            public function __construct(private int $continueTimes) {}
 
             public function canContinue(): bool
             {
-                $canContinue = $this->canContinue;
-                $this->canContinue = false;
-
-                return $canContinue;
+                return $this->continueTimes-- > 0;
             }
         };
     }
