@@ -35,7 +35,7 @@ $logger = new NullLogger(); // replace with your PSR-3 logger in production
 
 // Define message handlers
 $handlers = [
-    DownloadFileMessage::TYPE => [FileDownloader::class, 'handle'],
+    DownloadFileMessage::TYPE => [RemoteFileHandler::class, 'handle'],
 ];
 
 // Create middleware dispatchers
