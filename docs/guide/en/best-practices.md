@@ -145,7 +145,7 @@ Messages should contain only the data needed for processing. Avoid embedding lar
 #### Bad
 
 ```php
-new Message(ProcessImageHandler::class, [
+new GenericMessage(ProcessImageHandler::class, [
     'imageData' => base64_encode($imageContent), // Large binary data
     'operations' => ['resize', 'watermark'],
 ]);
@@ -154,7 +154,7 @@ new Message(ProcessImageHandler::class, [
 #### Good
 
 ```php
-new Message(ProcessImageHandler::class, [
+new GenericMessage(ProcessImageHandler::class, [
     'imageId' => 12345, // You can get the image itself from DB or disk by id in a message handler
     'operations' => ['resize', 'watermark'],
 ]);
@@ -171,7 +171,7 @@ new Message(ProcessImageHandler::class, [
 #### Bad
 
 ```php
-new Message(SendEmailHandler::class, [
+new GenericMessage(SendEmailHandler::class, [
     'to' => 'user@example.com',
     'mailer' => $this->mailer, // Object instance
     'callback' => fn() => $this->log(), // Closure
@@ -181,7 +181,7 @@ new Message(SendEmailHandler::class, [
 #### Good
 
 ```php
-new Message(SendEmailHandler::class, [
+new GenericMessage(SendEmailHandler::class, [
     'to' => 'user@example.com',
     'subject' => 'Welcome',
     'templateId' => 'welcome-email',
@@ -203,7 +203,7 @@ new Message(SendEmailHandler::class, [
 
 ```php
 // External system pushes messages with handler class name
-new Message('\App\Queue\EmailHandler', ['to' => 'user@example.com']);
+new GenericMessage('\App\Queue\EmailHandler', ['to' => 'user@example.com']);
 ```
 
 #### Good
@@ -219,7 +219,7 @@ return [
 ];
 
 // External system uses stable type
-new Message('send-email', ['to' => 'user@example.com']);
+new GenericMessage('send-email', ['to' => 'user@example.com']);
 ```
 
 #### Why
@@ -242,14 +242,14 @@ return [
     ],
 ];
 
-$queue->push(new Message('generate-report', ['reportId' => 123]));
+$queue->push(new GenericMessage('generate-report', ['reportId' => 123]));
 ```
 
 #### Good
 
 ```php
 // No configuration needed
-$queue->push(new Message(
+$queue->push(new GenericMessage(
     GenerateReportHandler::class,
     ['reportId' => 123]
 ));
@@ -328,7 +328,7 @@ $this->logger->info('Queued task');
 
 ```php
 $pushedMessage = $queue->push($message);
-$id = $pushedMessage->getMetadata()[IdEnvelope::META_ID] ?? null;
+$id = $pushedMessage->getMeta()[IdEnvelope::META_ID] ?? null;
 
 $this->logger->info('Queued task', [
     'messageId' => $id,
@@ -478,7 +478,7 @@ See [Loops](loops.md) and [Performance tuning](performance-tuning.md) for more d
 // Testing through the queue (integration test)
 public function testProcessesPayment(): void
 {
-    $queue->push(new Message(ProcessPaymentHandler::class, ['paymentId' => 123]));
+    $queue->push(new GenericMessage(ProcessPaymentHandler::class, ['paymentId' => 123]));
     // Hard to verify behavior, slow, requires queue setup
 }
 ```
@@ -495,7 +495,7 @@ final class ProcessPaymentHandlerTest extends TestCase
             $this->createMock(PaymentRepository::class),
         );
         
-        $message = new Message(ProcessPaymentHandler::class, [
+        $message = new GenericMessage(ProcessPaymentHandler::class, [
             'paymentId' => 123,
         ]);
         
@@ -599,7 +599,7 @@ See [Consuming messages from external systems](consuming-messages-from-external-
 #### Bad
 
 ```php
-new Message(SendEmailHandler::class, [
+new GenericMessage(SendEmailHandler::class, [
     'userEmail' => 'user@example.com',
     'apiKey' => 'secret-key-here', // Secret in message
     'password' => 'user-password', // Sensitive data
@@ -609,7 +609,7 @@ new Message(SendEmailHandler::class, [
 #### Good
 
 ```php
-new Message(SendEmailHandler::class, [
+new GenericMessage(SendEmailHandler::class, [
     'userId' => 123,
     'templateId' => 'welcome',
 ]);

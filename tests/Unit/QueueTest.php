@@ -6,10 +6,10 @@ namespace Yiisoft\Queue\Tests\Unit;
 
 use Closure;
 use Psr\Log\NullLogger;
-use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\MessageStatus;
@@ -96,55 +96,29 @@ final class QueueTest extends TestCase
         $consumer = new QueueConsumer($this->getWorker(), new StubLoop(false), new NullLogger(), $adapter);
 
         self::assertSame(0, $consumer->run());
+        self::assertSame(0, $this->executionTimes);
         self::assertCount(2, $adapter->getMessagesList());
     }
 
-    public function testConsumerProcessesLastMessageAtLimitOnceAndLeavesNextOneWaiting(): void
+    public function testMessageHandledBeforeStopIsNotHandledAgain(): void
     {
         $adapter = new InMemoryAdapter();
         $producer = $this->createQueue($adapter);
         $producer->push(new GenericMessage('simple', null));
         $producer->push(new GenericMessage('simple', null));
-        $third = IdEnvelope::fromMessage($producer->push(new GenericMessage('simple', null)));
-        $consumer = new QueueConsumer($this->getWorker(), $this->getLoop(), new NullLogger(), $adapter);
+        $loop = $this->createMock(LoopInterface::class);
+        $loop->method('canContinue')->willReturn(true, false);
+        $consumer = new QueueConsumer($this->getWorker(), $loop, new NullLogger(), $adapter);
 
-        $processed = $consumer->run(2);
-
-        self::assertSame(2, $processed);
-        self::assertSame(2, $this->executionTimes);
-        self::assertSame(MessageStatus::WAITING, $adapter->status($third->getId()));
-    }
-
-    public function testConsumerProcessesMessageLeftAtLimitOnNextRun(): void
-    {
-        $adapter = new InMemoryAdapter();
-        $producer = $this->createQueue($adapter);
-        $producer->push(new GenericMessage('simple', null));
-        $producer->push(new GenericMessage('simple', null));
-        $producer->push(new GenericMessage('simple', null));
-        $consumer = new QueueConsumer($this->getWorker(), $this->getLoop(), new NullLogger(), $adapter);
-        $consumer->run(2);
-
-        $processed = $consumer->run(2);
-
-        self::assertSame(1, $processed);
-        self::assertSame(3, $this->executionTimes);
-    }
-
-    public function testConsumerRunReportsMessageProcessedBeforeLoopStops(): void
-    {
-        $adapter = new InMemoryAdapter();
-        $producer = $this->createQueue($adapter);
-        $first = IdEnvelope::fromMessage($producer->push(new GenericMessage('simple', null)));
-        $second = IdEnvelope::fromMessage($producer->push(new GenericMessage('simple', null)));
-        $consumer = new QueueConsumer($this->getWorker(), $this->createStopAfterFirstExecutionLoop(), new NullLogger(), $adapter);
-
-        $processed = $consumer->run();
-
-        self::assertSame(1, $processed);
+        self::assertSame(1, $consumer->run());
         self::assertSame(1, $this->executionTimes);
-        self::assertSame(MessageStatus::DONE, $adapter->status($first->getId()));
-        self::assertSame(MessageStatus::WAITING, $adapter->status($second->getId()));
+        self::assertCount(1, $adapter->getMessagesList());
+
+        $consumer = new QueueConsumer($this->getWorker(), new StubLoop(), new NullLogger(), $adapter);
+
+        self::assertSame(1, $consumer->run());
+        self::assertSame(2, $this->executionTimes, 'The message handled before the stop is not handled again.');
+        self::assertCount(0, $adapter->getMessagesList());
     }
 
     public function testConsumerListenReportsMessageProcessedBeforeLoopStops(): void

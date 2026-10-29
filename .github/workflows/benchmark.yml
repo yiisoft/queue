@@ -22,7 +22,7 @@ on:
       - 'psalm.xml'
       - 'tests/**'
 
-name: bechmark
+name: benchmark
 
 permissions:
   contents: read

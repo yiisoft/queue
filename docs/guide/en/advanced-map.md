@@ -15,7 +15,7 @@ Use this index when you need to customize internals: custom middleware, adapters
 - [Middleware pipelines deep dive](middleware-pipelines.md) — dispatcher lifecycle, request mutations, and per-pipeline contracts.
 - [Callable definitions and middleware factories](callable-definitions-extended.md) — container-aware definitions for middleware factories.
 - [Error handling internals](error-handling-advanced.md) — failure pipeline flow, built-in components, and custom middleware.
-- [Envelope metadata and stack reconstruction](envelopes-metadata-internals.md) — stack resolution and metadata merging.
+- [Envelope metadata and serialization](envelopes-metadata-internals.md) — metadata merging and what survives a round-trip.
 - [Handler resolver pipeline](message-handler-advanced.md) — alternative handler lookup strategies.
 
 ## Queue adapters and interoperability

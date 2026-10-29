@@ -2,9 +2,11 @@
 
 Yii Queue uses middlewares to run custom logic around message pushing and message processing.
 
-A middleware is a piece of code that receives a request object and can either:
+A middleware is a piece of code that receives the message being pushed, or a request object wrapping it, and can
+either:
 
-- change the request (for example, change the message, adapter, or error handling behavior) and continue the pipeline, or
+- change what it received (for example, wrap the message into an envelope, or change the error handling behavior)
+  and continue the pipeline, or
 - stop the pipeline by returning without calling the next handler.
 
 The pipeline mechanism is similar to HTTP middleware, but applied to queue messages.
@@ -21,8 +23,9 @@ Common reasons to add middlewares:
   You can log message ids, queue names, attempts, and failures in a consistent way.
 - **Modify the message payload**
   You can obfuscate sensitive data, normalize payload, add extra fields required by consumers, or wrap a message into envelopes.
-- **Route and schedule**
-  You can switch queue, choose a different adapter, or add delay when the adapter supports it.
+- **Schedule**
+  You can add delay when the adapter supports it. Routing to another queue is not done in a middleware: resolve the
+  producer for that queue through `QueueProducerProviderInterface` instead, see [Queue names](queue-names.md).
 
 ## Pipelines overview
 
@@ -74,38 +77,23 @@ The required interface depends on the pipeline:
 
 The push pipeline is executed when calling `QueueProducerInterface::push()`.
 
-Push middlewares can:
+Push middlewares receive the message and return a message, so they can wrap it into envelopes, add metadata,
+obfuscate data, and so on.
 
-- Modify the message (wrap it into envelopes, add metadata, obfuscate data, etc.).
-- Modify the adapter (add delay, route to a different backend, etc.).
-
-In particular, push middlewares may define or replace the adapter that will be used to push the message. This can be useful when:
-
-- You choose a backend dynamically (for example, based on message type or payload).
-- You route messages to different queues/backends (for example, `critical` vs `low`).
-- You apply scheduling/delay logic in a middleware.
-
-The adapter is set by returning a modified request:
-
-```php
-return $pushRequest->withAdapter($adapter);
-```
-
-### Adapter must be configured by the end of the pipeline
-
-The push pipeline ends with a final handler that actually pushes the message using the adapter.
-
-If the adapter is not configured by the time the pipeline reaches the final handler,
-`Yiisoft\Queue\Exception\AdapterNotConfiguredException` is thrown.
+The adapter is not part of the pipeline: it is fixed when the producer is built, and the push pipeline ends with a
+final handler that pushes through it (`AdapterPushHandler` for `AsyncQueueProducer`, `SynchronousPushHandler` for
+`SyncQueueProducer`). To route messages to different backends, resolve a different producer by queue name through
+`QueueProducerProviderInterface` instead — see [Queue names](queue-names.md).
 
 ### Custom push middleware
 
-Implement `PushMiddlewareInterface` and return a modified `PushRequest` from `processPush()`:
+Implement `PushMiddlewareInterface` and return the message to pass down the pipeline:
 
 ```php
-return $pushRequest
-    ->withMessage($newMessage)
-    ->withAdapter($newAdapter);
+public function processPush(MessageInterface $message, PushHandlerInterface $handler): MessageInterface
+{
+    return $handler->handlePush(new MyEnvelope($message));
+}
 ```
 
 ## Consume pipeline
@@ -128,7 +116,7 @@ The pipeline receives a `FailureHandlingRequest` that contains:
 
 - the message
 - the caught exception
-- the queue instance
+- the queue name
 
 The pipeline is selected by queue name; if there is no queue-specific pipeline configured,
 `FailureMiddlewareDispatcher::DEFAULT_PIPELINE` is used.
