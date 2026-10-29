@@ -84,18 +84,20 @@ final class ListenAllCommand extends Command
             $pauseSeconds = 1;
         }
 
+        $limit = (int) $input->getOption('limit');
+
         while ($this->loop->canContinue()) {
             $hasMessages = false;
             foreach ($consumers as $consumer) {
-                $hasMessages = $consumer->run((int) $input->getOption('limit')) > 0 || $hasMessages;
+                $hasMessages = $consumer->run($limit) > 0 || $hasMessages;
             }
 
-            if (!$hasMessages) {
+            if (!$hasMessages && $this->loop->canContinue()) {
                 /** @psalm-var 0|positive-int $pauseSeconds */
                 sleep($pauseSeconds);
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

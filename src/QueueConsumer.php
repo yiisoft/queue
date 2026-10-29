@@ -58,7 +58,11 @@ final class QueueConsumer implements QueueConsumerInterface
 
     private function handle(MessageInterface $message): bool
     {
+        if (!$this->loop->canContinue()) {
+            return false;
+        }
+
         $this->worker->process($message, $this->queueName);
-        return $this->loop->canContinue();
+        return true;
     }
 }

@@ -48,9 +48,11 @@ final class InMemoryAdapter implements AdapterInterface
 
     public function runExisting(callable $handlerCallback): void
     {
-        $result = true;
-        while (isset($this->messages[$this->current]) && $result === true) {
-            $result = $handlerCallback($this->messages[$this->current]);
+        while (isset($this->messages[$this->current])) {
+            if ($handlerCallback($this->messages[$this->current]) !== true) {
+                break;
+            }
+
             unset($this->messages[$this->current]);
             $this->current++;
         }

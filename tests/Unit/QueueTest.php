@@ -8,10 +8,12 @@ use Psr\Log\NullLogger;
 use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\MessageStatus;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
+use Yiisoft\Queue\Stubs\StubLoop;
 use Yiisoft\Queue\Tests\TestCase;
 
 use function count;
@@ -81,5 +83,40 @@ final class QueueTest extends TestCase
         $consumer = new QueueConsumer($this->getWorker(), $this->getLoop(), new NullLogger(), $adapter);
         self::assertSame(1, $consumer->run(1));
         self::assertSame(1, $this->executionTimes);
+        self::assertCount(1, $adapter->getMessagesList(), 'The message that hits the limit stays in the queue.');
+    }
+
+    public function testMessageIsNotConsumedWhenLoopCannotContinue(): void
+    {
+        $adapter = new InMemoryAdapter();
+        $producer = $this->createQueue($adapter);
+        $producer->push(new GenericMessage('simple', null));
+        $producer->push(new GenericMessage('simple', null));
+        $consumer = new QueueConsumer($this->getWorker(), new StubLoop(false), new NullLogger(), $adapter);
+
+        self::assertSame(0, $consumer->run());
+        self::assertSame(0, $this->executionTimes);
+        self::assertCount(2, $adapter->getMessagesList());
+    }
+
+    public function testMessageHandledBeforeStopIsNotHandledAgain(): void
+    {
+        $adapter = new InMemoryAdapter();
+        $producer = $this->createQueue($adapter);
+        $producer->push(new GenericMessage('simple', null));
+        $producer->push(new GenericMessage('simple', null));
+        $loop = $this->createMock(LoopInterface::class);
+        $loop->method('canContinue')->willReturn(true, false);
+        $consumer = new QueueConsumer($this->getWorker(), $loop, new NullLogger(), $adapter);
+
+        self::assertSame(1, $consumer->run());
+        self::assertSame(1, $this->executionTimes);
+        self::assertCount(1, $adapter->getMessagesList());
+
+        $consumer = new QueueConsumer($this->getWorker(), new StubLoop(), new NullLogger(), $adapter);
+
+        self::assertSame(1, $consumer->run());
+        self::assertSame(2, $this->executionTimes, 'The message handled before the stop is not handled again.');
+        self::assertCount(0, $adapter->getMessagesList());
     }
 }

@@ -60,6 +60,6 @@ final class RunCommand extends Command
             $output->writeln("Messages processed: $count.");
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }
