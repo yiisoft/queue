@@ -69,21 +69,6 @@ final class ListenAllCommandTest extends TestCase
         self::assertGreaterThanOrEqual(1.0, (hrtime(true) - $start) / 1_000_000_000, 'An empty queue is polled once per pause.');
     }
 
-    /**
-     * @return LoopInterface A loop which allows the given number of checks and then asks to stop.
-     */
-    private function createLoop(int $continueTimes): LoopInterface
-    {
-        return new class ($continueTimes) implements LoopInterface {
-            public function __construct(private int $continueTimes) {}
-
-            public function canContinue(): bool
-            {
-                return $this->continueTimes-- > 0;
-            }
-        };
-    }
-
     public function testStartsAndFinishesScopedLoopOnce(): void
     {
         $calls = [];
@@ -99,15 +84,29 @@ final class ListenAllCommandTest extends TestCase
         $loop->method('finish')->willReturnCallback(static function () use (&$calls): void {
             $calls[] = 'finish';
         });
-        $loop->method('canContinue')->willReturn(true, false);
+        $loop->method('canContinue')->willReturn(true, false, false);
         $command = new ListenAllCommand(new PredefinedQueueProvider([
             'consumer' => ['consumer' => $consumer],
         ]), $loop);
-        $input = new ArrayInput([], $command->getNativeDefinition());
-        $input->setOption('pause', 0);
+        $input = new ArrayInput(['--pause' => 0], $command->getNativeDefinition());
 
         $command->run($input, $this->createMock(OutputInterface::class));
 
         self::assertSame(['start', 'run', 'finish'], $calls);
+    }
+
+    /**
+     * @return LoopInterface A loop which allows the given number of checks and then asks to stop.
+     */
+    private function createLoop(int $continueTimes): LoopInterface
+    {
+        return new class ($continueTimes) implements LoopInterface {
+            public function __construct(private int $continueTimes) {}
+
+            public function canContinue(): bool
+            {
+                return $this->continueTimes-- > 0;
+            }
+        };
     }
 }

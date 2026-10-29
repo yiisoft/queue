@@ -7,6 +7,7 @@ namespace Yiisoft\Queue\Tests\Unit\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Yiisoft\Queue\Cli\ScopedLoopInterface;
 use Yiisoft\Queue\Command\RunCommand;
 use Yiisoft\Queue\DefaultQueue;
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;
@@ -35,5 +36,33 @@ final class RunCommandTest extends TestCase
             DefaultQueue::NAME => ['consumer' => $consumer],
         ]));
         self::assertSame(0, $command->run(new StringInput(''), $this->createMock(OutputInterface::class)));
+    }
+
+    public function testStartsAndFinishesScopedLoopOnceForAllQueues(): void
+    {
+        $calls = [];
+        $createConsumer = function (string $name) use (&$calls): QueueConsumerInterface {
+            $consumer = $this->createMock(QueueConsumerInterface::class);
+            $consumer->method('run')->willReturnCallback(static function () use (&$calls, $name): int {
+                $calls[] = "run $name";
+                return 0;
+            });
+            return $consumer;
+        };
+        $loop = $this->createMock(ScopedLoopInterface::class);
+        $loop->method('start')->willReturnCallback(static function () use (&$calls): void {
+            $calls[] = 'start';
+        });
+        $loop->method('finish')->willReturnCallback(static function () use (&$calls): void {
+            $calls[] = 'finish';
+        });
+        $command = new RunCommand(new PredefinedQueueProvider([
+            'first' => ['consumer' => $createConsumer('first')],
+            'second' => ['consumer' => $createConsumer('second')],
+        ]), $loop);
+
+        $command->run(new StringInput('first second'), $this->createMock(OutputInterface::class));
+
+        self::assertSame(['start', 'run first', 'run second', 'finish'], $calls);
     }
 }

@@ -137,6 +137,21 @@ final class SignalLoopTest extends TestCase
         self::assertFalse($loop->canContinue());
     }
 
+    public function testFinishKeepsHandlersInstalledByCanContinueBeforeStart(): void
+    {
+        $handler = static function (): void {};
+        pcntl_signal(SIGTERM, $handler);
+        $loop = new SignalLoop();
+        $loop->canContinue();
+        $installed = pcntl_signal_get_handler(SIGTERM);
+
+        $loop->start();
+        $loop->finish();
+
+        self::assertNotSame($handler, $installed);
+        self::assertSame($installed, pcntl_signal_get_handler(SIGTERM));
+    }
+
     public function testMemoryLimitReached(): void
     {
         $loop = new SignalLoop(1);

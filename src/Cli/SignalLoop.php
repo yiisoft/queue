@@ -15,7 +15,8 @@ use const SIGTSTP;
  *
  * Signal handlers are installed by {@see start()} and the previous ones are restored by {@see finish()}, so creating
  * the loop doesn't affect handlers registered by other code, such as Symfony Console. If {@see canContinue()} is
- * called outside of {@see start()} and {@see finish()}, the handlers are installed then and kept.
+ * called outside of {@see start()} and {@see finish()}, the handlers are installed then and kept, also through any
+ * later {@see start()} and {@see finish()}: the code using the loop that way relies on them until it stops.
  */
 final class SignalLoop implements ScopedLoopInterface
 {

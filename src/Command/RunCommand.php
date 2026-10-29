@@ -10,6 +10,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Yiisoft\Queue\Cli\LoopInterface;
+use Yiisoft\Queue\Cli\ScopedLoopInterface;
 use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
 
 #[AsCommand(
@@ -20,6 +22,7 @@ final class RunCommand extends Command
 {
     public function __construct(
         private readonly QueueConsumerProviderInterface $queueProvider,
+        private readonly ?LoopInterface $loop = null,
     ) {
         parent::__construct();
     }
@@ -50,14 +53,27 @@ final class RunCommand extends Command
             $queueNames = $this->queueProvider->getConsumerQueueNames();
         }
 
-        /** @var string $queueName */
-        foreach ($queueNames as $queueName) {
-            $queueConsumer = $this->queueProvider->getConsumer($queueName);
+        $limit = (int) $input->getOption('limit');
 
-            $output->write("Processing queue $queueName... ");
-            $count = $queueConsumer->run((int) $input->getOption('limit'));
+        // One scope for all queues, so that a signal received between two of them doesn't reach the default handler.
+        if ($this->loop instanceof ScopedLoopInterface) {
+            $this->loop->start();
+        }
 
-            $output->writeln("Messages processed: $count.");
+        try {
+            /** @var string $queueName */
+            foreach ($queueNames as $queueName) {
+                $queueConsumer = $this->queueProvider->getConsumer($queueName);
+
+                $output->write("Processing queue $queueName... ");
+                $count = $queueConsumer->run($limit);
+
+                $output->writeln("Messages processed: $count.");
+            }
+        } finally {
+            if ($this->loop instanceof ScopedLoopInterface) {
+                $this->loop->finish();
+            }
         }
 
         return Command::SUCCESS;

@@ -26,8 +26,9 @@ It supports:
 - Pause/resume via `SIGTSTP` and `SIGCONT`.
 - Optional soft memory limit (see below).
 
-Signal handlers are installed only while messages are consumed: `QueueConsumer::run()`, `QueueConsumer::listen()`
-and `queue:listen-all` install them when they start and restore the previous handlers when they finish. Creating
+Signal handlers are installed only while messages are consumed: `QueueConsumer::run()`, `QueueConsumer::listen()`,
+`queue:run` and `queue:listen-all` install them when they start and restore the previous handlers when they finish.
+The commands keep them installed between queues. Creating
 `SignalLoop`, for example when it is resolved from the container, doesn't affect handlers registered by other code,
 such as Symfony Console. While a consumer runs, its handlers replace the previous ones, so that the message being
 processed is finished before stopping. If `canContinue()` is called outside of a consumer, the handlers are installed
