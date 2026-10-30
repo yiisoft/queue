@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit;
 
+use Closure;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Yiisoft\Queue\Adapter\AdapterInterface;
@@ -160,6 +161,49 @@ final class QueueTest extends TestCase
         }
 
         self::assertSame(['start', 'finish'], $loop->calls);
+    }
+
+    public function testConsumerListenReportsMessageProcessedBeforeLoopStops(): void
+    {
+        $adapter = new InMemoryAdapter();
+        $producer = $this->createQueue($adapter);
+        $message = IdEnvelope::fromMessage($producer->push(new GenericMessage('simple', null)));
+        $consumer = new QueueConsumer($this->getWorker(), $this->createStopAfterFirstExecutionLoop(), new NullLogger(), $adapter);
+
+        $consumer->listen();
+
+        self::assertSame(1, $this->executionTimes);
+        self::assertSame(MessageStatus::DONE, $adapter->status($message->getId()));
+    }
+
+    public function testConsumerListenStopsBeforeProcessingAnotherMessage(): void
+    {
+        $adapter = new InMemoryAdapter();
+        $producer = $this->createQueue($adapter);
+        $first = IdEnvelope::fromMessage($producer->push(new GenericMessage('simple', null)));
+        $second = IdEnvelope::fromMessage($producer->push(new GenericMessage('simple', null)));
+        $consumer = new QueueConsumer($this->getWorker(), $this->createStopAfterFirstExecutionLoop(), new NullLogger(), $adapter);
+
+        $consumer->listen();
+
+        self::assertSame(1, $this->executionTimes);
+        self::assertSame(MessageStatus::DONE, $adapter->status($first->getId()));
+        self::assertSame(MessageStatus::WAITING, $adapter->status($second->getId()));
+    }
+
+    private function createStopAfterFirstExecutionLoop(): LoopInterface
+    {
+        return new class (fn(): int => $this->executionTimes) implements LoopInterface {
+            /**
+             * @param Closure(): int $executionTimes
+             */
+            public function __construct(private readonly Closure $executionTimes) {}
+
+            public function canContinue(): bool
+            {
+                return ($this->executionTimes)() === 0;
+            }
+        };
     }
 }
 
