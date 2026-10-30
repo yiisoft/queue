@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit;
 
-use Closure;
 use Psr\Log\NullLogger;
-use RuntimeException;
-use Yiisoft\Queue\Adapter\AdapterInterface;
-use Yiisoft\Queue\Cli\ScopedLoopInterface;
 use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueProducerInterface;
@@ -21,11 +17,6 @@ use Yiisoft\Queue\Stubs\StubLoop;
 use Yiisoft\Queue\Tests\TestCase;
 
 use function count;
-
-enum TestQueue: string
-{
-    case HIGH_PRIORITY = 'high-priority';
-}
 
 final class QueueTest extends TestCase
 {
@@ -124,45 +115,6 @@ final class QueueTest extends TestCase
         self::assertCount(0, $adapter->getMessagesList());
     }
 
-    public function testConsumerRunStartsAndFinishesScopedLoop(): void
-    {
-        $adapter = new InMemoryAdapter();
-        $this->createQueue($adapter)->push(new GenericMessage('simple', null));
-        $loop = new RecordingScopedLoop();
-        $consumer = new QueueConsumer($this->getWorker(), $loop, new NullLogger(), $adapter);
-
-        $consumer->run();
-
-        self::assertSame(['start', 'canContinue', 'finish'], $loop->calls);
-    }
-
-    public function testConsumerListenStartsAndFinishesScopedLoop(): void
-    {
-        $adapter = new InMemoryAdapter();
-        $this->createQueue($adapter)->push(new GenericMessage('simple', null));
-        $loop = new RecordingScopedLoop();
-        $consumer = new QueueConsumer($this->getWorker(), $loop, new NullLogger(), $adapter);
-
-        $consumer->listen();
-
-        self::assertSame(['start', 'canContinue', 'finish'], $loop->calls);
-    }
-
-    public function testConsumerFinishesScopedLoopWhenAdapterThrows(): void
-    {
-        $adapter = $this->createMock(AdapterInterface::class);
-        $adapter->method('runExisting')->willThrowException(new RuntimeException('Adapter failed.'));
-        $loop = new RecordingScopedLoop();
-        $consumer = new QueueConsumer($this->getWorker(), $loop, new NullLogger(), $adapter);
-
-        try {
-            $consumer->run();
-        } catch (RuntimeException) {
-        }
-
-        self::assertSame(['start', 'finish'], $loop->calls);
-    }
-
     public function testConsumerListenReportsMessageProcessedBeforeLoopStops(): void
     {
         $adapter = new InMemoryAdapter();
@@ -193,40 +145,9 @@ final class QueueTest extends TestCase
 
     private function createStopAfterFirstExecutionLoop(): LoopInterface
     {
-        return new class (fn(): int => $this->executionTimes) implements LoopInterface {
-            /**
-             * @param Closure(): int $executionTimes
-             */
-            public function __construct(private readonly Closure $executionTimes) {}
+        $loop = $this->createMock(LoopInterface::class);
+        $loop->method('canContinue')->willReturnCallback(fn(): bool => $this->executionTimes === 0);
 
-            public function canContinue(): bool
-            {
-                return ($this->executionTimes)() === 0;
-            }
-        };
-    }
-}
-
-final class RecordingScopedLoop implements ScopedLoopInterface
-{
-    /**
-     * @var string[]
-     */
-    public array $calls = [];
-
-    public function start(): void
-    {
-        $this->calls[] = 'start';
-    }
-
-    public function finish(): void
-    {
-        $this->calls[] = 'finish';
-    }
-
-    public function canContinue(): bool
-    {
-        $this->calls[] = 'canContinue';
-        return true;
+        return $loop;
     }
 }

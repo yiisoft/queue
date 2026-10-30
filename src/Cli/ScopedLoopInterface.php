@@ -7,9 +7,9 @@ namespace Yiisoft\Queue\Cli;
 /**
  * A loop that changes process-wide state, such as signal handlers, only while messages are consumed.
  *
- * {@see start()} is called before consuming starts and {@see finish()} after it ends. Calls may be nested, for example
+ * {@see ScopedLoopInterface::start()} is called before consuming starts and {@see ScopedLoopInterface::finish()} after it ends. Calls may be nested, for example
  * when `queue:listen-all` runs consumers that share the same loop: the state is changed by the outermost
- * {@see start()} and restored by the matching {@see finish()}.
+ * {@see ScopedLoopInterface::start()} and restored by the matching {@see ScopedLoopInterface::finish()}.
  */
 interface ScopedLoopInterface extends LoopInterface
 {
@@ -19,7 +19,7 @@ interface ScopedLoopInterface extends LoopInterface
     public function start(): void;
 
     /**
-     * Restores what {@see start()} changed after consuming messages.
+     * Restores what {@see ScopedLoopInterface::start()} changed after consuming messages.
      */
     public function finish(): void;
 }

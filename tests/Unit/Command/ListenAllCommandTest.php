@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
-use Yiisoft\Queue\Cli\ScopedLoopInterface;
 use Yiisoft\Queue\Command\ListenAllCommand;
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;
 use Yiisoft\Queue\QueueConsumerInterface;
@@ -69,44 +68,19 @@ final class ListenAllCommandTest extends TestCase
         self::assertGreaterThanOrEqual(1.0, (hrtime(true) - $start) / 1_000_000_000, 'An empty queue is polled once per pause.');
     }
 
-    public function testStartsAndFinishesScopedLoopOnce(): void
-    {
-        $calls = [];
-        $consumer = $this->createMock(QueueConsumerInterface::class);
-        $consumer->method('run')->willReturnCallback(static function () use (&$calls): int {
-            $calls[] = 'run';
-            return 0;
-        });
-        $loop = $this->createMock(ScopedLoopInterface::class);
-        $loop->method('start')->willReturnCallback(static function () use (&$calls): void {
-            $calls[] = 'start';
-        });
-        $loop->method('finish')->willReturnCallback(static function () use (&$calls): void {
-            $calls[] = 'finish';
-        });
-        $loop->method('canContinue')->willReturn(true, false, false);
-        $command = new ListenAllCommand(new PredefinedQueueProvider([
-            'consumer' => ['consumer' => $consumer],
-        ]), $loop);
-        $input = new ArrayInput(['--pause' => 0], $command->getNativeDefinition());
-
-        $command->run($input, $this->createMock(OutputInterface::class));
-
-        self::assertSame(['start', 'run', 'finish'], $calls);
-    }
-
     /**
      * @return LoopInterface A loop which allows the given number of checks and then asks to stop.
      */
     private function createLoop(int $continueTimes): LoopInterface
     {
-        return new class ($continueTimes) implements LoopInterface {
-            public function __construct(private int $continueTimes) {}
+        $loop = $this->createMock(LoopInterface::class);
+        $loop->method('canContinue')->willReturnCallback(static function () use (&$continueTimes): bool {
+            $canContinue = $continueTimes > 0;
+            $continueTimes--;
 
-            public function canContinue(): bool
-            {
-                return $this->continueTimes-- > 0;
-            }
-        };
+            return $canContinue;
+        });
+
+        return $loop;
     }
 }

@@ -27,13 +27,18 @@ It supports:
 - Pause/resume via `SIGTSTP` and `SIGCONT`.
 - Optional soft memory limit (see below).
 
-Signal handlers are installed only while messages are consumed: `QueueConsumer::run()`, `QueueConsumer::listen()`,
-`queue:run` and `queue:listen-all` install them when they start and restore the previous handlers when they finish.
-The commands keep them installed between queues. Creating
-`SignalLoop`, for example when it is resolved from the container, doesn't affect handlers registered by other code,
-such as Symfony Console. While a consumer runs, its handlers replace the previous ones, so that the message being
-processed is finished before stopping. If `canContinue()` is called outside of a consumer, the handlers are installed
-at that moment and kept.
+To stop a worker gracefully, send `SIGTERM` to its process, for example:
+
+```shell
+kill -TERM <worker-pid>
+```
+
+The worker finishes the current message and leaves the remaining messages in the queue for the next worker.
+Use `SIGTSTP` to pause processing and `SIGCONT` to resume it.
+
+You can create or resolve `SignalLoop` in another console command without changing that command's signal handling.
+Existing application handlers are restored when queue processing ends, including when processing fails.
+While a queue worker is running, its graceful-shutdown behavior takes precedence over application handlers.
 
 ### `SimpleLoop`
 
@@ -99,6 +104,31 @@ use Yiisoft\Queue\Cli\SignalLoop;
 $loop = new SignalLoop(memorySoftLimit: 256 * 1024 * 1024);
 ```
 
+When creating `RunCommand` or `ListenAllCommand` manually, pass the same loop instance to the command and its consumers.
+This keeps graceful shutdown active between queues. For example, with your configured consumer provider:
+
+```php
+use Yiisoft\Queue\Command\RunCommand;
+
+$command = new RunCommand($consumerProvider, $loop);
+```
+
+For your own execution loop, use `start()` and `finish()` to restore application signal handlers when work ends:
+
+```php
+$loop->start();
+try {
+    while ($loop->canContinue()) {
+        // Process one unit of work.
+    }
+} finally {
+    $loop->finish();
+}
+```
+
+If you call `canContinue()` without `start()`, the loop keeps its signal handlers for the rest of the process.
+Use the paired calls above when other application code needs to handle signals after your work ends.
+
 ## Writing a custom loop
 
 Implement `LoopInterface` and encapsulate your own stopping conditions:
@@ -110,7 +140,8 @@ Implement `LoopInterface` and encapsulate your own stopping conditions:
 
 The only requirement is that `canContinue()` returns `false` when the worker should stop.
 
-If the loop needs to change process-wide state only while messages are consumed, such as installing signal handlers,
-implement `ScopedLoopInterface` instead. Its `start()` is called before consuming begins and `finish()` after it ends.
-Calls may be nested when several consumers share one loop, so restore the state on the outermost `finish()`.
+Implement `ScopedLoopInterface` when your custom loop needs setup and cleanup around message processing.
+Put setup in `start()` and cleanup in `finish()`; consumers and commands call these methods for you,
+even if processing throws. Support nested calls when consumers share a loop with a command: keep the loop active
+until the matching outermost `finish()`.
 

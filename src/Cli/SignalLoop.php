@@ -13,10 +13,10 @@ use const SIGTSTP;
 /**
  * A loop that stops on `SIGHUP`, `SIGINT` and `SIGTERM`, and pauses on `SIGTSTP` until `SIGCONT`.
  *
- * Signal handlers are installed by {@see start()} and the previous ones are restored by {@see finish()}, so creating
- * the loop doesn't affect handlers registered by other code, such as Symfony Console. If {@see canContinue()} is
- * called outside of {@see start()} and {@see finish()}, the handlers are installed then and kept, also through any
- * later {@see start()} and {@see finish()}: the code using the loop that way relies on them until it stops.
+ * Pass the same loop to your consumers and commands to finish the current message before stopping.
+ * Creating a loop preserves existing application signal handlers. Consumers restore them after processing ends.
+ * For a custom execution loop, pair {@see SignalLoop::start()} with {@see SignalLoop::finish()} in a `finally` block.
+ * Calling {@see SignalLoop::canContinue()} without starting a scope keeps the handlers for the rest of the process.
  */
 final class SignalLoop implements ScopedLoopInterface
 {
@@ -44,7 +44,9 @@ final class SignalLoop implements ScopedLoopInterface
 
     public function start(): void
     {
-        if ($this->depth++ === 0 && $this->previousHandlers === null) {
+        $this->depth++;
+
+        if ($this->depth === 1 && $this->previousHandlers === null) {
             $this->installHandlers();
             $this->installedByStart = true;
         }
@@ -56,7 +58,9 @@ final class SignalLoop implements ScopedLoopInterface
             return;
         }
 
-        if (--$this->depth === 0 && $this->installedByStart) {
+        $this->depth--;
+
+        if ($this->depth === 0 && $this->installedByStart) {
             $this->restoreHandlers();
         }
     }
