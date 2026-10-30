@@ -21,6 +21,9 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
+use Yiisoft\Queue\Middleware\Worker\WorkerFinalHandler;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareFactory;
 use Yiisoft\Queue\Tests\App\FakeHandler;
 use Yiisoft\Queue\Tests\TestCase;
 use Yiisoft\Queue\Worker\Worker;
@@ -163,9 +166,15 @@ final class WorkerTest extends TestCase
 
         return new Worker(
             $logger ?? new NullLogger(),
-            $consumeMiddlewareDispatcher ?? new ConsumeMiddlewareDispatcher($consumeMiddlewareFactory),
+            new WorkerMiddlewareDispatcher(
+                new WorkerMiddlewareFactory(new SimpleContainer()),
+                [],
+                new WorkerFinalHandler(
+                    $handlerResolver,
+                    $consumeMiddlewareDispatcher ?? new ConsumeMiddlewareDispatcher($consumeMiddlewareFactory),
+                ),
+            ),
             $failureMiddlewareDispatcher ?? new FailureMiddlewareDispatcher($failureMiddlewareFactory, []),
-            $handlerResolver,
         );
     }
 }

@@ -11,6 +11,7 @@ use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Middleware\Push\AdapterPushHandler;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
+use Yiisoft\Queue\Middleware\Push\PushRequest;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareDispatcher;
 
 /**
@@ -50,7 +51,7 @@ final class AsyncQueueProducer implements QueueProducerInterface
             'Preparing to push message with message type "{messageType}".',
             ['messageType' => $message->getType()],
         );
-        $message = $this->dispatcher->dispatch($message);
+        $message = $this->dispatcher->dispatch(new PushRequest($message, $this->queueName))->getMessage();
         $id = IdEnvelope::fromMessage($message)->getId();
         $this->logger->info(
             $id === null

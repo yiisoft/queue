@@ -21,6 +21,9 @@ use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\Implementation\SendAgainMiddleware;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareConfig;
 use Yiisoft\Queue\Middleware\Push\PushMiddlewareFactory;
+use Yiisoft\Queue\Middleware\Worker\WorkerFinalHandler;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareFactory;
 use Yiisoft\Queue\Provider\InvalidQueueConfigException;
 use Yiisoft\Queue\Stubs\InMemoryAdapter;
 use Yiisoft\Queue\SyncQueueProducer;
@@ -106,12 +109,18 @@ final class SynchronousFailureHandlingTest extends TestCase
         $container = new SimpleContainer();
         $worker = new Worker(
             new NullLogger(),
-            new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container)),
+            new WorkerMiddlewareDispatcher(
+                new WorkerMiddlewareFactory($container),
+                [],
+                new WorkerFinalHandler(
+                    new HandlerResolver($this->getMessageHandlers(), $container),
+                    new ConsumeMiddlewareDispatcher(new ConsumeMiddlewareFactory($container)),
+                ),
+            ),
             new FailureMiddlewareDispatcher(
                 new FailureMiddlewareFactory($container),
                 $failureMiddlewareDefinitions,
             ),
-            new HandlerResolver($this->getMessageHandlers(), $container),
         );
 
         return new SyncQueueProducer(
