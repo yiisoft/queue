@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
+use Yiisoft\Queue\Cli\ScopedLoopInterface;
 use Yiisoft\Queue\Provider\QueueConsumerProviderInterface;
 
 #[AsCommand(
@@ -86,15 +87,25 @@ final class ListenAllCommand extends Command
 
         $limit = (int) $input->getOption('limit');
 
-        while ($this->loop->canContinue()) {
-            $hasMessages = false;
-            foreach ($consumers as $consumer) {
-                $hasMessages = $consumer->run($limit) > 0 || $hasMessages;
-            }
+        if ($this->loop instanceof ScopedLoopInterface) {
+            $this->loop->start();
+        }
 
-            if (!$hasMessages && $this->loop->canContinue()) {
-                /** @psalm-var 0|positive-int $pauseSeconds */
-                sleep($pauseSeconds);
+        try {
+            while ($this->loop->canContinue()) {
+                $hasMessages = false;
+                foreach ($consumers as $consumer) {
+                    $hasMessages = $consumer->run($limit) > 0 || $hasMessages;
+                }
+
+                if (!$hasMessages && $this->loop->canContinue()) {
+                    /** @psalm-var 0|positive-int $pauseSeconds */
+                    sleep($pauseSeconds);
+                }
+            }
+        } finally {
+            if ($this->loop instanceof ScopedLoopInterface) {
+                $this->loop->finish();
             }
         }
 

@@ -73,13 +73,14 @@ final class ListenAllCommandTest extends TestCase
      */
     private function createLoop(int $continueTimes): LoopInterface
     {
-        return new class ($continueTimes) implements LoopInterface {
-            public function __construct(private int $continueTimes) {}
+        $loop = $this->createMock(LoopInterface::class);
+        $loop->method('canContinue')->willReturnCallback(static function () use (&$continueTimes): bool {
+            $canContinue = $continueTimes > 0;
+            $continueTimes--;
 
-            public function canContinue(): bool
-            {
-                return $this->continueTimes-- > 0;
-            }
-        };
+            return $canContinue;
+        });
+
+        return $loop;
     }
 }
