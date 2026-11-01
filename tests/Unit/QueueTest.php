@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit;
 
-use Closure;
 use Psr\Log\NullLogger;
 use Yiisoft\Queue\QueueConsumer;
 use Yiisoft\Queue\QueueConsumerInterface;
@@ -18,11 +17,6 @@ use Yiisoft\Queue\Stubs\StubLoop;
 use Yiisoft\Queue\Tests\TestCase;
 
 use function count;
-
-enum TestQueue: string
-{
-    case HIGH_PRIORITY = 'high-priority';
-}
 
 final class QueueTest extends TestCase
 {
@@ -151,16 +145,9 @@ final class QueueTest extends TestCase
 
     private function createStopAfterFirstExecutionLoop(): LoopInterface
     {
-        return new class (fn(): int => $this->executionTimes) implements LoopInterface {
-            /**
-             * @param Closure(): int $executionTimes
-             */
-            public function __construct(private readonly Closure $executionTimes) {}
+        $loop = $this->createMock(LoopInterface::class);
+        $loop->method('canContinue')->willReturnCallback(fn(): bool => $this->executionTimes === 0);
 
-            public function canContinue(): bool
-            {
-                return ($this->executionTimes)() === 0;
-            }
-        };
+        return $loop;
     }
 }
