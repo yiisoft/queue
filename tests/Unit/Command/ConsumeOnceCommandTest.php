@@ -30,7 +30,7 @@ final class ConsumeOnceCommandTest extends TestCase
     public function testDefaultRunSkipsProducerOnlyQueues(): void
     {
         $consumer = $this->createMock(QueueConsumerInterface::class);
-        $consumer->expects($this->once())->method('run')->willReturn(0);
+        $consumer->expects($this->once())->method('run')->with(0)->willReturn(0);
         $command = new ConsumeCommand(new PredefinedQueueProvider([
             'producer' => ['producer' => new StubQueueProducer()],
             DefaultQueue::NAME => ['consumer' => $consumer],

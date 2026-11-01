@@ -31,24 +31,39 @@ final class ConsumeCommand extends Command
     {
         $this
             ->addArgument('queue', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'Queue names to consume.')
-            ->addOption('once', null, InputOption::VALUE_NONE, 'Process existing messages and exit when queues are empty.')
+            ->addOption(
+                'once',
+                null,
+                InputOption::VALUE_NONE,
+                'Process existing messages in one pass and exit. Without names, use all configured consumer queues.',
+            )
             ->addOption(
                 'all',
                 null,
                 InputOption::VALUE_NONE,
-                'Poll all consumer queues, or the specified queues. Recommended for development only.',
+                'Continuously poll queues. Without names, use all configured consumer queues. '
+                    . 'Recommended for development only.',
             )
             ->addOption(
                 'limit',
                 'm',
                 InputOption::VALUE_REQUIRED,
-                'Maximum messages per queue in each pass with --once or --all. 0 means no limit.',
-                0,
+                'Maximum messages per queue in each pass with --once or --all. Default: 0 (no limit).',
             )
-            ->addOption('pause', 'p', InputOption::VALUE_REQUIRED, 'Seconds between idle passes with --all.', 1)
+            ->addOption(
+                'pause',
+                'p',
+                InputOption::VALUE_REQUIRED,
+                'Seconds between idle passes with --all without --once. Default: 1.',
+            )
             ->addUsage('[queue]')
             ->addUsage('--once [queue1 [queue2 [...]]] --limit=100')
-            ->addUsage('--all [queue1 [queue2 [...]]] --pause=1 --limit=100');
+            ->addUsage('--all [queue1 [queue2 [...]]] --pause=1 --limit=100')
+            ->setHelp(
+                'Without queue names, listen to ' . DefaultQueue::NAME . '. '
+                    . '--once and --all instead use all configured consumer queues. '
+                    . '--once takes precedence over --all.',
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -57,6 +72,20 @@ final class ConsumeCommand extends Command
         $queueNames = $input->getArgument('queue');
         $once = (bool) $input->getOption('once');
         $all = (bool) $input->getOption('all');
+        $limit = $input->getOption('limit');
+        $pauseSeconds = $input->getOption('pause');
+
+        if (!$once && !$all && $limit !== null) {
+            $output->writeln('<error>--limit requires --once or --all.</error>');
+
+            return Command::INVALID;
+        }
+
+        if ((!$all || $once) && $pauseSeconds !== null) {
+            $output->writeln('<error>--pause requires --all without --once.</error>');
+
+            return Command::INVALID;
+        }
 
         if (!$once && !$all) {
             if (count($queueNames) > 1) {
@@ -85,8 +114,8 @@ final class ConsumeCommand extends Command
             return Command::SUCCESS;
         }
 
-        $limit = (int) $input->getOption('limit');
-        $pauseSeconds = (int) $input->getOption('pause');
+        $limit = (int) $limit;
+        $pauseSeconds = (int) ($pauseSeconds ?? 1);
         if ($pauseSeconds < 0) {
             $pauseSeconds = 1;
         }

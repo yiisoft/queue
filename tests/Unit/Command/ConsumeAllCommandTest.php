@@ -106,7 +106,7 @@ final class ConsumeAllCommandTest extends TestCase
         $command = new ConsumeCommand(new PredefinedQueueProvider([
             'consumer' => ['consumer' => $consumer],
         ]), $this->createLoop(2));
-        $input = new ArrayInput(['--all' => true, '--pause' => 1], $command->getNativeDefinition());
+        $input = new ArrayInput(['--all' => true], $command->getNativeDefinition());
 
         $start = hrtime(true);
         $command->run($input, $this->createMock(OutputInterface::class));

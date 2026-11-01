@@ -36,6 +36,9 @@ yii queue:consume [queueName]
 
 > **Note:** If the queue is not configured with an adapter (synchronous mode), the command logs an info message and exits gracefully.
 
+The `--limit` and `--pause` options are not accepted in this single-queue listening mode.
+Use `--once --limit=100` to process up to 100 existing messages per queue and exit.
+
 ## 3. Listen to multiple queues
 
 The following command iterates through multiple queues and is meant to be used in development environment only, as it consumes a lot of CPU for iterating through queues. You can pass to it:
@@ -45,6 +48,7 @@ The following command iterates through multiple queues and is meant to be used i
 - `--pause` option to specify the number of seconds to pause between checking queues when no messages are found. Defaults to `1`.
 
 Use `--all --once` to process those queues for one pass and exit. Passing several queue names requires `--all` or `--once`.
+`--once` takes precedence over `--all`. The `--pause` option is accepted only with `--all` without `--once`.
 
 The full command signature is:
 ```sh
