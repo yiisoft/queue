@@ -31,7 +31,7 @@ phpunit: ## [test] Run PHPUnit tests: `make phpunit ARGS="--filter=TestName"`
 
 mutation: infection
 infection: ## [infection] Run mutation testing with Infection.
-	$(RUN) ./vendor/bin/roave-infection-static-analysis-plugin --threads=max --ignore-msi-with-no-mutations --only-covered
+	$(RUN) ./vendor/bin/infection --threads=max --ignore-msi-with-no-mutations --only-covered
 
 psalm: ## Run Psalm static analysis: `make psalm ARGS="--show-info=true"`
 	$(RUN) ./vendor/bin/psalm $(if $(ARGS),$(ARGS),--php-version=$(PHP_VERSION))
