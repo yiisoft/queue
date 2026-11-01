@@ -44,7 +44,7 @@ PartOf=yii-queue.target
 Type=simple
 User=www-data
 WorkingDirectory=/var/www/app
-ExecStart=/usr/bin/php /var/www/app/yii queue:listen
+ExecStart=/usr/bin/php /var/www/app/yii queue:consume
 Restart=always
 RestartSec=5
 
@@ -145,7 +145,7 @@ Supervisor manages multiple worker processes using a single configuration file a
 # /etc/supervisor/conf.d/yii-queue.conf
 [program:yii-queue-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=/usr/bin/php /var/www/app/yii queue:listen
+command=/usr/bin/php /var/www/app/yii queue:consume
 autostart=true
 autorestart=true
 user=www-data
@@ -199,10 +199,10 @@ sudo supervisorctl start yii-queue-worker:*
 
 ## Cron
 
-For simple workloads without a persistent process manager, you can run `queue:run` via cron. It processes all pending messages and exits.
+For simple workloads without a persistent process manager, you can run `queue:consume --once` via cron. It processes all pending messages and exits.
 
 ```cron
-* * * * * /usr/bin/php /var/www/app/yii queue:run
+* * * * * /usr/bin/php /var/www/app/yii queue:consume --once
 ```
 
-This starts a worker every minute. Use this only when the message volume is low and a processing delay of a minute or more is acceptable. For high-throughput or latency-sensitive queues, use `systemd` or Supervisor with `queue:listen` instead.
+This starts a worker every minute. Use this only when the message volume is low and a processing delay of a minute or more is acceptable. For high-throughput or latency-sensitive queues, use `systemd` or Supervisor with `queue:consume` instead.

@@ -11,8 +11,7 @@ use RuntimeException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Yiisoft\Queue\Cli\SignalLoop;
-use Yiisoft\Queue\Command\ListenAllCommand;
-use Yiisoft\Queue\Command\RunCommand;
+use Yiisoft\Queue\Command\ConsumeCommand;
 use Yiisoft\Queue\Message\GenericMessage;
 use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\MessageStatus;
@@ -120,10 +119,10 @@ final class SignalHandlingTest extends TestCase
     }
 
     /**
-     * @param class-string<RunCommand>|class-string<ListenAllCommand> $commandClass
+     * @param array<string, bool> $options
      */
     #[DataProvider('commandProvider')]
-    public function testSignalBetweenQueuesStopsBeforeTheNextMessage(string $commandClass): void
+    public function testSignalBetweenQueuesStopsBeforeTheNextMessage(array $options): void
     {
         $applicationSignals = [];
         pcntl_signal(SIGTERM, static function (int $signal) use (&$applicationSignals): void {
@@ -154,8 +153,8 @@ final class SignalHandlingTest extends TestCase
             'first' => ['consumer' => $consumerAtQueueBoundary],
             'second' => ['consumer' => new QueueConsumer($secondWorker, $loop, new NullLogger(), $secondAdapter)],
         ]);
-        $command = new $commandClass($provider, $loop);
-        $input = new ArrayInput([], $command->getNativeDefinition());
+        $command = new ConsumeCommand($provider, $loop);
+        $input = new ArrayInput($options, $command->getNativeDefinition());
 
         $result = $command->run($input, new BufferedOutput());
         posix_kill(getmypid(), SIGTERM);
@@ -167,10 +166,10 @@ final class SignalHandlingTest extends TestCase
     }
 
     /**
-     * @param class-string<RunCommand>|class-string<ListenAllCommand> $commandClass
+     * @param array<string, bool> $options
      */
     #[DataProvider('commandProvider')]
-    public function testCommandFailureRestoresApplicationSignalHandling(string $commandClass): void
+    public function testCommandFailureRestoresApplicationSignalHandling(array $options): void
     {
         $applicationSignals = [];
         pcntl_signal(SIGTERM, static function (int $signal) use (&$applicationSignals): void {
@@ -183,8 +182,8 @@ final class SignalHandlingTest extends TestCase
         $worker->method('process')->willThrowException($failure);
         $loop = new SignalLoop();
         $consumer = new QueueConsumer($worker, $loop, new NullLogger(), $adapter);
-        $command = new $commandClass(new PredefinedQueueProvider(['queue' => ['consumer' => $consumer]]), $loop);
-        $input = new ArrayInput([], $command->getNativeDefinition());
+        $command = new ConsumeCommand(new PredefinedQueueProvider(['queue' => ['consumer' => $consumer]]), $loop);
+        $input = new ArrayInput($options, $command->getNativeDefinition());
 
         try {
             $command->run($input, new BufferedOutput());
@@ -198,11 +197,11 @@ final class SignalHandlingTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{class-string<RunCommand>|class-string<ListenAllCommand>}>
+     * @return iterable<string, array{array<string, bool>}>
      */
     public static function commandProvider(): iterable
     {
-        yield 'queue:run' => [RunCommand::class];
-        yield 'queue:listen-all' => [ListenAllCommand::class];
+        yield 'queue:consume --once' => [['--once' => true]];
+        yield 'queue:consume --all' => [['--all' => true]];
     }
 }
