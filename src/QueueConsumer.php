@@ -8,6 +8,7 @@ use BackedEnum;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Queue\Adapter\AdapterInterface;
 use Yiisoft\Queue\Cli\LoopInterface;
+use Yiisoft\Queue\Cli\ScopedLoopInterface;
 use Yiisoft\Queue\Message\MessageInterface;
 use Yiisoft\Queue\Worker\WorkerInterface;
 
@@ -34,13 +35,18 @@ final class QueueConsumer implements QueueConsumerInterface
         }
         $this->logger->debug('Start processing queue messages.');
         $count = 0;
-        $this->adapter->runExisting(function (MessageInterface $message) use (&$count, $max): bool {
-            if (($max > 0 && $count >= $max) || !$this->handle($message)) {
-                return false;
-            }
-            $count++;
-            return true;
-        });
+        $this->startLoop();
+        try {
+            $this->adapter->runExisting(function (MessageInterface $message) use (&$count, $max): bool {
+                if (($max > 0 && $count >= $max) || !$this->handle($message)) {
+                    return false;
+                }
+                $count++;
+                return true;
+            });
+        } finally {
+            $this->finishLoop();
+        }
         $this->logger->info('Processed {count} queue messages.', ['count' => $count]);
         return $count;
     }
@@ -52,8 +58,27 @@ final class QueueConsumer implements QueueConsumerInterface
             return;
         }
         $this->logger->info('Start listening to the queue.');
-        $this->adapter->subscribe(fn(MessageInterface $message): bool => $this->handle($message));
+        $this->startLoop();
+        try {
+            $this->adapter->subscribe(fn(MessageInterface $message): bool => $this->handle($message));
+        } finally {
+            $this->finishLoop();
+        }
         $this->logger->info('Finish listening to the queue.');
+    }
+
+    private function startLoop(): void
+    {
+        if ($this->loop instanceof ScopedLoopInterface) {
+            $this->loop->start();
+        }
+    }
+
+    private function finishLoop(): void
+    {
+        if ($this->loop instanceof ScopedLoopInterface) {
+            $this->loop->finish();
+        }
     }
 
     private function handle(MessageInterface $message): bool

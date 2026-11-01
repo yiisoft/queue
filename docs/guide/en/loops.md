@@ -27,6 +27,19 @@ It supports:
 - Pause/resume via `SIGTSTP` and `SIGCONT`.
 - Optional soft memory limit (see below).
 
+To stop a worker gracefully, send `SIGTERM` to its process, for example:
+
+```shell
+kill -TERM <worker-pid>
+```
+
+The worker finishes the current message and leaves the remaining messages in the queue for the next worker.
+Use `SIGTSTP` to pause processing and `SIGCONT` to resume it.
+
+You can create or resolve `SignalLoop` in another console command without changing that command's signal handling.
+Existing application handlers are restored when queue processing ends, including when processing fails.
+While a queue worker is running, its graceful-shutdown behavior takes precedence over application handlers.
+
 ### `SimpleLoop`
 
 `\Yiisoft\Queue\Cli\SimpleLoop` is used by default when `ext-pcntl` is **not** available.
@@ -91,6 +104,31 @@ use Yiisoft\Queue\Cli\SignalLoop;
 $loop = new SignalLoop(memorySoftLimit: 256 * 1024 * 1024);
 ```
 
+When creating `RunCommand` or `ListenAllCommand` manually, pass the same loop instance to the command and its consumers.
+This keeps graceful shutdown active between queues. For example, with your configured consumer provider:
+
+```php
+use Yiisoft\Queue\Command\RunCommand;
+
+$command = new RunCommand($consumerProvider, $loop);
+```
+
+For your own execution loop, use `start()` and `finish()` to restore application signal handlers when work ends:
+
+```php
+$loop->start();
+try {
+    while ($loop->canContinue()) {
+        // Process one unit of work.
+    }
+} finally {
+    $loop->finish();
+}
+```
+
+If you call `canContinue()` without `start()`, the loop keeps its signal handlers for the rest of the process.
+Use the paired calls above when other application code needs to handle signals after your work ends.
+
 ## Writing a custom loop
 
 Implement `LoopInterface` and encapsulate your own stopping conditions:
@@ -101,4 +139,9 @@ Implement `LoopInterface` and encapsulate your own stopping conditions:
 - Integration with your own signal / shutdown handling.
 
 The only requirement is that `canContinue()` returns `false` when the worker should stop.
+
+Implement `ScopedLoopInterface` when your custom loop needs setup and cleanup around message processing.
+Put setup in `start()` and cleanup in `finish()`; consumers and commands call these methods for you,
+even if processing throws. Support nested calls when consumers share a loop with a command: keep the loop active
+until the matching outermost `finish()`.
 
