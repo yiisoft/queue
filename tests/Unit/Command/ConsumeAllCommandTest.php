@@ -114,6 +114,22 @@ final class ConsumeAllCommandTest extends TestCase
         self::assertGreaterThanOrEqual(1.0, (hrtime(true) - $start) / 1_000_000_000, 'An empty queue is polled once per pause.');
     }
 
+    public function testNegativePauseUsesDefaultIdleDelay(): void
+    {
+        $consumer = $this->createMock(QueueConsumerInterface::class);
+        $consumer->expects($this->once())->method('run')->willReturn(0);
+        $command = new ConsumeCommand(new PredefinedQueueProvider([
+            'consumer' => ['consumer' => $consumer],
+        ]), $this->createLoop(2));
+        $input = new ArrayInput(['--all' => true, '--pause' => -1], $command->getNativeDefinition());
+
+        $start = hrtime(true);
+        $result = $command->run($input, new BufferedOutput());
+
+        self::assertSame(Command::SUCCESS, $result);
+        self::assertGreaterThanOrEqual(1.0, (hrtime(true) - $start) / 1_000_000_000);
+    }
+
     /**
      * @return LoopInterface A loop which allows the given number of checks and then asks to stop.
      */
