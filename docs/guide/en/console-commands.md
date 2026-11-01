@@ -53,16 +53,3 @@ yii queue:consume --all [queueName1 [queueName2 [...]]] --pause=1 --limit=0
 
 For long-running processes, graceful shutdown is controlled by `LoopInterface`. When `ext-pcntl` is available,
 the default `SignalLoop` handles signals such as `SIGTERM`/`SIGINT`.
-
-## Migrating existing commands
-
-Update process manager and cron configurations as follows:
-
-| Previous command | Replacement |
-| --- | --- |
-| `queue:run` | `queue:consume --once` |
-| `queue:listen [queueName]` | `queue:consume [queueName]` |
-| `queue:listen-all [queueNames...]` | `queue:consume --all [queueNames...]` |
-
-The previous command names are no longer registered. For manual registration, replace `RunCommand`, `ListenCommand`,
-and `ListenAllCommand` with `ConsumeCommand`, passing the consumer provider and loop to its constructor.
