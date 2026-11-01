@@ -113,6 +113,12 @@ final class SendEmailHandler implements \Yiisoft\Queue\Message\Handler\HandlerIn
 
 The handler can have any dependencies injected through the DI container. The message payload remains plain data.
 
+The handler is always given the message its type was registered for, never an envelope wrapped
+around it on the way through the queue, so the `assert()` above holds on every adapter. What the
+envelopes carried comes with it as message meta, so the handler still reads those values —
+`IdEnvelope::fromMessage($message)->getId()`, or `$message->getMeta()` directly. Consume
+middleware run before that step and receive the envelope itself.
+
 ## Why the separation matters
 
 ### Versioning
