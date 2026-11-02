@@ -410,7 +410,7 @@ return [
  
  ```bash
  # Running worker manually without supervision in production
- php yii queue:listen
+ php yii queue:consume
  ```
  
 #### Good
