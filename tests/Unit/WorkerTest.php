@@ -12,11 +12,15 @@ use Yiisoft\Test\Support\Log\SimpleLogger;
 use Yiisoft\Queue\Exception\MessageFailureException;
 use Yiisoft\Queue\Message\Handler\HandlerNotFoundException;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
+use Yiisoft\Queue\Message\Envelope;
 use Yiisoft\Queue\Message\GenericMessage;
+use Yiisoft\Queue\Message\IdEnvelope;
 use Yiisoft\Queue\Message\MessageInterface;
+use Yiisoft\Queue\Middleware\Consume\ConsumeHandlerInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareInterface;
+use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
@@ -138,6 +142,75 @@ final class WorkerTest extends TestCase
         $worker = $this->createWorkerByParams($handlerResolver, failureMiddlewareDispatcher: $failureDispatcher);
 
         $worker->process($message, $queueName);
+    }
+
+    public function testHandlerReceivesTheMessageAndNotTheEnvelopeAroundIt(): void
+    {
+        $message = new GenericMessage('simple', ['test-data']);
+        $envelope = new IdEnvelope($message, 'id-42');
+
+        $received = null;
+        $handlerResolver = $this->createHandlerResolver(
+            $message,
+            static function (MessageInterface $message) use (&$received): void {
+                $received = $message;
+            },
+        );
+
+        $this->createWorkerByParams($handlerResolver)->process($envelope, 'test-queue');
+
+        // The handler is registered for the message type and gets that message, whatever the
+        // adapter wrapped it in on the way back.
+        $this->assertInstanceOf(GenericMessage::class, $received);
+        $this->assertNotInstanceOf(Envelope::class, $received);
+        $this->assertSame($message->getType(), $received->getType());
+        $this->assertSame($message->getPayload(), $received->getPayload());
+
+        // What the envelope carried comes with it, so a handler that logs or de-duplicates on
+        // the id still has one.
+        $this->assertSame($envelope->getMeta(), $received->getMeta());
+        $this->assertSame('id-42', IdEnvelope::fromMessage($received)->getId());
+    }
+
+    public function testConsumeMiddlewareStillSeesTheEnvelope(): void
+    {
+        $message = new GenericMessage('simple', null);
+        $envelope = new IdEnvelope($message, 'id-42');
+
+        $seenByMiddleware = null;
+        /** @var ConsumeMiddlewareInterface&MockObject $consumeMiddleware */
+        $consumeMiddleware = $this->createMock(ConsumeMiddlewareInterface::class);
+        $consumeMiddleware
+            ->method('processConsume')
+            ->willReturnCallback(
+                static function (ConsumeRequest $request, ConsumeHandlerInterface $handler) use (&$seenByMiddleware) {
+                    $seenByMiddleware = $request->getMessage();
+
+                    return $handler->handleConsume($request);
+                },
+            );
+
+        /** @var ConsumeMiddlewareFactoryInterface&MockObject $consumeMiddlewareFactory */
+        $consumeMiddlewareFactory = $this->createMock(ConsumeMiddlewareFactoryInterface::class);
+        $consumeMiddlewareFactory->method('createConsumeMiddleware')->willReturn($consumeMiddleware);
+        $consumeDispatcher = new ConsumeMiddlewareDispatcher($consumeMiddlewareFactory, 'simple');
+
+        $receivedByHandler = null;
+        $handlerResolver = $this->createHandlerResolver(
+            $message,
+            static function (MessageInterface $message) use (&$receivedByHandler): void {
+                $receivedByHandler = $message;
+            },
+        );
+
+        $worker = $this->createWorkerByParams($handlerResolver, new NullLogger(), $consumeDispatcher);
+        $worker->process($envelope, 'test-queue');
+
+        // Unwrapping happens at the last step, so middleware keep the envelope itself, and only
+        // the handler is given the message — with the meta the envelope carried.
+        $this->assertSame($envelope, $seenByMiddleware);
+        $this->assertNotInstanceOf(Envelope::class, $receivedByHandler);
+        $this->assertSame('id-42', IdEnvelope::fromMessage($receivedByHandler)->getId());
     }
 
     private function createHandlerResolver(MessageInterface $message, callable $handler): HandlerResolver
