@@ -12,6 +12,9 @@ use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareFactoryInterface;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareFactoryInterface;
+use Yiisoft\Queue\Middleware\Worker\WorkerFinalHandler;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareFactory;
 use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Tests\Integration\Support\TestHandler;
 use Yiisoft\Queue\Tests\TestCase;
@@ -30,15 +33,21 @@ final class MessageConsumingTest extends TestCase
         $container = $this->createMock(ContainerInterface::class);
         $worker = new Worker(
             new NullLogger(),
-            new ConsumeMiddlewareDispatcher($this->createMock(ConsumeMiddlewareFactoryInterface::class)),
-            new FailureMiddlewareDispatcher($this->createMock(FailureMiddlewareFactoryInterface::class), []),
-            new HandlerResolver(
-                [
-                    'test' => fn(MessageInterface $message): mixed => $this->messagesProcessed[] = $message->getPayload(),
-                    'test2' => fn(MessageInterface $message): mixed => $this->messagesProcessedSecond[] = $message->getPayload(),
-                ],
-                $container,
+            new WorkerMiddlewareDispatcher(
+                new WorkerMiddlewareFactory($container),
+                [],
+                new WorkerFinalHandler(
+                    new HandlerResolver(
+                        [
+                            'test' => fn(MessageInterface $message): mixed => $this->messagesProcessed[] = $message->getPayload(),
+                            'test2' => fn(MessageInterface $message): mixed => $this->messagesProcessedSecond[] = $message->getPayload(),
+                        ],
+                        $container,
+                    ),
+                    new ConsumeMiddlewareDispatcher($this->createMock(ConsumeMiddlewareFactoryInterface::class)),
+                ),
             ),
+            new FailureMiddlewareDispatcher($this->createMock(FailureMiddlewareFactoryInterface::class), []),
         );
 
         $messages = [1, 'foo', 'bar-baz'];
@@ -59,9 +68,15 @@ final class MessageConsumingTest extends TestCase
         $container->method('has')->with(TestHandler::class)->willReturn(true);
         $worker = new Worker(
             new NullLogger(),
-            new ConsumeMiddlewareDispatcher($this->createMock(ConsumeMiddlewareFactoryInterface::class)),
+            new WorkerMiddlewareDispatcher(
+                new WorkerMiddlewareFactory($container),
+                [],
+                new WorkerFinalHandler(
+                    new HandlerResolver([], $container),
+                    new ConsumeMiddlewareDispatcher($this->createMock(ConsumeMiddlewareFactoryInterface::class)),
+                ),
+            ),
             new FailureMiddlewareDispatcher($this->createMock(FailureMiddlewareFactoryInterface::class), []),
-            new HandlerResolver([], $container),
         );
 
         $messages = [1, 'foo', 'bar-baz'];

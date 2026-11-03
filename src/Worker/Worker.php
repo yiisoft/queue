@@ -7,11 +7,9 @@ namespace Yiisoft\Queue\Worker;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Yiisoft\Queue\Exception\MessageFailureException;
-use Yiisoft\Queue\Message\Handler\HandlerResolver;
 use Yiisoft\Queue\Message\MessageInterface;
-use Yiisoft\Queue\Middleware\Consume\ConsumeFinalHandler;
-use Yiisoft\Queue\Middleware\Consume\ConsumeMiddlewareDispatcher;
-use Yiisoft\Queue\Middleware\Consume\ConsumeRequest;
+use Yiisoft\Queue\Middleware\Worker\WorkerMiddlewareDispatcher;
+use Yiisoft\Queue\Middleware\Worker\WorkerRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureFinalHandler;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureHandlingRequest;
 use Yiisoft\Queue\Middleware\FailureHandling\FailureMiddlewareDispatcher;
@@ -21,9 +19,8 @@ final class Worker implements WorkerInterface
 {
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly ConsumeMiddlewareDispatcher $consumeMiddlewareDispatcher,
+        private readonly WorkerMiddlewareDispatcher $workerMiddlewareDispatcher,
         private readonly FailureMiddlewareDispatcher $failureMiddlewareDispatcher,
-        private readonly HandlerResolver $handlerResolver,
     ) {}
 
     /**
@@ -38,11 +35,9 @@ final class Worker implements WorkerInterface
             $this->logger->info('Processing message #{message}.', ['message' => $messageId]);
         }
 
-        $request = new ConsumeRequest($message, $queueName);
+        $request = new WorkerRequest($message, $queueName);
         try {
-            $handler = $this->handlerResolver->resolve($message->getType());
-            $finalHandler = new ConsumeFinalHandler($handler->handle(...));
-            $this->consumeMiddlewareDispatcher->dispatch($request, $finalHandler);
+            $this->workerMiddlewareDispatcher->dispatch($request);
         } catch (Throwable $exception) {
             $request = new FailureHandlingRequest($request->getMessage(), $exception, $request->getQueueName());
 
