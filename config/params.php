@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-use Yiisoft\Queue\Command\ListenAllCommand;
-use Yiisoft\Queue\Command\ListenCommand;
-use Yiisoft\Queue\Command\RunCommand;
+use Yiisoft\Queue\Command\ConsumeCommand;
 use Yiisoft\Queue\Debug\QueueCollector;
 use Yiisoft\Queue\Debug\QueueConsumerProviderProxy;
 use Yiisoft\Queue\Debug\QueueProducerProviderProxy;
@@ -18,9 +16,7 @@ use Yiisoft\Queue\Worker\WorkerInterface;
 return [
     'yiisoft/yii-console' => [
         'commands' => [
-            'queue:run' => RunCommand::class,
-            'queue:listen' => ListenCommand::class,
-            'queue:listen-all' => ListenAllCommand::class,
+            'queue:consume' => ConsumeCommand::class,
         ],
     ],
     'yiisoft/queue' => [

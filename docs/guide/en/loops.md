@@ -6,7 +6,7 @@ The loop is evaluated to determine whether it can continue:
 
 - Before each message in `QueueConsumer::run()` and `QueueConsumer::listen()`. A message taken from the queue after the
   loop stopped is not processed and goes back to the queue.
-- On each iteration of `queue:listen-all`.
+- On each iteration of `queue:consume --all`.
 
 When `canContinue()` returns `false`, consuming stops gracefully (as soon as the current message is finished).
 
@@ -104,13 +104,13 @@ use Yiisoft\Queue\Cli\SignalLoop;
 $loop = new SignalLoop(memorySoftLimit: 256 * 1024 * 1024);
 ```
 
-When creating `RunCommand` or `ListenAllCommand` manually, pass the same loop instance to the command and its consumers.
+When creating `ConsumeCommand` manually, pass the same loop instance to the command and its consumers.
 This keeps graceful shutdown active between queues. For example, with your configured consumer provider:
 
 ```php
-use Yiisoft\Queue\Command\RunCommand;
+use Yiisoft\Queue\Command\ConsumeCommand;
 
-$command = new RunCommand($consumerProvider, $loop);
+$command = new ConsumeCommand($consumerProvider, $loop);
 ```
 
 For your own execution loop, use `start()` and `finish()` to restore application signal handlers when work ends:

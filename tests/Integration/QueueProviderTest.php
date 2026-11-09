@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Yiisoft\Definitions\Reference;
-use Yiisoft\Queue\Command\ListenCommand;
+use Yiisoft\Queue\Command\ConsumeCommand;
 use Yiisoft\Queue\Debug\QueueCollector;
 use Yiisoft\Queue\Debug\QueueConsumerDecorator;
 use Yiisoft\Queue\Debug\QueueConsumerProviderProxy;
@@ -20,6 +20,7 @@ use Yiisoft\Queue\Provider\QueueFactoryProvider;
 use Yiisoft\Queue\Provider\QueueNotFoundException;
 use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\QueueProducerInterface;
+use Yiisoft\Queue\Stubs\StubLoop;
 use Yiisoft\Queue\Stubs\StubQueueConsumer;
 use Yiisoft\Queue\Stubs\StubQueueProducer;
 use Yiisoft\Test\Support\Container\SimpleContainer;
@@ -54,7 +55,7 @@ final class QueueProviderTest extends TestCase
         $provider->getConsumer('producer-only');
     }
 
-    public function testPredefinedRoleMapsAndListenCommandUseConsumerOnlyService(): void
+    public function testPredefinedRoleMapsAndConsumeCommandUseConsumerOnlyService(): void
     {
         $consumer = $this->createMock(QueueConsumerInterface::class);
         $consumer->expects(self::once())->method('listen');
@@ -71,7 +72,7 @@ final class QueueProviderTest extends TestCase
         self::assertFalse($provider->hasConsumer('producer-only'));
         self::assertFalse($provider->hasProducer('consumer-only'));
 
-        self::assertSame(0, (new ListenCommand($provider))->run(new StringInput('consumer-only'), new NullOutput()));
+        self::assertSame(0, (new ConsumeCommand($provider, new StubLoop()))->run(new StringInput('consumer-only'), new NullOutput()));
 
         try {
             $provider->getProducer('consumer-only');

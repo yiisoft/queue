@@ -82,6 +82,6 @@ Both typed providers accept strings and `BackedEnum` values. Use `getProducerQue
 
 ## Running workers
 
-`queue:run` and `queue:listen-all` use all configured consumer names when no names are supplied. `queue:listen` and explicitly named commands resolve that name through `QueueConsumerProviderInterface`, so a producer-only name cannot be consumed. See [Console commands](console-commands.md) for details.
+`queue:consume --once` and `queue:consume --all` use all configured consumer names when no names are supplied. `queue:consume` and explicitly named commands resolve that name through `QueueConsumerProviderInterface`, so a producer-only name cannot be consumed. See [Console commands](console-commands.md) for details.
 
 For provider implementations and manually constructed role maps, see [Advanced queue name internals](queue-names-advanced.md). For migration details, see [Producer and consumer capabilities](queue-capabilities.md).
