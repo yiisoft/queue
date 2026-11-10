@@ -57,3 +57,17 @@ yii queue:consume --all [queueName1 [queueName2 [...]]] --pause=1 --limit=0
 
 For long-running processes, graceful shutdown is controlled by `LoopInterface`. When `ext-pcntl` is available,
 the default `SignalLoop` handles signals such as `SIGTERM`/`SIGINT`.
+
+## Terminal program status (OSC 7501)
+
+When run in an interactive terminal, `queue:consume` reports what it is doing — processing or waiting on messages —
+and how it finished, using the [Program Status Protocol (OSC 7501)](https://www.superlogical.com/rex/docs/build/program-status),
+so the terminal itself can show the status in its UI.
+
+The reports are written directly to the output stream. They require no extra dependencies and appear only when the
+stream is an interactive TTY and the output is decorated and not quiet; redirected output, log files, cron runs and
+quiet invocations are unaffected. Set the environment variable `YII_QUEUE_STATUS` to `off` to disable the reports
+explicitly.
+
+Only the command itself reports status; adapters such as `yiisoft/queue-db`, `yiisoft/queue-redis` or
+`yiisoft/queue-amqp` do not emit their own terminal status.
