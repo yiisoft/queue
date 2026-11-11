@@ -43,6 +43,12 @@ final class QueueFactoryProvider implements QueueProducerProviderInterface, Queu
         $validatedDefinitions = $this->validateRoleMaps($definitions);
         $this->definitions = $validatedDefinitions;
         foreach ($this->definitions as $queueName => $roles) {
+            /**
+             * PHP converts numeric string array keys to int, so the key is not guaranteed to be a string.
+             *
+             * @psalm-suppress RedundantCastGivenDocblockType
+             */
+            $queueName = (string) $queueName;
             if (array_key_exists('producer', $roles)) {
                 $this->producerQueueNames[] = $queueName;
             }

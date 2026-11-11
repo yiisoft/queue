@@ -32,6 +32,12 @@ final class PredefinedQueueProvider implements QueueProducerProviderInterface, Q
     public function __construct(array $queues)
     {
         foreach ($queues as $queueName => $roles) {
+            /**
+             * PHP converts numeric string array keys to int, so the key is not guaranteed to be a string.
+             *
+             * @psalm-suppress RedundantCastGivenDocblockType
+             */
+            $queueName = (string) $queueName;
             if (!is_array($roles) || $roles === []) {
                 throw new InvalidQueueConfigException(sprintf('Queue "%s" must be a non-empty role map containing ready "producer" and/or "consumer" instances.', $queueName));
             }
