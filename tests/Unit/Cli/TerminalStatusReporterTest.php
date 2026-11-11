@@ -27,18 +27,21 @@ final class TerminalStatusReporterTest extends TestCase
     {
         parent::setUp();
 
-        $this->hadEnv = getenv('YII_QUEUE_STATUS') !== false;
-        $this->savedEnvValue = (string) getenv('YII_QUEUE_STATUS');
+        $this->hadEnv = getenv('YII_TERMINAL_STATUS') !== false;
+        $this->savedEnvValue = (string) getenv('YII_TERMINAL_STATUS');
+        putenv('YII_TERMINAL_STATUS');
         putenv('YII_QUEUE_STATUS');
     }
 
     protected function tearDown(): void
     {
         if ($this->hadEnv) {
-            putenv('YII_QUEUE_STATUS=' . $this->savedEnvValue);
+            putenv('YII_TERMINAL_STATUS=' . $this->savedEnvValue);
         } else {
-            putenv('YII_QUEUE_STATUS');
+            putenv('YII_TERMINAL_STATUS');
         }
+
+        putenv('YII_QUEUE_STATUS');
 
         parent::tearDown();
     }
@@ -141,6 +144,39 @@ final class TerminalStatusReporterTest extends TestCase
             "\x1b]7501;state=working:app=queue:msg=" . base64_encode('a b') . "\x1b\\",
             $read(),
         );
+    }
+
+    public function testLowUtf16SurrogateSequenceIsReplacedBySpace(): void
+    {
+        [, $reporter, $read] = $this->enabledOutput();
+
+        $reporter->emit('working', "a\xED\xB0\x80b");
+
+        self::assertSame(
+            "\x1b]7501;state=working:app=queue:msg=" . base64_encode('a b') . "\x1b\\",
+            $read(),
+        );
+    }
+
+    public function testInvalidUtf8TailIsStripped(): void
+    {
+        [, $reporter, $read] = $this->enabledOutput();
+
+        $reporter->emit('working', "ab\xFF");
+
+        self::assertSame(
+            "\x1b]7501;state=working:app=queue:msg=" . base64_encode('ab') . "\x1b\\",
+            $read(),
+        );
+    }
+
+    public function testMessageOfOnlyInvalidUtf8IsDropped(): void
+    {
+        [, $reporter, $read] = $this->enabledOutput();
+
+        $reporter->emit('working', "\xFF\xFF");
+
+        self::assertSame("\x1b]7501;state=working:app=queue\x1b\\", $read());
     }
 
     public function testEmptyMessageIsOmitted(): void
@@ -416,9 +452,9 @@ final class TerminalStatusReporterTest extends TestCase
     /**
      * @dataProvider provideOptOutValues
      */
-    public function testOptOutViaEnvironment(string $value): void
+    public function testOptOutViaEnvironment(string $envVar, string $value): void
     {
-        putenv('YII_QUEUE_STATUS=' . $value);
+        putenv($envVar . '=' . $value);
 
         $stream = fopen('php://memory', 'w+');
         $reporter = TerminalStatusReporter::forOutput(new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true));
@@ -431,15 +467,26 @@ final class TerminalStatusReporterTest extends TestCase
 
     public static function provideOptOutValues(): array
     {
-        return [
-            ['off'],
-            ['OFF'],
-            [' 0'],
-            [' no '],
-            ['false'],
-            ['False'],
-            [' false '],
-        ];
+        $values = ['off', 'OFF', ' 0', ' no ', 'false', 'False', ' false '];
+
+        $cases = [];
+        foreach (['YII_TERMINAL_STATUS', 'YII_QUEUE_STATUS'] as $envVar) {
+            foreach ($values as $value) {
+                $cases[] = [$envVar, $value];
+            }
+        }
+
+        return $cases;
+    }
+
+    public function testEnvironmentAliasDoesNotOverrideAbsentFamilyVariable(): void
+    {
+        putenv('YII_QUEUE_STATUS=off');
+
+        $stream = fopen('php://memory', 'w+');
+        $reporter = TerminalStatusReporter::forOutput(new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true));
+
+        self::assertFalse($reporter->isEnabled());
     }
 
     public function testEnabledOverride(): void
@@ -464,6 +511,32 @@ final class TerminalStatusReporterTest extends TestCase
 
         $reporter->emit('working', 'Working');
         $reporter->clear();
+
+        self::assertSame('', $this->read($stream));
+    }
+
+    public function testDisabledOverrideWithInvalidEmitArgumentsWritesNothing(): void
+    {
+        $stream = fopen('php://memory', 'w+');
+        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
+        $reporter = TerminalStatusReporter::forOutput($output, null, false);
+
+        self::assertFalse($reporter->isEnabled());
+
+        $reporter->emit('bogus', 'Working', str_repeat('a', 130), 101, 'wait');
+
+        self::assertSame('', $this->read($stream));
+    }
+
+    public function testDisabledOverrideWithInvalidClearIdWritesNothing(): void
+    {
+        $stream = fopen('php://memory', 'w+');
+        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
+        $reporter = TerminalStatusReporter::forOutput($output, null, false);
+
+        self::assertFalse($reporter->isEnabled());
+
+        $reporter->clear(str_repeat('a', 130));
 
         self::assertSame('', $this->read($stream));
     }
