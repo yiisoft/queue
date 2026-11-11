@@ -178,7 +178,9 @@ final class ConsumeCommandStatusTest extends TestCase
         $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
         $reporter = TerminalStatusReporter::forOutput($output, null, true);
         $consumer = $this->createMock(QueueConsumerInterface::class);
-        $consumer->method('listen')->willReturnCallback(static fn(): never => throw new RuntimeException('boom'));
+        $consumer->method('listen')->willReturnCallback(static function (): never {
+            throw new RuntimeException('boom');
+        });
         $command = new ConsumeCommand(
             new PredefinedQueueProvider(['queuea' => ['consumer' => $consumer]]),
             new StubLoop(),
@@ -798,7 +800,9 @@ final class ConsumeCommandStatusTest extends TestCase
     {
         $consumer = $this->createMock(QueueConsumerInterface::class);
         if ($count === false) {
-            $consumer->method('run')->willReturnCallback(static fn(): never => throw new RuntimeException('boom'));
+            $consumer->method('run')->willReturnCallback(static function (): never {
+                throw new RuntimeException('boom');
+            });
         } else {
             $consumer->method('run')->willReturn($count);
         }
