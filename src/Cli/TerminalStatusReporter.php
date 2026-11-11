@@ -30,13 +30,18 @@ use function trim;
  *
  * By default, a report is written only when the console output is decorated, not quiet, and backed by an
  * interactive TTY, so redirects, log files, cron runs and quiet invocations stay clean. Set the environment
- * variable `YII_QUEUE_STATUS` to `off` (also `0`, `no`, `false`) to disable the reports explicitly.
+ * variable `YII_TERMINAL_STATUS` to `off` (also `0`, `no`, `false`) to disable the reports explicitly;
+ * `YII_QUEUE_STATUS` is accepted as a compatibility alias.
+ *
+ * When forced enabled (or backed by a non-stream output), the reporter is enabled but no report is written,
+ * because there is no stream to write to.
  *
  * @see https://www.superlogical.com/rex/docs/build/program-status
  */
 final class TerminalStatusReporter
 {
-    private const ENV_VAR = 'YII_QUEUE_STATUS';
+    private const ENV_VAR = 'YII_TERMINAL_STATUS';
+    private const ENV_VAR_COMPAT = 'YII_QUEUE_STATUS';
     private const MAX_MESSAGE_BYTES = 2048;
     private const MAX_ID_BYTES = 128;
     private const ID_PATTERN = '/^[A-Za-z0-9_.+-]{1,32}(?:\/[A-Za-z0-9_.+-]{1,32}){0,7}$/D';
@@ -68,12 +73,13 @@ final class TerminalStatusReporter
      * Creates a reporter for the given console output.
      *
      * By default, the report is enabled only when the output is backed by an interactive TTY stream, is decorated
-     * and not quiet, and the `YII_QUEUE_STATUS` environment variable does not opt out.
+     * and not quiet, and neither the `YII_TERMINAL_STATUS` nor the legacy `YII_QUEUE_STATUS` environment variable
+     * opts out.
      *
      * @param string|null $app A stable identifier reported to the terminal, 1 to 32 characters among letters,
      *     digits, "_", "." and "-"; defaults to `queue`.
      * @param bool|null   $enabled When non-null, forces the report on or off, bypassing TTY detection and the
-     *     `YII_QUEUE_STATUS` opt-out (intended for tests or forced terminals).
+     *     environment opt-out (intended for tests or forced terminals).
      */
     public static function forOutput(OutputInterface $output, ?string $app = null, ?bool $enabled = null): self
     {
@@ -206,8 +212,11 @@ final class TerminalStatusReporter
 
     private static function isOptedOut(): bool
     {
-        $value = getenv(self::ENV_VAR);
+        return self::hasOptOutValue(getenv(self::ENV_VAR)) || self::hasOptOutValue(getenv(self::ENV_VAR_COMPAT));
+    }
 
+    private static function hasOptOutValue(string|false $value): bool
+    {
         return is_string($value) && in_array(strtolower(trim($value)), ['off', '0', 'no', 'false'], true);
     }
 
@@ -226,12 +235,12 @@ final class TerminalStatusReporter
     }
 
     /**
-     * Terminals discard a whole report whose text holds a control character or exceeds the size limit, so the
-     * text is made safe instead.
+     * Terminals discard a whole report whose text holds a control character, contains an invalid UTF-8 sequence,
+     * or exceeds the size limit, so the text is made safe instead.
      *
      * Unlike the canonical encoder, this replacement does not require `ext-mbstring` or ANSI stripping, so it
-     * additionally replaces unpaired UTF-16 surrogate sequences with spaces rather than scrubbing arbitrary
-     * invalid UTF-8.
+     * replaces unpaired UTF-16 surrogate sequences (all of U+D800–U+DFFF) with spaces and then strips the
+     * invalid trailing bytes the `//u` check still detects.
      */
     private static function normalizeText(?string $text): ?string
     {
@@ -239,15 +248,16 @@ final class TerminalStatusReporter
             return null;
         }
 
-        $text = trim((string) preg_replace('/(?:[\x00-\x1F\x7F]|\xC2[\x80-\x9F]|\xED[\xA0-\xAF][\x80-\xBF])+/', ' ', $text));
+        $text = trim((string) preg_replace('/(?:[\x00-\x1F\x7F]|\xC2[\x80-\x9F]|\xED[\xA0-\xBF][\x80-\xBF])+/', ' ', $text));
 
         if (strlen($text) > self::MAX_MESSAGE_BYTES) {
             $text = substr($text, 0, self::MAX_MESSAGE_BYTES);
-            while (strlen($text) > 0 && !preg_match('//u', $text)) {
-                $text = substr($text, 0, -1);
-            }
-            $text = rtrim($text);
         }
+
+        while (!preg_match('//u', $text)) {
+            $text = substr($text, 0, -1);
+        }
+        $text = rtrim($text);
 
         return $text !== '' ? $text : null;
     }
