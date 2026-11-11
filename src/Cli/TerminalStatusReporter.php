@@ -43,18 +43,14 @@ final class TerminalStatusReporter
     private const APP_PATTERN = '/^[A-Za-z0-9_.+-]{1,32}$/D';
     private const STATES = ['idle', 'working', 'done', 'error', 'blocked'];
     private const KINDS = ['permission', 'question', 'auth'];
-
-    private bool $enabled;
     private string $app;
     /** @var resource|null */
     private $stream;
 
     /** @param resource|null $stream */
-    private function __construct(bool $enabled, ?string $app, $stream = null)
+    private function __construct(private bool $enabled, ?string $app, $stream = null)
     {
-        if ($app === null) {
-            $app = 'queue';
-        }
+        $app ??= 'queue';
 
         if (!preg_match(self::APP_PATTERN, $app)) {
             throw new InvalidArgumentException(
@@ -64,10 +60,8 @@ final class TerminalStatusReporter
                 ),
             );
         }
-
-        $this->enabled = $enabled;
         $this->app = $app;
-        $this->stream = $enabled && is_resource($stream) ? $stream : null;
+        $this->stream = $this->enabled && is_resource($stream) ? $stream : null;
     }
 
     /**
@@ -85,13 +79,11 @@ final class TerminalStatusReporter
     {
         $stream = $output instanceof StreamOutput ? $output->getStream() : null;
 
-        if ($enabled === null) {
-            $enabled = !self::isOptedOut()
-                && $output->isDecorated()
-                && !$output->isQuiet()
-                && $stream !== null
-                && stream_isatty($stream);
-        }
+        $enabled ??= !self::isOptedOut()
+            && $output->isDecorated()
+            && !$output->isQuiet()
+            && $stream !== null
+            && stream_isatty($stream);
 
         return new self($enabled, $app, $stream);
     }

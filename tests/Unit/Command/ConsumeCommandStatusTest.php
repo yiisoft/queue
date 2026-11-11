@@ -328,7 +328,7 @@ final class ConsumeCommandStatusTest extends TestCase
         try {
             $command->run(new StringInput('--once ghost'), $output);
             self::fail('The command should rethrow the queue exception.');
-        } catch (QueueNotFoundException $exception) {
+        } catch (QueueNotFoundException) {
         }
 
         self::assertSame(
