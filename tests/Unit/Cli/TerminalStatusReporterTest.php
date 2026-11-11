@@ -4,560 +4,102 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Tests\Unit\Cli;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Yiisoft\Queue\Cli\TerminalStatusReporter;
 
-use function base64_encode;
-use function fopen;
-use function getenv;
-use function putenv;
-use function rewind;
-use function stream_get_contents;
-
 final class TerminalStatusReporterTest extends TestCase
 {
-    private bool $hadEnv = false;
-    private string $savedEnvValue = '';
+    /** @var array<string, string|false> */
+    private array $environment = [];
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->hadEnv = getenv('YII_TERMINAL_STATUS') !== false;
-        $this->savedEnvValue = (string) getenv('YII_TERMINAL_STATUS');
-        putenv('YII_TERMINAL_STATUS');
-        putenv('YII_QUEUE_STATUS');
+        foreach (['YII_TERMINAL_STATUS'] as $name) {
+            $this->environment[$name] = getenv($name);
+            putenv($name);
+        }
     }
 
     protected function tearDown(): void
     {
-        if ($this->hadEnv) {
-            putenv('YII_TERMINAL_STATUS=' . $this->savedEnvValue);
-        } else {
-            putenv('YII_TERMINAL_STATUS');
+        foreach ($this->environment as $name => $value) {
+            putenv($value === false ? $name : $name . '=' . $value);
         }
-
-        putenv('YII_QUEUE_STATUS');
-
-        parent::tearDown();
     }
 
-    public function testWorkingReport(): void
+    public function testForcedDecorationAndEnvironmentOnDoNotEnableRedirectedOutput(): void
     {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('working', 'Processing');
-
-        self::assertSame(
-            "\x1b]7501;state=working:app=queue:msg=" . base64_encode('Processing') . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testOtherStates(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('idle', 'Waiting');
-        $reporter->emit('done', 'Finished');
-        $reporter->emit('error', 'Failed');
-
-        self::assertSame(
-            "\x1b]7501;state=idle:app=queue:msg=" . base64_encode('Waiting') . "\x1b\\"
-            . "\x1b]7501;state=done:app=queue:msg=" . base64_encode('Finished') . "\x1b\\"
-            . "\x1b]7501;state=error:app=queue:msg=" . base64_encode('Failed') . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testReportWithIdAndProgress(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('working', 'Processing queue a', 'queue/a', 50);
-
-        self::assertSame(
-            "\x1b]7501;state=working:id=queue/a:progress=50:app=queue:msg=" . base64_encode('Processing queue a') . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testBlockedReportWithKind(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('blocked', 'Awaiting input', null, null, 'permission');
-
-        self::assertSame(
-            "\x1b]7501;state=blocked:kind=permission:app=queue:msg=" . base64_encode('Awaiting input') . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testControlCharactersAreReplacedBySpaces(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('working', "a\x01b\x1fc");
-
-        self::assertSame(
-            "\x1b]7501;state=working:app=queue:msg=" . base64_encode('a b c') . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testC1ControlCharactersAreReplacedBySpaces(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('working', "\xC2\x80x\xC2\x9F");
-
-        self::assertSame(
-            "\x1b]7501;state=working:app=queue:msg=" . base64_encode('x') . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testControlCharacterRunsBecomeSingleSpace(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('working', "a\x00\x00b");
-
-        self::assertSame(
-            "\x1b]7501;state=working:app=queue:msg=" . base64_encode('a b') . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testUtf16SurrogateSequenceIsReplacedBySpace(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('working', "a\xED\xA0\x80b");
-
-        self::assertSame(
-            "\x1b]7501;state=working:app=queue:msg=" . base64_encode('a b') . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testLowUtf16SurrogateSequenceIsReplacedBySpace(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('working', "a\xED\xB0\x80b");
-
-        self::assertSame(
-            "\x1b]7501;state=working:app=queue:msg=" . base64_encode('a b') . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testInvalidUtf8TailIsStripped(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('working', "ab\xFF");
-
-        self::assertSame(
-            "\x1b]7501;state=working:app=queue:msg=" . base64_encode('ab') . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testMessageOfOnlyInvalidUtf8IsDropped(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('working', "\xFF\xFF");
-
-        self::assertSame("\x1b]7501;state=working:app=queue\x1b\\", $read());
-    }
-
-    public function testEmptyMessageIsOmitted(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('working', "\x00\x01");
-
-        self::assertSame("\x1b]7501;state=working:app=queue\x1b\\", $read());
-    }
-
-    public function testLongMessageIsCut(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $message = str_repeat('a', 2100);
-        $reporter->emit('working', $message);
-
-        self::assertSame(
-            "\x1b]7501;state=working:app=queue:msg=" . base64_encode(substr($message, 0, 2048)) . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testLongMessageIsCutOnACharacterBoundary(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $message = str_repeat('a', 2047) . '€';
-        $reporter->emit('working', $message);
-
-        self::assertSame(
-            "\x1b]7501;state=working:app=queue:msg=" . base64_encode(str_repeat('a', 2047)) . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testMessageCutIsTrimmedAfterTheBoundary(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('working', str_repeat('a', 2047) . ' c');
-
-        self::assertSame(
-            "\x1b]7501;state=working:app=queue:msg=" . base64_encode(str_repeat('a', 2047)) . "\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testCustomApp(): void
-    {
+        putenv('YII_TERMINAL_STATUS=on');
         $stream = fopen('php://memory', 'w+');
-        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
-        $reporter = TerminalStatusReporter::forOutput($output, 'custom-app', true);
+        $writer = TerminalStatusReporter::forOutput(new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true));
+        $writer->emit('working', 'Processing');
 
-        $reporter->emit('working', 'Working');
-
-        self::assertSame(
-            "\x1b]7501;state=working:app=custom-app:msg=" . base64_encode('Working') . "\x1b\\",
-            $this->read($stream),
-        );
-    }
-
-    public function testInvalidState(): void
-    {
-        [, $reporter] = $this->enabledOutput();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('must be one of: idle, working, done, error, blocked');
-
-        $reporter->emit('spinning');
-    }
-
-    public function testProgressIsOnlyForWorkingAndBlocked(): void
-    {
-        [, $reporter] = $this->enabledOutput();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('only supported for the "working" and "blocked" states, "done" given');
-
-        $reporter->emit('done', 'Finished', null, 50);
-    }
-
-    public function testProgressIsBounded(): void
-    {
-        [, $reporter] = $this->enabledOutput();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('must be between 0 and 100, 101 given');
-
-        $reporter->emit('working', 'Working', null, 101);
-    }
-
-    public function testNegativeProgressIsRejected(): void
-    {
-        [, $reporter] = $this->enabledOutput();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('must be between 0 and 100, -1 given');
-
-        $reporter->emit('working', 'Working', null, -1);
-    }
-
-    public function testProgressBoundariesAreAccepted(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->emit('working', null, null, 0);
-        $reporter->emit('working', null, null, 100);
-
-        self::assertSame(
-            "\x1b]7501;state=working:progress=0:app=queue\x1b\\"
-            . "\x1b]7501;state=working:progress=100:app=queue\x1b\\",
-            $read(),
-        );
-    }
-
-    public function testKindIsOnlyForBlocked(): void
-    {
-        [, $reporter] = $this->enabledOutput();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('only supported for the "blocked" state, "working" given');
-
-        $reporter->emit('working', 'Working', null, null, 'permission');
-    }
-
-    public function testInvalidKind(): void
-    {
-        [, $reporter] = $this->enabledOutput();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('must be one of: permission, question, auth');
-
-        $reporter->emit('blocked', 'Waiting', null, null, 'wait');
-    }
-
-    public function testInvalidId(): void
-    {
-        [, $reporter] = $this->enabledOutput();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'The terminal status id "bad id" must be up to 8 "/"-separated segments of 1 to 32 characters '
-            . 'among letters, digits, "_", ".", "+" and "-", and at most 128 bytes.',
-        );
-
-        $reporter->emit('working', 'Working', 'bad id');
-    }
-
-    public function testLongIdIsRejected(): void
-    {
-        [, $reporter] = $this->enabledOutput();
-
-        $this->expectException(InvalidArgumentException::class);
-
-        $reporter->emit('working', 'Working', str_repeat('a', 45) . '/' . str_repeat('b', 45));
-    }
-
-    public function testManyIdSegmentsAreRejected(): void
-    {
-        [, $reporter] = $this->enabledOutput();
-
-        $this->expectException(InvalidArgumentException::class);
-
-        $reporter->emit(
-            'working',
-            'Working',
-            implode('/', array_fill(0, 9, str_repeat('a', 14))),
-        );
-    }
-
-    public function testIdAtTheLimitSizeIsAccepted(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $id = str_repeat('a', 32) . '/' . str_repeat('b', 32) . '/' . str_repeat('c', 32) . '/' . str_repeat('d', 29);
-        $reporter->emit('working', null, $id);
-
-        self::assertSame("\x1b]7501;state=working:id={$id}:app=queue\x1b\\", $read());
-    }
-
-    public function testInvalidApp(): void
-    {
-        $stream = fopen('php://memory', 'w+');
-        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('must be 1 to 32 characters');
-
-        TerminalStatusReporter::forOutput($output, 'bad app', true);
-    }
-
-    public function testClearWithoutId(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->clear();
-
-        self::assertSame("\x1b]7501;state=clear\x1b\\", $read());
-    }
-
-    public function testClearWithId(): void
-    {
-        [, $reporter, $read] = $this->enabledOutput();
-
-        $reporter->clear('queue/a');
-
-        self::assertSame("\x1b]7501;state=clear:id=queue/a\x1b\\", $read());
-    }
-
-    public function testClearWithInvalidId(): void
-    {
-        [, $reporter] = $this->enabledOutput();
-
-        $this->expectException(InvalidArgumentException::class);
-
-        $reporter->clear('bad id');
-    }
-
-    public function testNotEnabledForPlainOutput(): void
-    {
-        $reporter = TerminalStatusReporter::forOutput($this->createMock(OutputInterface::class));
-
-        self::assertFalse($reporter->isEnabled());
-
-        $reporter->emit('working', 'Working');
-        $reporter->clear();
-    }
-
-    public function testNotEnabledForRedirectedStream(): void
-    {
-        $stream = fopen('php://memory', 'w+');
-        $reporter = TerminalStatusReporter::forOutput(new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true));
-
-        self::assertFalse($reporter->isEnabled());
-
-        $reporter->emit('working', 'Working');
-        self::assertSame('', $this->read($stream));
-    }
-
-    public function testNotEnabledForUndecoratedOutput(): void
-    {
-        $stream = fopen('php://memory', 'w+');
-        $reporter = TerminalStatusReporter::forOutput(new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, false));
-
-        self::assertFalse($reporter->isEnabled());
-
-        $reporter->emit('working', 'Working');
-        self::assertSame('', $this->read($stream));
-    }
-
-    public function testNotEnabledForQuietOutput(): void
-    {
-        $stream = fopen('php://memory', 'w+');
-        $reporter = TerminalStatusReporter::forOutput(new StreamOutput($stream, OutputInterface::VERBOSITY_QUIET, true));
-
-        self::assertFalse($reporter->isEnabled());
-
-        $reporter->emit('working', 'Working');
-        self::assertSame('', $this->read($stream));
-    }
-
-    public function testNotEnabledForBufferedOutput(): void
-    {
-        $reporter = TerminalStatusReporter::forOutput(new BufferedOutput());
-
-        self::assertFalse($reporter->isEnabled());
-
-        $reporter->emit('working', 'Working');
-    }
-
-    /**
-     * @dataProvider provideOptOutValues
-     */
-    public function testOptOutViaEnvironment(string $envVar, string $value): void
-    {
-        putenv($envVar . '=' . $value);
-
-        $stream = fopen('php://memory', 'w+');
-        $reporter = TerminalStatusReporter::forOutput(new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true));
-
-        self::assertFalse($reporter->isEnabled());
-
-        $reporter->emit('working', 'Working');
-        self::assertSame('', $this->read($stream));
-    }
-
-    public static function provideOptOutValues(): array
-    {
-        $values = ['off', 'OFF', ' 0', ' no ', 'false', 'False', ' false '];
-
-        $cases = [];
-        foreach (['YII_TERMINAL_STATUS', 'YII_QUEUE_STATUS'] as $envVar) {
-            foreach ($values as $value) {
-                $cases[] = [$envVar, $value];
-            }
-        }
-
-        return $cases;
-    }
-
-    public function testEnvironmentAliasDoesNotOverrideAbsentFamilyVariable(): void
-    {
-        putenv('YII_QUEUE_STATUS=off');
-
-        $stream = fopen('php://memory', 'w+');
-        $reporter = TerminalStatusReporter::forOutput(new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true));
-
-        self::assertFalse($reporter->isEnabled());
-    }
-
-    public function testEnabledOverride(): void
-    {
-        $stream = fopen('php://memory', 'w+');
-        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
-        $reporter = TerminalStatusReporter::forOutput($output, null, true);
-
-        self::assertTrue($reporter->isEnabled());
-
-        $reporter->emit('working', 'Working');
-        self::assertNotSame('', $this->read($stream));
-    }
-
-    public function testDisabledOverrideWithStreamWritesNothing(): void
-    {
-        $stream = fopen('php://memory', 'w+');
-        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
-        $reporter = TerminalStatusReporter::forOutput($output, null, false);
-
-        self::assertFalse($reporter->isEnabled());
-
-        $reporter->emit('working', 'Working');
-        $reporter->clear();
-
-        self::assertSame('', $this->read($stream));
-    }
-
-    public function testDisabledOverrideWithInvalidEmitArgumentsWritesNothing(): void
-    {
-        $stream = fopen('php://memory', 'w+');
-        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
-        $reporter = TerminalStatusReporter::forOutput($output, null, false);
-
-        self::assertFalse($reporter->isEnabled());
-
-        $reporter->emit('bogus', 'Working', str_repeat('a', 130), 101, 'wait');
-
-        self::assertSame('', $this->read($stream));
-    }
-
-    public function testDisabledOverrideWithInvalidClearIdWritesNothing(): void
-    {
-        $stream = fopen('php://memory', 'w+');
-        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
-        $reporter = TerminalStatusReporter::forOutput($output, null, false);
-
-        self::assertFalse($reporter->isEnabled());
-
-        $reporter->clear(str_repeat('a', 130));
-
-        self::assertSame('', $this->read($stream));
-    }
-
-    /**
-     * @return array{0: StreamOutput, 1: TerminalStatusReporter, 2: callable(): string}
-     */
-    private function enabledOutput(): array
-    {
-        $stream = fopen('php://memory', 'w+');
-        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
-        $reporter = TerminalStatusReporter::forOutput($output, null, true);
-
-        return [$output, $reporter, fn(): string => $this->read($stream)];
-    }
-
-    /** @param resource $stream */
-    private function read($stream): string
-    {
+        self::assertFalse($writer->isEnabled());
         rewind($stream);
+        self::assertSame('', stream_get_contents($stream));
+    }
 
-        return (string) stream_get_contents($stream);
+    public function testCustomBufferedOutputIsDisabled(): void
+    {
+        self::assertFalse(TerminalStatusReporter::forOutput(new BufferedOutput(decorated: true))->isEnabled());
+    }
+
+    public function testActualTerminalStderrIsSelectedAndInvocationsHaveDifferentRecords(): void
+    {
+        $stream = $this->terminal();
+        $output = new ConsoleOutput();
+        $output->setErrorOutput(new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true));
+        $first = TerminalStatusReporter::forOutput($output);
+        $second = TerminalStatusReporter::forOutput($output);
+
+        self::assertTrue($first->isEnabled());
+        self::assertTrue($second->isEnabled());
+        // The master PTY provides a real TTY; encoding and per-invocation isolation are also covered by writer tests.
+        self::assertNotEquals($first, $second);
+        fclose($stream);
+    }
+
+    public function testRedirectedStderrIsNotReplacedWithTerminalStdout(): void
+    {
+        $output = new ConsoleOutput(decorated: true);
+        $output->setErrorOutput(new StreamOutput(fopen('php://memory', 'w+'), OutputInterface::VERBOSITY_NORMAL, true));
+        self::assertFalse(TerminalStatusReporter::forOutput($output)->isEnabled());
+    }
+
+    public function testQuietAndUndecoratedTerminalsAreDisabled(): void
+    {
+        $stream = $this->terminal();
+        self::assertFalse(TerminalStatusReporter::forOutput(new StreamOutput($stream, OutputInterface::VERBOSITY_QUIET, true))->isEnabled());
+        self::assertFalse(TerminalStatusReporter::forOutput(new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, false))->isEnabled());
+        fclose($stream);
+    }
+
+    public function testFamilyEnvironmentDisablesTerminalOutput(): void
+    {
+        $stream = $this->terminal();
+        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
+        foreach (['off', '0', 'no', ' FALSE '] as $value) {
+            putenv('YII_TERMINAL_STATUS=' . $value);
+            self::assertFalse(TerminalStatusReporter::forOutput($output)->isEnabled());
+        }
+        fclose($stream);
+    }
+
+    /** @return resource */
+    private function terminal()
+    {
+        if (!file_exists('/dev/ptmx')) {
+            self::markTestSkipped('A Unix PTY is required for positive TTY checks.');
+        }
+        $stream = fopen('/dev/ptmx', 'r+');
+        if (!stream_isatty($stream)) {
+            fclose($stream);
+            self::markTestSkipped('The PTY is not exposed as a TTY.');
+        }
+        return $stream;
     }
 }

@@ -22,9 +22,4 @@ interface QueueConsumerInterface
      * Listen to the queue and handle messages as they come.
      */
     public function listen(): void;
-
-    /**
-     * Whether the consumer is in synchronous mode, i.e. has no adapter and processes messages on push only.
-     */
-    public function isSynchronous(): bool;
 }

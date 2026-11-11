@@ -24,30 +24,26 @@ use function assert;
 /** Lazily creates producer and consumer roles from strict nested role maps. */
 final class QueueFactoryProvider implements QueueProducerProviderInterface, QueueConsumerProviderInterface
 {
-    /** @var array<string, array<string, mixed>> */
+    /** @var array<array-key, array<string, mixed>> */
     private array $definitions;
-    /** @var array<string, array<string, QueueProducerInterface|QueueConsumerInterface|Throwable>> */
+    /** @var array<array-key, array<string, QueueProducerInterface|QueueConsumerInterface|Throwable>> */
     private array $resolved = [];
     /** @var list<string> */
     private array $producerQueueNames = [];
     /** @var list<string> */
     private array $consumerQueueNames = [];
 
-    /** @param array<string, mixed> $definitions */
+    /** @param array<array-key, mixed> $definitions */
     public function __construct(
         array $definitions,
         private readonly ?ContainerInterface $container = null,
         private readonly bool $validate = true,
     ) {
-        /** @var array<string, array<string, mixed>> $validatedDefinitions */
+        /** @var array<array-key, array<string, mixed>> $validatedDefinitions */
         $validatedDefinitions = $this->validateRoleMaps($definitions);
         $this->definitions = $validatedDefinitions;
         foreach ($this->definitions as $queueName => $roles) {
-            /**
-             * PHP converts numeric string array keys to int, so the key is not guaranteed to be a string.
-             *
-             * @psalm-suppress RedundantCastGivenDocblockType
-             */
+            // PHP stores numeric string keys as integers; the advertised names must remain strings.
             $queueName = (string) $queueName;
             if (array_key_exists('producer', $roles)) {
                 $this->producerQueueNames[] = $queueName;
@@ -144,10 +140,10 @@ final class QueueFactoryProvider implements QueueProducerProviderInterface, Queu
         }
     }
 
-    /** @param array<string, mixed> $definitions @return array<string, array<string, mixed>> */
+    /** @param array<array-key, mixed> $definitions @return array<array-key, array<string, mixed>> */
     private function validateRoleMaps(array $definitions): array
     {
-        /** @var array<string, array<string, mixed>> $result */
+        /** @var array<array-key, array<string, mixed>> $result */
         $result = [];
         foreach ($definitions as $queueName => $roles) {
             if (!is_array($roles)) {

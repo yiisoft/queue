@@ -67,11 +67,6 @@ final class QueueConsumer implements QueueConsumerInterface
         $this->logger->info('Finish listening to the queue.');
     }
 
-    public function isSynchronous(): bool
-    {
-        return $this->adapter === null;
-    }
-
     private function startLoop(): void
     {
         if ($this->loop instanceof ScopedLoopInterface) {
