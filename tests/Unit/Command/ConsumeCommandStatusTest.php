@@ -13,6 +13,7 @@ use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\TerminalStatusReporter;
 use Yiisoft\Queue\Command\ConsumeCommand;
 use Yiisoft\Queue\Provider\PredefinedQueueProvider;
+use Yiisoft\Queue\Provider\QueueNotFoundException;
 use Yiisoft\Queue\QueueConsumerInterface;
 use Yiisoft\Queue\Stubs\StubLoop;
 
@@ -237,6 +238,105 @@ final class ConsumeCommandStatusTest extends TestCase
         self::assertStringContainsString(
             $this->sequence('done', 'Queue "weird: name": 1 messages processed', 'queue/weird-name'),
             (string) $this->read($stream),
+        );
+    }
+
+    public function testLongQueueNameIsCutInId(): void
+    {
+        $queueName = str_repeat('a', 40);
+        $stream = fopen('php://memory', 'w+');
+        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
+        $reporter = TerminalStatusReporter::forOutput($output, null, true);
+        $command = new ConsumeCommand(
+            new PredefinedQueueProvider([$queueName => ['consumer' => $this->consumer(2)]]),
+            new StubLoop(),
+            $reporter,
+        );
+
+        $command->run(new StringInput('--once ' . $queueName), $output);
+
+        self::assertStringContainsString(
+            $this->sequence('done', 'Queue "' . $queueName . '": 2 messages processed', 'queue/' . str_repeat('a', 32)),
+            (string) $this->read($stream),
+        );
+    }
+
+    public function testQueueNameWithSlashesIsFlattenedInId(): void
+    {
+        $queueName = 'a/b/c/d/e/f/g/h/i';
+        $stream = fopen('php://memory', 'w+');
+        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
+        $reporter = TerminalStatusReporter::forOutput($output, null, true);
+        $command = new ConsumeCommand(
+            new PredefinedQueueProvider([$queueName => ['consumer' => $this->consumer(1)]]),
+            new StubLoop(),
+            $reporter,
+        );
+
+        $command->run(new StringInput('--once "' . $queueName . '"'), $output);
+
+        self::assertStringContainsString(
+            $this->sequence('done', 'Queue "' . $queueName . '": 1 messages processed', 'queue/a-b-c-d-e-f-g-h-i'),
+            (string) $this->read($stream),
+        );
+    }
+
+    public function testNonAsciiQueueNameFallsBackToRootRecord(): void
+    {
+        $queueName = 'почта';
+        $stream = fopen('php://memory', 'w+');
+        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
+        $reporter = TerminalStatusReporter::forOutput($output, null, true);
+        $command = new ConsumeCommand(
+            new PredefinedQueueProvider([$queueName => ['consumer' => $this->consumer(1)]]),
+            new StubLoop(),
+            $reporter,
+        );
+
+        $command->run(new StringInput('--once "' . $queueName . '"'), $output);
+
+        $bytes = (string) $this->read($stream);
+        self::assertStringContainsString($this->sequence('working', 'Processing queue "' . $queueName . '"'), $bytes);
+        self::assertStringNotContainsString('id=', $bytes);
+    }
+
+    public function testOnceWithoutConfiguredQueuesReportsDoneStatus(): void
+    {
+        $stream = fopen('php://memory', 'w+');
+        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
+        $reporter = TerminalStatusReporter::forOutput($output, null, true);
+        $command = new ConsumeCommand(new PredefinedQueueProvider([]), new StubLoop(), $reporter);
+
+        $command->run(new StringInput('--once'), $output);
+
+        self::assertSame(
+            [
+                $this->sequence('working', 'Consuming all configured queues in one pass'),
+                $this->sequence('done', 'No consumers are configured.'),
+            ],
+            $this->statusSequences($this->read($stream)),
+        );
+    }
+
+    public function testOnceUnknownQueueReportsErrorStatus(): void
+    {
+        $stream = fopen('php://memory', 'w+');
+        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
+        $reporter = TerminalStatusReporter::forOutput($output, null, true);
+        $command = new ConsumeCommand(new PredefinedQueueProvider([]), new StubLoop(), $reporter);
+
+        try {
+            $command->run(new StringInput('--once ghost'), $output);
+            self::fail('The command should rethrow the queue exception.');
+        } catch (QueueNotFoundException $exception) {
+        }
+
+        self::assertSame(
+            [
+                $this->sequence('working', 'Consuming queue "ghost" in one pass'),
+                $this->sequence('error', 'Resolving consumers failed'),
+            ],
+            $this->statusSequences($this->read($stream)),
         );
     }
 

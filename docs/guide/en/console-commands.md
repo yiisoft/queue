@@ -66,8 +66,8 @@ so the terminal itself can show the status in its UI.
 
 The reports are written directly to the output stream. They require no extra dependencies and appear only when the
 stream is an interactive TTY and the output is decorated and not quiet; redirected output, log files, cron runs and
-quiet invocations are unaffected. Set the environment variable `YII_QUEUE_STATUS` to `off` to disable the reports
-explicitly.
+quiet invocations are unaffected. Set the environment variable `YII_QUEUE_STATUS` to `off` (also `0`, `no`, `false`)
+to disable the reports explicitly.
 
 Only the command itself reports status; adapters such as `yiisoft/queue-db`, `yiisoft/queue-redis` or
 `yiisoft/queue-amqp` do not emit their own terminal status.

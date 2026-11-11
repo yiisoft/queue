@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Queue\Command;
 
-use Throwable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 use Yiisoft\Queue\Cli\LoopInterface;
 use Yiisoft\Queue\Cli\ScopedLoopInterface;
 use Yiisoft\Queue\Cli\TerminalStatusReporter;
@@ -123,13 +123,22 @@ final class ConsumeCommand extends Command
             $queueNames = $this->queueProvider->getConsumerQueueNames();
         }
 
+        $statusReporter->emit('working', self::rootMessage($queueNames, $once));
+
         $consumers = [];
-        foreach ($queueNames as $queueName) {
-            $consumers[$queueName] = $this->queueProvider->getConsumer($queueName);
+        try {
+            foreach ($queueNames as $queueName) {
+                $consumers[$queueName] = $this->queueProvider->getConsumer($queueName);
+            }
+        } catch (Throwable $exception) {
+            $statusReporter->emit('error', 'Resolving consumers failed');
+
+            throw $exception;
         }
 
         if ($consumers === []) {
             $output->writeln('No consumers are configured.');
+            $statusReporter->emit('done', 'No consumers are configured.');
 
             return Command::SUCCESS;
         }
@@ -139,8 +148,6 @@ final class ConsumeCommand extends Command
         if ($pauseSeconds < 0) {
             $pauseSeconds = 1;
         }
-
-        $statusReporter->emit('working', self::rootMessage($queueNames, $once));
 
         $processed = 0;
         if ($this->loop instanceof ScopedLoopInterface) {
@@ -201,9 +208,13 @@ final class ConsumeCommand extends Command
     private static function rootMessage(array $queueNames, bool $once): string
     {
         $count = count($queueNames);
-        $description = $count === 1
-            ? sprintf('queue "%s"', $queueNames[0])
-            : sprintf('%d queues', $count);
+        if ($count === 0) {
+            $description = 'all configured queues';
+        } elseif ($count === 1) {
+            $description = sprintf('queue "%s"', $queueNames[0]);
+        } else {
+            $description = sprintf('%d queues', $count);
+        }
 
         return $once
             ? sprintf('Consuming %s in one pass', $description)
@@ -213,7 +224,8 @@ final class ConsumeCommand extends Command
     /**
      * A task id for the queue in terminal status reports.
      *
-     * Returns `null` when the queue name cannot be represented as a valid protocol id segment, in which case the
+     * Characters outside the protocol id alphabet, including "/", are replaced with "-", so the result always
+     * holds a single segment. Returns `null` when the queue name cannot be represented at all, in which case the
      * report falls back to the program-level record.
      */
     private static function statusId(string $queueName): ?string

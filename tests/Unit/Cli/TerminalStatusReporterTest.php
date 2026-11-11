@@ -119,6 +119,30 @@ final class TerminalStatusReporterTest extends TestCase
         );
     }
 
+    public function testControlCharacterRunsBecomeSingleSpace(): void
+    {
+        [, $reporter, $read] = $this->enabledOutput();
+
+        $reporter->emit('working', "a\x00\x00b");
+
+        self::assertSame(
+            "\x1b]7501;state=working:app=queue:msg=" . base64_encode('a b') . "\x1b\\",
+            $read(),
+        );
+    }
+
+    public function testUtf16SurrogateSequenceIsReplacedBySpace(): void
+    {
+        [, $reporter, $read] = $this->enabledOutput();
+
+        $reporter->emit('working', "a\xED\xA0\x80b");
+
+        self::assertSame(
+            "\x1b]7501;state=working:app=queue:msg=" . base64_encode('a b') . "\x1b\\",
+            $read(),
+        );
+    }
+
     public function testEmptyMessageIsOmitted(): void
     {
         [, $reporter, $read] = $this->enabledOutput();
@@ -147,6 +171,18 @@ final class TerminalStatusReporterTest extends TestCase
 
         $message = str_repeat('a', 2047) . '€';
         $reporter->emit('working', $message);
+
+        self::assertSame(
+            "\x1b]7501;state=working:app=queue:msg=" . base64_encode(str_repeat('a', 2047)) . "\x1b\\",
+            $read(),
+        );
+    }
+
+    public function testMessageCutIsTrimmedAfterTheBoundary(): void
+    {
+        [, $reporter, $read] = $this->enabledOutput();
+
+        $reporter->emit('working', str_repeat('a', 2047) . ' c');
 
         self::assertSame(
             "\x1b]7501;state=working:app=queue:msg=" . base64_encode(str_repeat('a', 2047)) . "\x1b\\",
@@ -198,6 +234,30 @@ final class TerminalStatusReporterTest extends TestCase
         $reporter->emit('working', 'Working', null, 101);
     }
 
+    public function testNegativeProgressIsRejected(): void
+    {
+        [, $reporter] = $this->enabledOutput();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('must be between 0 and 100, -1 given');
+
+        $reporter->emit('working', 'Working', null, -1);
+    }
+
+    public function testProgressBoundariesAreAccepted(): void
+    {
+        [, $reporter, $read] = $this->enabledOutput();
+
+        $reporter->emit('working', null, null, 0);
+        $reporter->emit('working', null, null, 100);
+
+        self::assertSame(
+            "\x1b]7501;state=working:progress=0:app=queue\x1b\\"
+            . "\x1b]7501;state=working:progress=100:app=queue\x1b\\",
+            $read(),
+        );
+    }
+
     public function testKindIsOnlyForBlocked(): void
     {
         [, $reporter] = $this->enabledOutput();
@@ -223,7 +283,10 @@ final class TerminalStatusReporterTest extends TestCase
         [, $reporter] = $this->enabledOutput();
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The terminal status id "bad id" must be up to 8');
+        $this->expectExceptionMessage(
+            'The terminal status id "bad id" must be up to 8 "/"-separated segments of 1 to 32 characters '
+            . 'among letters, digits, "_", ".", "+" and "-", and at most 128 bytes.',
+        );
 
         $reporter->emit('working', 'Working', 'bad id');
     }
@@ -248,6 +311,16 @@ final class TerminalStatusReporterTest extends TestCase
             'Working',
             implode('/', array_fill(0, 9, str_repeat('a', 14))),
         );
+    }
+
+    public function testIdAtTheLimitSizeIsAccepted(): void
+    {
+        [, $reporter, $read] = $this->enabledOutput();
+
+        $id = str_repeat('a', 32) . '/' . str_repeat('b', 32) . '/' . str_repeat('c', 32) . '/' . str_repeat('d', 29);
+        $reporter->emit('working', null, $id);
+
+        self::assertSame("\x1b]7501;state=working:id={$id}:app=queue\x1b\\", $read());
     }
 
     public function testInvalidApp(): void
@@ -364,6 +437,8 @@ final class TerminalStatusReporterTest extends TestCase
             [' 0'],
             [' no '],
             ['false'],
+            ['False'],
+            [' false '],
         ];
     }
 
@@ -377,6 +452,20 @@ final class TerminalStatusReporterTest extends TestCase
 
         $reporter->emit('working', 'Working');
         self::assertNotSame('', $this->read($stream));
+    }
+
+    public function testDisabledOverrideWithStreamWritesNothing(): void
+    {
+        $stream = fopen('php://memory', 'w+');
+        $output = new StreamOutput($stream, OutputInterface::VERBOSITY_NORMAL, true);
+        $reporter = TerminalStatusReporter::forOutput($output, null, false);
+
+        self::assertFalse($reporter->isEnabled());
+
+        $reporter->emit('working', 'Working');
+        $reporter->clear();
+
+        self::assertSame('', $this->read($stream));
     }
 
     /**

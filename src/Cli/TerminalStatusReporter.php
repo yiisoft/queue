@@ -70,6 +70,17 @@ final class TerminalStatusReporter
         $this->stream = $enabled && is_resource($stream) ? $stream : null;
     }
 
+    /**
+     * Creates a reporter for the given console output.
+     *
+     * By default, the report is enabled only when the output is backed by an interactive TTY stream, is decorated
+     * and not quiet, and the `YII_QUEUE_STATUS` environment variable does not opt out.
+     *
+     * @param string|null $app A stable identifier reported to the terminal, 1 to 32 characters among letters,
+     *     digits, "_", "." and "-"; defaults to `queue`.
+     * @param bool|null   $enabled When non-null, forces the report on or off, bypassing TTY detection and the
+     *     `YII_QUEUE_STATUS` opt-out (intended for tests or forced terminals).
+     */
     public static function forOutput(OutputInterface $output, ?string $app = null, ?bool $enabled = null): self
     {
         $stream = $output instanceof StreamOutput ? $output->getStream() : null;
@@ -164,7 +175,7 @@ final class TerminalStatusReporter
             $pairs[] = 'kind=' . $kind;
         }
         if ($progress !== null) {
-            $pairs[] = 'progress=' . (string) $progress;
+            $pairs[] = 'progress=' . $progress;
         }
         $pairs[] = 'app=' . $this->app;
 
@@ -225,6 +236,10 @@ final class TerminalStatusReporter
     /**
      * Terminals discard a whole report whose text holds a control character or exceeds the size limit, so the
      * text is made safe instead.
+     *
+     * Unlike the canonical encoder, this replacement does not require `ext-mbstring` or ANSI stripping, so it
+     * additionally replaces unpaired UTF-16 surrogate sequences with spaces rather than scrubbing arbitrary
+     * invalid UTF-8.
      */
     private static function normalizeText(?string $text): ?string
     {
@@ -232,7 +247,7 @@ final class TerminalStatusReporter
             return null;
         }
 
-        $text = trim((string) preg_replace('/[\x00-\x1F\x7F]|\xC2[\x80-\x9F]/', ' ', $text));
+        $text = trim((string) preg_replace('/(?:[\x00-\x1F\x7F]|\xC2[\x80-\x9F]|\xED[\xA0-\xAF][\x80-\xBF])+/', ' ', $text));
 
         if (strlen($text) > self::MAX_MESSAGE_BYTES) {
             $text = substr($text, 0, self::MAX_MESSAGE_BYTES);
