@@ -19,4 +19,9 @@ final class QueueConsumerDecorator implements QueueConsumerInterface
     {
         $this->queue->listen();
     }
+
+    public function isSynchronous(): bool
+    {
+        return $this->queue->isSynchronous();
+    }
 }

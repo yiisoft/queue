@@ -14,4 +14,9 @@ final class StubQueueConsumer implements QueueConsumerInterface
     }
 
     public function listen(): void {}
+
+    public function isSynchronous(): bool
+    {
+        return true;
+    }
 }
