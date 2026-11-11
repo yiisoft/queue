@@ -79,6 +79,12 @@ final class SignalLoop implements ScopedLoopInterface
         return $this->dispatchSignals();
     }
 
+    /** Whether this loop has received a termination signal, including during scope cleanup. */
+    public function isInterrupted(): bool
+    {
+        return $this->exit;
+    }
+
     protected function dispatchSignals(): bool
     {
         if ($this->previousHandlers === null) {

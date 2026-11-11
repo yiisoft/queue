@@ -21,17 +21,19 @@ use function is_string;
 /** Provides already-created producer and consumer instances from strict role maps. */
 final class PredefinedQueueProvider implements QueueProducerProviderInterface, QueueConsumerProviderInterface
 {
-    /** @var array<string, array<string, QueueProducerInterface|QueueConsumerInterface>> */
+    /** @var array<array-key, array<string, QueueProducerInterface|QueueConsumerInterface>> */
     private array $queues = [];
     /** @var list<string> */
     private array $producerQueueNames = [];
     /** @var list<string> */
     private array $consumerQueueNames = [];
 
-    /** @param array<string, mixed> $queues */
+    /** @param array<array-key, mixed> $queues */
     public function __construct(array $queues)
     {
         foreach ($queues as $queueName => $roles) {
+            // PHP stores numeric string keys as integers; the advertised names must remain strings.
+            $queueName = (string) $queueName;
             if (!is_array($roles) || $roles === []) {
                 throw new InvalidQueueConfigException(sprintf('Queue "%s" must be a non-empty role map containing ready "producer" and/or "consumer" instances.', $queueName));
             }

@@ -57,3 +57,41 @@ yii queue:consume --all [queueName1 [queueName2 [...]]] --pause=1 --limit=0
 
 For long-running processes, graceful shutdown is controlled by `LoopInterface`. When `ext-pcntl` is available,
 the default `SignalLoop` handles signals such as `SIGTERM`/`SIGINT`.
+
+## Terminal program status (OSC 7501)
+
+`queue:consume` can report activity to terminals supporting the
+[Program Status Protocol (OSC 7501)](https://www.superlogical.com/rex/docs/build/program-status).
+Normal console output stays unchanged. No extra dependency is required.
+
+Reports use the terminal attached to standard error when Symfony provides a separate error output.
+For another stream output, they use that stream. Reporting requires positive TTY detection, enabled
+ANSI decoration and non-quiet output on the selected stream. Redirecting standard error, running under
+cron, disabling decoration or using quiet mode suppresses the reports. Forcing decoration does not
+bypass TTY detection. Unknown or buffered outputs do not receive reports.
+
+Set `YII_TERMINAL_STATUS=off` to disable reporting (`0`, `no` and `false` also disable it,
+case-insensitively). Other values do not force reporting on redirected streams. OSC 7501 is sent
+without querying the terminal. Delivery through SSH or multiplexers depends on their support;
+an interactive SSH terminal can qualify, while a connection without a TTY cannot.
+
+Each invocation uses a distinct record subtree with stable `app=queue`, so concurrent consumers and
+Composer do not compete for the terminal's root record. Queue records use positions in the selected
+queue list rather than names, supporting numeric, Unicode and otherwise unusual queue names without
+identifier collisions. Repeated passes update those same records rather than allocate one per job.
+
+A finite `--once` pass reports completion after processing and loop cleanup. Continuous polling remains
+working while waiting for messages. When a persistent consumer returns, or the default signal loop is
+interrupted, the invocation's subtree is replaced by an idle record rather than a completion notice.
+The listening call may return immediately for a synchronous consumer; reports do not claim that it
+opened a subscription. Custom consumer or loop implementations must provide their own cancellation
+semantics; the command cannot infer why a custom finite consumer returned early.
+
+Consumption failures report error for the active queue and the invocation. Messages contain queue
+names and counts, not job bodies, credentials or exception details. Invalid UTF-8 messages are omitted;
+valid messages are kept within the protocol's byte limit with control characters replaced. A failed
+status stream disables further reports without changing the consumption result.
+
+Only the command reports status. Adapters such as `yiisoft/queue-db`, `yiisoft/queue-redis` and
+`yiisoft/queue-amqp` do not emit duplicate reports. The encoder, writer and Symfony adapter are internal
+implementation details; applications can continue constructing `ConsumeCommand` with its provider and loop.
